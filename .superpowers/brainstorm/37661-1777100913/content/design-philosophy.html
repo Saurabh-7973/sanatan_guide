@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanatan Guide — Design Philosophy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0F0B07;
+    color: #F0EBE5;
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+    padding: 32px 24px 64px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 400;
+    color: #F4A830;
+    text-align: center;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .sub {
+    text-align: center;
+    color: #9B9390;
+    font-size: 14px;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    border: 1.5px solid #3A3531;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.25s, transform 0.2s;
+    background: #1C1816;
+  }
+  .card:hover { border-color: #F4A830; transform: translateY(-2px); }
+  .card.selected {
+    border-color: #F4A830;
+    box-shadow: 0 0 0 2px #F4A83055, 0 8px 32px #00000066;
+  }
+
+  .card-preview {
+    height: 340px;
+    position: relative;
+    overflow: hidden;
+    background: #0F0B07;
+  }
+
+  .card-label {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: #F4A830;
+    color: #0F0B07;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .card-body {
+    padding: 20px;
+    border-top: 1px solid #2E2A27;
+  }
+  .card-body h3 {
+    font-size: 16px;
+    color: #F4A830;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .card-body p {
+    font-size: 13px;
+    color: #9B9390;
+    line-height: 1.6;
+  }
+  .check {
+    float: right;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid #3A3531;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s;
+    margin-top: -2px;
+  }
+  .card.selected .check {
+    background: #F4A830;
+    border-color: #F4A830;
+    color: #0F0B07;
+  }
+
+  /* ── OPTION A: Single Temple Metaphor ─────────────────────── */
+  .preview-a {
+    display: flex; flex-direction: column; height: 100%;
+    background: linear-gradient(180deg, #1A0800 0%, #0F0B07 60%);
+  }
+  .a-header {
+    height: 90px;
+    position: relative;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 8px;
+  }
+  .a-gopuram {
+    width: 80px; height: 70px;
+    position: relative;
+  }
+  .a-gopuram svg { width: 100%; height: 100%; }
+  .a-screen-strip {
+    display: flex; gap: 4px; padding: 12px;
+    overflow: hidden;
+  }
+  .a-mini {
+    flex: 1; height: 200px; border-radius: 8px;
+    border: 1px solid #3A3531;
+    background: #1C1816;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 9px; color: #6B5A4A; gap: 6px;
+    padding: 8px;
+    text-align: center;
+  }
+  .a-mini .icon { font-size: 18px; }
+  .a-mini .screen-name { color: #9B9390; font-size: 8px; }
+
+  /* ── OPTION B: Per-screen metaphor ──────────────────────── */
+  .preview-b {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    background: #0A0806;
+  }
+  .b-screen {
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .b-screen .b-label {
+    font-size: 8px;
+    color: #9B9390;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    position: absolute;
+    bottom: 8px; left: 0; right: 0;
+    text-align: center;
+  }
+  .b-screen .b-icon {
+    font-size: 36px;
+    margin-bottom: 6px;
+  }
+  .b-screen .b-name {
+    font-size: 9px;
+    color: #F4A830;
+    letter-spacing: 0.05em;
+  }
+
+  .b-onboard { background: linear-gradient(135deg, #2D1B00 0%, #0F0B07 100%); }
+  .b-search  { background: linear-gradient(135deg, #0B1F1A 0%, #0F0B07 100%); }
+  .b-library { background: linear-gradient(135deg, #1A1500 0%, #0F0B07 100%); }
+  .b-festival{ background: linear-gradient(135deg, #1F0B0B 0%, #0F0B07 100%); }
+
+  /* ── OPTION C: Shared Atmosphere ──────────────────────── */
+  .preview-c {
+    height: 100%;
+    position: relative;
+    background: #FDFAF6;
+    display: flex; flex-direction: column;
+  }
+  .c-stripe {
+    height: 6px;
+    background: linear-gradient(90deg, #E8820C, #FFD700, #8B0000, #E8820C);
+  }
+  .c-body {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 16px 12px 0;
+    gap: 10px;
+  }
+  .c-hero {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FFF8F0 0%, #F7F2EC 100%);
+    border: 1px solid #E0D9CF;
+    padding: 14px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .c-hero-label { font-size: 9px; color: #E8820C; letter-spacing: 0.1em; }
+  .c-hero-text { font-size: 11px; color: #1A1210; margin-top: 4px; font-style: italic; }
+  .c-hero-ornament {
+    position: absolute; right: -10px; top: -10px;
+    width: 70px; height: 70px;
+    opacity: 0.12;
+    color: #E8820C;
+  }
+  .c-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .c-chip {
+    background: #F7F2EC;
+    border: 1px solid #E0D9CF;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 9px; color: #6B6360;
+  }
+  .c-chip.active {
+    background: #FFF3E8;
+    border-color: #E8820C;
+    color: #E8820C;
+  }
+  .c-list { display: flex; flex-direction: column; gap: 6px; }
+  .c-row {
+    background: #F7F2EC;
+    border: 1px solid #E0D9CF;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .c-dot { width: 8px; height: 8px; border-radius: 50%; background: #E8820C; flex-shrink: 0; }
+  .c-row-text { font-size: 9px; color: #1A1210; }
+  .c-note { font-size: 8px; color: #9E9A97; }
+
+  .bottom-bar {
+    margin-top: 40px;
+    text-align: center;
+    color: #6B5A4A;
+    font-size: 12px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sanatan Guide — Design Direction</h1>
+<p class="sub">Three philosophies. Each screen, its own identity. Pick what feels right.</p>
+
+<div class="cards">
+
+  <!-- ── OPTION A ──────────────────────────────── -->
+  <div class="card" id="opt-a" onclick="pick('a')">
+    <div class="card-preview">
+      <div class="card-label">A</div>
+      <div class="preview-a">
+        <div class="a-header">
+          <div class="a-gopuram">
+            <svg viewBox="0 0 80 70" fill="none">
+              <!-- Gopuram silhouette -->
+              <polygon points="40,2 55,20 70,38 70,70 10,70 10,38 25,20" fill="#2D1B00" stroke="#F4A830" stroke-width="0.8"/>
+              <!-- tiers -->
+              <rect x="28" y="22" width="24" height="4" fill="#3A2000" stroke="#F4A830" stroke-width="0.5"/>
+              <rect x="24" y="30" width="32" height="4" fill="#3A2000" stroke="#F4A830" stroke-width="0.5"/>
+              <rect x="20" y="38" width="40" height="4" fill="#3A2000" stroke="#F4A830" stroke-width="0.5"/>
+              <!-- arch door -->
+              <path d="M33,70 L33,52 Q40,44 47,52 L47,70" fill="#1A0800" stroke="#F4A830" stroke-width="0.8"/>
+              <!-- kalash top -->
+              <circle cx="40" cy="5" r="3" fill="#F4A830"/>
+              <line x1="40" y1="2" x2="40" y2="0" stroke="#F4A830" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+        <div style="text-align:center; padding: 0 12px 8px; font-size:9px; color:#6B5A4A; letter-spacing:0.08em;">EVERY SCREEN — ONE TEMPLE</div>
+        <div class="a-screen-strip">
+          <div class="a-mini">
+            <span class="icon">🕉</span>
+            <span>Onboarding</span>
+            <span class="screen-name">Gopuram Gate</span>
+          </div>
+          <div class="a-mini">
+            <span class="icon">🪔</span>
+            <span>Home</span>
+            <span class="screen-name">Courtyard</span>
+          </div>
+          <div class="a-mini">
+            <span class="icon">🦚</span>
+            <span>Search</span>
+            <span class="screen-name">Garden</span>
+          </div>
+          <div class="a-mini">
+            <span class="icon">📜</span>
+            <span>Library</span>
+            <span class="screen-name">Scripture Hall</span>
+          </div>
+          <div class="a-mini">
+            <span class="icon">✨</span>
+            <span>Verse</span>
+            <span class="screen-name">Sanctum</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Living Temple <span class="check" id="chk-a">✓</span></h3>
+      <p>Every screen is a chamber of one temple. Onboarding = Gopuram entrance. Home = courtyard at dawn. Search = temple garden with peacock. Verse detail = sanctum sanctorum. Consistent spatial metaphor — you journey deeper as you use the app.</p>
+    </div>
+  </div>
+
+  <!-- ── OPTION B ──────────────────────────────── -->
+  <div class="card" id="opt-b" onclick="pick('b')">
+    <div class="card-preview">
+      <div class="card-label">B</div>
+      <div class="preview-b">
+        <div class="b-screen b-onboard">
+          <div class="b-icon">🌅</div>
+          <div class="b-name">Ganga at dawn</div>
+          <div class="b-label">Onboarding</div>
+        </div>
+        <div class="b-screen b-search">
+          <div class="b-icon">🦚</div>
+          <div class="b-name">Forest of sages</div>
+          <div class="b-label">Search</div>
+        </div>
+        <div class="b-screen b-library">
+          <div class="b-icon">📜</div>
+          <div class="b-name">Nalanda library</div>
+          <div class="b-label">Scripture Library</div>
+        </div>
+        <div class="b-screen b-festival">
+          <div class="b-icon">🪔</div>
+          <div class="b-name">Festival lamps</div>
+          <div class="b-label">Festivals</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Sacred Geography <span class="check" id="chk-b">✓</span></h3>
+      <p>Each screen draws from a distinct sacred place or legend. Onboarding = river Ganga at sunrise (you step in). Search = Naimisharanya forest where sages debated (peacock wanders). Library = ruins of Nalanda. Verse detail = cave of rishis. Maximum uniqueness — no two screens share an atmosphere.</p>
+    </div>
+  </div>
+
+  <!-- ── OPTION C ──────────────────────────────── -->
+  <div class="card" id="opt-c" onclick="pick('c')">
+    <div class="card-preview">
+      <div class="card-label">C</div>
+      <div class="preview-c">
+        <div class="c-stripe"></div>
+        <div class="c-body">
+          <div class="c-hero">
+            <div class="c-hero-ornament">
+              <svg viewBox="0 0 70 70" fill="none">
+                <circle cx="35" cy="35" r="30" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <circle cx="35" cy="35" r="20" stroke="currentColor" stroke-width="0.6"/>
+                <circle cx="35" cy="35" r="10" stroke="currentColor" stroke-width="0.5"/>
+                <line x1="35" y1="5" x2="35" y2="65" stroke="currentColor" stroke-width="0.4"/>
+                <line x1="5" y1="35" x2="65" y2="35" stroke="currentColor" stroke-width="0.4"/>
+              </svg>
+            </div>
+            <div class="c-hero-label">VERSE OF THE DAY</div>
+            <div class="c-hero-text">कर्म करो, फल की चिंता मत करो</div>
+          </div>
+          <div class="c-chips">
+            <div class="c-chip active">All</div>
+            <div class="c-chip">Gita</div>
+            <div class="c-chip">Upanishads</div>
+          </div>
+          <div class="c-list">
+            <div class="c-row"><div class="c-dot"></div><div class="c-row-text">BG 2.47 · Do your duty…<div class="c-note">Bhagavad Gita</div></div></div>
+            <div class="c-row"><div class="c-dot" style="background:#8B0000"></div><div class="c-row-text">MU 1.1 · Two birds on a tree…<div class="c-note">Mundaka Upanishad</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Shared Palette, Unique Energy <span class="check" id="chk-c">✓</span></h3>
+      <p>Same saffron + cream color language across all screens, but each screen gets its own ornamental element, its own compositional energy, its own cultural reference. Search gets peacock. Festivals gets diyas. Credits gets a carved stone inscription wall. Settings gets an oil-lamp keeper's corner.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="bottom-bar">Click a card to select · You can change your mind before confirming</p>
+
+<script>
+let selected = null;
+function pick(id) {
+  if (selected) {
+    document.getElementById('opt-' + selected).classList.remove('selected');
+    document.getElementById('chk-' + selected).textContent = '✓';
+  }
+  selected = id;
+  document.getElementById('opt-' + id).classList.add('selected');
+  document.getElementById('chk-' + id).textContent = '✓';
+
+  // Record selection
+  if (window.recordSelection) window.recordSelection(id, document.querySelector('#opt-' + id + ' h3').textContent.trim());
+}
+</script>
+</body>
+</html>

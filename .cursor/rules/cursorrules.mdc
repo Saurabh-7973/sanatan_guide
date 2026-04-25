@@ -1,0 +1,216 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SANATAN GUIDE APP — CURSOR RULES
+# Engineering Standard: Production-grade, TDD-first, Clean Architecture
+# Stack: Flutter 3.x + Riverpod 2.x + Drift + go_router
+# Last Updated: April 2026
+# ═══════════════════════════════════════════════════════════════════════════
+
+## PROJECT IDENTITY
+This is a guided Sanatan Dharma / Hinduism learning app.
+- Sanskrit → Hindi + English, offline-first
+- Target: Beginners, Diaspora, Curious Hindus, Non-Hindus globally
+- No fixed deadline — engineer for quality, not speed
+
+## ARCHITECTURE: STRICT CLEAN ARCHITECTURE
+MANDATORY. Never violate layer boundaries.
+
+Layer 1 — domain/ (pure Dart, ZERO Flutter imports allowed)
+  - entities/     → Immutable domain objects (freezed)
+  - repositories/ → Abstract interfaces only
+  - usecases/     → Single-responsibility use case classes
+
+Layer 2 — data/ (implements domain interfaces)
+  - datasources/local/  → Drift DAOs
+  - datasources/remote/ → API clients (Dio)
+  - models/             → DTOs with fromJson/toJson (freezed + json_serializable)
+  - repositories/       → Concrete implementations of domain interfaces
+
+Layer 3 — presentation/ (Flutter UI)
+  - features/[name]/
+      - pages/      → Screens (ConsumerWidget, ConsumerStatefulWidget only)
+      - widgets/    → Reusable widgets for this feature
+      - providers/  → Riverpod providers and notifiers
+  - shared/widgets/ → App-wide reusable widgets
+  - theme/          → AppTheme, AppColors, AppTypography, AppSpacing
+
+core/ — Shared utilities, no business logic
+  - constants/  → AppConstants, AppStrings
+  - errors/     → Failure classes, AppException
+  - extensions/ → Dart extension methods
+  - utils/      → Pure helper functions
+
+## STATE MANAGEMENT: RIVERPOD 2.x (riverpod_generator)
+ALWAYS use code generation (@riverpod annotation).
+
+Rules:
+- AsyncNotifier for async data with loading/error/data states
+- Notifier for synchronous complex state
+- AutoDisposeNotifier for screen-scoped state (default for most features)
+- Notifier (non-dispose) ONLY for truly global state: AudioPlayerNotifier, UserProgressNotifier
+- StreamProvider for reactive Drift DB .watch() streams
+- Provider (plain) for computed/derived values and dependency injection
+- NEVER use StateProvider for complex state — use Notifier
+- NEVER use StateNotifierProvider — deprecated in Riverpod 2.x
+
+Provider naming:
+- @riverpod → generates [name]Provider
+- Keep provider names descriptive: verseOfTheDayProvider, not votdProvider
+- Notifier class: [FeatureName]Notifier
+- Provider family: [name]Provider (use .family modifier)
+
+Accessing providers:
+- ref.watch() in build() — ALWAYS
+- ref.read() in callbacks/handlers — ONLY
+- ref.listen() for side effects (navigation, snackbars)
+- NEVER use ref.read() in build() — silent bug
+
+## DATABASE: DRIFT 2.x (SQLite)
+ALL DB access goes through domain repository interfaces. Never call DAO from UI.
+
+Rules:
+- Table names: snake_case plural (verses, learning_modules, user_progress_records)
+- Use @DriftDatabase for the main AppDatabase class
+- DAOs annotated with @DriftAccessor
+- Use .watch() streams for reactive UI — never poll
+- Run DB in background isolate for bulk operations (compute or Drift isolate)
+- For scripture content: bundle pre-populated .db in assets/db/
+  Copy to documents dir on first launch, open with Drift
+- Use Drift migrations (stepByStep) for schema changes — never drop-recreate
+
+## TESTING: TDD-ISH (tests alongside implementation)
+Test file location: mirrors source tree under test/
+e.g. lib/domain/usecases/get_verse_usecase.dart
+→  test/domain/usecases/get_verse_usecase_test.dart
+
+Testing stack:
+- flutter_test (standard)
+- mocktail (NOT mockito) for mocking
+- riverpod testing: ProviderContainer for notifier tests
+
+MANDATORY test coverage:
+1. All use cases (unit test, mock repositories)
+2. All repository implementations (unit test, mock data sources)
+3. All Notifiers with meaningful state transitions
+4. Critical widgets (verse reader, learning path card) — widget tests
+
+Test structure: Arrange / Act / Assert pattern, always with comments:
+```dart
+test('should return verse when repository succeeds', () async {
+  // Arrange
+  when(() => mockRepo.getVerse(any())).thenAnswer((_) async => testVerse);
+  
+  // Act
+  final result = await useCase.execute(GetVerseParams(verseId: 'BG1.1'));
+  
+  // Assert
+  expect(result, isA<Right<Failure, Verse>>());
+});
+```
+
+## DART/FLUTTER CODE RULES
+- Dart SDK: >=3.0.0 (use Dart 3 features: sealed classes, switch expressions, patterns)
+- Null safety: mandatory, no ! operator unless you can prove non-null
+- const: use everywhere possible (const constructors, const widgets)
+- Immutability: all entities/models must be immutable (use freezed)
+- Named params: all functions with 2+ parameters must use named parameters
+- No dynamic: never use dynamic type unless absolutely required (JSON deserialization only)
+- switch expressions over if-else chains for exhaustive matching
+- Extension methods over utility classes for cleaner APIs
+- Max function body: 40 lines. If longer, extract.
+- Max file: 300 lines. If longer, split.
+- No magic numbers: extract to AppConstants or local const
+- No hardcoded strings in widgets: use AppStrings constants
+- BuildContext safety: ALWAYS check mounted before using context after await
+
+## ERROR HANDLING
+Use Either<Failure, T> pattern (fpdart package) in repository and use case layers.
+Define specific Failure subclasses in core/errors/failures.dart:
+```dart
+sealed class Failure {
+  final String message;
+  const Failure(this.message);
+}
+class DatabaseFailure extends Failure { ... }
+class NetworkFailure extends Failure { ... }
+class CacheFailure extends Failure { ... }
+```
+
+NEVER throw raw exceptions from repository layer upward.
+Map all exceptions to Failure types in repository implementations.
+
+## SANSKRIT / DEVANAGARI RULES
+- Font: TiroDevanagari (bundled asset) for Sanskrit shlokas
+- Font: NotoSansDevanagari (bundled asset) for Hindi UI text
+- Minimum fontSize: 18 for any Sanskrit text — never smaller
+- lineHeight: 1.8 minimum for Sanskrit shloka display blocks
+- Store Sanskrit text as UTF-8 Devanagari Unicode in DB (U+0900–U+097F)
+- IAST transliteration: computed on-the-fly from stored Devanagari — not stored separately
+- Always provide font scaling (respect system textScaleFactor)
+- Test Sanskrit rendering on: Pixel 3a (API 28), Samsung A-series (API 30)
+
+## AD PLACEMENT — INVIOLABLE RULES
+ALLOWED: app open screens, between learning modules, in article/festival feed
+NEVER PLACE ADS IN:
+  - Scripture reader screen (any verse/shloka display)
+  - Mantra audio player
+  - Puja vidhi step-by-step screens
+  - Any active meditation/practice screen
+If in doubt: no ad. The sacred content is the product — never let ads touch it.
+
+## THEME & DESIGN SYSTEM
+ALL colors from AppColors — never hardcode hex in widgets
+ALL text styles from AppTypography — never hardcode font in widgets
+ALL spacing from AppSpacing (use 4pt grid: 4, 8, 12, 16, 24, 32, 48, 64)
+Support both light and dark themes from day 1
+Colors defined in AppColors:
+  saffron: #FF9933 (primary brand, CTAs)
+  deepRed: #8B0000 (headers, important text)
+  cream: #FFF8E7 (primary background light)
+  gold: #FFD700 (decorative, badges)
+  forestGreen: #1B5E20 (completion, streaks)
+  charcoal: #1A1A1A (body text)
+
+## NAVIGATION: go_router
+Define ALL routes in a single AppRouter class in core/router/
+Use GoRoute with typed params — never pass complex objects through routes
+Named routes with AppRoutes constants class
+Handle deep links for verse sharing (sanatan://verse/BG1.1)
+Guards for authenticated routes using redirect
+
+## LOGGING
+Use the logger package — NEVER use print() or debugPrint() in production code
+Logger instance: AppLogger.instance (singleton in core/)
+Log levels: verbose (dev only), debug, info, warning, error
+Remove verbose/debug in release builds
+
+## DEPENDENCY INJECTION
+Use Riverpod providers for DI — no get_it or injectable needed
+Register data sources and repositories as providers in data/providers/
+Domain use cases get repo via constructor injection (passed by provider)
+
+## WHAT CURSOR MUST NEVER DO
+- Never put business logic in a widget or page
+- Never access Drift DAO directly from a widget or provider
+- Never use BuildContext across async gaps without mounted check
+- Never generate God objects — single responsibility always
+- Never use setState for app state — only for local animation state
+- Never commit TODO comments in generated code
+- Never hardcode colors, strings, or spacing in widgets
+- Never use print() — use AppLogger
+- Never import dart:io or dart:html in domain or presentation layers
+- Never generate a "working" implementation that skips error handling
+- Never use late keyword unless truly necessary and well-commented why
+- Never skip const on constructors that can be const
+- Never generate widget tests that only test rendering — test behavior
+
+## CODE GENERATION
+Run after any change to annotated files:
+  flutter pub run build_runner build --delete-conflicting-outputs
+Files ending in .g.dart and .freezed.dart are generated — never edit manually
+
+## BEFORE GENERATING ANY FILE, CHECK:
+1. Does this belong in domain, data, or presentation layer?
+2. Is there an existing abstraction I should implement rather than create new?
+3. Will this be testable without Flutter? (domain/data: yes always)
+4. Am I creating a new constant instead of using AppConstants?
+5. Am I handling all three states: loading, error, success?

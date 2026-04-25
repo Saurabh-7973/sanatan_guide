@@ -1,0 +1,63 @@
+{
+  "@@locale": "en",
+  "appName": "Sanatan Guide",
+  "@appName": {
+    "description": "App name shown in launcher and about dialogs."
+  },
+
+  "settingsTitle": "Settings",
+  "settingsSectionAppearance": "Appearance",
+  "settingsSectionLanguage": "Language",
+  "settingsSectionNotifications": "Notifications",
+  "settingsSectionData": "Data",
+  "settingsSectionReading": "Reading",
+  "settingsSectionAbout": "About",
+
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "System",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsFontSize": "Reading font size",
+  "settingsDailyReminder": "Daily verse reminder",
+  "settingsClearHistory": "Clear reading history",
+  "settingsScriptureExperience": "Scripture experience",
+  "settingsSendFeedback": "Send Feedback",
+  "settingsCredits": "Credits & Attributions",
+  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsTermsOfService": "Terms of Service",
+
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System default",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageHindi": "हिन्दी (Hindi)",
+
+  "commentarySectionTitle": "Commentaries",
+  "commentaryPublicDomain": "Public domain.",
+  "commentaryLicensePrefix": "License:",
+  "commentaryTranslatorPrefix": "Translation:",
+
+  "traditionAdvaita": "Advaita Vedanta",
+  "traditionVishishtadvaita": "Vishishtadvaita",
+  "traditionDvaita": "Dvaita",
+
+  "navHome": "Home",
+  "navLearn": "Learn",
+  "navLibrary": "Library",
+  "navSearch": "Search",
+  "navBookmarks": "Bookmarks",
+
+  "commonCancel": "Cancel",
+  "commonClose": "Close",
+  "commonRetry": "Retry",
+  "commonLoading": "Loading…",
+  "commonError": "Something went wrong",
+
+  "verseOfDay": "Verse of the Day",
+  "bookmarksTitle": "Bookmarks",
+  "bookmarksEmpty": "No bookmarks yet",
+  "bookmarksEmptyHint": "Tap the bookmark icon on any verse to save it here.",
+
+  "searchHint": "Search verses…",
+  "searchEmptyTitle": "Start typing to search",
+  "searchEmptyHint": "Try a word like karma, dharma, moksha"
+}

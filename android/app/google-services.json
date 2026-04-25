@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "896997168517",
+    "project_id": "sanatan-guide-7973",
+    "storage_bucket": "sanatan-guide-7973.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896997168517:android:02beaaec355debb44ee0ec",
+        "android_client_info": {
+          "package_name": "com.Saurabh7973.sanatan_guide"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZj3LJOvEzI9HVdxGV4QB_sZ0kMiFk264"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "_comment": "Template only — replace with OCR/transcription from a verified public-domain source. The seeder will REJECT this file as-is (empty English/Sanskrit). See tool/seed_shankara_commentary.dart for the allowlist rules.",
+    "id": "shankara_gita_2.47",
+    "verse_id": "BG.2.47",
+    "tradition": "advaita",
+    "author": "Adi Shankaracharya",
+    "text_sanskrit": "",
+    "text_english": "",
+    "translator": "A. Mahadeva Sastri",
+    "source_url": "https://archive.org/details/bhagavadgitawith00shan",
+    "license": "public_domain"
+  }
+]

@@ -1,0 +1,60 @@
+{
+  "@@locale": "hi",
+  "appName": "सनातन गाइड",
+
+  "settingsTitle": "सेटिंग्स",
+  "settingsSectionAppearance": "रूप",
+  "settingsSectionLanguage": "भाषा",
+  "settingsSectionNotifications": "सूचनाएँ",
+  "settingsSectionData": "डेटा",
+  "settingsSectionReading": "पठन",
+  "settingsSectionAbout": "बारे में",
+
+  "settingsTheme": "थीम",
+  "settingsThemeSystem": "डिफ़ॉल्ट",
+  "settingsThemeLight": "लाइट",
+  "settingsThemeDark": "डार्क",
+  "settingsFontSize": "पठन फ़ॉन्ट आकार",
+  "settingsDailyReminder": "दैनिक श्लोक अनुस्मारक",
+  "settingsClearHistory": "पठन इतिहास साफ़ करें",
+  "settingsScriptureExperience": "शास्त्र अनुभव",
+  "settingsSendFeedback": "प्रतिक्रिया भेजें",
+  "settingsCredits": "श्रेय और आभार",
+  "settingsPrivacyPolicy": "गोपनीयता नीति",
+  "settingsTermsOfService": "उपयोग की शर्तें",
+
+  "settingsLanguage": "भाषा",
+  "settingsLanguageSystem": "डिफ़ॉल्ट",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageHindi": "हिन्दी",
+
+  "commentarySectionTitle": "भाष्य",
+  "commentaryPublicDomain": "सार्वजनिक डोमेन।",
+  "commentaryLicensePrefix": "लाइसेंस:",
+  "commentaryTranslatorPrefix": "अनुवाद:",
+
+  "traditionAdvaita": "अद्वैत वेदांत",
+  "traditionVishishtadvaita": "विशिष्टाद्वैत",
+  "traditionDvaita": "द्वैत",
+
+  "navHome": "मुख्य",
+  "navLearn": "सीखें",
+  "navLibrary": "पुस्तकालय",
+  "navSearch": "खोज",
+  "navBookmarks": "बुकमार्क",
+
+  "commonCancel": "रद्द करें",
+  "commonClose": "बंद करें",
+  "commonRetry": "पुनः प्रयास",
+  "commonLoading": "लोड हो रहा है…",
+  "commonError": "कुछ गलत हो गया",
+
+  "verseOfDay": "आज का श्लोक",
+  "bookmarksTitle": "बुकमार्क",
+  "bookmarksEmpty": "अभी कोई बुकमार्क नहीं",
+  "bookmarksEmptyHint": "किसी भी श्लोक पर बुकमार्क आइकन दबाकर सहेजें।",
+
+  "searchHint": "श्लोक खोजें…",
+  "searchEmptyTitle": "खोजने के लिए लिखना शुरू करें",
+  "searchEmptyHint": "कर्म, धर्म, मोक्ष जैसे शब्द आज़माएँ"
+}

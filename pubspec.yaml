@@ -1,0 +1,151 @@
+name: sanatan_guide
+description: A guided path through Sanatan Dharma — Vedas, Gita, Upanishads and more.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # ── State Management ───────────────────────────────────────────────────────
+  flutter_riverpod: ^3.0.0          # was ^2.5.1
+  riverpod_annotation: ^4.0.0       # was ^2.3.5
+
+  # ── Database (local, offline-first) ───────────────────────────────────────
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.24
+  path_provider: ^2.1.3
+  path: ^1.9.0
+
+  # ── Navigation ────────────────────────────────────────────────────────────
+  go_router: ^14.2.7
+
+  # ── Networking ────────────────────────────────────────────────────────────
+  dio: ^5.6.0
+
+  # ── Monetisation ──────────────────────────────────────────────────────────
+  google_mobile_ads: ^5.2.0
+
+  # ── Firebase ──────────────────────────────────────────────────────────────
+  firebase_core: ^3.6.0
+  firebase_analytics: ^11.3.3
+  firebase_crashlytics: ^4.1.3
+  firebase_remote_config: ^5.1.3     # For OTA content updates
+
+  # ── Notifications ─────────────────────────────────────────────────────────
+  flutter_local_notifications: ^17.2.2
+  timezone: ^0.9.4
+
+  # ── UI & Fonts ────────────────────────────────────────────────────────────
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.0
+  haptic_feedback: ^0.5.1+2
+
+  # ── Sharing ───────────────────────────────────────────────────────────────
+  share_plus: ^10.0.2
+
+  # ── In-App Review ─────────────────────────────────────────────────────────
+  in_app_review: ^2.0.9
+
+  # ── Utilities ─────────────────────────────────────────────────────────────
+  url_launcher: ^6.3.0
+  freezed_annotation: ^3.0.0      # was ^2.4.4
+  json_annotation: ^4.9.0
+  fpdart: ^1.1.0                     # Either<Failure, T> for error handling
+  logger: ^2.4.0
+  shared_preferences: ^2.3.3        # Simple key-value (onboarding done, etc.)
+  intl: ^0.20.2
+  shimmer: ^3.0.0
+  package_info_plus: ^9.0.1
+  flutter_native_splash: ^2.4.3
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # ── Code Generation ───────────────────────────────────────────────────────
+  build_runner: ^2.4.11
+  riverpod_generator: ^4.0.0        # was ^2.4.3
+  drift_dev: ^2.18.0
+  freezed: ^3.0.0                 # was ^2.5.7
+  json_serializable: ^6.8.0
+
+  # ── Tool scripts (tool/) — not bundled into release APK ───────────────────
+  sqlite3: ^2.9.4
+
+  # ── Testing ───────────────────────────────────────────────────────────────
+  mocktail: ^1.0.4
+
+  # ── Linting ───────────────────────────────────────────────────────────────
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  generate: true                     # Enables l10n generation
+
+  assets:
+    - assets/db/                     # Pre-populated scripture SQLite DB
+    - assets/fonts/                  # Bundled Devanagari fonts (offline guarantee)
+    - assets/images/                 # Static app images
+    - assets/icons/                  # SVG icons
+
+  fonts:
+    # Sanskrit shloka display — scholarly, beautiful Vedic diacritic support
+    - family: TiroDevanagari
+      fonts:
+        - asset: assets/fonts/TiroDevanagariSanskrit-Regular.ttf
+        - asset: assets/fonts/TiroDevanagariSanskrit-Italic.ttf
+          style: italic
+
+    # Hindi UI text — widest Unicode coverage including Vedic accent marks
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+        - asset: assets/fonts/NotoSansDevanagari-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansDevanagari-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansDevanagari-Bold.ttf
+          weight: 700
+
+    # English body text — clean, literary, high readability
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/Lora-Regular.ttf
+        - asset: assets/fonts/Lora-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Lora-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Lora-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Lora-Italic.ttf
+          style: italic
+
+    # UI labels, buttons, navigation — modern, legible
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Regular.ttf
+        - asset: assets/fonts/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Outfit-Bold.ttf
+          weight: 700
+          
+
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/ic_foreground.png"
+  adaptive_icon_background: "#1A1A2E"
+  adaptive_icon_foreground: "assets/icons/ic_foreground.png"
+  min_sdk_android: 21

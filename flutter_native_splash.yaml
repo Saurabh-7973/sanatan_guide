@@ -1,0 +1,25 @@
+# flutter_native_splash configuration
+# Run: dart run flutter_native_splash:create
+# Reset: dart run flutter_native_splash:remove
+
+flutter_native_splash:
+  # Light mode — warm cream background, saffron Om
+  color: "#FDFAF6"
+  image: assets/images/splash_om.png
+
+  # Dark mode — warm near-black background, same Om (slightly brighter saffron version can be added later)
+  color_dark: "#0F0F0F"
+  image_dark: assets/images/splash_om.png
+
+  # Android 12+ (SplashScreen API)
+  android_12:
+    color: "#FDFAF6"
+    image: assets/images/splash_om.png
+    color_dark: "#0F0F0F"
+    image_dark: assets/images/splash_om.png
+
+  # Keep native splash visible while Flutter initialises
+  # (until FlutterNativeSplash.remove() is called in main.dart)
+  android: true
+  ios: true
+  web: false

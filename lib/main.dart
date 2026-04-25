@@ -1,0 +1,122 @@
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'; // ignore: unnecessary_import
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sanatan_guide/core/router/app_router.dart';
+import 'package:sanatan_guide/core/services/ad_service.dart';
+import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
+import 'package:sanatan_guide/core/services/notification_service.dart';
+import 'package:sanatan_guide/firebase_options.dart';
+import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
+import 'package:sanatan_guide/presentation/theme/app_theme.dart';
+
+void main() async {
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  // Keep the native splash visible until we explicitly remove it below.
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Disable Crashlytics collection during development so debug noise
+  // doesn't pollute production crash reports.
+  await FirebaseCrashlytics.instance
+      .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+  if (!kDebugMode) {
+    FlutterError.onError = (details) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    };
+
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  await NotificationService.init();
+  await AdService.initialize();
+  // Pre-load the App Open Ad in the background.
+  // It will be shown once when the splash completes.
+  unawaited(AppOpenAdService.instance.preload());
+
+  runApp(const ProviderScope(child: SanatanGuideApp()));
+  // Dismiss the native splash once Flutter's first frame is drawn.
+  FlutterNativeSplash.remove();
+}
+
+class SanatanGuideApp extends ConsumerStatefulWidget {
+  const SanatanGuideApp({super.key});
+
+  @override
+  ConsumerState<SanatanGuideApp> createState() => _SanatanGuideAppState();
+}
+
+class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // After [MaterialApp.router] attaches, Android Activity is non-null for
+    // flutter_local_notifications permission APIs.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(const Duration(seconds: 1), () async {
+        if (!mounted) return;
+        await NotificationService.requestPermission();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Called whenever the app lifecycle changes.
+  /// When resuming from background, check if a notification was tapped
+  /// and navigate to the deep link if one is pending.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final deepLink = NotificationService.pendingDeepLink;
+      if (deepLink != null && deepLink.isNotEmpty) {
+        NotificationService.pendingDeepLink = null;
+        // Defer until after the current frame so the router is ready.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref.read(appRouterProvider).go(deepLink);
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final router = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
+
+    return MaterialApp.router(
+      title: 'Sanatan Guide',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
+      routerConfig: router,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+    );
+  }
+}
