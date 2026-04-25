@@ -1142,3 +1142,243 @@ class _ScrollPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ScrollPainter old) => old.color != color;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PeacockIllustration
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Ink-drawing peacock illustration. Size-parameterised: use 200 for hero
+/// empty state, 18 for search-bar prefix icon (singleFeather: true).
+/// Stroke-only, no fills — saffron on dark, sanskritText on light.
+class PeacockIllustration extends StatelessWidget {
+  const PeacockIllustration({
+    super.key,
+    this.size = 200,
+    this.singleFeather = false,
+    this.tailFolded = false,
+  });
+
+  final double size;
+  final bool singleFeather;
+  final bool tailFolded;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.sanskritText;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: _PeacockPainter(
+          color: color,
+          isDark: isDark,
+          singleFeather: singleFeather,
+          tailFolded: tailFolded,
+        ),
+      ),
+    );
+  }
+}
+
+class _PeacockPainter extends CustomPainter {
+  const _PeacockPainter({
+    required this.color,
+    required this.isDark,
+    this.singleFeather = false,
+    this.tailFolded = false,
+  });
+
+  final Color color;
+  final bool isDark;
+  final bool singleFeather;
+  final bool tailFolded;
+
+  static const _featherAngles = [
+    -65.0, -48.0, -32.0, -16.0, 0.0, 16.0, 32.0, 48.0, 65.0,
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (singleFeather) {
+      _paintSingleFeather(canvas, size);
+      return;
+    }
+    _paintFull(canvas, size);
+  }
+
+  void _paintSingleFeather(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.08
+      ..strokeCap = StrokeCap.round
+      ..color = color;
+
+    canvas.drawLine(Offset(w / 2, h * 0.95), Offset(w / 2, h * 0.25), stroke);
+    _paintFeatherEye(canvas, Offset(w / 2, h * 0.22), w * 0.28, 0, stroke);
+  }
+
+  void _paintFull(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final bodyX = w * 0.50;
+    final bodyY = h * 0.68;
+    final bodyRx = w * 0.09;
+    final bodyRy = h * 0.13;
+
+    final mainStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.008
+      ..strokeCap = StrokeCap.round
+      ..color = color;
+
+    final faintStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.005
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.50);
+
+    // Tail feathers
+    final tailOrigin = Offset(bodyX, bodyY - bodyRy * 0.4);
+    final angles = tailFolded
+        ? _featherAngles.map((a) => a * 0.15).toList()
+        : _featherAngles;
+
+    for (var i = 0; i < angles.length; i++) {
+      final angleDeg = angles[i];
+      final angleRad = (angleDeg - 90) * math.pi / 180;
+      final lengthFrac = 1.0 - (i - 4).abs() * 0.06;
+      final featherLen = h * 0.54 * lengthFrac;
+
+      final tip = Offset(
+        tailOrigin.dx + math.cos(angleRad) * featherLen,
+        tailOrigin.dy + math.sin(angleRad) * featherLen,
+      );
+
+      final shaft = Path()
+        ..moveTo(tailOrigin.dx, tailOrigin.dy)
+        ..quadraticBezierTo(
+          tailOrigin.dx +
+              (tip.dx - tailOrigin.dx) * 0.3 +
+              math.sin(angleRad) * featherLen * 0.08,
+          tailOrigin.dy +
+              (tip.dy - tailOrigin.dy) * 0.3 -
+              math.cos(angleRad) * featherLen * 0.08,
+          tip.dx,
+          tip.dy,
+        );
+      canvas.drawPath(shaft, i == 4 ? mainStroke : faintStroke);
+
+      if (!tailFolded || (tailFolded && i == 4)) {
+        final eyeR = w * 0.032 * lengthFrac;
+        _paintFeatherEye(canvas, tip, eyeR, angleRad, mainStroke);
+      }
+    }
+
+    // Body
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(bodyX, bodyY),
+        width: bodyRx * 2,
+        height: bodyRy * 2,
+      ),
+      mainStroke,
+    );
+
+    // Neck
+    final neckBase = Offset(bodyX, bodyY - bodyRy);
+    final headCenter = Offset(bodyX - w * 0.02, h * 0.30);
+    final neckPath = Path()
+      ..moveTo(neckBase.dx, neckBase.dy)
+      ..cubicTo(
+        bodyX - w * 0.04,
+        h * 0.55,
+        bodyX - w * 0.06,
+        h * 0.42,
+        headCenter.dx,
+        headCenter.dy,
+      );
+    canvas.drawPath(neckPath, mainStroke);
+
+    // Head
+    final headR = w * 0.055;
+    canvas.drawCircle(headCenter, headR, mainStroke);
+
+    // Crest
+    for (final ca in [-20.0, 0.0, 20.0]) {
+      final cRad = (ca - 90) * math.pi / 180;
+      final crestLen = headR * 1.4;
+      final cTip = Offset(
+        headCenter.dx + math.cos(cRad) * crestLen,
+        headCenter.dy + math.sin(cRad) * crestLen,
+      );
+      canvas.drawLine(headCenter, cTip, faintStroke);
+      final dotPaint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = color;
+      canvas.drawCircle(cTip, w * 0.010, dotPaint);
+    }
+
+    // Eye
+    final eyePaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = color;
+    canvas.drawCircle(
+      Offset(headCenter.dx - headR * 0.3, headCenter.dy - headR * 0.1),
+      w * 0.012,
+      eyePaint,
+    );
+
+    // Beak
+    final beakPath = Path()
+      ..moveTo(headCenter.dx - headR, headCenter.dy + headR * 0.2)
+      ..lineTo(headCenter.dx - headR * 1.55, headCenter.dy + headR * 0.55);
+    canvas.drawPath(beakPath, faintStroke);
+
+    // Feet
+    final footBaseL = Offset(bodyX - bodyRx * 0.5, bodyY + bodyRy);
+    final footBaseR = Offset(bodyX + bodyRx * 0.5, bodyY + bodyRy);
+    for (final fb in [footBaseL, footBaseR]) {
+      for (var t = -1; t <= 1; t++) {
+        final toe = Path()
+          ..moveTo(fb.dx, fb.dy)
+          ..lineTo(fb.dx + t * w * 0.045, fb.dy + h * 0.05);
+        canvas.drawPath(toe, faintStroke);
+      }
+    }
+  }
+
+  void _paintFeatherEye(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double angle,
+    Paint stroke,
+  ) {
+    final eyeW = radius * 1.6;
+    final eyeH = radius * 1.0;
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(angle + math.pi / 2);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: eyeW, height: eyeH),
+      stroke,
+    );
+    canvas.drawCircle(
+      Offset.zero,
+      radius * 0.32,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = stroke.color.withValues(alpha: 0.50),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _PeacockPainter old) =>
+      old.color != color ||
+      old.tailFolded != tailFolded ||
+      old.singleFeather != singleFeather;
+}
