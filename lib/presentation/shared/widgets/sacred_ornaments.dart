@@ -750,3 +750,174 @@ class _KalashPainter extends CustomPainter {
   bool shouldRepaint(covariant _KalashPainter old) =>
       old.color != color || old.isDark != isDark;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  GangaWaveBackdrop
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Full-bleed background for the onboarding screen.
+/// Paints: sky gradient, sun disk with radial glow at horizon,
+/// ghats silhouettes left+right, and three sine-wave Ganga paths.
+class GangaWaveBackdrop extends StatelessWidget {
+  const GangaWaveBackdrop({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return IgnorePointer(
+      child: SizedBox.expand(
+        child: CustomPaint(painter: _GangaWavePainter(isDark: isDark)),
+      ),
+    );
+  }
+}
+
+class _GangaWavePainter extends CustomPainter {
+  const _GangaWavePainter({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+
+    // Sky gradient
+    final skyPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: isDark
+            ? const [Color(0xFF1A0E2A), Color(0xFF3D1800), Color(0xFF2D1500)]
+            : const [Color(0xFFFDFAF6), Color(0xFFFFF3E0), Color(0xFFFDE8C8)],
+        stops: const [0.0, 0.6, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), skyPaint);
+
+    // Sun radial glow
+    final sunY = h * 0.76;
+    final sunColor = isDark ? const Color(0xFFF4A830) : const Color(0xFFE8820C);
+    final glowPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          sunColor.withValues(alpha: isDark ? 0.35 : 0.20),
+          sunColor.withValues(alpha: isDark ? 0.10 : 0.06),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.4, 1.0],
+      ).createShader(
+        Rect.fromCircle(center: Offset(cx, sunY), radius: w * 0.55),
+      );
+    canvas.drawCircle(Offset(cx, sunY), w * 0.55, glowPaint);
+
+    // Sun disk
+    canvas.drawCircle(
+      Offset(cx, sunY),
+      14,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = sunColor.withValues(alpha: isDark ? 0.90 : 0.70),
+    );
+    // Inner highlight
+    canvas.drawCircle(
+      Offset(cx, sunY),
+      8,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = (isDark ? const Color(0xFFFFE08A) : const Color(0xFFFFF3D0))
+            .withValues(alpha: 0.80),
+    );
+
+    // Horizon line
+    canvas.drawLine(
+      Offset(0, sunY + 14),
+      Offset(w, sunY + 14),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.6
+        ..color = sunColor.withValues(alpha: 0.35),
+    );
+
+    // Ghats silhouettes
+    final ghatsColor = isDark ? const Color(0xFF0F0508) : const Color(0xFFD4C4B0);
+    final ghatsPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = ghatsColor.withValues(alpha: isDark ? 0.85 : 0.40);
+
+    final leftGhats = Path()
+      ..moveTo(0, sunY + 14)
+      ..lineTo(0, h * 0.60)
+      ..lineTo(w * 0.06, h * 0.60)
+      ..lineTo(w * 0.06, h * 0.52)
+      ..lineTo(w * 0.12, h * 0.52)
+      ..lineTo(w * 0.12, h * 0.56)
+      ..lineTo(w * 0.18, h * 0.56)
+      ..lineTo(w * 0.18, h * 0.50)
+      ..lineTo(w * 0.22, h * 0.50)
+      ..lineTo(w * 0.22, h * 0.58)
+      ..lineTo(w * 0.28, h * 0.58)
+      ..lineTo(w * 0.28, sunY + 14)
+      ..close();
+    canvas.drawPath(leftGhats, ghatsPaint);
+
+    final rightGhats = Path()
+      ..moveTo(w, sunY + 14)
+      ..lineTo(w, h * 0.60)
+      ..lineTo(w * 0.94, h * 0.60)
+      ..lineTo(w * 0.94, h * 0.52)
+      ..lineTo(w * 0.88, h * 0.52)
+      ..lineTo(w * 0.88, h * 0.56)
+      ..lineTo(w * 0.82, h * 0.56)
+      ..lineTo(w * 0.82, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.58)
+      ..lineTo(w * 0.72, h * 0.58)
+      ..lineTo(w * 0.72, sunY + 14)
+      ..close();
+    canvas.drawPath(rightGhats, ghatsPaint);
+
+    // Three Ganga wave sine paths
+    final wavePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final waveConfigs = [
+      (h * 0.80, 0.38, 1.0),
+      (h * 0.86, 0.28, 0.8),
+      (h * 0.92, 0.20, 0.6),
+    ];
+
+    for (final (y, alpha, strokeW) in waveConfigs) {
+      wavePaint.color = sunColor.withValues(alpha: alpha);
+      wavePaint.strokeWidth = strokeW;
+      final wavePath = Path();
+      const steps = 40;
+      for (var i = 0; i <= steps; i++) {
+        final x = w * i / steps;
+        final dy = math.sin((x / w) * math.pi * 4) * h * 0.012;
+        if (i == 0) {
+          wavePath.moveTo(x, y + dy);
+        } else {
+          wavePath.lineTo(x, y + dy);
+        }
+      }
+      canvas.drawPath(wavePath, wavePaint);
+    }
+
+    // Sun reflection on water
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, h * 0.84),
+        width: w * 0.12,
+        height: h * 0.02,
+      ),
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = sunColor.withValues(alpha: 0.18),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GangaWavePainter old) => old.isDark != isDark;
+}
