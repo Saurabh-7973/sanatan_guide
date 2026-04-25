@@ -316,7 +316,7 @@ class _SanskritBlock extends StatelessWidget {
                 child: ClipRect(
                   child: JaaliLattice(
                     cell: 24,
-                    opacity: isDark ? 0.10 : 0.08,
+                    opacity: isDark ? 0.12 : 0.26,
                   ),
                 ),
               ),
