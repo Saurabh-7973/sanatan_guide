@@ -155,28 +155,33 @@ class ToranaArch extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _ToranaPainter(color: color)),
+      child: CustomPaint(painter: _ToranaPainter(color: color, isDark: isDark)),
     );
   }
 }
 
 class _ToranaPainter extends CustomPainter {
-  _ToranaPainter({required this.color});
+  _ToranaPainter({required this.color, required this.isDark});
 
   final Color color;
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final strokeAlpha = isDark ? 0.55 : 0.30;
+    final fillAlpha   = isDark ? 0.85 : 0.55;
+    final curlAlpha   = isDark ? 0.42 : 0.22;
+
     final stroke = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..color = color.withValues(alpha: 0.55);
+      ..color = color.withValues(alpha: strokeAlpha);
 
     final fill = Paint()
       ..style = PaintingStyle.fill
-      ..color = color.withValues(alpha: 0.85);
+      ..color = color.withValues(alpha: fillAlpha);
 
     final w = size.width;
     final h = size.height;
@@ -253,7 +258,7 @@ class _ToranaPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.8
       ..strokeCap = StrokeCap.round
-      ..color = color.withValues(alpha: 0.42);
+      ..color = color.withValues(alpha: curlAlpha);
     final curlL = Path()
       ..moveTo(left, baseY)
       ..quadraticBezierTo(left - 10, baseY - 4, left - 18, baseY)
@@ -267,7 +272,8 @@ class _ToranaPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ToranaPainter old) => old.color != color;
+  bool shouldRepaint(covariant _ToranaPainter old) =>
+      old.color != color || old.isDark != isDark;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
