@@ -921,3 +921,224 @@ class _GangaWavePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _GangaWavePainter old) => old.isDark != isDark;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Onboarding Icon Painters — Seedling, Diya, Scroll
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// 32×32 seedling: central stem, two teardrop leaves, root forks.
+/// Used for "New Seeker / Beginner" level card on onboarding.
+class SeedlingIcon extends StatelessWidget {
+  const SeedlingIcon({super.key, this.size = 32, this.selected = false});
+
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _SeedlingPainter(color: color)),
+    );
+  }
+}
+
+class _SeedlingPainter extends CustomPainter {
+  const _SeedlingPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.035
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+
+    final strokeFaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.025
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.55);
+
+    // Stem
+    canvas.drawLine(Offset(cx, h * 0.88), Offset(cx, h * 0.42), stroke);
+
+    // Left leaf
+    final leftLeaf = Path()
+      ..moveTo(cx, h * 0.42)
+      ..cubicTo(cx - w * 0.30, h * 0.30, cx - w * 0.38, h * 0.12, cx - w * 0.12, h * 0.10)
+      ..cubicTo(cx + w * 0.04, h * 0.10, cx + w * 0.02, h * 0.30, cx, h * 0.42);
+    canvas.drawPath(leftLeaf, stroke);
+
+    // Right leaf (slightly smaller)
+    final rightLeaf = Path()
+      ..moveTo(cx, h * 0.42)
+      ..cubicTo(cx + w * 0.26, h * 0.32, cx + w * 0.32, h * 0.16, cx + w * 0.10, h * 0.14)
+      ..cubicTo(cx - w * 0.02, h * 0.14, cx - w * 0.01, h * 0.32, cx, h * 0.42);
+    canvas.drawPath(rightLeaf, strokeFaint);
+
+    // Root forks
+    canvas.drawLine(Offset(cx, h * 0.88), Offset(cx - w * 0.18, h), strokeFaint);
+    canvas.drawLine(Offset(cx, h * 0.88), Offset(cx + w * 0.18, h), strokeFaint);
+    canvas.drawLine(Offset(cx, h * 0.92), Offset(cx - w * 0.08, h), strokeFaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SeedlingPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// 32×32 diya lamp: clay bowl, wick, teardrop flame.
+/// Used for "Devoted Hindu / Regular" level card on onboarding.
+class DiyaIcon extends StatelessWidget {
+  const DiyaIcon({super.key, this.size = 32, this.selected = false});
+
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _DiyaPainter(color: color)),
+    );
+  }
+}
+
+class _DiyaPainter extends CustomPainter {
+  const _DiyaPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.038
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+
+    // Bowl
+    final bowl = Path()
+      ..moveTo(w * 0.15, h * 0.58)
+      ..cubicTo(w * 0.10, h * 0.72, w * 0.20, h * 0.85, cx, h * 0.87)
+      ..cubicTo(w * 0.80, h * 0.85, w * 0.90, h * 0.72, w * 0.85, h * 0.58)
+      ..lineTo(w * 0.15, h * 0.58);
+    canvas.drawPath(bowl, stroke);
+
+    // Spout (right tip)
+    final spout = Path()
+      ..moveTo(w * 0.85, h * 0.58)
+      ..cubicTo(w * 0.92, h * 0.52, w * 0.96, h * 0.48, w * 0.92, h * 0.44)
+      ..cubicTo(w * 0.88, h * 0.42, w * 0.84, h * 0.46, w * 0.80, h * 0.50);
+    canvas.drawPath(spout, stroke);
+
+    // Wick
+    canvas.drawLine(Offset(cx * 0.92, h * 0.58), Offset(cx * 0.92, h * 0.44), stroke);
+
+    // Flame (teardrop)
+    final flame = Path()
+      ..moveTo(cx * 0.92, h * 0.44)
+      ..cubicTo(cx * 0.72, h * 0.36, cx * 0.74, h * 0.18, cx * 0.92, h * 0.12)
+      ..cubicTo(cx * 1.00, h * 0.10, cx * 1.00, h * 0.10, cx * 0.96, h * 0.12)
+      ..cubicTo(cx * 1.10, h * 0.18, cx * 1.12, h * 0.36, cx * 0.92, h * 0.44);
+    canvas.drawPath(flame, stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _DiyaPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// 32×32 palm-leaf scroll: rounded rect + text lines + curl edges.
+/// Used for "Vidvān / Scholar" level card on onboarding.
+class ScrollIcon extends StatelessWidget {
+  const ScrollIcon({super.key, this.size = 32, this.selected = false});
+
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _ScrollPainter(color: color)),
+    );
+  }
+}
+
+class _ScrollPainter extends CustomPainter {
+  const _ScrollPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.038
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+
+    final faint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.022
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.50);
+
+    // Scroll body
+    final body = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.08, h * 0.12, w * 0.84, h * 0.76),
+      Radius.circular(w * 0.12),
+    );
+    canvas.drawRRect(body, stroke);
+
+    // Curl lines
+    canvas.drawLine(Offset(w * 0.12, h * 0.20), Offset(w * 0.88, h * 0.20), faint);
+    canvas.drawLine(Offset(w * 0.12, h * 0.80), Offset(w * 0.88, h * 0.80), faint);
+
+    // Text lines on scroll
+    final lineY = [0.34, 0.46, 0.58, 0.70];
+    for (var i = 0; i < lineY.length; i++) {
+      final lineW = i == lineY.length - 1 ? w * 0.45 : w * 0.64;
+      canvas.drawLine(
+        Offset(w * 0.18, h * lineY[i]),
+        Offset(w * 0.18 + lineW, h * lineY[i]),
+        faint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScrollPainter old) => old.color != color;
+}
