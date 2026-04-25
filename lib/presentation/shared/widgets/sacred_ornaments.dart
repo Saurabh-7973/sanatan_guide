@@ -1382,3 +1382,806 @@ class _PeacockPainter extends CustomPainter {
       old.tailFolded != tailFolded ||
       old.singleFeather != singleFeather;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ForestDappleBackdrop — overlapping circles, canopy suggestion
+// ─────────────────────────────────────────────────────────────────────────────
+class ForestDappleBackdrop extends StatelessWidget {
+  const ForestDappleBackdrop({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? const Color(0xFF2E5A38) : const Color(0xFF8A6830);
+    return IgnorePointer(
+      child: SizedBox.expand(
+        child: CustomPaint(painter: _ForestDapplePainter(color: color)),
+      ),
+    );
+  }
+}
+
+class _ForestDapplePainter extends CustomPainter {
+  const _ForestDapplePainter({required this.color});
+  final Color color;
+
+  static const _circles = [
+    (0.08, 0.08, 0.14, 0.30), (0.85, 0.06, 0.16, 0.25),
+    (0.50, 0.04, 0.10, 0.20), (0.20, 0.85, 0.18, 0.15),
+    (0.80, 0.88, 0.16, 0.15), (0.35, 0.40, 0.22, 0.10),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final (fx, fy, fr, alpha) in _circles) {
+      final paint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = color.withValues(alpha: alpha);
+      canvas.drawCircle(
+        Offset(size.width * fx, size.height * fy),
+        size.width * fr,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ForestDapplePainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  NalandaArchBackdrop — ruined multi-foil arch, scripture library header
+// ─────────────────────────────────────────────────────────────────────────────
+class NalandaArchBackdrop extends StatelessWidget {
+  const NalandaArchBackdrop({super.key, this.height = 80});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(painter: _NalandaArchPainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _NalandaArchPainter extends CustomPainter {
+  const _NalandaArchPainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final alpha = isDark ? 0.22 : 0.28;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..color = color.withValues(alpha: alpha);
+
+    const spans = 5;
+    final spanW = w / spans;
+    for (var i = 0; i < spans; i++) {
+      final cx = spanW * i + spanW / 2;
+      final archPath = Path()
+        ..moveTo(cx - spanW * 0.48, h)
+        ..cubicTo(
+          cx - spanW * 0.48, h * 0.4,
+          cx - spanW * 0.28, h * 0.05,
+          cx, h * 0.05,
+        )
+        ..cubicTo(
+          cx + spanW * 0.28, h * 0.05,
+          cx + spanW * 0.48, h * 0.4,
+          cx + spanW * 0.48, h,
+        );
+      canvas.drawPath(archPath, stroke);
+      canvas.drawCircle(Offset(cx, h * 0.05), 2.0, stroke..style = PaintingStyle.fill);
+      stroke.style = PaintingStyle.stroke;
+    }
+
+    canvas.drawLine(Offset(0, h * 0.90), Offset(w, h * 0.90), stroke);
+    canvas.drawLine(Offset(0, h - 1), Offset(w, h - 1), stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _NalandaArchPainter old) =>
+      old.color != color || old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PalmLeafBorder — thin leaf-vein ornament for verse list rows
+// ─────────────────────────────────────────────────────────────────────────────
+class PalmLeafBorder extends StatelessWidget {
+  const PalmLeafBorder({super.key, this.height = 6});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(painter: _PalmLeafBorderPainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _PalmLeafBorderPainter extends CustomPainter {
+  const _PalmLeafBorderPainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final cy = size.height / 2;
+    final alpha = isDark ? 0.20 : 0.28;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.6
+      ..color = color.withValues(alpha: alpha);
+
+    canvas.drawLine(Offset(0, cy), Offset(w, cy), stroke);
+
+    const spacing = 16.0;
+    for (var x = spacing; x < w; x += spacing) {
+      canvas.drawLine(Offset(x, cy), Offset(x + 6, cy - size.height * 0.4), stroke);
+      canvas.drawLine(Offset(x, cy), Offset(x + 6, cy + size.height * 0.4), stroke);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PalmLeafBorderPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PrasadTrayIllustration — offering tray for bookmarks empty state
+// ─────────────────────────────────────────────────────────────────────────────
+class PrasadTrayIllustration extends StatelessWidget {
+  const PrasadTrayIllustration({super.key, this.size = 160});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _PrasadTrayPainter(color: color)),
+    );
+  }
+}
+
+class _PrasadTrayPainter extends CustomPainter {
+  const _PrasadTrayPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+    final cy = h / 2;
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.012
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.70);
+    final faint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.008
+      ..color = color.withValues(alpha: 0.35);
+
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, cy + h * 0.10), width: w * 0.80, height: h * 0.22),
+      stroke,
+    );
+
+    for (final r in [0.30, 0.45, 0.60]) {
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy + h * 0.10), width: w * r, height: h * r * 0.25),
+        faint,
+      );
+    }
+
+    final positions = [
+      Offset(cx, cy - h * 0.08),
+      Offset(cx - w * 0.22, cy + h * 0.02),
+      Offset(cx + w * 0.22, cy + h * 0.02),
+      Offset(cx - w * 0.12, cy + h * 0.14),
+      Offset(cx + w * 0.12, cy + h * 0.14),
+    ];
+
+    for (final pos in positions) {
+      _drawLotus(canvas, pos, w * 0.09, stroke, faint);
+    }
+  }
+
+  void _drawLotus(Canvas canvas, Offset center, double r, Paint stroke, Paint faint) {
+    for (var i = 0; i < 6; i++) {
+      final angle = i * math.pi / 3;
+      final tipDir = Offset(math.cos(angle), math.sin(angle));
+      final tip = center + tipDir * r;
+      final n = Offset(-tipDir.dy, tipDir.dx);
+      final path = Path()
+        ..moveTo(center.dx, center.dy)
+        ..quadraticBezierTo(
+          (center + n * (r * 0.55)).dx, (center + n * (r * 0.55)).dy,
+          tip.dx, tip.dy,
+        )
+        ..quadraticBezierTo(
+          (center - n * (r * 0.55)).dx, (center - n * (r * 0.55)).dy,
+          center.dx, center.dy,
+        );
+      canvas.drawPath(path, faint);
+    }
+    canvas.drawCircle(center, r * 0.20, stroke..style = PaintingStyle.fill);
+    stroke.style = PaintingStyle.stroke;
+  }
+
+  @override
+  bool shouldRepaint(covariant _PrasadTrayPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DiyaFlameIcon — 24px drawn diya (festivals, settings sections)
+// ─────────────────────────────────────────────────────────────────────────────
+class DiyaFlameIcon extends StatelessWidget {
+  const DiyaFlameIcon({super.key, this.size = 24});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _DiyaFlamePainter(color: color)),
+    );
+  }
+}
+
+class _DiyaFlamePainter extends CustomPainter {
+  const _DiyaFlamePainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.08
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+
+    final bowl = Path()
+      ..moveTo(w * 0.12, h * 0.54)
+      ..cubicTo(w * 0.08, h * 0.70, w * 0.18, h * 0.84, cx, h * 0.86)
+      ..cubicTo(w * 0.82, h * 0.84, w * 0.92, h * 0.70, w * 0.88, h * 0.54)
+      ..lineTo(w * 0.12, h * 0.54);
+    canvas.drawPath(bowl, stroke);
+
+    canvas.drawLine(Offset(cx, h * 0.54), Offset(cx, h * 0.40), stroke);
+    final flame = Path()
+      ..moveTo(cx, h * 0.40)
+      ..cubicTo(cx - w * 0.10, h * 0.30, cx - w * 0.08, h * 0.12, cx, h * 0.06)
+      ..cubicTo(cx + w * 0.08, h * 0.12, cx + w * 0.10, h * 0.30, cx, h * 0.40);
+    canvas.drawPath(flame, stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _DiyaFlamePainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  TempleStaircaseBackdrop — ascending steps, learning path header
+// ─────────────────────────────────────────────────────────────────────────────
+class TempleStaircaseBackdrop extends StatelessWidget {
+  const TempleStaircaseBackdrop({super.key, this.height = 100});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(painter: _TempleStaircasePainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _TempleStaircasePainter extends CustomPainter {
+  const _TempleStaircasePainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final alpha = isDark ? 0.20 : 0.26;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..color = color.withValues(alpha: alpha);
+
+    const steps = 8;
+    final stepW = w / steps;
+    final stepH = h / steps;
+
+    for (var i = 0; i < steps; i++) {
+      final x = i * stepW;
+      final y = h - (i + 1) * stepH;
+      canvas.drawLine(Offset(x, y + stepH), Offset(x + stepW, y + stepH), stroke);
+      canvas.drawLine(Offset(x + stepW, y + stepH), Offset(x + stepW, y), stroke);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TempleStaircasePainter old) => old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PeepalTreeBackdrop — faint peepal silhouette, module reader
+// ─────────────────────────────────────────────────────────────────────────────
+class PeepalTreeBackdrop extends StatelessWidget {
+  const PeepalTreeBackdrop({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return IgnorePointer(
+      child: SizedBox.expand(
+        child: CustomPaint(painter: _PeepalTreePainter(color: color, isDark: isDark)),
+      ),
+    );
+  }
+}
+
+class _PeepalTreePainter extends CustomPainter {
+  const _PeepalTreePainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final alpha = isDark ? 0.10 : 0.18;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: alpha);
+    final fill = Paint()
+      ..style = PaintingStyle.fill
+      ..color = color.withValues(alpha: alpha * 0.5);
+
+    canvas.drawLine(
+      Offset(w * 0.50, h),
+      Offset(w * 0.50, h * 0.55),
+      stroke..strokeWidth = 2.0,
+    );
+
+    final branches = [
+      (0.50, 0.55, 0.28, 0.32), (0.50, 0.55, 0.72, 0.32),
+      (0.50, 0.55, 0.50, 0.30), (0.28, 0.32, 0.16, 0.14),
+      (0.72, 0.32, 0.84, 0.14),
+    ];
+    stroke.strokeWidth = 0.8;
+    for (final (x1, y1, x2, y2) in branches) {
+      canvas.drawLine(Offset(w * x1, h * y1), Offset(w * x2, h * y2), stroke);
+    }
+
+    final leafPositions = [
+      (0.50, 0.20), (0.30, 0.18), (0.70, 0.18), (0.20, 0.26),
+      (0.80, 0.26), (0.40, 0.12), (0.60, 0.12), (0.50, 0.08),
+    ];
+    for (final (fx, fy) in leafPositions) {
+      final lc = Offset(w * fx, h * fy);
+      final lr = w * 0.042;
+      canvas.drawOval(Rect.fromCenter(center: lc, width: lr * 2, height: lr * 2.6), fill);
+      final tipPath = Path()
+        ..moveTo(lc.dx - lr * 0.3, lc.dy + lr * 1.1)
+        ..lineTo(lc.dx, lc.dy + lr * 1.8)
+        ..lineTo(lc.dx + lr * 0.3, lc.dy + lr * 1.1);
+      canvas.drawPath(tipPath, fill);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PeepalTreePainter old) => old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DhyanaAsanaBackdrop — seated rishi silhouette + incense, verse chat
+// ─────────────────────────────────────────────────────────────────────────────
+class DhyanaAsanaBackdrop extends StatelessWidget {
+  const DhyanaAsanaBackdrop({super.key, this.height = 120});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(painter: _DhyanaAsanaPainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _DhyanaAsanaPainter extends CustomPainter {
+  const _DhyanaAsanaPainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final alpha = isDark ? 0.16 : 0.22;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: alpha);
+
+    final cx = w * 0.50;
+
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, h * 0.78), width: w * 0.30, height: h * 0.16),
+      stroke,
+    );
+    canvas.drawLine(Offset(cx, h * 0.70), Offset(cx, h * 0.36), stroke);
+    canvas.drawCircle(Offset(cx, h * 0.26), h * 0.11, stroke);
+    canvas.drawLine(Offset(cx, h * 0.58), Offset(cx - w * 0.10, h * 0.72), stroke);
+    canvas.drawLine(Offset(cx, h * 0.58), Offset(cx + w * 0.10, h * 0.72), stroke);
+
+    final smokeX = cx - w * 0.20;
+    for (var i = 0; i < 3; i++) {
+      final xOff = i * w * 0.03;
+      final smokePath = Path()
+        ..moveTo(smokeX + xOff, h * 0.90)
+        ..cubicTo(
+          smokeX + xOff - w * 0.02, h * 0.75,
+          smokeX + xOff + w * 0.03, h * 0.60,
+          smokeX + xOff, h * 0.45,
+        )
+        ..cubicTo(
+          smokeX + xOff - w * 0.03, h * 0.30,
+          smokeX + xOff + w * 0.02, h * 0.15,
+          smokeX + xOff, h * 0.02,
+        );
+      canvas.drawPath(
+        smokePath,
+        stroke..color = color.withValues(alpha: alpha * (1 - i * 0.25)),
+      );
+    }
+    stroke.color = color.withValues(alpha: alpha);
+  }
+
+  @override
+  bool shouldRepaint(covariant _DhyanaAsanaPainter old) => old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  OilLampRowDivider — 3 diya lamps as section divider for settings
+// ─────────────────────────────────────────────────────────────────────────────
+class OilLampRowDivider extends StatelessWidget {
+  const OilLampRowDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: 28,
+      child: CustomPaint(painter: _OilLampRowPainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _OilLampRowPainter extends CustomPainter {
+  const _OilLampRowPainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final alpha = isDark ? 0.35 : 0.45;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: alpha);
+
+    canvas.drawLine(Offset(0, size.height / 2), Offset(w * 0.30, size.height / 2), stroke);
+    canvas.drawLine(Offset(w * 0.70, size.height / 2), Offset(w, size.height / 2), stroke);
+
+    final lampPositions = [w * 0.38, w * 0.50, w * 0.62];
+    for (final lx in lampPositions) {
+      _drawMiniDiya(canvas, lx, size.height / 2, size.height * 0.36, stroke);
+    }
+  }
+
+  void _drawMiniDiya(Canvas canvas, double cx, double cy, double r, Paint stroke) {
+    final bowl = Path()
+      ..moveTo(cx - r, cy)
+      ..cubicTo(cx - r, cy + r * 0.6, cx - r * 0.4, cy + r, cx, cy + r)
+      ..cubicTo(cx + r * 0.4, cy + r, cx + r, cy + r * 0.6, cx + r, cy)
+      ..lineTo(cx - r, cy);
+    canvas.drawPath(bowl, stroke);
+    final flame = Path()
+      ..moveTo(cx, cy)
+      ..cubicTo(cx - r * 0.3, cy - r * 0.7, cx - r * 0.2, cy - r * 1.4, cx, cy - r * 1.5)
+      ..cubicTo(cx + r * 0.2, cy - r * 1.4, cx + r * 0.3, cy - r * 0.7, cx, cy);
+    canvas.drawPath(flame, stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _OilLampRowPainter old) => old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  InscriptionBorderBackdrop — carved stone header for credits page
+// ─────────────────────────────────────────────────────────────────────────────
+class InscriptionBorderBackdrop extends StatelessWidget {
+  const InscriptionBorderBackdrop({super.key, this.height = 56});
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: CustomPaint(painter: _InscriptionBorderPainter(color: color, isDark: isDark)),
+    );
+  }
+}
+
+class _InscriptionBorderPainter extends CustomPainter {
+  const _InscriptionBorderPainter({required this.color, required this.isDark});
+  final Color color;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final alpha = isDark ? 0.28 : 0.35;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: alpha);
+    final dotFill = Paint()
+      ..style = PaintingStyle.fill
+      ..color = color.withValues(alpha: alpha);
+
+    canvas.drawLine(const Offset(0, 2), Offset(w, 2), stroke);
+    canvas.drawLine(Offset(0, h - 2), Offset(w, h - 2), stroke);
+
+    const spacing = 80.0;
+    for (var x = spacing / 2; x < w; x += spacing) {
+      final center = Offset(x, h / 2);
+      for (var i = 0; i < 4; i++) {
+        final a = i * math.pi / 2;
+        final tip = center + Offset(math.cos(a), math.sin(a)) * 8.0;
+        final n = Offset(-math.sin(a), math.cos(a));
+        final path = Path()
+          ..moveTo(center.dx, center.dy)
+          ..quadraticBezierTo(
+            (center + n * 5).dx, (center + n * 5).dy, tip.dx, tip.dy,
+          )
+          ..quadraticBezierTo(
+            (center - n * 5).dx, (center - n * 5).dy, center.dx, center.dy,
+          );
+        canvas.drawPath(path, stroke);
+      }
+      canvas.drawCircle(center, 1.5, dotFill);
+    }
+
+    canvas.drawLine(
+      Offset(0, h / 2),
+      Offset(w, h / 2),
+      stroke..color = color.withValues(alpha: alpha * 0.4),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _InscriptionBorderPainter old) => old.isDark != isDark;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Onboarding Path Step 2 Icon Painters
+// ─────────────────────────────────────────────────────────────────────────────
+
+class TempleStairsIcon extends StatelessWidget {
+  const TempleStairsIcon({super.key, this.size = 32, this.selected = false});
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _TempleStairsIconPainter(color: color)),
+    );
+  }
+}
+
+class _TempleStairsIconPainter extends CustomPainter {
+  const _TempleStairsIconPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.055
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+    const steps = 4;
+    for (var i = 0; i < steps; i++) {
+      final x = w * 0.10 + i * (w * 0.18);
+      final y = h * 0.90 - i * (h * 0.18);
+      canvas.drawLine(Offset(x, y), Offset(x + w * 0.22, y), stroke);
+      canvas.drawLine(Offset(x + w * 0.22, y), Offset(x + w * 0.22, y - h * 0.18), stroke);
+    }
+    final temple = Path()
+      ..moveTo(w * 0.82, h * 0.18)
+      ..lineTo(w * 0.70, h * 0.04)
+      ..lineTo(w * 0.58, h * 0.18);
+    canvas.drawPath(temple, stroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TempleStairsIconPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class DiamondKnotIcon extends StatelessWidget {
+  const DiamondKnotIcon({super.key, this.size = 32, this.selected = false});
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _DiamondKnotPainter(color: color)),
+    );
+  }
+}
+
+class _DiamondKnotPainter extends CustomPainter {
+  const _DiamondKnotPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+    final cy = h / 2;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.045
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+    final diamond = Path()
+      ..moveTo(cx, cy - h * 0.38)
+      ..lineTo(cx + w * 0.32, cy)
+      ..lineTo(cx, cy + h * 0.38)
+      ..lineTo(cx - w * 0.32, cy)
+      ..close();
+    canvas.drawPath(diamond, stroke);
+    canvas.drawLine(Offset(cx, cy - h * 0.22), Offset(cx, cy + h * 0.22), stroke);
+    canvas.drawLine(Offset(cx - w * 0.18, cy), Offset(cx + w * 0.18, cy), stroke);
+    for (final pos in [
+      Offset(cx, cy - h * 0.38),
+      Offset(cx + w * 0.32, cy),
+      Offset(cx, cy + h * 0.38),
+      Offset(cx - w * 0.32, cy),
+    ]) {
+      canvas.drawCircle(pos, w * 0.040, stroke..style = PaintingStyle.fill);
+      stroke.style = PaintingStyle.stroke;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DiamondKnotPainter old) => old.color != color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class OpenScrollIcon extends StatelessWidget {
+  const OpenScrollIcon({super.key, this.size = 32, this.selected = false});
+  final double size;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
+        : AppColors.textSecondary;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(painter: _OpenScrollPainter(color: color)),
+    );
+  }
+}
+
+class _OpenScrollPainter extends CustomPainter {
+  const _OpenScrollPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.040
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+    final faint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.025
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.45);
+    final leftCurl = Path()
+      ..moveTo(w * 0.10, h * 0.16)
+      ..cubicTo(w * 0.00, h * 0.16, w * 0.00, h * 0.84, w * 0.10, h * 0.84)
+      ..cubicTo(w * 0.18, h * 0.84, w * 0.18, h * 0.72, w * 0.10, h * 0.72)
+      ..cubicTo(w * 0.04, h * 0.72, w * 0.04, h * 0.28, w * 0.10, h * 0.28);
+    canvas.drawPath(leftCurl, stroke);
+    final rightCurl = Path()
+      ..moveTo(w * 0.90, h * 0.16)
+      ..cubicTo(w * 1.00, h * 0.16, w * 1.00, h * 0.84, w * 0.90, h * 0.84)
+      ..cubicTo(w * 0.82, h * 0.84, w * 0.82, h * 0.72, w * 0.90, h * 0.72)
+      ..cubicTo(w * 0.96, h * 0.72, w * 0.96, h * 0.28, w * 0.90, h * 0.28);
+    canvas.drawPath(rightCurl, stroke);
+    for (final y in [0.34, 0.48, 0.62]) {
+      canvas.drawLine(Offset(w * 0.22, h * y), Offset(w * 0.78, h * y), faint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _OpenScrollPainter old) => old.color != color;
+}
