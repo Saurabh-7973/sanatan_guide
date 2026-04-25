@@ -24,22 +24,23 @@ class MandalaBackdrop extends StatelessWidget {
   const MandalaBackdrop({
     super.key,
     this.size = 320,
-    this.opacity = 0.10,
+    this.opacity,
   });
 
   final double size;
-  final double opacity;
+  final double? opacity;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    final resolvedOpacity = opacity ?? (isDark ? 0.10 : 0.24);
     return IgnorePointer(
       child: SizedBox(
         width: size,
         height: size,
         child: CustomPaint(
-          painter: _MandalaPainter(color: color, baseOpacity: opacity),
+          painter: _MandalaPainter(color: color, baseOpacity: resolvedOpacity),
         ),
       ),
     );
@@ -300,19 +301,24 @@ class VineFlourish extends StatelessWidget {
       child: SizedBox(
         width: maxWidth,
         height: height,
-        child: CustomPaint(painter: _VinePainter(color: color)),
+        child: CustomPaint(painter: _VinePainter(color: color, isDark: isDark)),
       ),
     );
   }
 }
 
 class _VinePainter extends CustomPainter {
-  _VinePainter({required this.color});
+  _VinePainter({required this.color, required this.isDark});
 
   final Color color;
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final ruleAlpha  = isDark ? 0.40 : 0.30;
+    final petalAlpha = isDark ? 0.70 : 0.55;
+    final dotAlpha   = isDark ? 0.75 : 0.60;
+
     final cy = size.height / 2;
     final cx = size.width / 2;
 
@@ -320,39 +326,24 @@ class _VinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.7
       ..strokeCap = StrokeCap.round
-      ..color = color.withValues(alpha: 0.40);
+      ..color = color.withValues(alpha: ruleAlpha);
 
     final petal = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.7
       ..strokeCap = StrokeCap.round
-      ..color = color.withValues(alpha: 0.70);
+      ..color = color.withValues(alpha: petalAlpha);
 
     final dot = Paint()
       ..style = PaintingStyle.fill
-      ..color = color.withValues(alpha: 0.75);
+      ..color = color.withValues(alpha: dotAlpha);
 
-    // Rosette radius (4 petals around centre)
     const rosetteR = 6.0;
-
-    // Left rule
-    canvas.drawLine(
-      Offset(0, cy),
-      Offset(cx - rosetteR - 8, cy),
-      rule,
-    );
-    // Right rule
-    canvas.drawLine(
-      Offset(cx + rosetteR + 8, cy),
-      Offset(size.width, cy),
-      rule,
-    );
-
-    // Terminal dots
+    canvas.drawLine(Offset(0, cy), Offset(cx - rosetteR - 8, cy), rule);
+    canvas.drawLine(Offset(cx + rosetteR + 8, cy), Offset(size.width, cy), rule);
     canvas.drawCircle(Offset(0, cy), 1.2, dot);
     canvas.drawCircle(Offset(size.width, cy), 1.2, dot);
 
-    // Central 4-petal rosette
     for (var i = 0; i < 4; i++) {
       final a = i * math.pi / 2;
       final tip = Offset(cx + math.cos(a) * rosetteR, cy + math.sin(a) * rosetteR);
@@ -365,13 +356,12 @@ class _VinePainter extends CustomPainter {
         ..quadraticBezierTo(ctrl2.dx, ctrl2.dy, cx, cy);
       canvas.drawPath(path, petal);
     }
-
-    // Centre bindu
     canvas.drawCircle(Offset(cx, cy), 1.4, dot);
   }
 
   @override
-  bool shouldRepaint(covariant _VinePainter old) => old.color != color;
+  bool shouldRepaint(covariant _VinePainter old) =>
+      old.color != color || old.isDark != isDark;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -642,7 +632,7 @@ class KalashFinial extends StatelessWidget {
     final widget = SizedBox(
       width: height * 0.55,
       height: height,
-      child: CustomPaint(painter: _KalashPainter(color: color)),
+      child: CustomPaint(painter: _KalashPainter(color: color, isDark: isDark)),
     );
     if (!flip) return widget;
     return Transform(
@@ -654,22 +644,26 @@ class KalashFinial extends StatelessWidget {
 }
 
 class _KalashPainter extends CustomPainter {
-  _KalashPainter({required this.color});
+  _KalashPainter({required this.color, required this.isDark});
 
   final Color color;
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final strokeAlpha = isDark ? 0.65 : 0.45;
+    final fillAlpha   = isDark ? 0.85 : 0.65;
+
     final stroke = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.9
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..color = color.withValues(alpha: 0.65);
+      ..color = color.withValues(alpha: strokeAlpha);
 
     final fill = Paint()
       ..style = PaintingStyle.fill
-      ..color = color.withValues(alpha: 0.85);
+      ..color = color.withValues(alpha: fillAlpha);
 
     final w = size.width;
     final h = size.height;
@@ -753,5 +747,6 @@ class _KalashPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _KalashPainter old) => old.color != color;
+  bool shouldRepaint(covariant _KalashPainter old) =>
+      old.color != color || old.isDark != isDark;
 }
