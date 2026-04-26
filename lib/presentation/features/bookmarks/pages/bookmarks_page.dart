@@ -6,6 +6,7 @@ import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/verse_preview_tile.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -72,18 +73,10 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '—',
-              style: TextStyle(
-                fontFamily: 'Lora',
-                fontSize: 72,
-                color: AppColors.warmGrey50,
-                height: 1,
-              ),
-            ),
+            const PrasadTrayIllustration(size: 160),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'Your saved verses will\nappear here',
+              'Your offerings await',
               style: context.ts.bodyLarge,
               textAlign: TextAlign.center,
             ),
