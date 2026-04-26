@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/core/constants/content_credits.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 
@@ -33,6 +34,11 @@ class CreditsPage extends StatelessWidget {
           bottom: AppSpacing.xxl,
         ),
         children: [
+          const SizedBox(
+            height: 32,
+            child: InscriptionBorderBackdrop(),
+          ),
+          const SizedBox(height: AppSpacing.md),
           const _DisclaimerBanner(),
           const SizedBox(height: AppSpacing.xl),
           ..._groupedCreditWidgets(context, isDark),

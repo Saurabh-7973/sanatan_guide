@@ -7,6 +7,7 @@ import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -22,6 +23,9 @@ class LearningPathPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text('Your Path', style: context.ts.displayMedium),
         centerTitle: false,
+        flexibleSpace: const IgnorePointer(
+          child: TempleStaircaseBackdrop(),
+        ),
       ),
       body: state.when(
         loading: () => const LearningPathShimmer(),

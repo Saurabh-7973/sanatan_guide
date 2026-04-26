@@ -6,6 +6,7 @@ import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -161,6 +162,9 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
           ],
         ),
         centerTitle: false,
+        flexibleSpace: const IgnorePointer(
+          child: DhyanaAsanaBackdrop(),
+        ),
       ),
       resizeToAvoidBottomInset: true,
       body: state.when(

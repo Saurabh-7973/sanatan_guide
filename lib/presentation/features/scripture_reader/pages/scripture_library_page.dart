@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/router/app_routes.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 
@@ -15,6 +16,9 @@ class ScriptureLibraryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Library', style: context.ts.displayMedium),
         centerTitle: false,
+        flexibleSpace: const IgnorePointer(
+          child: NalandaArchBackdrop(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmark_rounded),
