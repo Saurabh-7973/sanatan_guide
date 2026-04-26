@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,10 +8,11 @@ import 'package:go_router/go_router.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
+import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/services/review_service.dart';
+import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
-import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
@@ -20,12 +22,13 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/c
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/reading_mode_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
-import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/ai_explanation_block.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/commentaries_block.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/gutter_rail.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/sanctum_card.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/share_card_generator.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/share_card_widget.dart';
-import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/verse_content_sliver.dart';
-import 'package:sanatan_guide/core/services/gemini_service.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart'
+    as font_prefs;
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -374,11 +377,48 @@ class _VerseScaffoldState extends ConsumerState<_VerseScaffold> {
     final nextId = adjacent.asData?.value.nextId;
     final hasNote = _noteController.text.trim().isNotEmpty ||
         (verse.noteText != null && verse.noteText!.isNotEmpty);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saff = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    final muted = isDark
+        ? AppColors.textSecondaryOnDark
+        : AppColors.textSecondary;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
+          onPressed: widget.onBack,
+        ),
+        actions: [
+          _BookmarkAction(verseId: verse.id),
+          if (GeminiService.isEnabled)
+            IconButton(
+              icon: const Icon(Icons.auto_awesome_outlined),
+              tooltip: 'Ask about this verse',
+              color: AppColors.warmGrey50,
+              onPressed: () => context.push(
+                '/browse/${verse.scripture.code}/verse/${verse.id}/chat',
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Share verse',
+            onPressed: () {
+              AnalyticsService.verseShared(verse.id);
+              ShareCardGenerator.captureAndShare(
+                repaintKey: widget.shareCardKey,
+                verse: verse,
+              );
+            },
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          // Offscreen share card
           Transform.translate(
             offset: const Offset(-10000, 0),
             child: RepaintBoundary(
@@ -387,7 +427,6 @@ class _VerseScaffoldState extends ConsumerState<_VerseScaffold> {
             ),
           ),
 
-          // Temple mode hint overlay
           if (_showTempleHint)
             Positioned(
               bottom: 96,
@@ -422,19 +461,9 @@ class _VerseScaffoldState extends ConsumerState<_VerseScaffold> {
               ),
             ),
 
-          // Main scrollable content with swipe navigation
           GestureDetector(
             onDoubleTap: _toggleTempleMode,
             onHorizontalDragEnd: (details) {
-              if (details.primaryVelocity != null &&
-                  details.primaryVelocity! > 300 &&
-                  prevId != null) {
-                try {
-                  Haptics.vibrate(HapticsType.light);
-                } catch (_) {}
-                widget.onGoToVerse(prevId);
-                return;
-              }
               if (details.primaryVelocity != null &&
                   details.primaryVelocity! < -300 &&
                   nextId != null) {
@@ -444,101 +473,46 @@ class _VerseScaffoldState extends ConsumerState<_VerseScaffold> {
                 widget.onGoToVerse(nextId);
               }
             },
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              slivers: [
-                SliverAppBar(
-                  floating: true,
-                  snap: true,
-                  pinned: false,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    tooltip: 'Back',
-                    onPressed: () {
-                      widget.onBack();
-                    },
-                  ),
-                  title: Text(
-                    getVerseLabel(verse),
-                    style: context.ts.labelSmall,
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    _BookmarkAction(verseId: verse.id),
-                    if (GeminiService.isEnabled)
-                      IconButton(
-                        icon: const Icon(Icons.auto_awesome_outlined),
-                        tooltip: 'Ask about this verse',
-                        color: AppColors.warmGrey50,
-                        onPressed: () => context.push(
-                          '/browse/${verse.scripture.code}/verse/${verse.id}/chat',
-                        ),
-                      ),
-                    IconButton(
-                      icon: const Icon(Icons.share_outlined),
-                      tooltip: 'Share verse',
-                      onPressed: () {
-                        AnalyticsService.verseShared(verse.id);
-                        ShareCardGenerator.captureAndShare(
-                          repaintKey: widget.shareCardKey,
-                          verse: verse,
-                        );
-                      },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GutterRail(verse: verse),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics(),
                     ),
-                  ],
-                ),
-
-                // ── Translation toggle (fades in Temple mode) ──────
-                SliverToBoxAdapter(
-                  child: AnimatedOpacity(
-                    opacity: _templeMode ? 0.0 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOutCubic,
-                    child: IgnorePointer(
-                      ignoring: _templeMode,
-                      child: const _TranslationToggle(),
+                    child: _SanctumContent(
+                      verse: verse,
+                      isDark: isDark,
+                      saff: saff,
+                      muted: muted,
+                      plainSanskritReading: _plainSanskritReading,
+                      canStripAccents: _canStripVedicAccents(verse),
+                      isTirukkural: _isTirukkuralVerse(verse),
+                      onToggleAccents: () => setState(() {
+                        _plainSanskritReading = !_plainSanskritReading;
+                      }),
+                      wordMeaningsExpanded: _wordMeaningsExpanded,
+                      onToggleWordMeanings: () => setState(() {
+                        _wordMeaningsExpanded = !_wordMeaningsExpanded;
+                      }),
+                      showTranslitOverride: _showTranslit,
+                      onToggleTranslit: () => setState(() {
+                        _showTranslit = !_showTranslit;
+                      }),
+                      noteController: _noteController,
+                      onNoteChanged: _onNoteChanged,
+                      onOpenNotes: _showNotesSheet,
+                      hasNote: hasNote,
                     ),
                   ),
-                ),
-
-                // ── Verse content ──────────────────────────────────
-                VerseContentSliver(
-                  verse: verse,
-                  plainSanskritReading: _plainSanskritReading,
-                  canStripAccents: _canStripVedicAccents(verse),
-                  isTirukkural: _isTirukkuralVerse(verse),
-                  onToggleAccents: () => setState(() {
-                    _plainSanskritReading = !_plainSanskritReading;
-                  }),
-                  wordMeaningsExpanded: _wordMeaningsExpanded,
-                  onToggleWordMeanings: () => setState(() {
-                    _wordMeaningsExpanded = !_wordMeaningsExpanded;
-                  }),
-                  hasPrev: prevId != null,
-                  hasNext: nextId != null,
-                  showTranslitOverride: _showTranslit,
-                  onToggleTranslit: () => setState(() {
-                    _showTranslit = !_showTranslit;
-                  }),
-                ),
-                SliverToBoxAdapter(
-                  child: AiExplanationBlock(verseId: verse.id),
-                ),
-                SliverToBoxAdapter(
-                  child: CommentariesBlock(verseId: verse.id),
                 ),
               ],
             ),
           ),
         ],
       ),
-
-      // ── Bottom verse navigation bar (fades in Temple mode) ──────
       bottomNavigationBar: AnimatedOpacity(
         opacity: _templeMode ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 200),
@@ -554,6 +528,483 @@ class _VerseScaffoldState extends ConsumerState<_VerseScaffold> {
             hasNote: hasNote,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Sanctum right-column content ─────────────────────────────────────────
+
+class _SanctumContent extends ConsumerWidget {
+  const _SanctumContent({
+    required this.verse,
+    required this.isDark,
+    required this.saff,
+    required this.muted,
+    required this.plainSanskritReading,
+    required this.canStripAccents,
+    required this.isTirukkural,
+    required this.onToggleAccents,
+    required this.wordMeaningsExpanded,
+    required this.onToggleWordMeanings,
+    required this.showTranslitOverride,
+    required this.onToggleTranslit,
+    required this.noteController,
+    required this.onNoteChanged,
+    required this.onOpenNotes,
+    required this.hasNote,
+  });
+
+  final Verse verse;
+  final bool isDark;
+  final Color saff;
+  final Color muted;
+  final bool plainSanskritReading;
+  final bool canStripAccents;
+  final bool isTirukkural;
+  final VoidCallback onToggleAccents;
+  final bool wordMeaningsExpanded;
+  final VoidCallback onToggleWordMeanings;
+  final bool showTranslitOverride;
+  final VoidCallback onToggleTranslit;
+  final TextEditingController noteController;
+  final ValueChanged<String> onNoteChanged;
+  final VoidCallback onOpenNotes;
+  final bool hasNote;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(readingModeProvider);
+    final fontSize = ref.watch(font_prefs.fontSizeProvider);
+    final showSanskrit =
+        mode == ReadingMode.all || mode == ReadingMode.sanskrit;
+    final showTranslit = mode == ReadingMode.all || showTranslitOverride;
+    final showTranslation =
+        mode == ReadingMode.all || mode == ReadingMode.translationOnly;
+    const saffFaint = AppColors.saffronFaint;
+    final borderC = isDark ? AppColors.borderDark : AppColors.border;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 10, 18, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _TranslationToggle(),
+          const SizedBox(height: AppSpacing.md),
+
+          // Scripture chip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: saffFaint,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: saff,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  verse.scripture.displayName,
+                  style: TextStyle(
+                    fontFamily: 'Lora',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: saff,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Sanskrit / Tamil
+          if (showSanskrit && verse.sanskrit.isNotEmpty) ...[
+            if (isTirukkural)
+              _TamilInline(verse: verse, isDark: isDark)
+            else
+              _SanskritInline(
+                verse: verse,
+                plain: plainSanskritReading,
+                canStrip: canStripAccents,
+                onToggleAccents: onToggleAccents,
+                fontSize: fontSize,
+                isDark: isDark,
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+
+          if (showSanskrit &&
+              verse.sanskrit.isNotEmpty &&
+              canStripAccents)
+            Text(
+              plainSanskritReading
+                  ? 'Tap Sanskrit to show Vedic accents'
+                  : 'Tap Sanskrit for plain reading',
+              style: TextStyle(
+                fontSize: 11,
+                color: muted.withValues(alpha: 0.6),
+              ),
+            ),
+
+          if (!showTranslit &&
+              mode != ReadingMode.all &&
+              verse.transliteration != null &&
+              verse.transliteration!.isNotEmpty &&
+              showSanskrit) ...[
+            const SizedBox(height: AppSpacing.sm),
+            GestureDetector(
+              onTap: onToggleTranslit,
+              child: Text(
+                showTranslitOverride
+                    ? 'Hide pronunciation'
+                    : 'Show pronunciation',
+                style: TextStyle(
+                  fontFamily: 'Lora',
+                  fontSize: 13,
+                  color: saff,
+                  decoration: TextDecoration.underline,
+                  decorationColor: saff,
+                ),
+              ),
+            ),
+          ],
+
+          if (showTranslit &&
+              verse.transliteration != null &&
+              verse.transliteration!.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Container(width: 20, height: 1, color: borderC),
+                const SizedBox(width: 8),
+                Text(
+                  'TRANSLITERATION',
+                  style: TextStyle(
+                    fontFamily: 'Lora',
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                    color: muted,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              verse.transliteration!,
+              style: TextStyle(
+                fontFamily: 'Lora',
+                fontStyle: FontStyle.italic,
+                fontSize: fontSize,
+                height: 1.7,
+                color: isDark
+                    ? const Color(0xFFB8A88E)
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 22),
+          ],
+
+          // Translation card
+          if (showTranslation &&
+              ((verse.english != null && verse.english!.isNotEmpty) ||
+                  (verse.hindi != null && verse.hindi!.isNotEmpty)))
+            SanctumCard(
+              title: 'Translation',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (verse.english != null && verse.english!.isNotEmpty)
+                    Text(
+                      verse.english!,
+                      style: TextStyle(
+                        fontFamily: 'Lora',
+                        fontSize: fontSize,
+                        height: 1.65,
+                        color: isDark
+                            ? AppColors.textOnDark
+                            : AppColors.textPrimary.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  if (verse.hindi != null && verse.hindi!.isNotEmpty) ...[
+                    if (verse.english != null &&
+                        verse.english!.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Divider(height: 1, color: borderC),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    Text(
+                      'HINDI',
+                      style: TextStyle(
+                        fontFamily: 'Lora',
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2,
+                        color: muted,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      verse.hindi!,
+                      style: TextStyle(
+                        fontFamily: 'NotoSansDevanagari',
+                        fontSize: math.max(15.0, fontSize),
+                        height: 1.7,
+                        color: isDark
+                            ? AppColors.textOnDark
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+          if (!showTranslation &&
+              (verse.english != null && verse.english!.isNotEmpty)) ...[
+            const SizedBox(height: AppSpacing.md),
+            GestureDetector(
+              onTap: () => ref
+                  .read(readingModeProvider.notifier)
+                  .setMode(ReadingMode.all),
+              child: Text(
+                'Translation hidden · tap to show',
+                style: TextStyle(
+                  fontFamily: 'Lora',
+                  fontSize: 12,
+                  color: saff.withValues(alpha: 0.7),
+                  decoration: TextDecoration.underline,
+                  decorationColor: saff.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ],
+
+          // Word-by-word card
+          if (verse.wordMeanings != null && verse.wordMeanings!.isNotEmpty)
+            SanctumCard(
+              title: 'Word by Word',
+              collapsible: true,
+              initiallyExpanded: wordMeaningsExpanded,
+              child: Column(
+                children: verse.wordMeanings!.map((wm) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        SizedBox(
+                          width: 86,
+                          child: Text(
+                            wm.word,
+                            style: TextStyle(
+                              fontFamily: 'TiroDevanagari',
+                              fontSize: 17,
+                              color: isDark
+                                  ? AppColors.sanskritTextOnDark
+                                  : AppColors.sanskritText,
+                            ),
+                          ),
+                        ),
+                        Text('·',
+                            style: TextStyle(color: muted, fontSize: 13)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            wm.meaning,
+                            style: TextStyle(
+                              fontFamily: 'Lora',
+                              fontSize: fontSize,
+                              color: isDark
+                                  ? AppColors.textOnDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+          // Your Reflection card
+          SanctumCard(
+            title: 'Your Reflection',
+            headerAction: GestureDetector(
+              onTap: onOpenNotes,
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  fontFamily: 'Lora',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: saff,
+                ),
+              ),
+            ),
+            child: noteController.text.trim().isEmpty
+                ? Text(
+                    'Tap Edit to add your reflection on this verse.',
+                    style: TextStyle(
+                      fontFamily: 'Lora',
+                      fontStyle: FontStyle.italic,
+                      fontSize: 14,
+                      height: 1.7,
+                      color: muted,
+                    ),
+                  )
+                : Text(
+                    noteController.text.trim(),
+                    style: TextStyle(
+                      fontFamily: 'Lora',
+                      fontStyle: FontStyle.italic,
+                      fontSize: 15,
+                      height: 1.7,
+                      color: isDark
+                          ? AppColors.textOnDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+          ),
+
+          // Ask the Guide row
+          if (GeminiService.isEnabled) ...[
+            GestureDetector(
+              onTap: () => context.push(
+                '/browse/${verse.scripture.code}/verse/${verse.id}/chat',
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: saffFaint,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: saff.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.auto_awesome_outlined, color: saff, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Ask the Guide',
+                            style: TextStyle(
+                              fontFamily: 'Lora',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColors.textOnDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Context, meaning, Sanskrit terms',
+                            style: TextStyle(
+                              fontFamily: 'Lora',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                              color: muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: saff, size: 18),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
+          CommentariesBlock(verseId: verse.id),
+
+          const SizedBox(height: AppSpacing.xl),
+          Text(
+            'Swipe left or right to navigate',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11,
+              color: muted.withValues(alpha: 0.35),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.huge),
+        ],
+      ),
+    );
+  }
+}
+
+class _SanskritInline extends StatelessWidget {
+  const _SanskritInline({
+    required this.verse,
+    required this.plain,
+    required this.canStrip,
+    required this.onToggleAccents,
+    required this.fontSize,
+    required this.isDark,
+  });
+
+  final Verse verse;
+  final bool plain;
+  final bool canStrip;
+  final VoidCallback onToggleAccents;
+  final double fontSize;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final text =
+        plain && canStrip ? stripVedicAccents(verse.sanskrit) : verse.sanskrit;
+    final color =
+        isDark ? AppColors.sanskritTextOnDark : AppColors.sanskritText;
+    final scale = fontSize / font_prefs.kDefaultFontSize;
+
+    return GestureDetector(
+      onTap: canStrip ? onToggleAccents : null,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontFamily: 'TiroDevanagari',
+          fontSize: 24 * scale,
+          height: 2.0,
+          color: color,
+          letterSpacing: 0.4,
+        ),
+      ),
+    );
+  }
+}
+
+class _TamilInline extends StatelessWidget {
+  const _TamilInline({required this.verse, required this.isDark});
+
+  final Verse verse;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      verse.sanskrit,
+      style: TextStyle(
+        fontFamily: 'monospace',
+        fontSize: 24,
+        height: 2.0,
+        color: isDark ? AppColors.sanskritTextOnDark : AppColors.sanskritText,
       ),
     );
   }
