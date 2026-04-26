@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/credits_page.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
@@ -40,34 +41,19 @@ class SettingsPage extends ConsumerWidget {
           _SectionHeader(title: l10n.settingsSectionAppearance),
           const _ThemeTile(),
           const _FontSizeTile(),
-          const Divider(
-            indent: AppSpacing.pagePadding,
-            endIndent: AppSpacing.pagePadding,
-          ),
+          const OilLampRowDivider(),
           _SectionHeader(title: l10n.settingsSectionLanguage),
           const _LanguageTile(),
-          const Divider(
-            indent: AppSpacing.pagePadding,
-            endIndent: AppSpacing.pagePadding,
-          ),
+          const OilLampRowDivider(),
           _SectionHeader(title: l10n.settingsSectionNotifications),
           const _NotificationTimeTile(),
-          const Divider(
-            indent: AppSpacing.pagePadding,
-            endIndent: AppSpacing.pagePadding,
-          ),
+          const OilLampRowDivider(),
           _SectionHeader(title: l10n.settingsSectionData),
           const _ClearHistoryTile(),
-          const Divider(
-            indent: AppSpacing.pagePadding,
-            endIndent: AppSpacing.pagePadding,
-          ),
+          const OilLampRowDivider(),
           _SectionHeader(title: l10n.settingsSectionReading),
           const _ExperienceLevelTile(),
-          const Divider(
-            indent: AppSpacing.pagePadding,
-            endIndent: AppSpacing.pagePadding,
-          ),
+          const OilLampRowDivider(),
           _SectionHeader(title: l10n.settingsSectionAbout),
           const _AppVersionTile(),
           const _CreditsTile(),
