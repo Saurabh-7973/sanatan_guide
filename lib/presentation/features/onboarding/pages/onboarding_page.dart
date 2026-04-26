@@ -8,6 +8,7 @@ import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/onboarding_service.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 
@@ -54,35 +55,42 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.pagePadding,
-              vertical: AppSpacing.lg,
+        body: Stack(
+          children: [
+            const Positioned.fill(
+              child: IgnorePointer(child: GangaWaveBackdrop()),
             ),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 280),
-              transitionBuilder: (child, animation) {
-                final isForward = child.key == const ValueKey(1);
-                final offset = isForward
-                    ? const Offset(0.12, 0)
-                    : const Offset(-0.12, 0);
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: offset,
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  )),
-                  child: FadeTransition(opacity: animation, child: child),
-                );
-              },
-              child: _step == 0
-                  ? _buildExperienceStep(key: const ValueKey(0))
-                  : _buildPathStep(key: const ValueKey(1)),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.pagePadding,
+                  vertical: AppSpacing.lg,
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 280),
+                  transitionBuilder: (child, animation) {
+                    final isForward = child.key == const ValueKey(1);
+                    final offset = isForward
+                        ? const Offset(0.12, 0)
+                        : const Offset(-0.12, 0);
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: offset,
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      )),
+                      child: FadeTransition(opacity: animation, child: child),
+                    );
+                  },
+                  child: _step == 0
+                      ? _buildExperienceStep(key: const ValueKey(0))
+                      : _buildPathStep(key: const ValueKey(1)),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -95,8 +103,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       children: [
         const Spacer(),
         const Text(
-          '🕉',
-          style: TextStyle(fontSize: 48),
+          'ॐ',
+          style: TextStyle(
+            fontFamily: 'TiroDevanagari',
+            fontSize: 56,
+            color: AppColors.saffron,
+            height: 1,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -116,7 +129,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         const SizedBox(height: AppSpacing.xl),
         _LevelCard(
           level: UserExperienceLevel.beginner,
-          emoji: '🌱',
+          icon: const SeedlingIcon(size: 32),
           selected: _selectedLevel == UserExperienceLevel.beginner,
           onTap: () => setState(
             () => _selectedLevel = UserExperienceLevel.beginner,
@@ -125,7 +138,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         const SizedBox(height: AppSpacing.md),
         _LevelCard(
           level: UserExperienceLevel.regular,
-          emoji: '🪔',
+          icon: const DiyaIcon(size: 32),
           selected: _selectedLevel == UserExperienceLevel.regular,
           onTap: () =>
               setState(() => _selectedLevel = UserExperienceLevel.regular),
@@ -133,7 +146,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         const SizedBox(height: AppSpacing.md),
         _LevelCard(
           level: UserExperienceLevel.scholar,
-          emoji: '📜',
+          icon: const ScrollIcon(size: 32),
           selected: _selectedLevel == UserExperienceLevel.scholar,
           onTap: () =>
               setState(() => _selectedLevel = UserExperienceLevel.scholar),
@@ -169,21 +182,21 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         ),
         const Spacer(),
         _PathCard(
-          emoji: '🌱',
+          icon: const TempleStairsIcon(size: 32),
           title: 'Complete Beginner',
           subtitle: 'I know little about Hinduism',
           onTap: () => _selectPath(destination: '/learn/mod_01'),
         ),
         const SizedBox(height: AppSpacing.md),
         _PathCard(
-          emoji: '🪔',
+          icon: const DiamondKnotIcon(size: 32),
           title: 'Curious Hindu',
           subtitle: 'I grew up Hindu but want to learn deeper',
           onTap: () => _selectPath(destination: '/learn/mod_03'),
         ),
         const SizedBox(height: AppSpacing.md),
         _PathCard(
-          emoji: '📖',
+          icon: const OpenScrollIcon(size: 32),
           title: 'Serious Seeker',
           subtitle: 'I want to read the scriptures directly',
           onTap: () =>
@@ -236,13 +249,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 class _LevelCard extends StatelessWidget {
   const _LevelCard({
     required this.level,
-    required this.emoji,
+    required this.icon,
     required this.selected,
     required this.onTap,
   });
 
   final UserExperienceLevel level;
-  final String emoji;
+  final Widget icon;
   final bool selected;
   final VoidCallback onTap;
 
@@ -270,7 +283,7 @@ class _LevelCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
+            SizedBox(width: 32, height: 32, child: icon),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -304,13 +317,13 @@ class _LevelCard extends StatelessWidget {
 
 class _PathCard extends StatelessWidget {
   const _PathCard({
-    required this.emoji,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
 
-  final String emoji;
+  final Widget icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -332,7 +345,7 @@ class _PathCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
+            SizedBox(width: 32, height: 32, child: icon),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
