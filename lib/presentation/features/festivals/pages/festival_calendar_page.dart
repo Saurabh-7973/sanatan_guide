@@ -4,6 +4,7 @@ import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -155,10 +156,7 @@ class _FestivalTile extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Hero(
               tag: 'festival_emoji_${festival.id}',
-              child: Text(
-                festival.emoji,
-                style: const TextStyle(fontSize: 24),
-              ),
+              child: const DiyaFlameIcon(size: 24),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -271,10 +269,7 @@ class _FestivalDetailPage extends StatelessWidget {
           children: [
             Hero(
               tag: 'festival_emoji_${festival.id}',
-              child: Text(
-                festival.emoji,
-                style: const TextStyle(fontSize: 56),
-              ),
+              child: const DiyaFlameIcon(size: 56),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(festival.name, style: context.ts.displayLarge),
