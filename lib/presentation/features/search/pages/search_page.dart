@@ -9,6 +9,7 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/features/search/providers/search_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/verse_preview_tile.dart';
@@ -98,10 +99,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               hintStyle: context.ts.bodyMedium.copyWith(
                 color: AppColors.textHint,
               ),
-              prefixIcon: const Icon(
-                Icons.search_rounded,
-                size: 20,
-                color: AppColors.textHint,
+              prefixIcon: const Padding(
+                padding: EdgeInsets.all(12),
+                child: PeacockIllustration(
+                  singleFeather: true,
+                  size: 20,
+                ),
               ),
               suffixIcon: query.isNotEmpty
                   ? IconButton(
@@ -250,19 +253,7 @@ class _EmptyPrompt extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.warmGrey10,
-              ),
-              child: const Icon(
-                Icons.auto_stories_outlined,
-                size: 32,
-                color: AppColors.warmGrey50,
-              ),
-            ),
+            const PeacockIllustration(size: 200),
             const SizedBox(height: AppSpacing.xl),
             Text(
               'Explore the scriptures',
