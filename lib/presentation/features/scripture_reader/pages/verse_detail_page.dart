@@ -30,6 +30,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/sha
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart'
     as font_prefs;
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -981,9 +982,9 @@ class _SanskritInline extends StatelessWidget {
         style: TextStyle(
           fontFamily: 'TiroDevanagari',
           fontSize: 24 * scale,
-          height: 2.0,
+          height: 1.95,
           color: color,
-          letterSpacing: 0.4,
+          letterSpacing: 0.1,
         ),
       ),
     );
@@ -1069,14 +1070,13 @@ class _VerseNavBar extends StatelessWidget {
                 : null,
           ),
 
-          // Center: verse position label
+          // Center: daṇḍa-coord verse identity ‖१·१‖
           Expanded(
-            child: Text(
-              'Verse ${verse.verseNum}',
-              textAlign: TextAlign.center,
-              style: context.ts.caption.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+            child: Center(
+              child: DandaCoord(
+                chapter: verse.chapterNum,
+                verse: verse.verseNum,
+                isDark: isDark,
               ),
             ),
           ),
