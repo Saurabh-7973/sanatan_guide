@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/onboarding_service.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
+import 'package:sanatan_guide/presentation/features/onboarding/providers/daily_reminder_provider.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -23,200 +23,34 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   int _step = 0;
   UserExperienceLevel? _selectedLevel;
 
-  Future<void> _skipToHome() async {
+  Future<void> _finishOnboarding({
+    required bool reminderEnabled,
+    TimeOfDay? reminderTime,
+  }) async {
+    final notifier = ref.read(dailyReminderProvider.notifier);
+    await notifier.setEnabled(reminderEnabled);
+    if (reminderEnabled && reminderTime != null) {
+      await notifier.setTime(reminderTime);
+    }
+    unawaited(
+      AnalyticsService.onboardingReminderChosen(
+        enabled: reminderEnabled,
+        hour: reminderTime?.hour,
+        minute: reminderTime?.minute,
+      ),
+    );
     await OnboardingService.markComplete();
     if (mounted) context.go('/home');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, dynamic result) async {
-        if (_step == 1) {
-          setState(() => _step = 0);
-        } else {
-          await _skipToHome();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          leading: _step == 1
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => setState(() => _step = 0),
-                )
-              : IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip: 'Skip',
-                  onPressed: _skipToHome,
-                ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: IgnorePointer(child: GangaWaveBackdrop()),
-            ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.pagePadding,
-                  vertical: AppSpacing.lg,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 280),
-                  transitionBuilder: (child, animation) {
-                    final isForward = child.key == const ValueKey(1);
-                    final offset = isForward
-                        ? const Offset(0.12, 0)
-                        : const Offset(-0.12, 0);
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: offset,
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutCubic,
-                      )),
-                      child: FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: _step == 0
-                      ? _buildExperienceStep(key: const ValueKey(0))
-                      : _buildPathStep(key: const ValueKey(1)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _skipFromWelcome() async {
+    await ref
+        .read(userExperienceLevelProvider.notifier)
+        .setLevel(UserExperienceLevel.regular);
+    if (mounted) setState(() => _step = 1);
   }
 
-  Widget _buildExperienceStep({Key? key}) {
-    return Column(
-      key: key,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Spacer(),
-        const Text(
-          'ॐ',
-          style: TextStyle(
-            fontFamily: 'TiroDevanagari',
-            fontSize: 56,
-            color: AppColors.saffron,
-            height: 1,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Text(
-          'Welcome to\nSanatan Guide',
-          style: context.ts.displayLarge,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'How familiar are you with Hindu scriptures?',
-          style: context.ts.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        _LevelCard(
-          level: UserExperienceLevel.beginner,
-          icon: const SeedlingIcon(size: 32),
-          selected: _selectedLevel == UserExperienceLevel.beginner,
-          onTap: () => setState(
-            () => _selectedLevel = UserExperienceLevel.beginner,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _LevelCard(
-          level: UserExperienceLevel.regular,
-          icon: const DiyaIcon(size: 32),
-          selected: _selectedLevel == UserExperienceLevel.regular,
-          onTap: () =>
-              setState(() => _selectedLevel = UserExperienceLevel.regular),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _LevelCard(
-          level: UserExperienceLevel.scholar,
-          icon: const ScrollIcon(size: 32),
-          selected: _selectedLevel == UserExperienceLevel.scholar,
-          onTap: () =>
-              setState(() => _selectedLevel = UserExperienceLevel.scholar),
-        ),
-        const Spacer(),
-        FilledButton(
-          onPressed: _selectedLevel == null ? null : _onExperienceContinue,
-          child: const Text('Continue'),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-      ],
-    );
-  }
-
-  Widget _buildPathStep({Key? key}) {
-    return Column(
-      key: key,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Spacer(),
-        Text(
-          'Where would you like to begin?',
-          style: context.ts.displayMedium,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'You can always change this later from the library.',
-          style: context.ts.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const Spacer(),
-        _PathCard(
-          icon: const TempleStairsIcon(size: 32),
-          title: 'Complete Beginner',
-          subtitle: 'I know little about Hinduism',
-          onTap: () => _selectPath(destination: '/learn/mod_01'),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _PathCard(
-          icon: const DiamondKnotIcon(size: 32),
-          title: 'Curious Hindu',
-          subtitle: 'I grew up Hindu but want to learn deeper',
-          onTap: () => _selectPath(destination: '/learn/mod_03'),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _PathCard(
-          icon: const OpenScrollIcon(size: 32),
-          title: 'Serious Seeker',
-          subtitle: 'I want to read the scriptures directly',
-          onTap: () =>
-              _selectPath(destination: '/browse/bhagavad_gita/chapter/1'),
-        ),
-        const Spacer(),
-        TextButton(
-          onPressed: () => _selectPath(destination: '/home'),
-          child: Text(
-            'Skip for now',
-            style: context.ts.caption.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _onExperienceContinue() async {
+  Future<void> _continueFromWelcome() async {
     final level = _selectedLevel;
     if (level == null) return;
     await ref.read(userExperienceLevelProvider.notifier).setLevel(level);
@@ -229,83 +63,476 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     if (mounted) setState(() => _step = 1);
   }
 
-  Future<void> _selectPath({required String destination}) async {
-    unawaited(AnalyticsService.onboardingPathSelected(destination));
-    await OnboardingService.markComplete();
-    if (!mounted) return;
-    // Always land on home first so back-stack is established.
-    // Then push the chosen destination on top — back button returns to home.
-    context.go('/home');
-    if (destination != '/home') {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.push(destination);
-      });
-    }
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? DColors.bg : LColors.bg;
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (_step == 1) setState(() => _step = 0);
+      },
+      child: Scaffold(
+        backgroundColor: bg,
+        body: SafeArea(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.06, 0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOut,
+                  )),
+                  child: child,
+                ),
+              );
+            },
+            child: _step == 0
+                ? _WelcomeStep(
+                    key: const ValueKey('welcome'),
+                    isDark: isDark,
+                    selectedLevel: _selectedLevel,
+                    onSelect: (level) =>
+                        setState(() => _selectedLevel = level),
+                    onContinue: _continueFromWelcome,
+                    onSkip: _skipFromWelcome,
+                  )
+                : _ReminderStep(
+                    key: const ValueKey('reminder'),
+                    isDark: isDark,
+                    onEnable: (time) => _finishOnboarding(
+                      reminderEnabled: true,
+                      reminderTime: time,
+                    ),
+                    onSkip: () => _finishOnboarding(reminderEnabled: false),
+                  ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
-// ── Level card (step 1) ───────────────────────────────────────────────────
+// ============================================================
+// Welcome step
+// ============================================================
+class _WelcomeStep extends StatelessWidget {
+  const _WelcomeStep({
+    super.key,
+    required this.isDark,
+    required this.selectedLevel,
+    required this.onSelect,
+    required this.onContinue,
+    required this.onSkip,
+  });
 
+  final bool isDark;
+  final UserExperienceLevel? selectedLevel;
+  final ValueChanged<UserExperienceLevel> onSelect;
+  final VoidCallback onContinue;
+  final VoidCallback onSkip;
+
+  static const _levelCopy = {
+    UserExperienceLevel.beginner:
+        'New to the texts. Start with Foundations and gentle commentary.',
+    UserExperienceLevel.regular:
+        'Comfortable with the basics. Read directly with optional commentary.',
+    UserExperienceLevel.scholar:
+        'Read texts and transliteration directly. Commentary only when asked.',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: Spacing.xxxl),
+          Center(
+            child: Text(
+              '॥ श्री गणेशाय नमः ॥',
+              style: AppText
+                  .invocation(saffronColor: saffron)
+                  .copyWith(color: saffron.withValues(alpha: 0.5)),
+            ),
+          ),
+          const SizedBox(height: Spacing.xl),
+          _StepDots(active: 0, isDark: isDark),
+          const SizedBox(height: Spacing.xxl),
+          Center(
+            child: Text(
+              'ॐ',
+              style: TextStyle(
+                fontFamily: Fonts.deva,
+                fontSize: 68,
+                color: saffron,
+                height: 1,
+                shadows: isDark
+                    ? const [
+                        Shadow(
+                          color: Color(0x4DE8820C),
+                          blurRadius: 24,
+                        ),
+                      ]
+                    : null,
+              ),
+            ),
+          ),
+          const SizedBox(height: Spacing.lg),
+          Center(
+            child: Text(
+              'Sanatan Guide',
+              style: AppText.screenTitle(color: text1).copyWith(fontSize: 32),
+            ),
+          ),
+          const SizedBox(height: Spacing.sm),
+          Center(
+            child: Text(
+              'A reader for Hindu scripture — fully offline, with deep textual care.',
+              style: AppText.subtitle(color: text2),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: Spacing.lg),
+          Center(
+            child: SizedBox(
+              width: 64,
+              child: BindingLine(isDark: isDark, diamondSize: 4, sideGap: 6),
+            ),
+          ),
+          const SizedBox(height: Spacing.xxxl),
+          Text(
+            'TELL US WHERE TO BEGIN',
+            style: AppText.sectionLabel(color: text3),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: Spacing.sm),
+          Text(
+            'How familiar are you with the scriptures?',
+            style: AppText.subtitle(color: text2).copyWith(fontSize: 14.5),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: Spacing.xl),
+          for (final level in UserExperienceLevel.values) ...[
+            _LevelCard(
+              level: level,
+              description: _levelCopy[level]!,
+              selected: selectedLevel == level,
+              isDark: isDark,
+              onTap: () => onSelect(level),
+            ),
+            const SizedBox(height: Spacing.sm + 2),
+          ],
+          const Spacer(),
+          _PrimaryButton(
+            label: 'Continue',
+            isDark: isDark,
+            enabled: selectedLevel != null,
+            trailing: const Icon(Icons.arrow_forward, size: 14),
+            onTap: onContinue,
+          ),
+          const SizedBox(height: Spacing.md),
+          Center(
+            child: TextButton(
+              onPressed: onSkip,
+              child: Text(
+                'SKIP FOR NOW',
+                style: AppText.textButton(color: text3),
+              ),
+            ),
+          ),
+          const SizedBox(height: Spacing.lg),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Reminder step
+// ============================================================
+class _ReminderStep extends StatefulWidget {
+  const _ReminderStep({
+    super.key,
+    required this.isDark,
+    required this.onEnable,
+    required this.onSkip,
+  });
+
+  final bool isDark;
+  final ValueChanged<TimeOfDay> onEnable;
+  final VoidCallback onSkip;
+
+  @override
+  State<_ReminderStep> createState() => _ReminderStepState();
+}
+
+class _ReminderStepState extends State<_ReminderStep> {
+  TimeOfDay _time = const TimeOfDay(hour: 7, minute: 0);
+
+  bool get _isAm => _time.hour < 12;
+
+  int get _displayHour {
+    final h = _time.hour % 12;
+    return h == 0 ? 12 : h;
+  }
+
+  void _setPeriod(bool am) {
+    if (am == _isAm) return;
+    setState(() {
+      _time = TimeOfDay(
+        hour: am ? (_time.hour - 12) : (_time.hour + 12),
+        minute: _time.minute,
+      );
+    });
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _time,
+    );
+    if (picked != null) setState(() => _time = picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final surface2 = isDark ? DColors.surface2 : LColors.surface2;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: Spacing.xxxl + Spacing.lg),
+          _StepDots(active: 1, isDark: isDark),
+          const SizedBox(height: Spacing.xxxl + Spacing.xxxl),
+          Center(child: _BellGlyph(saffron: saffron)),
+          const SizedBox(height: Spacing.xl),
+          Center(
+            child: Text(
+              'A verse a day',
+              style: AppText.screenTitle(color: text1).copyWith(fontSize: 26),
+            ),
+          ),
+          const SizedBox(height: Spacing.sm),
+          Center(
+            child: Text(
+              'A short morning notification with one verse — chosen for the day. '
+              'You can change or silence it any time.',
+              style: AppText.subtitle(color: text2).copyWith(fontSize: 14.5),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: Spacing.xxxl),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.xl,
+              vertical: Spacing.lg,
+            ),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(Radii.card),
+              border: Border.all(color: divider, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'REMIND ME AT',
+                  style: AppText.sectionLabel(color: text3),
+                ),
+                const SizedBox(height: Spacing.md),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: _pickTime,
+                      child: Text(
+                        '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontSize: 38,
+                          fontWeight: FontWeight.w500,
+                          height: 1,
+                          color: saffron,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    _PeriodToggle(
+                      isAm: _isAm,
+                      isDark: isDark,
+                      surface2: surface2,
+                      saffron: saffron,
+                      text3: text3,
+                      onChanged: _setPeriod,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          _PrimaryButton(
+            label: 'Enable reminder',
+            isDark: isDark,
+            enabled: true,
+            onTap: () => widget.onEnable(_time),
+          ),
+          const SizedBox(height: Spacing.md),
+          Center(
+            child: TextButton(
+              onPressed: widget.onSkip,
+              child: Text(
+                'NOT NOW',
+                style: AppText.textButton(color: text3),
+              ),
+            ),
+          ),
+          const SizedBox(height: Spacing.lg),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Step dots
+// ============================================================
+class _StepDots extends StatelessWidget {
+  const _StepDots({required this.active, required this.isDark});
+
+  final int active;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final inactive = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < 2; i++) ...[
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: i == active ? saffron : inactive,
+            ),
+          ),
+          if (i == 0) const SizedBox(width: 6),
+        ],
+      ],
+    );
+  }
+}
+
+// ============================================================
+// Level card
+// ============================================================
 class _LevelCard extends StatelessWidget {
   const _LevelCard({
     required this.level,
-    required this.icon,
+    required this.description,
     required this.selected,
+    required this.isDark,
     required this.onTap,
   });
 
   final UserExperienceLevel level;
-  final Widget icon;
+  final String description;
   final bool selected;
+  final bool isDark;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = selected
-        ? AppColors.saffron
-        : (Theme.of(context).brightness == Brightness.dark
-            ? AppColors.borderDark
-            : AppColors.border);
-    final fill = selected
-        ? AppColors.saffron.withValues(alpha: 0.08)
-        : Theme.of(context).colorScheme.surface;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final softDivider = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: fill,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          border: Border.all(color: borderColor, width: selected ? 2 : 1),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.fromLTRB(
+          Spacing.lg + Spacing.xs,
+          Spacing.lg,
+          Spacing.lg + Spacing.xs,
+          Spacing.lg,
         ),
-        child: Row(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(Radii.card),
+          border: Border.all(
+            color: selected ? divider : softDivider,
+            width: 1,
+          ),
+        ),
+        child: Stack(
           children: [
-            SizedBox(width: 32, height: 32, child: icon),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    level.displayTitle,
-                    style: context.ts.labelLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(level.displaySubtitle, style: context.ts.caption),
-                ],
-              ),
-            ),
             if (selected)
-              const Icon(Icons.check_circle, color: AppColors.saffron, size: 22)
-            else
-              Icon(
-                Icons.circle_outlined,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
-                size: 22,
+              Positioned(
+                left: -(Spacing.lg + Spacing.xs),
+                top: 12,
+                bottom: 12,
+                child: LeafThread(
+                  isDark: isDark,
+                  pulseOnce: true,
+                ),
               ),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        level.displayTitle,
+                        style: AppText.moduleTitle(color: text1)
+                            .copyWith(fontSize: 16),
+                      ),
+                      const SizedBox(height: Spacing.xs + 1),
+                      Text(
+                        description,
+                        style: AppText.moduleDesc(color: text2)
+                            .copyWith(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: Spacing.md),
+                _Radio(
+                  selected: selected,
+                  saffron: saffron,
+                  inactive: text3,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -313,56 +540,204 @@ class _LevelCard extends StatelessWidget {
   }
 }
 
-// ── Path card (step 2) ──────────────────────────────────────────────────────
-
-class _PathCard extends StatelessWidget {
-  const _PathCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
+class _Radio extends StatelessWidget {
+  const _Radio({
+    required this.selected,
+    required this.saffron,
+    required this.inactive,
   });
 
-  final Widget icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+  final bool selected;
+  final Color saffron;
+  final Color inactive;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          border: Border.all(
-            color: isDark ? AppColors.borderDark : AppColors.border,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      width: 18,
+      height: 18,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: selected ? saffron : inactive,
+          width: 1.5,
+        ),
+      ),
+      child: Center(
+        child: AnimatedScale(
+          duration: const Duration(milliseconds: 180),
+          scale: selected ? 1 : 0,
+          child: Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: saffron,
+            ),
           ),
         ),
-        child: Row(
-          children: [
-            SizedBox(width: 32, height: 32, child: icon),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: context.ts.labelMedium),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(subtitle, style: context.ts.caption),
-                ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Bell glyph (reminder hero)
+// ============================================================
+class _BellGlyph extends StatelessWidget {
+  const _BellGlyph({required this.saffron});
+
+  final Color saffron;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 64,
+      height: 64,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: saffron.withValues(alpha: 0.18),
+                width: 1,
               ),
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
-              size: 20,
+          ),
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: saffron.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
-          ],
+          ),
+          Icon(
+            Icons.notifications_none_rounded,
+            size: 26,
+            color: saffron,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// AM/PM toggle
+// ============================================================
+class _PeriodToggle extends StatelessWidget {
+  const _PeriodToggle({
+    required this.isAm,
+    required this.isDark,
+    required this.surface2,
+    required this.saffron,
+    required this.text3,
+    required this.onChanged,
+  });
+
+  final bool isAm;
+  final bool isDark;
+  final Color surface2;
+  final Color saffron;
+  final Color text3;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _periodButton(label: 'AM', active: isAm, onTap: () => onChanged(true)),
+        const SizedBox(width: Spacing.xs),
+        _periodButton(label: 'PM', active: !isAm, onTap: () => onChanged(false)),
+      ],
+    );
+  }
+
+  Widget _periodButton({
+    required String label,
+    required bool active,
+    required VoidCallback onTap,
+  }) {
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.md,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: active ? glow : surface2,
+          borderRadius: BorderRadius.circular(Radii.pill),
+        ),
+        child: Text(
+          label,
+          style: AppText.pill(color: active ? saffron : text3),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Primary button
+// ============================================================
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({
+    required this.label,
+    required this.isDark,
+    required this.enabled,
+    required this.onTap,
+    this.trailing,
+  });
+
+  final String label;
+  final bool isDark;
+  final bool enabled;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final fg = isDark ? const Color(0xFF1A1208) : Colors.white;
+    final bgColor = enabled ? saffron : saffron.withValues(alpha: 0.4);
+    return SizedBox(
+      height: 50,
+      child: Material(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(Radii.button),
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(Radii.button),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: AppText.primaryButton(color: fg),
+                ),
+                if (trailing != null) ...[
+                  const SizedBox(width: Spacing.sm),
+                  IconTheme(
+                    data: IconThemeData(color: fg, size: 14),
+                    child: trailing!,
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );
