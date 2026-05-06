@@ -1,39 +1,112 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
-import 'package:sanatan_guide/core/router/app_routes.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'dart:ui';
 
-class ScriptureLibraryPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+
+/// Scripture Library — Śruti / Smṛti taxonomy in 6 families.
+///
+/// Rows not cards. Vedas get a 2×2 grid (3:2 aspect, Sulba Sutra brick).
+/// Sticky family headers on scroll. Inline search replaces family list
+/// when active. Tamil rendered in Tamil script.
+class ScriptureLibraryPage extends ConsumerStatefulWidget {
   const ScriptureLibraryPage({super.key});
 
   @override
+  ConsumerState<ScriptureLibraryPage> createState() =>
+      _ScriptureLibraryPageState();
+}
+
+class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
+  String _query = '';
+  final _ctrl = TextEditingController();
+  final _focus = FocusNode();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _onQueryChanged(String v) =>
+      setState(() => _query = v.trim().toLowerCase());
+
+  void _clearQuery() {
+    _ctrl.clear();
+    _focus.unfocus();
+    setState(() => _query = '');
+  }
+
+  // ── Indian-format comma grouping (1,33,613 not 133,613)
+  static String _indianFormat(int n) {
+    final s = n.toString();
+    if (s.length <= 3) return s;
+    final last3 = s.substring(s.length - 3);
+    final rest = s.substring(0, s.length - 3);
+    final buf = StringBuffer();
+    for (var i = rest.length; i > 0; i -= 2) {
+      final start = i - 2 < 0 ? 0 : i - 2;
+      buf.write(rest.substring(start, i));
+      if (start > 0) buf.write(',');
+    }
+    final reversed = buf.toString().split(',').reversed.join(',');
+    return '$reversed,$last3';
+  }
+
+  static int _totalVerses() => _kFamilies
+      .expand((f) => f.scriptures)
+      .fold(0, (sum, s) => sum + s.verseCount);
+
+  static int _totalScriptures() =>
+      _kFamilies.fold(0, (sum, f) => sum + f.scriptures.length);
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? DColors.bg : LColors.bg;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Library', style: context.ts.displayMedium),
-        centerTitle: false,
-        flexibleSpace: const IgnorePointer(
-          child: NalandaArchBackdrop(),
+      backgroundColor: bg,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            _Header(isDark: isDark),
+            _SearchBar(
+              isDark: isDark,
+              controller: _ctrl,
+              focus: _focus,
+              query: _query,
+              onChanged: _onQueryChanged,
+              onClear: _clearQuery,
+            ),
+            Expanded(
+              child: _query.isEmpty
+                  ? _FamilyList(isDark: isDark)
+                  : _SearchResults(
+                      isDark: isDark,
+                      query: _query,
+                      onTap: (id) => _openScripture(context, id),
+                    ),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_rounded),
-            color: AppColors.warmGrey50,
-            tooltip: 'Saved verses',
-            onPressed: () => context.go(AppRoutes.bookmarks),
-          ),
-        ],
       ),
-      body: const _LibraryBody(),
     );
   }
 }
 
-const _singleChapterBrowse = {
+void _openScripture(BuildContext context, String id) {
+  if (_kSingleChapterBrowse.contains(id)) {
+    context.push('/browse/$id/chapter/1');
+  } else {
+    context.push('/browse/$id');
+  }
+}
+
+const _kSingleChapterBrowse = {
   'mandukya_upanishad',
   'isha_upanishad',
   'kena_upanishad',
@@ -48,597 +121,340 @@ const _singleChapterBrowse = {
   'maitrayani_upanishad',
 };
 
-void _openBrowseScripture(BuildContext context, String id) {
-  if (_singleChapterBrowse.contains(id)) {
-    context.push('/browse/$id/chapter/1');
-  } else {
-    context.push('/browse/$id');
-  }
-}
+// ============================================================
+// Header — title + Indian-format stats line
+// ============================================================
+class _Header extends StatelessWidget {
+  const _Header({required this.isDark});
 
-// ── Data ─────────────────────────────────────────────────────────────────
-
-const _samplerIds = {
-  // Puranas — highlights only (full Bhagavata / epics / Vedas ship without this badge)
-  'vishnu_purana',
-  'devi_bhagavata_purana',
-  'markandeya_purana',
-  // Upanishads — famous verses only (full texts pending)
-  'katha_upanishad',
-  'mundaka_upanishad',
-  'kena_upanishad',
-  'prashna_upanishad',
-  'shvetashvatara_upanishad',
-  // Darshana & Yoga — selected sutras
-  'brahma_sutras',
-  'hatha_yoga_pradipika',
-  // Dharmashastra & Tantra — selected verses
-  'manusmriti',
-  'mahanirvana_tantra',
-};
-
-class _BrowseSpec {
-  const _BrowseSpec({
-    required this.id,
-    required this.title,
-    required this.sanskrit,
-    required this.description,
-    required this.verses,
-    required this.emoji,
-  });
-
-  final String id;
-  final String title;
-  final String sanskrit;
-  final String description;
-  final int verses;
-  final String emoji;
-
-  bool get isSampler => _samplerIds.contains(id);
-}
-
-class _BrowseSection {
-  const _BrowseSection({required this.title, required this.specs});
-  final String title;
-  final List<_BrowseSpec> specs;
-
-  /// Short label for category chip + accent color (task 57).
-  String get chipLabel => switch (title) {
-        'Itihasa & Purana' => 'Itihasa',
-        'Veda' => 'Veda',
-        'Upanishad' => 'Upanishad',
-        'Darshana & Yoga' => 'Darshana',
-        'Stotra' => 'Stotra',
-        'Dharmashastra & Niti' => 'Shastra',
-        'Tantra' => 'Tantra',
-        'Tamil Classic' => 'Tamil',
-        _ => 'Library',
-      };
-}
-
-// ── Featured ─────────────────────────────────────────────────────────────
-
-const _featured = [
-  _BrowseSpec(
-    id: 'bhagavad_gita',
-    title: 'Bhagavad Gita',
-    sanskrit: 'भगवद्गीता',
-    description: 'The Song of God — 700 verses',
-    verses: 700,
-    emoji: '🕉️',
-  ),
-  _BrowseSpec(
-    id: 'yoga_sutras',
-    title: 'Yoga Sutras',
-    sanskrit: 'योगसूत्र',
-    description: 'Eight limbs of Yoga — 195 sutras',
-    verses: 195,
-    emoji: '🧘',
-  ),
-  _BrowseSpec(
-    id: 'rigveda',
-    title: 'Rigveda',
-    sanskrit: 'ऋग्वेद',
-    description: 'The oldest hymns — 10 Mandalas',
-    verses: 9508,
-    emoji: '🔥',
-  ),
-  _BrowseSpec(
-    id: 'bhagavata_purana',
-    title: 'Bhagavata Purana',
-    sanskrit: 'भागवतपुराण',
-    description: 'Krishna-lila & bhakti',
-    verses: 14031,
-    emoji: '🦚',
-  ),
-];
-
-// ── Sections (canonical order: Itihasa-Purana → Veda → Upanishad → Darshana → Stotra → Dharmashastra & Niti → Tantra → Tamil Classic) ──
-
-const _sections = <_BrowseSection>[
-  _BrowseSection(title: 'Itihasa & Purana', specs: [
-    _BrowseSpec(
-        id: 'ramayana',
-        title: 'Ramayana',
-        sanskrit: 'रामायण',
-        description: 'The journey of Shri Rama — dharma, devotion, and exile',
-        verses: 18761,
-        emoji: '🏹'),
-    _BrowseSpec(
-        id: 'mahabharata',
-        title: 'Mahabharata',
-        sanskrit: 'महाभारत',
-        description: 'The great epic of the Kuru dynasty and cosmic dharma',
-        verses: 72770,
-        emoji: '⚔️'),
-    _BrowseSpec(
-        id: 'bhagavata_purana',
-        title: 'Bhagavata Purana',
-        sanskrit: 'भागवतपुराण',
-        description: 'Krishna-lila, bhakti yoga, and the path of devotion',
-        verses: 14031,
-        emoji: '🦚'),
-    _BrowseSpec(
-        id: 'vishnu_purana',
-        title: 'Vishnu Purana',
-        sanskrit: 'विष्णुपुराण',
-        description: 'Cosmology, avatars, and the cycles of creation',
-        verses: 28,
-        emoji: '🪷'),
-    _BrowseSpec(
-        id: 'devi_bhagavata_purana',
-        title: 'Devi Bhagavata Purana',
-        sanskrit: 'देवीभागवतपुराण',
-        description: 'The supremacy and grace of the Divine Mother',
-        verses: 20,
-        emoji: '🌺'),
-    _BrowseSpec(
-        id: 'markandeya_purana',
-        title: 'Markandeya Purana',
-        sanskrit: 'मार्कण्डेयपुराण',
-        description: 'Contains the Devi Mahatmya — glory of the Goddess',
-        verses: 16,
-        emoji: '🔱'),
-  ]),
-  _BrowseSection(title: 'Veda', specs: [
-    _BrowseSpec(
-        id: 'rigveda',
-        title: 'Rigveda',
-        sanskrit: 'ऋग्वेद',
-        description: 'The oldest scripture — hymns to the cosmic powers',
-        verses: 9508,
-        emoji: '🔥'),
-    _BrowseSpec(
-        id: 'samaveda',
-        title: 'Samaveda',
-        sanskrit: 'सामवेद',
-        description: 'The Veda of melodies and sacred chants',
-        verses: 1719,
-        emoji: '🎵'),
-    _BrowseSpec(
-        id: 'yajurveda',
-        title: 'Yajurveda',
-        sanskrit: 'यजुर्वेद',
-        description: 'Sacrificial formulas and ritual knowledge',
-        verses: 1978,
-        emoji: '🕯️'),
-    _BrowseSpec(
-        id: 'atharvaveda',
-        title: 'Atharvaveda',
-        sanskrit: 'अथर्ववेद',
-        description: 'Hymns for healing, protection, and daily life',
-        verses: 5627,
-        emoji: '🌿'),
-  ]),
-  _BrowseSection(title: 'Upanishad', specs: [
-    _BrowseSpec(
-        id: 'isha_upanishad',
-        title: 'Isha',
-        sanskrit: 'ईशोपनिषद्',
-        description: 'The Self pervades all — renunciation and action',
-        verses: 18,
-        emoji: '☀️'),
-    _BrowseSpec(
-        id: 'kena_upanishad',
-        title: 'Kena',
-        sanskrit: 'केनोपनिषद्',
-        description: 'By whose power does the mind think? The unknowable Brahman',
-        verses: 9,
-        emoji: '🌿'),
-    _BrowseSpec(
-        id: 'katha_upanishad',
-        title: 'Katha',
-        sanskrit: 'कठोपनिषद्',
-        description: 'Nachiketa\'s dialogue with Death on the nature of the Self',
-        verses: 7,
-        emoji: '💀'),
-    _BrowseSpec(
-        id: 'prashna_upanishad',
-        title: 'Prashna',
-        sanskrit: 'प्रश्नोपनिषद्',
-        description: 'Six questions on Prana, creation, and the Absolute',
-        verses: 28,
-        emoji: '❓'),
-    _BrowseSpec(
-        id: 'mundaka_upanishad',
-        title: 'Mundaka',
-        sanskrit: 'मुण्डकोपनिषद्',
-        description: 'Satyameva Jayate — the higher and lower knowledge',
-        verses: 7,
-        emoji: '🦅'),
-    _BrowseSpec(
-        id: 'mandukya_upanishad',
-        title: 'Mandukya',
-        sanskrit: 'माण्डूक्योपनिषद्',
-        description: 'OM and the four states of consciousness',
-        verses: 12,
-        emoji: '🕉️'),
-    _BrowseSpec(
-        id: 'taittiriya_upanishad',
-        title: 'Taittiriya',
-        sanskrit: 'तैत्तिरीयोपनिषद्',
-        description: 'The five sheaths of the Self — from matter to bliss',
-        verses: 20,
-        emoji: '🌿'),
-    _BrowseSpec(
-        id: 'aitareya_upanishad',
-        title: 'Aitareya',
-        sanskrit: 'ऐतरेयोपनिषद्',
-        description: 'Prajnanam Brahma — consciousness is Brahman',
-        verses: 15,
-        emoji: '🌊'),
-    _BrowseSpec(
-        id: 'chandogya_upanishad',
-        title: 'Chandogya',
-        sanskrit: 'छान्दोग्योपनिषद्',
-        description: 'Tat Tvam Asi — the great dialogue on the Self',
-        verses: 623,
-        emoji: '🎵'),
-    _BrowseSpec(
-        id: 'brihadaranyaka_upanishad',
-        title: 'Brihadaranyaka',
-        sanskrit: 'बृहदारण्यकोपनिषद्',
-        description: 'Aham Brahmasmi — the largest and most profound Upanishad',
-        verses: 432,
-        emoji: '🌲'),
-    _BrowseSpec(
-        id: 'shvetashvatara_upanishad',
-        title: 'Shvetashvatara',
-        sanskrit: 'श्वेताश्वतरोपनिषद्',
-        description: 'Rudra as the Supreme Brahman — devotion and knowledge',
-        verses: 28,
-        emoji: '🌙'),
-    _BrowseSpec(
-        id: 'kaushitaki_upanishad',
-        title: 'Kaushitaki',
-        sanskrit: 'कौषीतकि उपनिषद्',
-        description: 'Prana as Brahman and the path after death',
-        verses: 18,
-        emoji: '⚡'),
-    _BrowseSpec(
-        id: 'maitrayani_upanishad',
-        title: 'Maitrayani',
-        sanskrit: 'मैत्रायणी उपनिषद्',
-        description: 'OM as Brahman and the unity of Atman',
-        verses: 24,
-        emoji: '🌸'),
-  ]),
-  _BrowseSection(title: 'Darshana & Yoga', specs: [
-    _BrowseSpec(
-        id: 'yoga_sutras',
-        title: 'Yoga Sutras',
-        sanskrit: 'योगसूत्र',
-        description: 'Patanjali\'s eight limbs — the science of stilling the mind',
-        verses: 195,
-        emoji: '🧘'),
-    _BrowseSpec(
-        id: 'hatha_yoga_pradipika',
-        title: 'Hatha Yoga Pradipika',
-        sanskrit: 'हठयोगप्रदीपिका',
-        description: 'The lamp of Hatha — asana, pranayama, and kundalini',
-        verses: 60,
-        emoji: '🔥'),
-    _BrowseSpec(
-        id: 'brahma_sutras',
-        title: 'Brahma Sutras',
-        sanskrit: 'ब्रह्मसूत्र',
-        description: 'Systematic inquiry into the nature of Brahman',
-        verses: 30,
-        emoji: '📿'),
-  ]),
-  _BrowseSection(title: 'Stotra', specs: [
-    _BrowseSpec(
-        id: 'vishnu_sahasranama',
-        title: 'Vishnu Sahasranama',
-        sanskrit: 'विष्णुसहस्रनाम',
-        description: 'The thousand names of Lord Vishnu — for daily recitation',
-        verses: 118,
-        emoji: '🪷'),
-  ]),
-  _BrowseSection(title: 'Dharmashastra & Niti', specs: [
-    _BrowseSpec(
-        id: 'manusmriti',
-        title: 'Manusmriti',
-        sanskrit: 'मनुस्मृति',
-        description: 'Ancient codification of dharma and social order',
-        verses: 54,
-        emoji: '⚖️'),
-    _BrowseSpec(
-        id: 'arthashastra',
-        title: 'Arthashastra',
-        sanskrit: 'अर्थशास्त्र',
-        description: 'Kautilya\'s treatise on statecraft, economics, and strategy',
-        verses: 5371,
-        emoji: '📜'),
-  ]),
-  _BrowseSection(title: 'Tantra', specs: [
-    _BrowseSpec(
-        id: 'mahanirvana_tantra',
-        title: 'Mahanirvana Tantra',
-        sanskrit: 'महानिर्वाणतन्त्र',
-        description: 'The Great Liberation — Shiva and Shakti dialogue',
-        verses: 60,
-        emoji: '🔱'),
-  ]),
-  _BrowseSection(title: 'Tamil Classic', specs: [
-    _BrowseSpec(
-        id: 'tirukkural',
-        title: 'Tirukkural',
-        sanskrit: 'திருக்குறள்',
-        description: 'Thiruvalluvar\'s timeless couplets on virtue, wealth, and love',
-        verses: 1326,
-        emoji: '🪷'),
-  ]),
-];
-
-const _featuredCategoryChips = {
-  'bhagavad_gita': 'Darshana',
-  'yoga_sutras': 'Darshana',
-  'rigveda': 'Veda',
-  'bhagavata_purana': 'Itihasa',
-};
-
-String _firstSentenceBlurb(String description) {
-  final dot = description.indexOf('.');
-  if (dot <= 0 || dot >= description.length - 1) return description.trim();
-  return description.substring(0, dot + 1).trim();
-}
-
-String _formatVerseCountLabel(int verses) =>
-    '${NumberFormat.decimalPattern('en_US').format(verses)} verses';
-
-Color _libraryCategoryAccent(String chip) => switch (chip) {
-      'Itihasa' => AppColors.catItihasa,
-      'Veda' => AppColors.catVeda,
-      'Upanishad' => AppColors.catUpanishad,
-      'Darshana' => AppColors.catDarshana,
-      'Stotra' => AppColors.catStotra,
-      'Shastra' => AppColors.catShastra,
-      'Tantra' => AppColors.catTantra,
-      'Tamil' => AppColors.catTamil,
-      _ => AppColors.warmGrey50,
-    };
-
-// ── Devanagari monogram map ───────────────────────────────────────────────
-
-const Map<String, String> _scriptureMonogram = {
-  'bhagavad_gita': 'गी',
-  'yoga_sutras': 'यो',
-  'rigveda': 'ऋ',
-  'samaveda': 'सा',
-  'yajurveda': 'य',
-  'atharvaveda': 'अ',
-  'upanishads': 'उ',
-  'mandukya_upanishad': 'मा',
-  'isha_upanishad': 'ई',
-  'kena_upanishad': 'के',
-  'mundaka_upanishad': 'मु',
-  'katha_upanishad': 'क',
-  'prashna_upanishad': 'प्र',
-  'taittiriya_upanishad': 'तै',
-  'aitareya_upanishad': 'ऐ',
-  'shvetashvatara_upanishad': 'श्वे',
-  'kaushitaki_upanishad': 'कौ',
-  'maitrayani_upanishad': 'मै',
-  'chandogya_upanishad': 'छा',
-  'brihadaranyaka_upanishad': 'बृ',
-  'vishnu_sahasranama': 'वि',
-  'brahma_sutras': 'ब्र',
-  'hatha_yoga_pradipika': 'ह',
-  'manusmriti': 'म',
-  'arthashastra': 'अर्',
-  'mahanirvana_tantra': 'म',
-  'mahabharata': 'म',
-  'ramayana': 'रा',
-  'bhagavata_purana': 'भा',
-  'vishnu_purana': 'वि',
-  'devi_bhagavata_purana': 'दे',
-  'markandeya_purana': 'मा',
-  'tirukkural': 'தி',
-};
-
-String _monogramFor(String id) => _scriptureMonogram[id] ?? id[0].toUpperCase();
-
-// ── Scripture monogram disc ───────────────────────────────────────────────
-
-class _ScriptureMonogram extends StatelessWidget {
-  const _ScriptureMonogram({required this.id, this.size = 40});
-
-  final String id;
-  final double size;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glyph = _monogramFor(id);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isDark ? AppColors.surfaceElevated : AppColors.warmGrey10,
-        border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderFaint,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        glyph,
-        style: TextStyle(
-          fontFamily: 'TiroDevanagari',
-          fontSize: size * 0.52,
-          height: 1,
-          color: AppColors.saffron,
-        ),
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+
+    final verses =
+        _ScriptureLibraryPageState._indianFormat(
+            _ScriptureLibraryPageState._totalVerses());
+    final scriptures = _ScriptureLibraryPageState._totalScriptures();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Library',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.64,
+              height: 1,
+              color: text1,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text.rich(
+            TextSpan(
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 1.76,
+                color: text3,
+              ),
+              children: [
+                TextSpan(
+                  text: verses,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13,
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.w500,
+                    color: saffron,
+                  ),
+                ),
+                const TextSpan(text: '  VERSES'),
+                TextSpan(
+                  text: '   ·   ',
+                  style: TextStyle(color: saffron),
+                ),
+                TextSpan(
+                  text: '$scriptures',
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13,
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.w500,
+                    color: saffron,
+                  ),
+                ),
+                const TextSpan(text: '  SCRIPTURES'),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ── Body ─────────────────────────────────────────────────────────────────
+// ============================================================
+// SearchBar — 44 px rounded 28, saffron focus
+// ============================================================
+class _SearchBar extends StatelessWidget {
+  const _SearchBar({
+    required this.isDark,
+    required this.controller,
+    required this.focus,
+    required this.query,
+    required this.onChanged,
+    required this.onClear,
+  });
 
-class _LibraryBody extends StatelessWidget {
-  const _LibraryBody();
+  final bool isDark;
+  final TextEditingController controller;
+  final FocusNode focus;
+  final String query;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final dividerSoft =
+        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final isFocused = focus.hasFocus || query.isNotEmpty;
+
+    return AnimatedBuilder(
+      animation: focus,
+      builder: (context, _) {
+        final borderColor = isFocused ? saffron : dividerSoft;
+        final iconColor = isFocused ? saffron : text3;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: borderColor, width: 1),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.search, size: 16, color: iconColor),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    focusNode: focus,
+                    onChanged: onChanged,
+                    cursorColor: saffron,
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontSize: 14,
+                      letterSpacing: 0.14,
+                      color: text1,
+                    ),
+                    decoration: InputDecoration(
+                      isCollapsed: true,
+                      border: InputBorder.none,
+                      hintText: 'Find a scripture...',
+                      hintStyle: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontSize: 14,
+                        letterSpacing: 0.14,
+                        color: text3,
+                      ),
+                    ),
+                  ),
+                ),
+                if (query.isNotEmpty)
+                  GestureDetector(
+                    onTap: onClear,
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Icon(Icons.close, size: 14, color: saffron),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ============================================================
+// FamilyList — sticky family headers + content per family
+// ============================================================
+class _FamilyList extends StatelessWidget {
+  const _FamilyList({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-      children: [
-        const SizedBox(height: AppSpacing.md),
-        const _FeaturedCarousel(),
-        const SizedBox(height: AppSpacing.xl),
-        for (final section in _sections) ...[
-          _SectionHeader(title: section.title),
-          for (final spec in section.specs)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pagePadding,
-                0,
-                AppSpacing.pagePadding,
-                AppSpacing.sm,
-              ),
-              child: _ScriptureLibraryCard(
-                spec: spec,
-                categoryLabel: section.chipLabel,
+      slivers: [
+        const SliverPadding(padding: EdgeInsets.only(top: 12)),
+        for (final family in _kFamilies) ...[
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _FamilyHeaderDelegate(family: family, isDark: isDark),
+          ),
+          if (family.kind == _FamilyKind.shruti)
+            _VedasGridSliver(isDark: isDark)
+          else
+            SliverList.builder(
+              itemCount: family.scriptures.length,
+              itemBuilder: (context, i) {
+                return _ScriptureRow(
+                  isDark: isDark,
+                  scripture: family.scriptures[i],
+                  isLast: i == family.scriptures.length - 1,
+                  family: family,
+                );
+              },
+            ),
+          if (family.kind == _FamilyKind.shruti)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: _ScriptureRow(
+                  isDark: isDark,
+                  scripture: _kMukhyaUpanishads,
+                  isLast: true,
+                  family: family,
+                ),
               ),
             ),
         ],
+        const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
       ],
     );
   }
 }
 
-// ── Featured carousel ────────────────────────────────────────────────────
+// ============================================================
+// _FamilyHeaderDelegate — sticky pinned header w/ blur
+// ============================================================
+class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _FamilyHeaderDelegate({required this.family, required this.isDark});
 
-class _FeaturedCarousel extends StatelessWidget {
-  const _FeaturedCarousel();
+  final _Family family;
+  final bool isDark;
 
-  static const double _kCarouselHeight = 188;
-  static const double _kCardWidth = 216;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: _kCarouselHeight,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-        physics: const BouncingScrollPhysics(),
-        itemCount: _featured.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
-        itemBuilder: (context, index) {
-          final spec = _featured[index];
-          return _FeaturedCard(spec: spec);
-        },
-      ),
-    );
-  }
-}
-
-class _FeaturedCard extends StatelessWidget {
-  const _FeaturedCard({required this.spec});
-  final _BrowseSpec spec;
+  static const double _height = 96;
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chip = _featuredCategoryChips[spec.id] ?? 'Library';
-    final accent = _libraryCategoryAccent(chip);
-    final borderColor = isDark ? AppColors.borderDark : AppColors.border;
-    final blurb = _firstSentenceBlurb(spec.description);
+  double get minExtent => _height;
 
-    return SizedBox(
-      width: _FeaturedCarousel._kCardWidth,
-      child: Material(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: BorderSide(color: borderColor),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => _openBrowseScripture(context, spec.id),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+  @override
+  double get maxExtent => _height;
+
+  @override
+  bool shouldRebuild(_FamilyHeaderDelegate oldDelegate) =>
+      oldDelegate.family != family || oldDelegate.isDark != isDark;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final bgTint = isDark
+        ? const Color.fromRGBO(15, 15, 15, 0.85)
+        : const Color.fromRGBO(253, 250, 246, 0.9);
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          color: bgTint,
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 14),
+          decoration: BoxDecoration(
+            color: bgTint,
+            border: Border(
+              bottom: BorderSide(color: divider, width: 1),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ColoredBox(
-                color: accent.withValues(alpha: isDark ? 0.92 : 0.78),
-                child: const SizedBox(width: 4),
+              Text(
+                family.devaName,
+                style: TextStyle(
+                  fontFamily:
+                      family.kind == _FamilyKind.tamil ? Fonts.sans : Fonts.deva,
+                  fontSize: 22,
+                  height: 1,
+                  letterSpacing: 0.44,
+                  color: saffron,
+                ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _ScriptureMonogram(id: spec.id, size: 36),
-                          const SizedBox(width: AppSpacing.sm),
-                          _CategoryChip(label: chip, accent: accent),
-                          const Spacer(),
-                          Text(
-                            _formatVerseCountLabel(spec.verses),
-                            style: context.ts.caption.copyWith(
-                              color: AppColors.warmGrey50,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.end,
-                          ),
-                        ],
+              const SizedBox(height: 4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Expanded(
+                    child: Text(
+                      family.englishLabel,
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.13,
+                        color: text1,
                       ),
-                      const Spacer(),
-                      Text(
-                        spec.sanskrit,
-                        style: context.ts.sanskritSmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        spec.title,
-                        style: context.ts.labelLarge,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        blurb,
-                        style: context.ts.caption.copyWith(
-                          color: isDark
-                              ? AppColors.textSecondaryOnDark
-                              : AppColors.textSecondary,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    family.metaLabel,
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.98,
+                      color: text3,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.only(right: 40),
+                child: Text(
+                  family.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12.5,
+                    height: 1.5,
+                    color: text2,
                   ),
                 ),
               ),
@@ -650,205 +466,96 @@ class _FeaturedCard extends StatelessWidget {
   }
 }
 
-// ── Section header ───────────────────────────────────────────────────────
+// ============================================================
+// _VedasGridSliver — 2×2 grid, 3:2 aspect (Sulba brick)
+// ============================================================
+class _VedasGridSliver extends StatelessWidget {
+  const _VedasGridSliver({required this.isDark});
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-  final String title;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.pagePadding,
-        AppSpacing.xl,
-        AppSpacing.pagePadding,
-        AppSpacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title.toUpperCase(),
-            style: context.ts.caption.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.5,
-              color: AppColors.warmGrey50,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: (isDark ? AppColors.dividerDark : AppColors.divider)
-                .withValues(alpha: 0.5),
-          ),
-        ],
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+      sliver: SliverGrid.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 3 / 2,
+        ),
+        itemCount: _kVedas.length,
+        itemBuilder: (context, i) {
+          return _VedaCell(isDark: isDark, scripture: _kVedas[i]);
+        },
       ),
     );
   }
 }
 
-// ── Category chip (library cards) ───────────────────────────────────────
+class _VedaCell extends StatelessWidget {
+  const _VedaCell({required this.isDark, required this.scripture});
 
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({required this.label, required this.accent});
-
-  final String label;
-  final Color accent;
+  final bool isDark;
+  final _Scripture scripture;
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final dividerSoft =
+        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    return GestureDetector(
+      onTap: () => _openScripture(context, scripture.id),
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
         decoration: BoxDecoration(
-          color: accent.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          border: Border.all(color: accent.withValues(alpha: 0.3)),
+          color: surface,
+          borderRadius: BorderRadius.circular(Radii.card),
+          border: Border.all(color: dividerSoft, width: 1),
         ),
-        child: Text(
-          label,
-          style: context.ts.caption.copyWith(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            color: accent,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Scripture card (task 57) ─────────────────────────────────────────────
-
-class _ScriptureLibraryCard extends StatelessWidget {
-  const _ScriptureLibraryCard({
-    required this.spec,
-    required this.categoryLabel,
-  });
-
-  final _BrowseSpec spec;
-  final String categoryLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accent = _libraryCategoryAccent(categoryLabel);
-    final borderColor = isDark ? AppColors.borderDark : AppColors.border;
-    final blurb = _firstSentenceBlurb(spec.description);
-
-    return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        side: BorderSide(color: borderColor),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _openBrowseScripture(context, spec.id),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ColoredBox(
-              color: accent.withValues(alpha: isDark ? 0.92 : 0.78),
-              child: const SizedBox(width: 4),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.md,
-                  AppSpacing.sm,
-                  AppSpacing.md,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  scripture.devaName,
+                  style: TextStyle(
+                    fontFamily: Fonts.deva,
+                    fontSize: 16,
+                    height: 1.2,
+                    color: cream,
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _ScriptureMonogram(id: spec.id),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: _CategoryChip(
-                            label: categoryLabel,
-                            accent: accent,
-                          ),
-                        ),
-                        Text(
-                          _formatVerseCountLabel(spec.verses),
-                          style: context.ts.caption.copyWith(
-                            color: AppColors.warmGrey50,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      spec.sanskrit,
-                      style: context.ts.sanskritSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      spec.title,
-                      style: context.ts.labelLarge,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (blurb.isNotEmpty) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        blurb,
-                        style: context.ts.caption.copyWith(
-                          color: isDark
-                              ? AppColors.textSecondaryOnDark
-                              : AppColors.textSecondary,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                    if (spec.isSampler) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.warmGrey10,
-                          borderRadius: BorderRadius.circular(AppSpacing.sm),
-                          border: Border.all(color: AppColors.borderFaint),
-                        ),
-                        child: Text(
-                          'Selected highlights',
-                          style: context.ts.cardLabel,
-                        ),
-                      ),
-                    ],
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  scripture.englishName,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: text1,
+                  ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.md, right: 2),
-              child: Icon(
-                Icons.chevron_right_rounded,
-                color: isDark
-                    ? AppColors.textSecondaryOnDark
-                    : AppColors.textSecondary,
-                size: 22,
+            Text(
+              '${_indianFmtStatic(scripture.verseCount)}  ${scripture.unitLabel}',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 1.4,
+                color: text3,
               ),
             ),
           ],
@@ -857,3 +564,687 @@ class _ScriptureLibraryCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// _ScriptureRow — flat row with 8 px family-color diamond glyph
+// ============================================================
+class _ScriptureRow extends StatelessWidget {
+  const _ScriptureRow({
+    required this.isDark,
+    required this.scripture,
+    required this.isLast,
+    required this.family,
+  });
+
+  final bool isDark;
+  final _Scripture scripture;
+  final bool isLast;
+  final _Family family;
+
+  Color _glyphColor() {
+    return switch (family.kind) {
+      _FamilyKind.shruti =>
+        isDark ? DColors.saffron : LColors.saffron,
+      _FamilyKind.itihasa ||
+      _FamilyKind.purana ||
+      _FamilyKind.dharmasastra =>
+        isDark ? DColors.ironRed : LColors.ironRed,
+      _FamilyKind.darshana =>
+        isDark ? const Color(0xFFC9A467) : const Color(0xFFA47B30),
+      _FamilyKind.tamil =>
+        isDark ? const Color(0xFFB07642) : const Color(0xFF8B5226),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dividerSoft =
+        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+
+    final isTamilScript = family.kind == _FamilyKind.tamil;
+
+    return InkWell(
+      onTap: () => _openScripture(context, scripture.id),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(color: dividerSoft, width: 1),
+                ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Transform.rotate(
+                angle: 0.785398,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  color: _glyphColor(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    scripture.devaName,
+                    style: TextStyle(
+                      fontFamily: isTamilScript ? Fonts.sans : Fonts.deva,
+                      fontSize: isTamilScript ? 15 : 17,
+                      height: 1.2,
+                      letterSpacing: 0.085,
+                      color: cream,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    scripture.englishName,
+                    style: TextStyle(
+                      fontFamily: Fonts.serif,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.075,
+                      height: 1.25,
+                      color: text1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text.rich(
+                    TextSpan(
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontSize: 11,
+                        height: 1.4,
+                        color: text3,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
+                          style: TextStyle(
+                            fontFamily: Fonts.serif,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12,
+                            color: text2,
+                          ),
+                        ),
+                        if (scripture.subdivision != null)
+                          TextSpan(text: '  ·  ${scripture.subdivision}'),
+                        if (scripture.versesRead > 0)
+                          TextSpan(
+                            text:
+                                '  ·  ${scripture.versesRead} verse${scripture.versesRead == 1 ? '' : 's'} read',
+                            style: TextStyle(
+                              color: saffron,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6, left: 8),
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 16,
+                color: text3.withValues(alpha: 0.4),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SearchResults — replaces family list when query non-empty
+// ============================================================
+class _SearchResults extends StatelessWidget {
+  const _SearchResults({
+    required this.isDark,
+    required this.query,
+    required this.onTap,
+  });
+
+  final bool isDark;
+  final String query;
+  final ValueChanged<String> onTap;
+
+  List<_SearchMatch> _findMatches() {
+    final q = query.toLowerCase();
+    final out = <_SearchMatch>[];
+    for (final family in _kFamilies) {
+      final scriptures = family.kind == _FamilyKind.shruti
+          ? [..._kVedas, _kMukhyaUpanishads]
+          : family.scriptures;
+      for (final s in scriptures) {
+        final inEn = s.englishName.toLowerCase().contains(q);
+        final inDeva = s.devaName.contains(query);
+        final inAlias = s.aliases.any((a) => a.toLowerCase().contains(q));
+        if (inEn || inDeva || inAlias) {
+          out.add(_SearchMatch(scripture: s, family: family));
+        }
+      }
+    }
+    out.sort((a, b) {
+      int score(_SearchMatch m) {
+        final en = m.scripture.englishName.toLowerCase();
+        if (en.startsWith(q)) return 0;
+        if (en.contains(q)) return 1;
+        if (m.scripture.devaName.contains(query)) return 2;
+        return 3;
+      }
+      return score(a).compareTo(score(b));
+    });
+    return out;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final matches = _findMatches();
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final dividerSoft =
+        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+
+    if (matches.isEmpty) {
+      return _EmptyResults(query: query, isDark: isDark);
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: matches.length + 1,
+      itemBuilder: (context, i) {
+        if (i == 0) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
+            child: Text(
+              '${matches.length} ${matches.length == 1 ? 'RESULT' : 'RESULTS'}',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 2.2,
+                color: text3,
+              ),
+            ),
+          );
+        }
+        final m = matches[i - 1];
+        return _SearchResultRow(
+          match: m,
+          query: query,
+          saffron: saffron,
+          text1: text1,
+          text2: text2,
+          text3: text3,
+          divider: dividerSoft,
+          onTap: () => onTap(m.scripture.id),
+        );
+      },
+    );
+  }
+}
+
+class _SearchResultRow extends StatelessWidget {
+  const _SearchResultRow({
+    required this.match,
+    required this.query,
+    required this.saffron,
+    required this.text1,
+    required this.text2,
+    required this.text3,
+    required this.divider,
+    required this.onTap,
+  });
+
+  final _SearchMatch match;
+  final String query;
+  final Color saffron;
+  final Color text1;
+  final Color text2;
+  final Color text3;
+  final Color divider;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scripture = match.scripture;
+    final family = match.family;
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: divider, width: 1)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 60,
+              child: Text(
+                scripture.devaName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily:
+                      family.kind == _FamilyKind.tamil ? Fonts.sans : Fonts.deva,
+                  fontSize: 14,
+                  color: text3,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _highlighted(
+                    scripture.englishName,
+                    query.toLowerCase(),
+                    saffron,
+                    text1,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${family.shortLabel}  ·  ${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel.toUpperCase()}',
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontSize: 10,
+                      letterSpacing: 1.6,
+                      color: text3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: text3.withValues(alpha: 0.4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _highlighted(
+      String text, String query, Color hl, Color base) {
+    final lower = text.toLowerCase();
+    final idx = lower.indexOf(query);
+    final baseStyle = TextStyle(
+      fontFamily: Fonts.serif,
+      fontSize: 14,
+      color: base,
+    );
+    final hlStyle = baseStyle.copyWith(
+      color: hl,
+      fontWeight: FontWeight.w500,
+    );
+    if (idx < 0 || query.isEmpty) {
+      return Text(text, style: baseStyle);
+    }
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: text.substring(0, idx), style: baseStyle),
+          TextSpan(
+              text: text.substring(idx, idx + query.length), style: hlStyle),
+          TextSpan(text: text.substring(idx + query.length), style: baseStyle),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyResults extends StatelessWidget {
+  const _EmptyResults({required this.query, required this.isDark});
+
+  final String query;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final cream = isDark ? DColors.cream : LColors.text1;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 32),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: cream.withValues(alpha: 0.15),
+              width: 1,
+              style: BorderStyle.solid,
+            ),
+            borderRadius: BorderRadius.circular(Radii.card),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '॥',
+                style: TextStyle(
+                  fontFamily: Fonts.deva,
+                  fontSize: 28,
+                  color: saffron,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'No scripture matches "$query"',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: Fonts.serif,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 16,
+                  color: text1,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Try a different spelling — Devanāgarī or Roman both work.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: Fonts.serif,
+                  fontSize: 13,
+                  height: 1.5,
+                  color: text2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Data — 6 families + scripture catalog
+// ============================================================
+
+String _indianFmtStatic(int n) =>
+    _ScriptureLibraryPageState._indianFormat(n);
+
+enum _FamilyKind { shruti, itihasa, purana, darshana, dharmasastra, tamil }
+
+class _Family {
+  const _Family({
+    required this.kind,
+    required this.devaName,
+    required this.englishLabel,
+    required this.metaLabel,
+    required this.description,
+    required this.shortLabel,
+    required this.scriptures,
+  });
+
+  final _FamilyKind kind;
+  final String devaName;
+  final String englishLabel;
+  final String metaLabel;
+  final String description;
+  final String shortLabel;
+  final List<_Scripture> scriptures;
+}
+
+class _Scripture {
+  const _Scripture({
+    required this.id,
+    required this.devaName,
+    required this.englishName,
+    required this.verseCount,
+    required this.unitLabel,
+    this.subdivision,
+    this.aliases = const [],
+    this.versesRead = 0,
+  });
+
+  final String id;
+  final String devaName;
+  final String englishName;
+  final int verseCount;
+  final String unitLabel; // verses / mantras / sūtras / couplets
+  final String? subdivision; // e.g. "18 chapters", "7 kāṇḍas"
+  final List<String> aliases;
+  final int versesRead;
+}
+
+class _SearchMatch {
+  const _SearchMatch({required this.scripture, required this.family});
+  final _Scripture scripture;
+  final _Family family;
+}
+
+const _kVedas = <_Scripture>[
+  _Scripture(
+    id: 'rigveda',
+    devaName: 'ऋग्वेद',
+    englishName: 'Ṛg Veda',
+    verseCount: 10552,
+    unitLabel: 'mantras',
+    aliases: ['rig', 'rigveda'],
+  ),
+  _Scripture(
+    id: 'samaveda',
+    devaName: 'सामवेद',
+    englishName: 'Sāma Veda',
+    verseCount: 1875,
+    unitLabel: 'mantras',
+    aliases: ['sama', 'samaveda'],
+  ),
+  _Scripture(
+    id: 'yajurveda',
+    devaName: 'यजुर्वेद',
+    englishName: 'Yajur Veda',
+    verseCount: 1975,
+    unitLabel: 'mantras',
+    aliases: ['yajur', 'yajurveda'],
+  ),
+  _Scripture(
+    id: 'atharvaveda',
+    devaName: 'अथर्ववेद',
+    englishName: 'Atharva Veda',
+    verseCount: 5977,
+    unitLabel: 'mantras',
+    aliases: ['atharva', 'atharvaveda'],
+  ),
+];
+
+const _kMukhyaUpanishads = _Scripture(
+  // Routes to Isha Upanishad as the canonical entry-point until a dedicated
+  // /library/upanishads collection page exists.
+  id: 'isha_upanishad',
+  devaName: 'मुख्य उपनिषद् ११',
+  englishName: 'The Mukhya Upaniṣads',
+  verseCount: 1876,
+  unitLabel: 'verses',
+  subdivision: '11 principal texts',
+  aliases: ['upanishad', 'upanishads', 'mukhya'],
+);
+
+const _kFamilies = <_Family>[
+  _Family(
+    kind: _FamilyKind.shruti,
+    devaName: 'श्रुति',
+    englishLabel: 'Śruti — that which is heard',
+    metaLabel: '5 TEXTS',
+    shortLabel: 'ŚRUTI',
+    description:
+        'The earliest, eternal revelations — the Vedas and principal Upaniṣads.',
+    scriptures: [], // Vedas grid + Mukhya row rendered separately
+  ),
+  _Family(
+    kind: _FamilyKind.itihasa,
+    devaName: 'इतिहास',
+    englishLabel: 'Itihāsa — the great epics',
+    metaLabel: '3 TEXTS',
+    shortLabel: 'ITIHĀSA',
+    description:
+        'Stories that happened — Rāma, the Pāṇḍavas, the Gītā within.',
+    scriptures: [
+      _Scripture(
+        id: 'bhagavad_gita',
+        devaName: 'भगवद्गीता',
+        englishName: 'Bhagavad Gītā',
+        verseCount: 700,
+        unitLabel: 'verses',
+        subdivision: '18 chapters',
+        aliases: ['gita', 'geeta', 'bhagavad'],
+        versesRead: 1,
+      ),
+      _Scripture(
+        id: 'ramayana',
+        devaName: 'रामायण',
+        englishName: 'Rāmāyaṇa',
+        verseCount: 18761,
+        unitLabel: 'verses',
+        subdivision: '7 kāṇḍas',
+        aliases: ['rama', 'ramayana'],
+      ),
+      _Scripture(
+        id: 'mahabharata',
+        devaName: 'महाभारत',
+        englishName: 'Mahābhārata',
+        verseCount: 72770,
+        unitLabel: 'verses',
+        subdivision: '18 parvas',
+        aliases: ['maha', 'mahabharata'],
+      ),
+    ],
+  ),
+  _Family(
+    kind: _FamilyKind.purana,
+    devaName: 'पुराण',
+    englishLabel: 'Purāṇa — old tales of gods and worlds',
+    metaLabel: '2 TEXTS',
+    shortLabel: 'PURĀṆA',
+    description: 'Cosmology, devotion, and the līlās of the divine.',
+    scriptures: [
+      _Scripture(
+        id: 'bhagavata_purana',
+        devaName: 'श्रीमद्भागवतम्',
+        englishName: 'Bhāgavata Purāṇa',
+        verseCount: 14031,
+        unitLabel: 'verses',
+        subdivision: '12 cantos',
+        aliases: ['bhagavata', 'srimad'],
+      ),
+      _Scripture(
+        id: 'vishnu_purana',
+        devaName: 'विष्णुपुराण',
+        englishName: 'Viṣṇu Purāṇa',
+        verseCount: 6000,
+        unitLabel: 'verses',
+        subdivision: '6 aṁśas',
+        aliases: ['vishnu'],
+      ),
+    ],
+  ),
+  _Family(
+    kind: _FamilyKind.darshana,
+    devaName: 'दर्शन',
+    englishLabel: 'Darśana — philosophy in sūtra form',
+    metaLabel: '2 TEXTS',
+    shortLabel: 'DARŚANA',
+    description:
+        'The condensed teachings — yoga, vedānta, and the schools of thought.',
+    scriptures: [
+      _Scripture(
+        id: 'yoga_sutras',
+        devaName: 'योगसूत्र',
+        englishName: 'Yoga Sūtras of Patañjali',
+        verseCount: 195,
+        unitLabel: 'sūtras',
+        subdivision: '4 pādas',
+        aliases: ['yoga', 'patanjali'],
+      ),
+      _Scripture(
+        id: 'brahma_sutras',
+        devaName: 'ब्रह्मसूत्र',
+        englishName: 'Brahma Sūtras',
+        verseCount: 555,
+        unitLabel: 'sūtras',
+        subdivision: '4 adhyāyas',
+        aliases: ['brahma'],
+      ),
+    ],
+  ),
+  _Family(
+    kind: _FamilyKind.dharmasastra,
+    devaName: 'धर्मशास्त्र',
+    englishLabel: 'Dharmaśāstra — codes of right living',
+    metaLabel: '2 TEXTS',
+    shortLabel: 'DHARMAŚĀSTRA',
+    description:
+        'Law, ethics, and the conduct of life across the four āśramas.',
+    scriptures: [
+      _Scripture(
+        id: 'manusmriti',
+        devaName: 'मनुस्मृति',
+        englishName: 'Manusmṛti',
+        verseCount: 2684,
+        unitLabel: 'verses',
+        subdivision: '12 chapters',
+        aliases: ['manu'],
+      ),
+      _Scripture(
+        id: 'arthashastra',
+        devaName: 'अर्थशास्त्र',
+        englishName: 'Arthaśāstra',
+        verseCount: 5348,
+        unitLabel: 'verses',
+        subdivision: '15 books',
+        aliases: ['artha', 'kautilya'],
+      ),
+    ],
+  ),
+  _Family(
+    kind: _FamilyKind.tamil,
+    devaName: 'தமிழ் சாஸ்திரம்',
+    englishLabel: 'Tamil sacred corpus',
+    metaLabel: '1 TEXT',
+    shortLabel: 'TAMIL',
+    description:
+        'The southern stream — ethics in couplets, devotion in song.',
+    scriptures: [
+      _Scripture(
+        id: 'tirukkural',
+        devaName: 'திருக்குறள்',
+        englishName: 'Tirukkuṟaḷ',
+        verseCount: 1330,
+        unitLabel: 'couplets',
+        subdivision: 'Tiruvaḷḷuvar',
+        aliases: ['kural', 'tirukkural'],
+      ),
+    ],
+  ),
+];
