@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sanatan_guide/core/router/app_routes.dart';
 import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
+import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/almanac_tiles.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/dawn_horizon.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/festival_banner.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/home_app_bar.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/path_card.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/streak_line.dart';
-import 'package:sanatan_guide/presentation/features/home/widgets/verse_of_day_card.dart';
+import 'package:sanatan_guide/presentation/features/home/widgets/home_strips.dart';
+import 'package:sanatan_guide/presentation/features/home/widgets/panchang_block.dart';
+import 'package:sanatan_guide/presentation/features/home/widgets/verse_hero_card.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
-/// Home screen — "Temple Dawn" direction.
+/// Home — the "Today" tab.
 ///
-/// Layered:
-///   L0  Dawn background      → soft saffron radial glow from the top
-///   L1  Horizon ornament     → sun arc + rays, sits behind the verse card
-///   L2  Content list         → verse hero, almanac tiles, festival, path, streak
+/// Top to bottom:
+///   PanchangBlock      greeting + Devanāgarī panchang + VS year + incised rule
+///   VerseHeroCard      palm-leaf manuscript verse-of-day
+///   ContinueStrip      last-read + 8 progress beads (hidden if no history)
+///   PathStrip          next learning module (hidden if all complete)
+///   FestivalPill       upcoming festival w/ moon glyph + days countdown
 ///
-/// All existing providers are preserved (verseOfDayProvider, modulesProvider,
-/// lastReadVerseProvider, currentStreakProvider, festivalsProvider). The
-/// AppBar is replaced by a scrolling custom header so the dawn gradient
-/// can reach the top edge of the screen.
+/// No sunrise, no painters, no almanac tiles, no streak line — those were
+/// the old "Temple Dawn" direction. The Devanāgarī panchang line and the
+/// verse hero card carry the visual heritage.
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -42,158 +37,48 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
+  Future<void> _refresh() async {
+    ref.invalidate(verseOfDayProvider);
+    ref.invalidate(modulesProvider);
+    ref.invalidate(festivalsProvider);
+    await ref.read(verseOfDayProvider.future);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final bg = isDark ? DColors.bg : LColors.bg;
+    final surface = isDark ? DColors.surface : LColors.surface;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: isDark ? AppColors.bgDark : AppColors.cream,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // ── L0 Dawn background ──────────────────────────────────────
-          const _DawnBackground(),
-
-          // ── L2 Content (scrollable) ─────────────────────────────────
-          RefreshIndicator(
-            color: AppColors.saffron,
-            backgroundColor: isDark
-                ? AppColors.surfaceElevated
-                : AppColors.surface,
-            onRefresh: () async {
-              ref.invalidate(verseOfDayProvider);
-              ref.invalidate(modulesProvider);
-              await ref.read(verseOfDayProvider.future);
-            },
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              slivers: [
-                // Spacer for system status bar
-                const SliverToBoxAdapter(child: SafeArea(bottom: false, child: SizedBox.shrink())),
-
-                // Greeting + icon actions
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      AppSpacing.sm,
-                      AppSpacing.pagePadding,
-                      AppSpacing.xs,
-                    ),
-                    child: HomeAppBar(
-                      onSearch: () => context.push(AppRoutes.search),
-                      onSettings: () => context.push(AppRoutes.settings),
-                    ),
-                  ),
-                ),
-
-                // Sun horizon (sits in flow; the verse card crosses it)
-                const SliverToBoxAdapter(
-                  child: DawnHorizon(),
-                ),
-
-                // Verse hero
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      0,
-                      AppSpacing.pagePadding,
-                      0,
-                    ),
-                    child: VerseOfDayCard(),
-                  ),
-                ),
-
-                // Celestial almanac (vāra · tithi · next parva)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      AppSpacing.lg,
-                      AppSpacing.pagePadding,
-                      0,
-                    ),
-                    child: AlmanacTiles(),
-                  ),
-                ),
-
-                // Upcoming festival
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      AppSpacing.md,
-                      AppSpacing.pagePadding,
-                      0,
-                    ),
-                    child: FestivalBanner(),
-                  ),
-                ),
-
-                // Path progress + continue reading
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      AppSpacing.md,
-                      AppSpacing.pagePadding,
-                      0,
-                    ),
-                    child: PathCard(),
-                  ),
-                ),
-
-                // Streak
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.pagePadding,
-                      AppSpacing.lg,
-                      AppSpacing.pagePadding,
-                      AppSpacing.xxxl,
-                    ),
-                    child: StreakLine(),
-                  ),
-                ),
+      backgroundColor: bg,
+      body: RefreshIndicator(
+        color: saffron,
+        backgroundColor: surface,
+        onRefresh: _refresh,
+        child: const SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              Spacing.xxl,
+              0,
+              Spacing.xxl,
+              Spacing.xxxl,
+            ),
+            child: Column(
+              children: [
+                PanchangBlock(),
+                VerseHeroCard(),
+                SizedBox(height: 24),
+                ContinueStrip(),
+                PathStrip(),
+                FestivalPill(),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Warm radial dawn glow — top-center fade into the scaffold colour.
-/// Replaces the existing dark-mode-only glow with a palette-safe gradient
-/// that works in both modes.
-class _DawnBackground extends StatelessWidget {
-  const _DawnBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Radial glow from brand saffron (same stops as before; sourced from tokens).
-    final base = isDark ? AppColors.saffronOnDark : AppColors.saffron;
-    final stops = <Color>[
-      base.withValues(alpha: isDark ? 0.22 : 0.22),
-      base.withValues(alpha: isDark ? 0.05 : 0.07),
-      base.withValues(alpha: 0),
-    ];
-
-    return IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(0, -1.05),
-            radius: 0.95,
-            colors: stops,
-            stops: const [0.0, 0.45, 1.0],
           ),
         ),
       ),

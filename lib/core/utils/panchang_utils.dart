@@ -64,9 +64,10 @@ class HinduDateInfo {
 
 String greetingForTimeOfDay(DateTime now) {
   final hour = now.hour;
-  if (hour < 12) return 'Shubh Prabhat';
-  if (hour < 17) return 'Namaskar';
-  return 'Shubh Sandhya';
+  if (hour >= 5 && hour < 11) return 'Shubh Prabhat';
+  if (hour >= 11 && hour < 17) return 'Namaste';
+  if (hour >= 17 && hour < 21) return 'Shubh Sandhya';
+  return 'Shubh Ratri';
 }
 
 // ── Panchang utils ────────────────────────────────────────────────────────
@@ -253,6 +254,67 @@ abstract final class PanchangUtils {
   }
 
   // ── Tithi data ────────────────────────────────────────────────────────────
+
+  // ── Devanagari name maps (for the Home panchang line) ──────────────────
+
+  static const Map<String, String> _hinduMonthDeva = {
+    'Chaitra': 'चैत्र',
+    'Vaishakha': 'वैशाख',
+    'Jyeshtha': 'ज्येष्ठ',
+    'Ashadha': 'आषाढ़',
+    'Shravana': 'श्रावण',
+    'Bhadrapada': 'भाद्रपद',
+    'Ashwin': 'आश्विन',
+    'Kartik': 'कार्तिक',
+    'Margashirsha': 'मार्गशीर्ष',
+    'Pausha': 'पौष',
+    'Magha': 'माघ',
+    'Phalguna': 'फाल्गुन',
+  };
+
+  static const Map<String, String> _tithiDeva = {
+    'Pratipada': 'प्रतिपदा',
+    'Dwitiya': 'द्वितीया',
+    'Tritiya': 'तृतीया',
+    'Chaturthi': 'चतुर्थी',
+    'Panchami': 'पञ्चमी',
+    'Shashthi': 'षष्ठी',
+    'Saptami': 'सप्तमी',
+    'Ashtami': 'अष्टमी',
+    'Navami': 'नवमी',
+    'Dashami': 'दशमी',
+    'Ekadashi': 'एकादशी',
+    'Dwadashi': 'द्वादशी',
+    'Trayodashi': 'त्रयोदशी',
+    'Chaturdashi': 'चतुर्दशी',
+    'Purnima': 'पूर्णिमा',
+    'Amavasya': 'अमावस्या',
+  };
+
+  static const Map<String, String> _pakshaDeva = {
+    'Shukla Paksha': 'शुक्ल',
+    'Krishna Paksha': 'कृष्ण',
+  };
+
+  static const Map<String, String> _varaDeva = {
+    'Somavara': 'सोमवार',
+    'Mangalavara': 'मङ्गलवार',
+    'Budhavara': 'बुधवार',
+    'Guruvara': 'गुरुवार',
+    'Shukravara': 'शुक्रवार',
+    'Shanivara': 'शनिवार',
+    'Ravivara': 'रविवार',
+  };
+
+  static String monthDeva(String monthName) =>
+      _hinduMonthDeva[monthName] ?? monthName;
+
+  static String tithiDeva(String tithiName) =>
+      _tithiDeva[tithiName] ?? tithiName;
+
+  static String pakshaDeva(String paksha) => _pakshaDeva[paksha] ?? paksha;
+
+  static String varaDeva(String varaName) => _varaDeva[varaName] ?? varaName;
 
   static const List<String> _shuklaTithiNames = [
     'Pratipada',
