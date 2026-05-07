@@ -81,6 +81,17 @@ abstract final class AnalyticsService {
   }) =>
       _log('experience_level_set', {'level': level, 'source': source});
 
+  static Future<void> onboardingReminderChosen({
+    required bool enabled,
+    int? hour,
+    int? minute,
+  }) =>
+      _log('onboarding_reminder_chosen', {
+        'enabled': enabled ? 1 : 0,
+        if (hour != null) 'hour': hour,
+        if (minute != null) 'minute': minute,
+      });
+
   // ── Internal ────────────────────────────────────────────────────────────
 
   static Future<void> _log(
