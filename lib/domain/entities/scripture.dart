@@ -123,6 +123,75 @@ extension ScriptureX on Scripture {
         Scripture.mahanirvana => 'Mahanirvana Tantra',
       };
 
+  /// Devanāgarī (or Tamil for Tirukkural) title used as the editorial
+  /// header on Chapter List. Falls back to [displayName] when not set.
+  String get devaName => switch (this) {
+        Scripture.bhagavadGita => 'भगवद्गीता',
+        Scripture.rigveda => 'ऋग्वेद',
+        Scripture.samaveda => 'सामवेद',
+        Scripture.yajurveda => 'यजुर्वेद',
+        Scripture.atharvaveda => 'अथर्ववेद',
+        Scripture.ishaUpanishad => 'ईशोपनिषद्',
+        Scripture.kenaUpanishad => 'केनोपनिषद्',
+        Scripture.kathaUpanishad => 'कठोपनिषद्',
+        Scripture.prasnaUpanishad => 'प्रश्नोपनिषद्',
+        Scripture.mundakaUpanishad => 'मुण्डकोपनिषद्',
+        Scripture.mandukyaUpanishad => 'माण्डूक्योपनिषद्',
+        Scripture.taittiriyaUpanishad => 'तैत्तिरीयोपनिषद्',
+        Scripture.aitareyaUpanishad => 'ऐतरेयोपनिषद्',
+        Scripture.chandogyaUpanishad => 'छान्दोग्योपनिषद्',
+        Scripture.brihadaranyakaUpanishad => 'बृहदारण्यकोपनिषद्',
+        Scripture.shvetashvataraUpanishad => 'श्वेताश्वतरोपनिषद्',
+        Scripture.kaushitakiUpanishad => 'कौषीतक्युपनिषद्',
+        Scripture.maitrayaniUpanishad => 'मैत्रायण्युपनिषद्',
+        Scripture.yogaSutras => 'योगसूत्र',
+        Scripture.brahmasutras => 'ब्रह्मसूत्र',
+        Scripture.hathaYogaPradipika => 'हठयोगप्रदीपिका',
+        Scripture.ramayana => 'रामायण',
+        Scripture.mahabharata => 'महाभारत',
+        Scripture.vishnuPurana => 'विष्णुपुराण',
+        Scripture.deviBhagavataPurana => 'देवीभागवतपुराणम्',
+        Scripture.bhagavataPurana => 'श्रीमद्भागवतम्',
+        Scripture.markandeya => 'मार्कण्डेयपुराण',
+        Scripture.vishnuSahasranama => 'विष्णुसहस्रनाम',
+        Scripture.arthashastra => 'अर्थशास्त्र',
+        Scripture.tirukkural => 'திருக்குறள்',
+        Scripture.manusmriti => 'मनुस्मृति',
+        Scripture.mahanirvana => 'महानिर्वाणतन्त्र',
+      };
+
+  /// Italic-serif scholarly subtitle shown beneath the Devanāgarī title
+  /// in the Chapter List header (e.g. "Bhagavad Gītā · The Song of God").
+  String get scholarlySubtitle => switch (this) {
+        Scripture.bhagavadGita => 'Bhagavad Gītā · The Song of God',
+        Scripture.rigveda => 'Ṛgveda · The Veda of Hymns',
+        Scripture.samaveda => 'Sāmaveda · The Veda of Melodies',
+        Scripture.yajurveda => 'Yajurveda · The Veda of Sacrificial Formulas',
+        Scripture.atharvaveda => 'Atharvaveda · The Veda of Atharvan',
+        Scripture.yogaSutras => 'Yoga Sūtras · Patañjali\'s aphorisms on Yoga',
+        Scripture.brahmasutras => 'Brahma Sūtras · The Vedānta aphorisms',
+        Scripture.hathaYogaPradipika =>
+          'Haṭha Yoga Pradīpikā · Light on the Forceful Path',
+        Scripture.ramayana => 'Rāmāyaṇa · The Journey of Rāma',
+        Scripture.mahabharata =>
+          'Mahābhārata · The Great Tale of the Bhāratas',
+        Scripture.vishnuPurana => 'Viṣṇu Purāṇa · The Story of Viṣṇu',
+        Scripture.deviBhagavataPurana =>
+          'Devī Bhāgavata Purāṇa · The Glory of the Goddess',
+        Scripture.bhagavataPurana =>
+          'Bhāgavata Purāṇa · The Story of the Lord',
+        Scripture.markandeya =>
+          'Mārkaṇḍeya Purāṇa · The Purāṇa of Mārkaṇḍeya',
+        Scripture.vishnuSahasranama =>
+          'Viṣṇu Sahasranāma · The Thousand Names of Viṣṇu',
+        Scripture.arthashastra => 'Arthaśāstra · The Treatise on Polity',
+        Scripture.tirukkural => 'Tirukkuṟaḷ · The Sacred Couplets',
+        Scripture.manusmriti => 'Manusmṛti · The Code of Manu',
+        Scripture.mahanirvana =>
+          'Mahānirvāṇa Tantra · Tantra of the Great Liberation',
+        _ => '$displayName · A principal Upaniṣad',
+      };
+
   /// Two- or three-letter abbreviation used in compact chapter/verse-list
   /// headers (e.g. `BG 1`, `MB 6.25`). Mirrors how scriptures are cited in
   /// scholarly editions.
