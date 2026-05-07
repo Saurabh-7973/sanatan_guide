@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Settings (Screen 09)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* deliberately sans-serif and quiet */
+  .topbar-title {
+    font-family: var(--f-sans);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* ==================== SECTION ==================== */
+  .section {
+    margin-top: 22px;
+  }
+
+  .section:first-child {
+    margin-top: 6px;
+  }
+
+  .section-label {
+    padding: 0 24px 10px;
+    margin: 0 0 4px;
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    border-bottom: 1px solid;
+  }
+
+  /* ==================== ROW ==================== */
+  .s-row {
+    padding: 13px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    min-height: 56px;
+  }
+
+  .s-row:last-child { border-bottom: none; }
+
+  .s-row-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .s-row-label {
+    font-family: var(--f-sans);
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+
+  .s-row-sub {
+    margin-top: 2px;
+    font-family: var(--f-sans);
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+
+  .s-row-control {
+    flex-shrink: 0;
+  }
+
+  .s-row-arrow { opacity: 0.35; }
+  .s-row-value {
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+
+  /* destructive variant */
+  .s-row.destructive .s-row-label { font-weight: 500; }
+
+  /* ==================== CONTROLS ==================== */
+
+  /* segmented theme picker */
+  .seg {
+    display: flex;
+    border-radius: 18px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .seg-item {
+    width: 36px;
+    height: 30px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* slider */
+  .slider {
+    flex: 1;
+    height: 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .slider-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .slider-fill {
+    position: absolute;
+    left: 0;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .slider-thumb {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+
+  .slider-tick {
+    position: absolute;
+    top: 11px;
+    width: 1.5px;
+    height: 4px;
+    border-radius: 0.5px;
+  }
+
+  .slider-bookend {
+    flex-shrink: 0;
+    font-family: var(--f-serif);
+    font-size: 12px;
+    width: 18px;
+    text-align: center;
+  }
+
+  .slider-bookend.large {
+    font-size: 16px;
+  }
+
+  .slider-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* toggle */
+  .toggle {
+    width: 40px;
+    height: 24px;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    transition: left 0.2s ease;
+    background: #fff;
+  }
+
+  .toggle.off .toggle-knob { left: 3px; }
+  .toggle.on .toggle-knob { left: 19px; }
+
+  /* ==================== ABOUT FOOTER ==================== */
+  .about-footer {
+    padding: 28px 24px 32px;
+    text-align: center;
+  }
+
+  .about-footer-title {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .about-footer-subtitle {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .about-footer-version {
+    font-family: var(--f-sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ==================== DIALOG (destructive confirmation) ==================== */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+  }
+
+  .dialog {
+    width: 100%;
+    border-radius: 8px;
+    padding: 26px 24px 18px;
+    text-align: left;
+  }
+
+  .dialog-title {
+    font-family: var(--f-serif);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .dialog-body {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 22px;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .dialog-btn {
+    padding: 10px 18px;
+    font-family: var(--f-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-back { color: var(--d-text-1); }
+  .theme-dark .topbar-title { color: var(--d-text-1); }
+
+  .theme-dark .section-label { color: var(--d-text-3); border-bottom-color: var(--d-divider); }
+
+  .theme-dark .s-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .s-row:active { background: rgba(232, 130, 12, 0.04); }
+  .theme-dark .s-row-label { color: var(--d-text-1); }
+  .theme-dark .s-row-sub { color: var(--d-text-3); }
+  .theme-dark .s-row-arrow { color: var(--d-text-3); }
+  .theme-dark .s-row-value { color: var(--d-saffron); }
+
+  .theme-dark .s-row.destructive .s-row-label { color: var(--d-iron-red); }
+
+  /* segment */
+  .theme-dark .seg { background: var(--d-surface); border: 1px solid var(--d-divider-soft); }
+  .theme-dark .seg-item { color: var(--d-text-3); }
+  .theme-dark .seg-item.active { background: var(--d-saffron); color: #1a1208; }
+
+  /* slider */
+  .theme-dark .slider-track { background: var(--d-divider-soft); }
+  .theme-dark .slider-fill { background: var(--d-saffron); }
+  .theme-dark .slider-thumb { background: var(--d-saffron); box-shadow: 0 0 8px rgba(232, 130, 12, 0.4); }
+  .theme-dark .slider-tick { background: var(--d-text-3); opacity: 0.4; }
+  .theme-dark .slider-bookend { color: var(--d-text-3); }
+
+  /* toggle */
+  .theme-dark .toggle.off { background: var(--d-surface-2); }
+  .theme-dark .toggle.on { background: var(--d-saffron); }
+  .theme-dark .toggle.on .toggle-knob { background: #1a1208; }
+
+  /* about footer */
+  .theme-dark .about-footer-title { color: var(--d-saffron); }
+  .theme-dark .about-footer-subtitle { color: var(--d-text-2); }
+  .theme-dark .about-footer-version { color: var(--d-text-3); }
+
+  /* dialog */
+  .theme-dark .dialog { background: var(--d-surface); border: 1px solid var(--d-divider); }
+  .theme-dark .dialog-title { color: var(--d-text-1); }
+  .theme-dark .dialog-body { color: var(--d-text-2); }
+  .theme-dark .dialog-btn.cancel { color: var(--d-text-2); background: transparent; }
+  .theme-dark .dialog-btn.confirm { color: #fff; background: var(--d-iron-red); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-back { color: var(--l-text-1); }
+  .theme-light .topbar-title { color: var(--l-text-1); }
+
+  .theme-light .section-label { color: var(--l-text-3); border-bottom-color: var(--l-divider); }
+
+  .theme-light .s-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .s-row:active { background: rgba(194, 101, 8, 0.04); }
+  .theme-light .s-row-label { color: var(--l-text-1); }
+  .theme-light .s-row-sub { color: var(--l-text-3); }
+  .theme-light .s-row-arrow { color: var(--l-text-3); }
+  .theme-light .s-row-value { color: var(--l-saffron); }
+
+  .theme-light .s-row.destructive .s-row-label { color: var(--l-iron-red); }
+
+  .theme-light .seg { background: var(--l-surface); border: 1px solid var(--l-divider-soft); }
+  .theme-light .seg-item { color: var(--l-text-3); }
+  .theme-light .seg-item.active { background: var(--l-saffron); color: #fff; }
+
+  .theme-light .slider-track { background: var(--l-divider-soft); }
+  .theme-light .slider-fill { background: var(--l-saffron); }
+  .theme-light .slider-thumb { background: var(--l-saffron); }
+  .theme-light .slider-tick { background: var(--l-text-3); opacity: 0.4; }
+  .theme-light .slider-bookend { color: var(--l-text-3); }
+
+  .theme-light .toggle.off { background: var(--l-divider-soft); }
+  .theme-light .toggle.on { background: var(--l-saffron); }
+  .theme-light .toggle.on .toggle-knob { background: #fff; }
+
+  .theme-light .about-footer-title { color: var(--l-saffron); }
+  .theme-light .about-footer-subtitle { color: var(--l-text-2); }
+  .theme-light .about-footer-version { color: var(--l-text-3); }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 09 · Settings</span></h1>
+  <p>Minimal · sober · scannable · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · TOP -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · top of settings</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-title">Settings</div>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- READING -->
+          <div class="section">
+            <div class="section-label">Reading</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Theme</div>
+              </div>
+              <div class="s-row-control">
+                <div class="seg">
+                  <div class="seg-item active" title="Auto">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1.5v11" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1.5a5.5 5.5 0 0 0 0 11V1.5z" fill="currentColor"/>
+                    </svg>
+                  </div>
+                  <div class="seg-item" title="Light">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.6 2.6l1 1M10.4 10.4l1 1M2.6 11.4l1-1M10.4 3.6l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="seg-item" title="Dark">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M11 8.5A4.5 4.5 0 1 1 5.5 3a4 4 0 0 0 5.5 5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="s-row" style="flex-direction: column; align-items: stretch;">
+              <div style="display:flex; align-items:center; gap: 14px;">
+                <div class="s-row-body">
+                  <div class="s-row-label">Reading font size</div>
+                  <div class="s-row-sub">Affects Sanskrit and translation text</div>
+                </div>
+              </div>
+              <div class="slider-row">
+                <div class="slider-bookend">A</div>
+                <div class="slider">
+                  <div class="slider-track"></div>
+                  <div class="slider-fill" style="width: 35%;"></div>
+                  <div class="slider-tick" style="left: 0%;"></div>
+                  <div class="slider-tick" style="left: 17.5%;"></div>
+                  <div class="slider-tick" style="left: 35%;"></div>
+                  <div class="slider-tick" style="left: 52.5%;"></div>
+                  <div class="slider-tick" style="left: 70%;"></div>
+                  <div class="slider-tick" style="left: 87.5%;"></div>
+                  <div class="slider-tick" style="left: 100%;"></div>
+                  <div class="slider-thumb" style="left: calc(35% - 7px);"></div>
+                </div>
+                <div class="slider-bookend large">A</div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Translation language</div>
+              </div>
+              <div class="s-row-control" style="display:flex; align-items:center; gap: 4px;">
+                <span class="s-row-value">English</span>
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Sanskrit display</div>
+                <div class="s-row-sub">Devanāgarī · IAST diacritics on</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Scripture experience</div>
+                <div class="s-row-sub">Beginner — guided commentary on</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS -->
+          <div class="section">
+            <div class="section-label">Notifications</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Daily verse reminder</div>
+                <div class="s-row-sub">Every morning</div>
+              </div>
+              <div class="s-row-control" style="display:flex; align-items: center; gap: 12px;">
+                <span class="s-row-value">7:00 AM</span>
+                <div class="toggle on"><div class="toggle-knob"></div></div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Festival alerts</div>
+                <div class="s-row-sub">Day before each major parva</div>
+              </div>
+              <div class="s-row-control">
+                <div class="toggle on"><div class="toggle-knob"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · MID/BOTTOM -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · scrolled down</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-title">Settings</div>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- DATA -->
+          <div class="section">
+            <div class="section-label">Data</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Storage</div>
+                <div class="s-row-sub">72.1 MB · 1,33,613 verses cached offline</div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Export bookmarks</div>
+                <div class="s-row-sub">Save your pothī as a JSON file</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row destructive">
+              <div class="s-row-body">
+                <div class="s-row-label">Clear reading history</div>
+                <div class="s-row-sub">Resets streaks and read counts</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABOUT -->
+          <div class="section">
+            <div class="section-label">About</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Credits & attributions</div>
+                <div class="s-row-sub">Translators, sources, and lineage</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Privacy Policy</div>
+              </div>
+              <div class="s-row-control">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="opacity: 0.4;">
+                  <path d="M5 1h7v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M12 1L5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M10 7v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Terms of Service</div>
+              </div>
+              <div class="s-row-control">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="opacity: 0.4;">
+                  <path d="M5 1h7v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M12 1L5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M10 7v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Send feedback</div>
+                <div class="s-row-sub">Bug reports, ideas, errata</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESET (destructive, last) -->
+          <div class="section">
+            <div class="section-label" style="color: var(--d-iron-red); border-bottom-color: rgba(184, 90, 58, 0.2);">Reset</div>
+
+            <div class="s-row destructive">
+              <div class="s-row-body">
+                <div class="s-row-label">Reset all settings</div>
+                <div class="s-row-sub">Restore defaults — bookmarks are preserved</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- About footer -->
+          <div class="about-footer">
+            <div class="about-footer-title">सनातन</div>
+            <div class="about-footer-subtitle">Sanatan Guide</div>
+            <div class="about-footer-version">v1.0.0 · build 1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · TOP -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · top of settings</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-title">Settings</div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="section">
+            <div class="section-label">Reading</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Theme</div>
+              </div>
+              <div class="s-row-control">
+                <div class="seg">
+                  <div class="seg-item" title="Auto">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1.5v11" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1.5a5.5 5.5 0 0 0 0 11V1.5z" fill="currentColor"/>
+                    </svg>
+                  </div>
+                  <div class="seg-item active" title="Light">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.6 2.6l1 1M10.4 10.4l1 1M2.6 11.4l1-1M10.4 3.6l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="seg-item" title="Dark">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M11 8.5A4.5 4.5 0 1 1 5.5 3a4 4 0 0 0 5.5 5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="s-row" style="flex-direction: column; align-items: stretch;">
+              <div style="display:flex; align-items:center; gap: 14px;">
+                <div class="s-row-body">
+                  <div class="s-row-label">Reading font size</div>
+                  <div class="s-row-sub">Affects Sanskrit and translation text</div>
+                </div>
+              </div>
+              <div class="slider-row">
+                <div class="slider-bookend">A</div>
+                <div class="slider">
+                  <div class="slider-track"></div>
+                  <div class="slider-fill" style="width: 35%;"></div>
+                  <div class="slider-tick" style="left: 0%;"></div>
+                  <div class="slider-tick" style="left: 17.5%;"></div>
+                  <div class="slider-tick" style="left: 35%;"></div>
+                  <div class="slider-tick" style="left: 52.5%;"></div>
+                  <div class="slider-tick" style="left: 70%;"></div>
+                  <div class="slider-tick" style="left: 87.5%;"></div>
+                  <div class="slider-tick" style="left: 100%;"></div>
+                  <div class="slider-thumb" style="left: calc(35% - 7px);"></div>
+                </div>
+                <div class="slider-bookend large">A</div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Translation language</div>
+              </div>
+              <div class="s-row-control" style="display:flex; align-items:center; gap: 4px;">
+                <span class="s-row-value">English</span>
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Sanskrit display</div>
+                <div class="s-row-sub">Devanāgarī · IAST diacritics on</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Scripture experience</div>
+                <div class="s-row-sub">Beginner — guided commentary on</div>
+              </div>
+              <div class="s-row-control">
+                <span class="s-row-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-label">Notifications</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Daily verse reminder</div>
+                <div class="s-row-sub">Every morning</div>
+              </div>
+              <div class="s-row-control" style="display:flex; align-items: center; gap: 12px;">
+                <span class="s-row-value">7:00 AM</span>
+                <div class="toggle on"><div class="toggle-knob"></div></div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Festival alerts</div>
+                <div class="s-row-sub">Day before each major parva</div>
+              </div>
+              <div class="s-row-control">
+                <div class="toggle on"><div class="toggle-knob"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- DARK · CONFIRMATION DIALOG -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · clear confirmation</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-title">Settings</div>
+        </div>
+
+        <div class="screen-content" style="filter: blur(1px); opacity: 0.5;">
+          <div class="section">
+            <div class="section-label">Data</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Storage</div>
+                <div class="s-row-sub">72.1 MB · 1,33,613 verses cached offline</div>
+              </div>
+            </div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Export bookmarks</div>
+                <div class="s-row-sub">Save your pothī as a JSON file</div>
+              </div>
+            </div>
+
+            <div class="s-row destructive">
+              <div class="s-row-body">
+                <div class="s-row-label">Clear reading history</div>
+                <div class="s-row-sub">Resets streaks and read counts</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- dialog -->
+        <div class="scrim">
+          <div class="dialog">
+            <div class="dialog-title">Clear reading history?</div>
+            <div class="dialog-body">
+              Your read counts, streaks, and resume points will be reset. Bookmarks and notes are preserved.
+            </div>
+            <div class="dialog-actions">
+              <div class="dialog-btn cancel">Cancel</div>
+              <div class="dialog-btn confirm">Clear</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · TIME PICKER (reminder) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · time picker</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-title">Settings</div>
+        </div>
+
+        <div class="screen-content" style="filter: blur(1px); opacity: 0.5;">
+          <div class="section">
+            <div class="section-label">Notifications</div>
+
+            <div class="s-row">
+              <div class="s-row-body">
+                <div class="s-row-label">Daily verse reminder</div>
+                <div class="s-row-sub">Every morning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scrim" style="align-items: flex-end; padding: 0;">
+          <div class="dialog" style="border-radius: 8px 8px 0 0; padding: 18px 24px 32px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+              <div style="font-family: var(--f-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--d-text-3);">Daily reminder</div>
+              <div style="font-family: var(--f-sans); font-size: 13px; font-weight: 600; color: var(--d-saffron); cursor: pointer;">Done</div>
+            </div>
+
+            <!-- time wheel mock -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 16px; padding: 12px 0; font-family: var(--f-serif); font-size: 38px; font-weight: 500; line-height: 1;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.35; color: var(--d-text-2);">
+                <span style="font-size: 16px;">06</span>
+              </div>
+              <div style="color: var(--d-saffron); font-size: 44px;">07 : 00</div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.35; color: var(--d-text-2);">
+                <span style="font-size: 16px;">08</span>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 8px; margin-top: 18px;">
+              <div style="padding: 8px 16px; border-radius: 18px; background: var(--d-saffron-glow); color: var(--d-saffron); font-family: var(--f-sans); font-size: 12px; font-weight: 600; cursor: pointer;">AM</div>
+              <div style="padding: 8px 16px; border-radius: 18px; color: var(--d-text-3); font-family: var(--f-sans); font-size: 12px; font-weight: 500; cursor: pointer;">PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Plain sans-serif "Settings" title.</b> Lora-italic was right for Bookmarks (पोथी), Festivals (पञ्चाङ्ग), and Library — heritage-charged screens. Settings is utility. Restraint here makes the heritage flourish elsewhere mean more.</li>
+    <li><b>Section labels in small caps with a hairline rule.</b> "Reading / Notifications / Data / About / Reset" — consistent with section labels everywhere else in the app. Scannable in &lt; 2 seconds.</li>
+    <li><b>Removed all per-row icons.</b> Bell, trash can, language, mortarboard, info, book, shield, document, mail — your current settings has 9 icons doing decorative work the labels already do. The redesign keeps icons only on the theme segmented control (where they convey state visually) and the external-link arrow on Privacy/Terms (which signals "leaves the app").</li>
+    <li><b>Theme picker becomes a 3-segment toggle (Auto/Light/Dark).</b> Replaces the colored pill row in your screenshot. Active segment fills with saffron. Single tap to change; no menu.</li>
+    <li><b>Font-size slider with 7 ticks.</b> Discrete steps with visible tick marks. Bookend "A / A" sized to communicate the range.</li>
+    <li><b>Added: Sanskrit display preferences.</b> Devanagari + IAST diacritics on/off. This is a real preference for the audience (some users find IAST helpful, some find it cluttered). Opens a sub-screen.</li>
+    <li><b>Added: Storage info.</b> "72.1 MB · 1,33,613 verses cached offline" — both reassurance and a key authenticity signal for a fully-offline app. Indian-format number grouping.</li>
+    <li><b>Added: Export bookmarks.</b> Saves the pothī as a JSON file. Cheap to build, real user trust.</li>
+    <li><b>Added: Festival alerts toggle.</b> The day-before notification for major parvas. Most users will want this.</li>
+    <li><b>Reset section at the bottom, with iron-red label.</b> Destructive action. Confirmation dialog uses iron-red destructive button with explicit body text about what's preserved (bookmarks, notes).</li>
+    <li><b>About footer — सनातन / Sanatan Guide / v1.0.0 · build 1.</b> Demoted from a primary settings row to a centered footer block. The version is still accessible to anyone who needs it for support, but it stops competing with actionable rows.</li>
+    <li><b>Time picker as a bottom sheet.</b> Standard Material/iOS pattern with a saffron AM toggle. Centered time ("07 : 00") in serif, peripheral hours visible at reduced opacity.</li>
+  </ul>
+</div>
+
+</body>
+</html>

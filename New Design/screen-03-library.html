@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Library (Screen 03)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== LIBRARY HEADER ==================== */
+  .lib-header {
+    padding: 8px 24px 18px;
+  }
+
+  .lib-title {
+    font-family: var(--f-serif);
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .lib-stats {
+    margin-top: 10px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .lib-stats .num {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  .lib-stats .sep {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin: 0 10px 2px;
+    vertical-align: middle;
+  }
+
+  /* search */
+  .lib-search {
+    margin: 16px 24px 0;
+    height: 44px;
+    border-radius: 28px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: text;
+  }
+
+  .lib-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ==================== FAMILY HEADER ==================== */
+  .family {
+    margin-top: 32px;
+    position: relative;
+  }
+
+  .family-header {
+    padding: 0 24px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    backdrop-filter: blur(8px);
+  }
+
+  .family-header-inner {
+    padding-top: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid;
+  }
+
+  .family-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .family-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .family-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .family-meta {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .family-desc {
+    margin-top: 8px;
+    font-family: var(--f-serif);
+    font-size: 12.5px;
+    font-style: italic;
+    line-height: 1.5;
+    padding-right: 40px;
+  }
+
+  /* ==================== SCRIPTURE ROW ==================== */
+  .scripture-row {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    transition: background 0.18s ease;
+  }
+  .scripture-row:last-child { border-bottom: none; }
+
+  .scripture-glyph {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    transform: rotate(45deg);
+  }
+
+  .scripture-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .scripture-deva {
+    font-family: var(--f-deva);
+    font-size: 17px;
+    line-height: 1.2;
+    letter-spacing: 0.005em;
+    margin-bottom: 3px;
+  }
+
+  .scripture-en {
+    font-family: var(--f-serif);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+
+  .scripture-meta {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .scripture-meta .verses {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+
+  .scripture-meta .read {
+    font-weight: 500;
+  }
+
+  .scripture-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  /* ==================== VEDAS GRID (special treatment) ==================== */
+  .vedas-grid {
+    margin: 8px 24px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .veda-cell {
+    aspect-ratio: 3 / 2;
+    border-radius: 4px;
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid;
+  }
+
+  .veda-cell-deva {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .veda-cell-en {
+    font-family: var(--f-serif);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .veda-cell-meta {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* ==================== READ INDICATOR ==================== */
+  .read-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .read-indicator::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--d-saffron);
+  }
+
+  /* ==================== BOTTOM NAV ==================== */
+  .bottom-nav {
+    flex-shrink: 0;
+    margin: 8px 24px 28px;
+    border-radius: 28px;
+    padding: 6px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .nav-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0 8px;
+    gap: 3px;
+    border-radius: 22px;
+    cursor: pointer;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .nav-tab svg { display: block; }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .lib-title { color: var(--d-text-1); }
+  .theme-dark .lib-stats { color: var(--d-text-3); }
+  .theme-dark .lib-stats .num { color: var(--d-saffron); }
+  .theme-dark .lib-stats .sep { background: var(--d-saffron); }
+
+  .theme-dark .lib-search {
+    background: var(--d-surface);
+    border: 1px solid var(--d-divider-soft);
+    color: var(--d-text-2);
+  }
+  .theme-dark .lib-search input { color: var(--d-text-1); }
+  .theme-dark .lib-search input::placeholder { color: var(--d-text-3); }
+
+  .theme-dark .family-header { background: rgba(15, 15, 15, 0.85); }
+  .theme-dark .family-header-inner { border-bottom-color: var(--d-divider); }
+  .theme-dark .family-deva { color: var(--d-saffron); }
+  .theme-dark .family-en { color: var(--d-text-1); }
+  .theme-dark .family-meta { color: var(--d-text-3); }
+  .theme-dark .family-desc { color: var(--d-text-2); }
+
+  .theme-dark .scripture-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .scripture-row:active { background: rgba(232, 130, 12, 0.04); }
+  .theme-dark .scripture-glyph.shruti { background: var(--d-saffron); }
+  .theme-dark .scripture-glyph.smriti { background: var(--d-iron-red); }
+  .theme-dark .scripture-glyph.darshana { background: #C9A467; }
+  .theme-dark .scripture-glyph.tamil { background: #B07642; }
+  .theme-dark .scripture-deva { color: var(--d-cream); }
+  .theme-dark .scripture-en { color: var(--d-text-1); }
+  .theme-dark .scripture-meta { color: var(--d-text-3); }
+  .theme-dark .scripture-meta .verses { color: var(--d-text-2); }
+  .theme-dark .scripture-meta .read { color: var(--d-saffron); }
+  .theme-dark .scripture-arrow { color: var(--d-text-3); }
+
+  .theme-dark .veda-cell {
+    background: var(--d-surface);
+    border-color: var(--d-divider-soft);
+  }
+  .theme-dark .veda-cell-deva { color: var(--d-cream); }
+  .theme-dark .veda-cell-en { color: var(--d-text-1); }
+  .theme-dark .veda-cell-meta { color: var(--d-text-3); }
+
+  .theme-dark .read-indicator { color: var(--d-saffron); }
+
+  .theme-dark .bottom-nav { background: var(--d-surface); }
+  .theme-dark .nav-tab { color: var(--d-text-3); }
+  .theme-dark .nav-tab.active { background: var(--d-saffron-glow); color: var(--d-saffron); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .lib-title { color: var(--l-text-1); }
+  .theme-light .lib-stats { color: var(--l-text-3); }
+  .theme-light .lib-stats .num { color: var(--l-saffron); }
+  .theme-light .lib-stats .sep { background: var(--l-saffron); }
+
+  .theme-light .lib-search {
+    background: var(--l-surface);
+    border: 1px solid var(--l-divider-soft);
+    color: var(--l-text-2);
+  }
+  .theme-light .lib-search input { color: var(--l-text-1); }
+  .theme-light .lib-search input::placeholder { color: var(--l-text-3); }
+
+  .theme-light .family-header { background: rgba(253, 250, 246, 0.9); }
+  .theme-light .family-header-inner { border-bottom-color: var(--l-divider); }
+  .theme-light .family-deva { color: var(--l-saffron); }
+  .theme-light .family-en { color: var(--l-text-1); }
+  .theme-light .family-meta { color: var(--l-text-3); }
+  .theme-light .family-desc { color: var(--l-text-2); }
+
+  .theme-light .scripture-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .scripture-row:active { background: rgba(194, 101, 8, 0.04); }
+  .theme-light .scripture-glyph.shruti { background: var(--l-saffron); }
+  .theme-light .scripture-glyph.smriti { background: var(--l-iron-red); }
+  .theme-light .scripture-glyph.darshana { background: #A47B30; }
+  .theme-light .scripture-glyph.tamil { background: #8B5226; }
+  .theme-light .scripture-deva { color: var(--l-text-1); }
+  .theme-light .scripture-en { color: var(--l-text-1); }
+  .theme-light .scripture-meta { color: var(--l-text-3); }
+  .theme-light .scripture-meta .verses { color: var(--l-text-2); }
+  .theme-light .scripture-meta .read { color: var(--l-saffron); }
+  .theme-light .scripture-arrow { color: var(--l-text-3); }
+
+  .theme-light .veda-cell {
+    background: var(--l-surface);
+    border-color: var(--l-divider-soft);
+  }
+  .theme-light .veda-cell-deva { color: var(--l-text-1); }
+  .theme-light .veda-cell-en { color: var(--l-text-1); }
+  .theme-light .veda-cell-meta { color: var(--l-text-3); }
+
+  .theme-light .read-indicator { color: var(--l-saffron); }
+
+  .theme-light .bottom-nav { background: var(--l-surface); }
+  .theme-light .nav-tab { color: var(--l-text-3); }
+  .theme-light .nav-tab.active { background: var(--l-saffron-glow); color: var(--l-saffron); }
+
+  /* ==================== STATES ==================== */
+  @keyframes shimmer {
+    0% { opacity: 0.5; }
+    50% { opacity: 0.85; }
+    100% { opacity: 0.5; }
+  }
+  .skeleton {
+    background: rgba(232, 130, 12, 0.08);
+    border-radius: 2px;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  .empty-state {
+    margin: 40px 24px 0;
+    padding: 32px 22px;
+    text-align: center;
+    border: 1px dashed rgba(242, 229, 206, 0.15);
+    border-radius: 4px;
+  }
+  .empty-state .glyph {
+    font-family: var(--f-deva);
+    font-size: 28px;
+    color: var(--d-saffron);
+    margin-bottom: 14px;
+  }
+  .empty-state .title {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-style: italic;
+    color: var(--d-text-1);
+    margin-bottom: 6px;
+  }
+  .empty-state .body {
+    font-family: var(--f-serif);
+    font-size: 13px;
+    color: var(--d-text-2);
+    line-height: 1.5;
+  }
+
+  /* search results state */
+  .search-result-row {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--d-divider-soft);
+  }
+  .search-result-deva {
+    font-family: var(--f-deva);
+    font-size: 14px;
+    color: var(--d-text-3);
+    width: 60px;
+  }
+  .search-result-body {
+    flex: 1;
+  }
+  .search-result-name {
+    font-family: var(--f-serif);
+    font-size: 14px;
+    color: var(--d-text-1);
+    margin-bottom: 2px;
+  }
+  .search-result-name b {
+    color: var(--d-saffron);
+    font-weight: 500;
+  }
+  .search-result-family {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--d-text-3);
+  }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .family { animation: inkSettle 500ms ease-out backwards; }
+  .family:nth-child(1) { animation-delay: 60ms; }
+  .family:nth-child(2) { animation-delay: 120ms; }
+  .family:nth-child(3) { animation-delay: 180ms; }
+  .family:nth-child(4) { animation-delay: 240ms; }
+  .family:nth-child(5) { animation-delay: 300ms; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 03 · Library</span></h1>
+  <p>Manuscript repository · Śruti / Smṛti taxonomy · rows not cards · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · DEFAULT (top of library) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · default · top</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-content">
+
+          <div class="lib-header">
+            <div class="lib-title">Library</div>
+            <div class="lib-stats">
+              <span class="num">1,33,613</span>&nbsp; verses
+              <span class="sep"></span>
+              <span class="num">31</span>&nbsp; scriptures
+            </div>
+          </div>
+
+          <div class="lib-search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <input type="text" placeholder="Find a scripture..." />
+          </div>
+
+          <!-- ŚRUTI -->
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">श्रुति</div>
+                <div class="family-row">
+                  <div class="family-en">Śruti — that which is heard</div>
+                  <div class="family-meta">5 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  The earliest, eternal revelations — the Vedas and principal Upaniṣads.
+                </div>
+              </div>
+            </div>
+
+            <!-- Vedas as 2x2 grid -->
+            <div class="vedas-grid">
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">ऋग्वेद</div>
+                  <div class="veda-cell-en">Ṛg Veda</div>
+                </div>
+                <div class="veda-cell-meta">10,552 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">सामवेद</div>
+                  <div class="veda-cell-en">Sāma Veda</div>
+                </div>
+                <div class="veda-cell-meta">1,875 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">यजुर्वेद</div>
+                  <div class="veda-cell-en">Yajur Veda</div>
+                </div>
+                <div class="veda-cell-meta">1,975 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">अथर्ववेद</div>
+                  <div class="veda-cell-en">Atharva Veda</div>
+                </div>
+                <div class="veda-cell-meta">5,977 mantras</div>
+              </div>
+            </div>
+
+            <!-- Upanishads as a single row entry -->
+            <div style="margin-top: 8px;">
+              <div class="scripture-row">
+                <div class="scripture-glyph shruti"></div>
+                <div class="scripture-body">
+                  <div class="scripture-deva">मुख्य उपनिषद् ११</div>
+                  <div class="scripture-en">The Mukhya Upaniṣads</div>
+                  <div class="scripture-meta">
+                    <span class="verses">1,876 verses</span>·&nbsp; 11 principal texts
+                  </div>
+                </div>
+                <div class="scripture-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ITIHĀSA -->
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">इतिहास</div>
+                <div class="family-row">
+                  <div class="family-en">Itihāsa — the great epics</div>
+                  <div class="family-meta">3 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  Stories that happened — Rāma, the Pāṇḍavas, the Gītā within.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">भगवद्गीता</div>
+                <div class="scripture-en">Bhagavad Gītā</div>
+                <div class="scripture-meta">
+                  <span class="verses">700 verses</span>·&nbsp; 18 chapters
+                  <span class="read"> · 1 verse read</span>
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">रामायण</div>
+                <div class="scripture-en">Rāmāyaṇa</div>
+                <div class="scripture-meta">
+                  <span class="verses">18,761 verses</span>·&nbsp; 7 kāṇḍas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">महाभारत</div>
+                <div class="scripture-en">Mahābhārata</div>
+                <div class="scripture-meta">
+                  <span class="verses">72,770 verses</span>·&nbsp; 18 parvas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 8px;"></div>
+        </div>
+
+        <!-- bottom nav -->
+        <div class="bottom-nav">
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 4v1.5M11 16.5V18M4 11h1.5M16.5 11H18M6.05 6.05l1.06 1.06M14.9 14.9l1.05 1.05M6.05 15.95l1.06-1.05M14.9 7.1l1.05-1.05" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Today</span>
+          </div>
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18c0-4 3-6 3-9a3 3 0 0 0-6 0c0 3 3 5 3 9z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Practice</span>
+          </div>
+          <div class="nav-tab active">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="11.5" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 8h3.5M5 11h3.5M13.5 8H17M13.5 11H17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Texts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · MID-SCROLL (showing more taxonomy) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · mid-scroll</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-content">
+
+          <!-- PURĀṆA -->
+          <div class="family" style="margin-top: 16px;">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">पुराण</div>
+                <div class="family-row">
+                  <div class="family-en">Purāṇa — old tales of gods and worlds</div>
+                  <div class="family-meta">2 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  Cosmology, devotion, and the līlās of the divine.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">श्रीमद्भागवतम्</div>
+                <div class="scripture-en">Bhāgavata Purāṇa</div>
+                <div class="scripture-meta">
+                  <span class="verses">14,031 verses</span>·&nbsp; 12 cantos
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">विष्णुपुराण</div>
+                <div class="scripture-en">Viṣṇu Purāṇa</div>
+                <div class="scripture-meta">
+                  <span class="verses">6,000 verses</span>·&nbsp; 6 aṁśas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- DARŚANA -->
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">दर्शन</div>
+                <div class="family-row">
+                  <div class="family-en">Darśana — philosophy in sūtra form</div>
+                  <div class="family-meta">2 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  The condensed teachings — yoga, vedānta, and the schools of thought.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph darshana"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">योगसूत्र</div>
+                <div class="scripture-en">Yoga Sūtras of Patañjali</div>
+                <div class="scripture-meta">
+                  <span class="verses">195 sūtras</span>·&nbsp; 4 pādas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph darshana"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">ब्रह्मसूत्र</div>
+                <div class="scripture-en">Brahma Sūtras</div>
+                <div class="scripture-meta">
+                  <span class="verses">555 sūtras</span>·&nbsp; 4 adhyāyas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- DHARMAŚĀSTRA -->
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">धर्मशास्त्र</div>
+                <div class="family-row">
+                  <div class="family-en">Dharmaśāstra — codes of right living</div>
+                  <div class="family-meta">2 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  Law, ethics, and the conduct of life across the four āśramas.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">मनुस्मृति</div>
+                <div class="scripture-en">Manusmṛti</div>
+                <div class="scripture-meta">
+                  <span class="verses">2,684 verses</span>·&nbsp; 12 chapters
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">अर्थशास्त्र</div>
+                <div class="scripture-en">Arthaśāstra</div>
+                <div class="scripture-meta">
+                  <span class="verses">5,348 verses</span>·&nbsp; 15 books
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAMIL -->
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">தமிழ் சாஸ்திரம்</div>
+                <div class="family-row">
+                  <div class="family-en">Tamil sacred corpus</div>
+                  <div class="family-meta">1 TEXT</div>
+                </div>
+                <div class="family-desc">
+                  The southern stream — ethics in couplets, devotion in song.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph tamil"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva" style="font-family: var(--f-sans); font-size: 15px;">திருக்குறள்</div>
+                <div class="scripture-en">Tirukkuṟaḷ</div>
+                <div class="scripture-meta">
+                  <span class="verses">1,330 couplets</span>·&nbsp; Tiruvaḷḷuvar
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 4v1.5M11 16.5V18M4 11h1.5M16.5 11H18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Today</span>
+          </div>
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18c0-4 3-6 3-9a3 3 0 0 0-6 0c0 3 3 5 3 9z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Practice</span>
+          </div>
+          <div class="nav-tab active">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="11.5" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 8h3.5M5 11h3.5M13.5 8H17M13.5 11H17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Texts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · DEFAULT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · default</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-content">
+
+          <div class="lib-header">
+            <div class="lib-title">Library</div>
+            <div class="lib-stats">
+              <span class="num">1,33,613</span>&nbsp; verses
+              <span class="sep"></span>
+              <span class="num">31</span>&nbsp; scriptures
+            </div>
+          </div>
+
+          <div class="lib-search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <input type="text" placeholder="Find a scripture..." />
+          </div>
+
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">श्रुति</div>
+                <div class="family-row">
+                  <div class="family-en">Śruti — that which is heard</div>
+                  <div class="family-meta">5 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  The earliest, eternal revelations — the Vedas and principal Upaniṣads.
+                </div>
+              </div>
+            </div>
+
+            <div class="vedas-grid">
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">ऋग्वेद</div>
+                  <div class="veda-cell-en">Ṛg Veda</div>
+                </div>
+                <div class="veda-cell-meta">10,552 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">सामवेद</div>
+                  <div class="veda-cell-en">Sāma Veda</div>
+                </div>
+                <div class="veda-cell-meta">1,875 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">यजुर्वेद</div>
+                  <div class="veda-cell-en">Yajur Veda</div>
+                </div>
+                <div class="veda-cell-meta">1,975 mantras</div>
+              </div>
+              <div class="veda-cell">
+                <div>
+                  <div class="veda-cell-deva">अथर्ववेद</div>
+                  <div class="veda-cell-en">Atharva Veda</div>
+                </div>
+                <div class="veda-cell-meta">5,977 mantras</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <div class="scripture-row">
+                <div class="scripture-glyph shruti"></div>
+                <div class="scripture-body">
+                  <div class="scripture-deva">मुख्य उपनिषद् ११</div>
+                  <div class="scripture-en">The Mukhya Upaniṣads</div>
+                  <div class="scripture-meta">
+                    <span class="verses">1,876 verses</span>·&nbsp; 11 principal texts
+                  </div>
+                </div>
+                <div class="scripture-arrow">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                    <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="family">
+            <div class="family-header">
+              <div class="family-header-inner">
+                <div class="family-deva">इतिहास</div>
+                <div class="family-row">
+                  <div class="family-en">Itihāsa — the great epics</div>
+                  <div class="family-meta">3 TEXTS</div>
+                </div>
+                <div class="family-desc">
+                  Stories that happened — Rāma, the Pāṇḍavas, the Gītā within.
+                </div>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">भगवद्गीता</div>
+                <div class="scripture-en">Bhagavad Gītā</div>
+                <div class="scripture-meta">
+                  <span class="verses">700 verses</span>·&nbsp; 18 chapters
+                  <span class="read"> · 1 verse read</span>
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">रामायण</div>
+                <div class="scripture-en">Rāmāyaṇa</div>
+                <div class="scripture-meta">
+                  <span class="verses">18,761 verses</span>·&nbsp; 7 kāṇḍas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="scripture-row">
+              <div class="scripture-glyph smriti"></div>
+              <div class="scripture-body">
+                <div class="scripture-deva">महाभारत</div>
+                <div class="scripture-en">Mahābhārata</div>
+                <div class="scripture-meta">
+                  <span class="verses">72,770 verses</span>·&nbsp; 18 parvas
+                </div>
+              </div>
+              <div class="scripture-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 8px;"></div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 4v1.5M11 16.5V18M4 11h1.5M16.5 11H18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Today</span>
+          </div>
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18c0-4 3-6 3-9a3 3 0 0 0-6 0c0 3 3 5 3 9z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Practice</span>
+          </div>
+          <div class="nav-tab active">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="11.5" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 8h3.5M5 11h3.5M13.5 8H17M13.5 11H17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Texts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- SEARCH ACTIVE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · search "gi"</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-content">
+
+          <div class="lib-header">
+            <div class="lib-title">Library</div>
+            <div class="lib-stats">
+              <span class="num">1,33,613</span>&nbsp; verses
+              <span class="sep"></span>
+              <span class="num">31</span>&nbsp; scriptures
+            </div>
+          </div>
+
+          <div class="lib-search" style="border-color: var(--d-saffron);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: var(--d-saffron);">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <input type="text" value="gi" />
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--d-text-3);">
+              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <div style="padding: 18px 24px 8px;">
+            <div style="font-family: var(--f-sans); font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--d-text-3);">
+              3 results
+            </div>
+          </div>
+
+          <div class="search-result-row">
+            <div class="search-result-deva">गीता</div>
+            <div class="search-result-body">
+              <div class="search-result-name">Bhagavad <b>Gī</b>tā</div>
+              <div class="search-result-family">ITIHĀSA · 700 VERSES</div>
+            </div>
+            <div class="scripture-arrow">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="search-result-row">
+            <div class="search-result-deva">गीतगोविन्द</div>
+            <div class="search-result-body">
+              <div class="search-result-name"><b>Gī</b>ta Govinda</div>
+              <div class="search-result-family">DEVOTIONAL · 288 VERSES</div>
+            </div>
+            <div class="scripture-arrow">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="search-result-row">
+            <div class="search-result-deva">अष्टावक्र</div>
+            <div class="search-result-body">
+              <div class="search-result-name">Aṣṭāvakra <b>Gī</b>tā</div>
+              <div class="search-result-family">DARŚANA · 298 VERSES</div>
+            </div>
+            <div class="scripture-arrow">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 4v1.5M11 16.5V18M4 11h1.5M16.5 11H18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Today</span>
+          </div>
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18c0-4 3-6 3-9a3 3 0 0 0-6 0c0 3 3 5 3 9z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Practice</span>
+          </div>
+          <div class="nav-tab active">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="11.5" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Texts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · loading</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-content">
+          <div class="lib-header">
+            <div class="lib-title">Library</div>
+            <div class="lib-stats" style="opacity: 0.4;">
+              <div class="skeleton" style="display:inline-block; height:10px; width:180px;"></div>
+            </div>
+          </div>
+
+          <div class="lib-search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <input type="text" placeholder="Find a scripture..." />
+          </div>
+
+          <div style="margin: 32px 24px 0;">
+            <div class="skeleton" style="height: 22px; width: 80px; margin-bottom: 8px;"></div>
+            <div class="skeleton" style="height: 12px; width: 60%; margin-bottom: 6px;"></div>
+            <div class="skeleton" style="height: 11px; width: 80%; margin-bottom: 24px;"></div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom: 16px;">
+              <div class="skeleton" style="aspect-ratio: 3/2;"></div>
+              <div class="skeleton" style="aspect-ratio: 3/2;"></div>
+              <div class="skeleton" style="aspect-ratio: 3/2;"></div>
+              <div class="skeleton" style="aspect-ratio: 3/2;"></div>
+            </div>
+          </div>
+
+          <div style="margin: 32px 24px 0;">
+            <div class="skeleton" style="height: 22px; width: 100px; margin-bottom: 8px;"></div>
+            <div class="skeleton" style="height: 12px; width: 60%; margin-bottom: 22px;"></div>
+
+            <div class="skeleton" style="height: 50px; margin-bottom: 12px;"></div>
+            <div class="skeleton" style="height: 50px; margin-bottom: 12px;"></div>
+            <div class="skeleton" style="height: 50px;"></div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 4v1.5M11 16.5V18M4 11h1.5M16.5 11H18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Today</span>
+          </div>
+          <div class="nav-tab">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18c0-4 3-6 3-9a3 3 0 0 0-6 0c0 3 3 5 3 9z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Practice</span>
+          </div>
+          <div class="nav-tab active">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="3" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="11.5" y="4" width="7.5" height="14" rx="0.5" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <span>Texts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Replaced "Itihasa & Purana" sections with the full Śruti / Smṛti taxonomy.</b> Six families: Śruti, Itihāsa, Purāṇa, Darśana, Dharmaśāstra, Tamil. This is how every actual Sanskrit library on earth is organized — mirroring it makes the app feel like a real repository, not a content app.</li>
+    <li><b>Cards became rows.</b> Cards say "product." Rows say "catalog." A scripture library is the latter. Net result: 2-3x more scriptures visible at a glance and a quieter, more navigable surface.</li>
+    <li><b>Vedas get a 2×2 grid.</b> The four Vedas are parallel (Ṛg, Sāma, Yajur, Atharva), not sequential. Geometric layout reflects that. Cell aspect ratio is 3:2 — Sulba Sutra brick proportion from Vedic altars.</li>
+    <li><b>Library header flexes the scale.</b> "1,33,613 verses · 31 scriptures" set in serif italic numerals. Indian-format comma grouping (1,33,613 not 133,613) — small but specific.</li>
+    <li><b>Family headers are typographically authoritative.</b> Devanāgarī display + italic English subtitle + saffron rule + small descriptor. Readable in two seconds, organizing in one.</li>
+    <li><b>Removed the Devanāgarī letter-circles.</b> "गी" before Bhagavad Gītā wasn't an icon, it was a placeholder. Replaced with a tiny diamond family-glyph (◆ for Smṛti, ◇ for Śruti). One character, monochrome, never decorative.</li>
+    <li><b>Reading state surfaced at the library level.</b> "1 verse read" appears in saffron next to the meta line. You see your progress on every text without drilling in.</li>
+    <li><b>Search is inline, not a separate screen.</b> Tap → expand → results replace the family list → "esc" returns you. Highlighting on the matched substring ("Bhagavad <b>Gī</b>tā").</li>
+    <li><b>Tamil corpus rendered in actual Tamil script (திருக்குறள்).</b> Not Devanagari. Respect for the linguistic tradition — the Tirukkuṟaḷ was never written in Devanagari.</li>
+    <li><b>Family headers stick on scroll.</b> No matter how deep you are, you always know which family you're browsing.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Bookmarks (Screen 07)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .topbar-spacer { flex: 1; }
+  .topbar-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ==================== HEADER ==================== */
+  .pothi-header {
+    padding: 4px 24px 18px;
+  }
+
+  .pothi-line {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+
+  .pothi-deva {
+    font-family: var(--f-deva);
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: 0.005em;
+  }
+
+  .pothi-en {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1;
+  }
+
+  .pothi-meta {
+    margin-top: 12px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .pothi-meta .num {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  .pothi-meta .sep {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    margin: 0 8px 2px;
+    vertical-align: middle;
+  }
+
+  /* ==================== SORT BAR ==================== */
+  .sort-bar {
+    margin: 0 24px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid;
+  }
+
+  .sort-tabs {
+    display: flex;
+    gap: 18px;
+  }
+
+  .sort-tab {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding-bottom: 2px;
+    border-bottom: 1.5px solid transparent;
+  }
+
+  .sort-options {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--f-sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  /* ==================== LEAF (saved verse) ==================== */
+  .leaf {
+    margin: 14px 24px 0;
+    padding: 18px 18px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* top binding line — the marker that makes this read as a "leaf" */
+  .leaf-binding {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 8px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .leaf-binding::before,
+  .leaf-binding::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+  .leaf-binding .hole {
+    width: 5px;
+    height: 5px;
+    margin: 0 10px;
+    transform: rotate(45deg);
+  }
+
+  /* knot-mark — top-right thread tie */
+  .leaf-knot {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .leaf-knot::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+  }
+
+  /* leaf content */
+  .leaf-coord {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .leaf-coord .dev-num {
+    font-family: var(--f-deva);
+    font-size: 11px;
+    margin-right: 2px;
+    letter-spacing: 0;
+  }
+
+  .leaf-sanskrit {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.55;
+    margin-bottom: 10px;
+    letter-spacing: 0.005em;
+  }
+
+  .leaf-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* user note — pencilled in */
+  .leaf-note {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .leaf-note-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.6;
+  }
+
+  .leaf-note-text {
+    flex: 1;
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* leaf footer */
+  .leaf-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .leaf-footer .scripture {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .leaf-footer .scripture-glyph {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    transform: rotate(45deg);
+  }
+
+  /* ==================== GROUP HEADER (when grouped by scripture) ==================== */
+  .group-header {
+    padding: 26px 24px 8px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .group-header-deva {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .group-header-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+
+  .group-header-count {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  /* ==================== EMPTY STATE ==================== */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
+    text-align: center;
+  }
+
+  .empty-illustration {
+    width: 180px;
+    height: 140px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .empty-leaf {
+    position: absolute;
+    width: 130px;
+    height: 38px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+
+  .empty-leaf::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 14px;
+    height: 1px;
+  }
+
+  .empty-leaf::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 4px;
+    height: 4px;
+  }
+
+  .empty-leaf-1 {
+    top: 10px;
+    left: 14px;
+    transform: rotate(-4deg);
+  }
+  .empty-leaf-2 {
+    top: 50px;
+    left: 26px;
+    transform: rotate(2deg);
+  }
+  .empty-leaf-3 {
+    top: 90px;
+    left: 18px;
+    transform: rotate(-2deg);
+  }
+
+  .empty-thread {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    left: 64px;
+    top: 0;
+    border-radius: 1px;
+    opacity: 0.6;
+  }
+
+  .empty-title {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .empty-body {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 280px;
+  }
+
+  .empty-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-back, .theme-dark .topbar-action { color: var(--d-text-1); }
+
+  .theme-dark .pothi-deva { color: var(--d-saffron); }
+  .theme-dark .pothi-en { color: var(--d-text-1); }
+  .theme-dark .pothi-meta { color: var(--d-text-3); }
+  .theme-dark .pothi-meta .num { color: var(--d-saffron); }
+  .theme-dark .pothi-meta .sep { background: var(--d-saffron); }
+
+  .theme-dark .sort-bar { border-bottom-color: var(--d-divider); }
+  .theme-dark .sort-tab { color: var(--d-text-3); }
+  .theme-dark .sort-tab.active { color: var(--d-saffron); border-bottom-color: var(--d-saffron); }
+  .theme-dark .sort-options { color: var(--d-text-2); }
+
+  .theme-dark .leaf {
+    background: var(--d-surface);
+    border: 1px solid var(--d-divider-soft);
+  }
+  .theme-dark .leaf-binding::before,
+  .theme-dark .leaf-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.4;
+  }
+  .theme-dark .leaf-binding .hole { background: var(--d-saffron); }
+  .theme-dark .leaf-knot::after {
+    background: var(--d-saffron);
+    box-shadow: 0 0 6px rgba(232, 130, 12, 0.5);
+  }
+  .theme-dark .leaf-coord { color: var(--d-saffron); }
+  .theme-dark .leaf-coord .dev-num { color: var(--d-cream); }
+  .theme-dark .leaf-sanskrit { color: var(--d-cream); }
+  .theme-dark .leaf-en { color: var(--d-text-2); }
+  .theme-dark .leaf-note { border-top-color: var(--d-divider-soft); }
+  .theme-dark .leaf-note-icon { color: var(--d-saffron); }
+  .theme-dark .leaf-note-text { color: var(--d-text-1); }
+  .theme-dark .leaf-footer { color: var(--d-text-3); }
+  .theme-dark .leaf-footer .scripture-glyph { background: var(--d-saffron); }
+
+  .theme-dark .group-header-deva { color: var(--d-saffron); }
+  .theme-dark .group-header-en { color: var(--d-text-2); }
+  .theme-dark .group-header-count { color: var(--d-text-3); }
+
+  .theme-dark .empty-leaf { border-color: var(--d-divider); }
+  .theme-dark .empty-leaf::before { background: var(--d-saffron-deep); opacity: 0.4; }
+  .theme-dark .empty-leaf::after { background: var(--d-saffron); }
+  .theme-dark .empty-thread { background: var(--d-saffron); }
+  .theme-dark .empty-title { color: var(--d-text-1); }
+  .theme-dark .empty-body { color: var(--d-text-2); }
+  .theme-dark .empty-cta { background: var(--d-saffron); color: #1a1208; }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-back, .theme-light .topbar-action { color: var(--l-text-1); }
+
+  .theme-light .pothi-deva { color: var(--l-saffron); }
+  .theme-light .pothi-en { color: var(--l-text-1); }
+  .theme-light .pothi-meta { color: var(--l-text-3); }
+  .theme-light .pothi-meta .num { color: var(--l-saffron); }
+  .theme-light .pothi-meta .sep { background: var(--l-saffron); }
+
+  .theme-light .sort-bar { border-bottom-color: var(--l-divider); }
+  .theme-light .sort-tab { color: var(--l-text-3); }
+  .theme-light .sort-tab.active { color: var(--l-saffron); border-bottom-color: var(--l-saffron); }
+  .theme-light .sort-options { color: var(--l-text-2); }
+
+  .theme-light .leaf {
+    background: var(--l-surface);
+    border: 1px solid var(--l-divider-soft);
+  }
+  .theme-light .leaf-binding::before,
+  .theme-light .leaf-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .leaf-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .leaf-knot::after { background: var(--l-saffron); }
+  .theme-light .leaf-coord { color: var(--l-saffron); }
+  .theme-light .leaf-coord .dev-num { color: var(--l-text-1); }
+  .theme-light .leaf-sanskrit { color: var(--l-text-1); }
+  .theme-light .leaf-en { color: var(--l-text-2); }
+  .theme-light .leaf-note { border-top-color: var(--l-divider-soft); }
+  .theme-light .leaf-note-icon { color: var(--l-saffron); }
+  .theme-light .leaf-note-text { color: var(--l-text-1); }
+  .theme-light .leaf-footer { color: var(--l-text-3); }
+  .theme-light .leaf-footer .scripture-glyph { background: var(--l-saffron); }
+
+  .theme-light .group-header-deva { color: var(--l-saffron); }
+  .theme-light .group-header-en { color: var(--l-text-2); }
+  .theme-light .group-header-count { color: var(--l-text-3); }
+
+  .theme-light .empty-leaf { border-color: var(--l-divider); }
+  .theme-light .empty-leaf::before { background: var(--l-saffron-deep); opacity: 0.4; }
+  .theme-light .empty-leaf::after { background: var(--l-saffron); }
+  .theme-light .empty-thread { background: var(--l-saffron); }
+  .theme-light .empty-title { color: var(--l-text-1); }
+  .theme-light .empty-body { color: var(--l-text-2); }
+  .theme-light .empty-cta { background: var(--l-saffron); color: #fff; }
+
+  /* ==================== STATES ==================== */
+  @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.85; } 100% { opacity: 0.5; } }
+  .skeleton { background: rgba(232, 130, 12, 0.08); border-radius: 2px; animation: shimmer 1.6s ease-in-out infinite; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .leaf { animation: inkSettle 450ms ease-out backwards; }
+  .leaf:nth-of-type(1) { animation-delay: 80ms; }
+  .leaf:nth-of-type(2) { animation-delay: 140ms; }
+  .leaf:nth-of-type(3) { animation-delay: 200ms; }
+  .leaf:nth-of-type(4) { animation-delay: 260ms; }
+  .leaf:nth-of-type(5) { animation-delay: 320ms; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 07 · Bookmarks</span></h1>
+  <p>The pothī · loose leaves tied with saffron thread · personal notes pencilled in · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · POPULATED -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · 12 leaves</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="pothi-header">
+          <div class="pothi-line">
+            <div class="pothi-deva">पोथी</div>
+            <div class="pothi-en">Your collection</div>
+          </div>
+          <div class="pothi-meta">
+            <span class="num">12</span>&nbsp; verses saved
+            <span class="sep"></span>
+            from <span class="num">5</span>&nbsp; scriptures
+          </div>
+        </div>
+
+        <div class="sort-bar">
+          <div class="sort-tabs">
+            <div class="sort-tab active">Recent</div>
+            <div class="sort-tab">By scripture</div>
+          </div>
+          <div class="sort-options">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4h8M3 7h6M4 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Filter</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- leaf 1 -->
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+
+            <div class="leaf-coord">
+              <span class="dev-num">२·४७</span> · BG · CHAPTER 2
+            </div>
+            <div class="leaf-sanskrit">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।</div>
+            <div class="leaf-en">"Your right is to action alone, never to its fruits..."</div>
+
+            <div class="leaf-note">
+              <div class="leaf-note-icon">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2 9l1.5-1.5L8 3 9.5 1.5l-1-1L7 2 2.5 6.5 1 8l1 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="leaf-note-text">The line my father read aloud at his retirement. Re-read on hard mornings.</div>
+            </div>
+
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Bhagavad Gītā</span>
+              </div>
+              <div>2 days ago</div>
+            </div>
+          </div>
+
+          <!-- leaf 2 -->
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+
+            <div class="leaf-coord">
+              <span class="dev-num">१·१</span> · BG · CHAPTER 1
+            </div>
+            <div class="leaf-sanskrit">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="leaf-en">"Dhṛtarāṣṭra said: O Sañjaya, what did my sons..."</div>
+
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Bhagavad Gītā</span>
+              </div>
+              <div>30 Apr 2026</div>
+            </div>
+          </div>
+
+          <!-- leaf 3 -->
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+
+            <div class="leaf-coord">
+              <span class="dev-num">१·३·१४</span> · KAṬHA UP. · CHAPTER 1.3
+            </div>
+            <div class="leaf-sanskrit">उत्तिष्ठत जाग्रत प्राप्य वरान्निबोधत ।</div>
+            <div class="leaf-en">"Arise, awake, having approached the great ones, learn..."</div>
+
+            <div class="leaf-note">
+              <div class="leaf-note-icon">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2 9l1.5-1.5L8 3 9.5 1.5l-1-1L7 2 2.5 6.5 1 8l1 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="leaf-note-text">Vivekananda's favorite mantra. Worth memorising.</div>
+            </div>
+
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Kaṭha Upaniṣad</span>
+              </div>
+              <div>27 Apr 2026</div>
+            </div>
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · GROUPED BY SCRIPTURE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · grouped</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="pothi-header">
+          <div class="pothi-line">
+            <div class="pothi-deva">पोथी</div>
+            <div class="pothi-en">Your collection</div>
+          </div>
+          <div class="pothi-meta">
+            <span class="num">42</span>&nbsp; verses saved
+            <span class="sep"></span>
+            from <span class="num">8</span>&nbsp; scriptures
+          </div>
+        </div>
+
+        <div class="sort-bar">
+          <div class="sort-tabs">
+            <div class="sort-tab">Recent</div>
+            <div class="sort-tab active">By scripture</div>
+          </div>
+          <div class="sort-options">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4h8M3 7h6M4 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Filter</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="group-header">
+            <div>
+              <span class="group-header-deva">भगवद्गीता</span>
+              <span class="group-header-en">Bhagavad Gītā</span>
+            </div>
+            <div class="group-header-count">18 verses</div>
+          </div>
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">२·४७</span> · CHAPTER 2</div>
+            <div class="leaf-sanskrit">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।</div>
+            <div class="leaf-en">"Your right is to action alone, never to its fruits..."</div>
+            <div class="leaf-footer">
+              <div class="scripture"><span class="scripture-glyph"></span><span>Saved 2 days ago</span></div>
+              <div></div>
+            </div>
+          </div>
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">४·७</span> · CHAPTER 4</div>
+            <div class="leaf-sanskrit">यदा यदा हि धर्मस्य ग्लानिर्भवति भारत ।</div>
+            <div class="leaf-en">"Whenever dharma declines, O Bhārata..."</div>
+            <div class="leaf-footer">
+              <div class="scripture"><span class="scripture-glyph"></span><span>Saved 5 days ago</span></div>
+              <div></div>
+            </div>
+          </div>
+
+          <div class="group-header">
+            <div>
+              <span class="group-header-deva">कठोपनिषद्</span>
+              <span class="group-header-en">Kaṭha Upaniṣad</span>
+            </div>
+            <div class="group-header-count">8 verses</div>
+          </div>
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">१·३·१४</span> · CHAPTER 1.3</div>
+            <div class="leaf-sanskrit">उत्तिष्ठत जाग्रत प्राप्य वरान्निबोधत ।</div>
+            <div class="leaf-en">"Arise, awake, having approached the great ones, learn..."</div>
+            <div class="leaf-footer">
+              <div class="scripture"><span class="scripture-glyph"></span><span>Saved 27 Apr</span></div>
+              <div></div>
+            </div>
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · POPULATED -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · 12 leaves</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="pothi-header">
+          <div class="pothi-line">
+            <div class="pothi-deva">पोथी</div>
+            <div class="pothi-en">Your collection</div>
+          </div>
+          <div class="pothi-meta">
+            <span class="num">12</span>&nbsp; verses saved
+            <span class="sep"></span>
+            from <span class="num">5</span>&nbsp; scriptures
+          </div>
+        </div>
+
+        <div class="sort-bar">
+          <div class="sort-tabs">
+            <div class="sort-tab active">Recent</div>
+            <div class="sort-tab">By scripture</div>
+          </div>
+          <div class="sort-options">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4h8M3 7h6M4 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Filter</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">२·४७</span> · BG · CHAPTER 2</div>
+            <div class="leaf-sanskrit">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।</div>
+            <div class="leaf-en">"Your right is to action alone, never to its fruits..."</div>
+            <div class="leaf-note">
+              <div class="leaf-note-icon">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2 9l1.5-1.5L8 3 9.5 1.5l-1-1L7 2 2.5 6.5 1 8l1 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="leaf-note-text">The line my father read aloud at his retirement. Re-read on hard mornings.</div>
+            </div>
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Bhagavad Gītā</span>
+              </div>
+              <div>2 days ago</div>
+            </div>
+          </div>
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">१·१</span> · BG · CHAPTER 1</div>
+            <div class="leaf-sanskrit">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="leaf-en">"Dhṛtarāṣṭra said: O Sañjaya, what did my sons..."</div>
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Bhagavad Gītā</span>
+              </div>
+              <div>30 Apr 2026</div>
+            </div>
+          </div>
+
+          <div class="leaf">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div class="leaf-knot"></div>
+            <div class="leaf-coord"><span class="dev-num">१·३·१४</span> · KAṬHA UP. · CHAPTER 1.3</div>
+            <div class="leaf-sanskrit">उत्तिष्ठत जाग्रत प्राप्य वरान्निबोधत ।</div>
+            <div class="leaf-en">"Arise, awake, having approached the great ones, learn..."</div>
+            <div class="leaf-note">
+              <div class="leaf-note-icon">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2 9l1.5-1.5L8 3 9.5 1.5l-1-1L7 2 2.5 6.5 1 8l1 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="leaf-note-text">Vivekananda's favorite mantra. Worth memorising.</div>
+            </div>
+            <div class="leaf-footer">
+              <div class="scripture">
+                <span class="scripture-glyph"></span>
+                <span>Kaṭha Upaniṣad</span>
+              </div>
+              <div>27 Apr 2026</div>
+            </div>
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- DARK · EMPTY STATE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · empty</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="pothi-header">
+          <div class="pothi-line">
+            <div class="pothi-deva">पोथी</div>
+            <div class="pothi-en">Your collection</div>
+          </div>
+        </div>
+
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <div class="empty-thread"></div>
+            <div class="empty-leaf empty-leaf-1"></div>
+            <div class="empty-leaf empty-leaf-2"></div>
+            <div class="empty-leaf empty-leaf-3"></div>
+          </div>
+          <div class="empty-title">Your pothī awaits</div>
+          <div class="empty-body">
+            Save a verse, and it joins your collection — like a leaf bound in your own bundle. Add a note about why it spoke to you.
+          </div>
+          <div class="empty-cta">
+            <span>Begin reading</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6h8M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · LOADING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · loading</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="pothi-header">
+          <div class="pothi-line">
+            <div class="pothi-deva">पोथी</div>
+            <div class="pothi-en">Your collection</div>
+          </div>
+          <div class="pothi-meta" style="opacity: 0.4;">
+            <div class="skeleton" style="display: inline-block; height: 10px; width: 220px;"></div>
+          </div>
+        </div>
+
+        <div class="sort-bar">
+          <div class="sort-tabs">
+            <div class="sort-tab active">Recent</div>
+            <div class="sort-tab">By scripture</div>
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="leaf" style="padding: 16px 18px;">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div style="margin-top: 14px;">
+              <div class="skeleton" style="height: 9px; width: 150px; margin-bottom: 12px;"></div>
+              <div class="skeleton" style="height: 14px; width: 90%; margin-bottom: 8px;"></div>
+              <div class="skeleton" style="height: 11px; width: 80%; margin-bottom: 4px;"></div>
+              <div class="skeleton" style="height: 11px; width: 60%;"></div>
+            </div>
+          </div>
+
+          <div class="leaf" style="padding: 16px 18px;">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div style="margin-top: 14px;">
+              <div class="skeleton" style="height: 9px; width: 130px; margin-bottom: 12px;"></div>
+              <div class="skeleton" style="height: 14px; width: 80%; margin-bottom: 8px;"></div>
+              <div class="skeleton" style="height: 11px; width: 70%;"></div>
+            </div>
+          </div>
+
+          <div class="leaf" style="padding: 16px 18px;">
+            <div class="leaf-binding"><div class="hole"></div></div>
+            <div style="margin-top: 14px;">
+              <div class="skeleton" style="height: 9px; width: 160px; margin-bottom: 12px;"></div>
+              <div class="skeleton" style="height: 14px; width: 95%; margin-bottom: 8px;"></div>
+              <div class="skeleton" style="height: 11px; width: 75%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Renamed "Saved Verses" to "Pothī" with English subtitle "Your collection."</b> A pothī is the actual word for a personal manuscript bundle in the Sanskrit/Hindi tradition. Every other reading app says "Saved Verses." Yours says what the thing actually is.</li>
+    <li><b>Each saved verse is a leaf, not a card.</b> Top binding line + central diamond hole + saffron knot-mark in the upper right (the silk thread that ties the leaf to mark significance). Compresses the binding-line vocabulary from Verse Detail into a smaller surface.</li>
+    <li><b>Sanskrit incipit visible, not buried.</b> Your current bookmark card shows only a fragment ("धृतराष्ट्र उवाच |"). The redesign shows a fuller incipit — enough that the user recognizes the verse without tapping in.</li>
+    <li><b>Personal notes — the highest-leverage feature most reading apps don't have.</b> A 1-line italic-serif note appears below the verse, separated by a dashed rule. "The line my father read aloud at his retirement." Turns bookmarks from a list of saves into personal commentary that compounds in value over time.</li>
+    <li><b>Sort tabs: Recent / By scripture.</b> Solves the heavy-user problem (50+ bookmarks). The "By scripture" view groups leaves under scripture headers. Filter affordance on the right for future tag/collection work.</li>
+    <li><b>Empty state actually teaches.</b> Three abstract leaves stacked on a saffron thread illustration. Title: "Your pothī awaits." Body explains that bookmarking is more than saving — you can add notes about why a verse spoke to you. CTA: "Begin reading."</li>
+    <li><b>Leaf footer carries scripture name + saved date.</b> Replaces the floating "BG.1.1" pill and the calendar-icon-with-date. Cleaner, more readable, no chrome.</li>
+    <li><b>Devanāgarī verse coordinates throughout.</b> "२·४७" instead of "BG.1.1" — system continuity with Verse List, Verse Detail, and Search.</li>
+    <li><b>Design implies long-term use.</b> The pothī framing scales from 1 leaf to 500. The sort tabs only matter at scale. The personal-note feature compounds in value over years. This is a screen designed to be used, not just shipped.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Onboarding (Screen 11)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ==================== INVOCATION (top watermark) ==================== */
+  .invocation {
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--f-deva);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* ==================== STEP DOTS ==================== */
+  .step-dots {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    z-index: 2;
+  }
+
+  .step-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  /* ==================== WELCOME LOGOMARK ==================== */
+  .welcome-hero {
+    flex: 0 0 auto;
+    padding: 110px 32px 16px;
+    text-align: center;
+  }
+
+  .welcome-om {
+    font-family: var(--f-deva);
+    font-size: 68px;
+    line-height: 1;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+
+  .welcome-title {
+    font-family: var(--f-serif);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .welcome-subtitle {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+
+  .welcome-meta {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .welcome-meta .num {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 11.5px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  .welcome-meta .sep {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    margin: 0 8px 2px;
+    vertical-align: middle;
+  }
+
+  /* incised rule */
+  .incised-rule {
+    margin: 22px auto 0;
+    width: 64px;
+    height: 1px;
+    position: relative;
+  }
+  .incised-rule::before, .incised-rule::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 1px;
+  }
+  .incised-rule::before { left: 0; right: 50%; margin-right: 5px; }
+  .incised-rule::after { right: 0; left: 50%; margin-left: 5px; }
+  .incised-rule .diamond {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 4px;
+    height: 4px;
+  }
+
+  /* ==================== LEVEL QUESTION ==================== */
+  .level-question {
+    padding: 28px 32px 14px;
+    text-align: center;
+  }
+
+  .level-question-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .level-question-text {
+    font-family: var(--f-serif);
+    font-size: 18px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+
+  /* ==================== LEVEL CARDS ==================== */
+  .levels {
+    flex: 1;
+    padding: 4px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .levels::-webkit-scrollbar { display: none; }
+
+  .level-card {
+    padding: 16px 18px 16px 22px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.18s ease;
+  }
+
+  /* saffron leaf-thread that appears on selected */
+  .level-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+
+  .level-card.selected::before { opacity: 1; }
+
+  .level-card-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .level-card-title {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    margin-bottom: 2px;
+  }
+
+  .level-card-desc {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .level-card-radio {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .level-card-radio::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    transition: transform 0.18s ease;
+    transform: scale(0);
+  }
+
+  .level-card.selected .level-card-radio::after { transform: scale(1); }
+
+  /* ==================== BOTTOM ACTIONS ==================== */
+  .bottom-actions {
+    flex-shrink: 0;
+    padding: 12px 24px 28px;
+  }
+
+  .primary-btn {
+    width: 100%;
+    height: 50px;
+    border-radius: 28px;
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+  }
+
+  .primary-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .skip-btn {
+    margin-top: 10px;
+    width: 100%;
+    height: 38px;
+    background: transparent;
+    border: none;
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* ==================== REMINDER SCREEN ==================== */
+  .reminder-hero {
+    padding: 110px 32px 32px;
+    text-align: center;
+  }
+
+  .reminder-bell-glyph {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .reminder-bell-glyph::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid;
+    opacity: 0.4;
+  }
+
+  .reminder-bell-glyph::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px solid;
+    opacity: 0.15;
+  }
+
+  .reminder-title {
+    font-family: var(--f-serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .reminder-body {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.6;
+    padding: 0 8px;
+  }
+
+  /* time picker block */
+  .reminder-time-block {
+    margin: 32px 24px 0;
+    padding: 22px 22px 20px;
+    border-radius: 4px;
+    border: 1px solid;
+    text-align: center;
+  }
+
+  .reminder-time-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .reminder-time-value {
+    font-family: var(--f-serif);
+    font-size: 38px;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .reminder-time-period {
+    display: inline-flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .reminder-period-btn {
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+
+  .theme-dark .invocation { color: var(--d-saffron); opacity: 0.5; }
+  .theme-dark .step-dot { background: var(--d-divider-soft); }
+  .theme-dark .step-dot.active { background: var(--d-saffron); }
+
+  .theme-dark .welcome-om { color: var(--d-saffron); text-shadow: 0 0 24px rgba(232, 130, 12, 0.3); }
+  .theme-dark .welcome-title { color: var(--d-text-1); }
+  .theme-dark .welcome-subtitle { color: var(--d-text-2); }
+  .theme-dark .welcome-meta { color: var(--d-text-3); }
+  .theme-dark .welcome-meta .num { color: var(--d-saffron); }
+  .theme-dark .welcome-meta .sep { background: var(--d-saffron); }
+
+  .theme-dark .incised-rule::before, .theme-dark .incised-rule::after { background: var(--d-divider); }
+  .theme-dark .incised-rule .diamond { background: var(--d-saffron); }
+
+  .theme-dark .level-question-label { color: var(--d-text-3); }
+  .theme-dark .level-question-text { color: var(--d-text-1); }
+
+  .theme-dark .level-card {
+    background: var(--d-surface);
+    border-color: var(--d-divider-soft);
+  }
+  .theme-dark .level-card.selected { border-color: var(--d-divider); }
+  .theme-dark .level-card.selected::before {
+    background: var(--d-saffron);
+    box-shadow: 0 0 6px rgba(232, 130, 12, 0.5);
+  }
+  .theme-dark .level-card-title { color: var(--d-text-1); }
+  .theme-dark .level-card-desc { color: var(--d-text-2); }
+  .theme-dark .level-card-radio { border-color: var(--d-text-3); }
+  .theme-dark .level-card.selected .level-card-radio { border-color: var(--d-saffron); }
+  .theme-dark .level-card.selected .level-card-radio::after { background: var(--d-saffron); }
+
+  .theme-dark .primary-btn { background: var(--d-saffron); color: #1a1208; }
+  .theme-dark .skip-btn { color: var(--d-text-3); }
+
+  .theme-dark .reminder-bell-glyph { color: var(--d-saffron); }
+  .theme-dark .reminder-bell-glyph::before { border-color: var(--d-saffron); }
+  .theme-dark .reminder-bell-glyph::after { border-color: var(--d-saffron); }
+  .theme-dark .reminder-title { color: var(--d-text-1); }
+  .theme-dark .reminder-body { color: var(--d-text-2); }
+
+  .theme-dark .reminder-time-block { background: var(--d-surface); border-color: var(--d-divider); }
+  .theme-dark .reminder-time-label { color: var(--d-text-3); }
+  .theme-dark .reminder-time-value { color: var(--d-saffron); }
+  .theme-dark .reminder-period-btn { background: var(--d-surface-2); color: var(--d-text-3); }
+  .theme-dark .reminder-period-btn.active { background: var(--d-saffron-glow); color: var(--d-saffron); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.04), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+
+  .theme-light .invocation { color: var(--l-saffron); opacity: 0.5; }
+  .theme-light .step-dot { background: var(--l-divider-soft); }
+  .theme-light .step-dot.active { background: var(--l-saffron); }
+
+  .theme-light .welcome-om { color: var(--l-saffron); }
+  .theme-light .welcome-title { color: var(--l-text-1); }
+  .theme-light .welcome-subtitle { color: var(--l-text-2); }
+  .theme-light .welcome-meta { color: var(--l-text-3); }
+  .theme-light .welcome-meta .num { color: var(--l-saffron); }
+  .theme-light .welcome-meta .sep { background: var(--l-saffron); }
+
+  .theme-light .incised-rule::before, .theme-light .incised-rule::after { background: var(--l-divider); }
+  .theme-light .incised-rule .diamond { background: var(--l-saffron); }
+
+  .theme-light .level-question-label { color: var(--l-text-3); }
+  .theme-light .level-question-text { color: var(--l-text-1); }
+
+  .theme-light .level-card {
+    background: var(--l-surface);
+    border-color: var(--l-divider-soft);
+  }
+  .theme-light .level-card.selected { border-color: var(--l-divider); }
+  .theme-light .level-card.selected::before { background: var(--l-saffron); }
+  .theme-light .level-card-title { color: var(--l-text-1); }
+  .theme-light .level-card-desc { color: var(--l-text-2); }
+  .theme-light .level-card-radio { border-color: var(--l-text-3); }
+  .theme-light .level-card.selected .level-card-radio { border-color: var(--l-saffron); }
+  .theme-light .level-card.selected .level-card-radio::after { background: var(--l-saffron); }
+
+  .theme-light .primary-btn { background: var(--l-saffron); color: #fff; }
+  .theme-light .skip-btn { color: var(--l-text-3); }
+
+  .theme-light .reminder-bell-glyph { color: var(--l-saffron); }
+  .theme-light .reminder-bell-glyph::before { border-color: var(--l-saffron); }
+  .theme-light .reminder-bell-glyph::after { border-color: var(--l-saffron); }
+  .theme-light .reminder-title { color: var(--l-text-1); }
+  .theme-light .reminder-body { color: var(--l-text-2); }
+
+  .theme-light .reminder-time-block { background: var(--l-surface); border-color: var(--l-divider); }
+  .theme-light .reminder-time-label { color: var(--l-text-3); }
+  .theme-light .reminder-time-value { color: var(--l-saffron); }
+  .theme-light .reminder-period-btn { background: var(--l-divider-soft); color: var(--l-text-3); }
+  .theme-light .reminder-period-btn.active { background: var(--l-saffron-glow); color: var(--l-saffron); }
+
+  /* ==================== ENTRANCE ==================== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .welcome-om { animation: fadeUp 700ms ease-out backwards; }
+  .welcome-title { animation: fadeUp 600ms 200ms ease-out backwards; }
+  .welcome-subtitle { animation: fadeUp 500ms 350ms ease-out backwards; }
+  .welcome-meta, .incised-rule { animation: fadeUp 500ms 480ms ease-out backwards; }
+  .level-question { animation: fadeUp 500ms 600ms ease-out backwards; }
+  .levels .level-card:nth-child(1) { animation: fadeUp 400ms 700ms ease-out backwards; }
+  .levels .level-card:nth-child(2) { animation: fadeUp 400ms 760ms ease-out backwards; }
+  .levels .level-card:nth-child(3) { animation: fadeUp 400ms 820ms ease-out backwards; }
+  .bottom-actions { animation: fadeUp 400ms 900ms ease-out backwards; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 11 · Onboarding</span></h1>
+  <p>Two screens, not three · welcome + level merged · reminder framed with intent · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · WELCOME (no selection) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · welcome (initial)</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="invocation">॥ श्री गणेशाय नमः ॥</div>
+        <div class="step-dots">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <div class="welcome-hero">
+          <div class="welcome-om">ॐ</div>
+          <div class="welcome-title">Sanatan Guide</div>
+          <div class="welcome-subtitle">A reader for Hindu scripture — fully offline, with deep textual care.</div>
+          <div class="incised-rule"><span class="diamond"></span></div>
+        </div>
+
+        <div class="level-question">
+          <div class="level-question-label">Tell us where to begin</div>
+          <div class="level-question-text">How familiar are you with the scriptures?</div>
+        </div>
+
+        <div class="levels">
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Beginner</div>
+              <div class="level-card-desc">New to the texts. Start with Foundations and gentle commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Regular</div>
+              <div class="level-card-desc">Comfortable with the basics. Read directly with optional commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Scholar</div>
+              <div class="level-card-desc">Read texts and transliteration directly. Commentary only when asked.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn disabled">
+            <span>Continue</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="skip-btn">Skip for now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · WELCOME (Beginner selected) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · selected</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="invocation">॥ श्री गणेशाय नमः ॥</div>
+        <div class="step-dots">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <div class="welcome-hero">
+          <div class="welcome-om">ॐ</div>
+          <div class="welcome-title">Sanatan Guide</div>
+          <div class="welcome-subtitle">A reader for Hindu scripture — fully offline, with deep textual care.</div>
+          <div class="incised-rule"><span class="diamond"></span></div>
+        </div>
+
+        <div class="level-question">
+          <div class="level-question-label">Tell us where to begin</div>
+          <div class="level-question-text">How familiar are you with the scriptures?</div>
+        </div>
+
+        <div class="levels">
+          <div class="level-card selected">
+            <div class="level-card-body">
+              <div class="level-card-title">Beginner</div>
+              <div class="level-card-desc">New to the texts. Start with Foundations and gentle commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Regular</div>
+              <div class="level-card-desc">Comfortable with the basics. Read directly with optional commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Scholar</div>
+              <div class="level-card-desc">Read texts and transliteration directly. Commentary only when asked.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn">
+            <span>Continue</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="skip-btn">Skip for now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · REMINDER -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · daily reminder</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="step-dots">
+          <div class="step-dot"></div>
+          <div class="step-dot active"></div>
+        </div>
+
+        <div class="reminder-hero">
+          <div class="reminder-bell-glyph">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 3v1.5M11 17.5v1.5M5 17h12l-1.5-3a3 3 0 0 1-.5-1.65V9a4 4 0 0 0-8 0v3.35a3 3 0 0 1-.5 1.65L5 17z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.5 19.5a2 2 0 0 0 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="reminder-title">A verse a day</div>
+          <div class="reminder-body">A short morning notification with one verse — chosen for the day. You can change or silence it any time.</div>
+        </div>
+
+        <div class="reminder-time-block">
+          <div class="reminder-time-label">Remind me at</div>
+          <div class="reminder-time-value">7 : 00</div>
+          <div class="reminder-time-period">
+            <div class="reminder-period-btn active">AM</div>
+            <div class="reminder-period-btn">PM</div>
+          </div>
+        </div>
+
+        <div style="flex: 1;"></div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn">
+            <span>Enable reminder</span>
+          </button>
+          <button class="skip-btn">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- LIGHT · WELCOME -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · welcome</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="invocation">॥ श्री गणेशाय नमः ॥</div>
+        <div class="step-dots">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <div class="welcome-hero">
+          <div class="welcome-om">ॐ</div>
+          <div class="welcome-title">Sanatan Guide</div>
+          <div class="welcome-subtitle">A reader for Hindu scripture — fully offline, with deep textual care.</div>
+          <div class="incised-rule"><span class="diamond"></span></div>
+        </div>
+
+        <div class="level-question">
+          <div class="level-question-label">Tell us where to begin</div>
+          <div class="level-question-text">How familiar are you with the scriptures?</div>
+        </div>
+
+        <div class="levels">
+          <div class="level-card selected">
+            <div class="level-card-body">
+              <div class="level-card-title">Beginner</div>
+              <div class="level-card-desc">New to the texts. Start with Foundations and gentle commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Regular</div>
+              <div class="level-card-desc">Comfortable with the basics. Read directly with optional commentary.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+
+          <div class="level-card">
+            <div class="level-card-body">
+              <div class="level-card-title">Scholar</div>
+              <div class="level-card-desc">Read texts and transliteration directly. Commentary only when asked.</div>
+            </div>
+            <div class="level-card-radio"></div>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn">
+            <span>Continue</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="skip-btn">Skip for now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · REMINDER -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · daily reminder</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="step-dots">
+          <div class="step-dot"></div>
+          <div class="step-dot active"></div>
+        </div>
+
+        <div class="reminder-hero">
+          <div class="reminder-bell-glyph">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 3v1.5M11 17.5v1.5M5 17h12l-1.5-3a3 3 0 0 1-.5-1.65V9a4 4 0 0 0-8 0v3.35a3 3 0 0 1-.5 1.65L5 17z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.5 19.5a2 2 0 0 0 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="reminder-title">A verse a day</div>
+          <div class="reminder-body">A short morning notification with one verse — chosen for the day. You can change or silence it any time.</div>
+        </div>
+
+        <div class="reminder-time-block">
+          <div class="reminder-time-label">Remind me at</div>
+          <div class="reminder-time-value">7 : 00</div>
+          <div class="reminder-time-period">
+            <div class="reminder-period-btn active">AM</div>
+            <div class="reminder-period-btn">PM</div>
+          </div>
+        </div>
+
+        <div style="flex: 1;"></div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn">
+            <span>Enable reminder</span>
+          </button>
+          <button class="skip-btn">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Killed one of the two redundant level screens.</b> Your current flow has "Where would you like to begin? (Complete Beginner / Curious Hindu / Serious Seeker)" AND "How familiar are you? (Beginner / Regular / Scholar)" — two screens for one decision. The redesign keeps the cleaner Beginner/Regular/Scholar framing and merges it onto the Welcome screen.</li>
+    <li><b>Removed "Curious Hindu" identity framing.</b> The old card said "I grew up Hindu but want to learn deeper" — assumed user identity in a way the others didn't. The redesign keeps levels purely about <em>familiarity with scriptures</em>, agnostic to the user's background.</li>
+    <li><b>Welcome and level selection on one screen.</b> Logomark + tagline + question + 3 cards + Continue all fit comfortably in a 390×844 viewport. Two extra taps deleted from onboarding.</li>
+    <li><b>Two screens total: Welcome+Level, then Daily Reminder.</b> Down from three. Every screen between download and first verse is friction; this is the v1 ceiling.</li>
+    <li><b>"॥ श्री गणेशाय नमः ॥" as a tiny watermark above the step dots.</b> Traditional opening invocation; signals intent without dominating. Same line shown in the first-day Home empty state — system continuity.</li>
+    <li><b>Saffron leaf-thread on the selected card.</b> Same vocabulary as Resume rows (Chapter List, Verse List, AI Chat anchor). The user has now seen this thread three times in their first 30 seconds — it becomes a learned visual that means "your place" / "your selection."</li>
+    <li><b>Reminder screen frames the <em>why</em>, not just the permission.</b> "A verse a day · A short morning notification with one verse — chosen for the day." The user sees the value before being asked to commit. System notification permission only fires on tap of "Enable reminder."</li>
+    <li><b>Time picker on the reminder screen, not buried in Settings.</b> User can choose 7AM (default) or change before enabling. Reduces "I enabled it but it's at the wrong time" abandonment.</li>
+    <li><b>"Skip for now" / "Not now" on every screen.</b> Onboarding is fully skippable. Skipped users get sensible defaults (Regular level, no reminder). Both choices respected.</li>
+    <li><b>Step dots, not chevron-back.</b> Two saffron dots at the top show progress (1 of 2, 2 of 2). No "back" on the first screen because there's nothing to go back to.</li>
+    <li><b>The logomark is typographic, not pictorial.</b> Saffron ॐ + serif "Sanatan Guide" + italic tagline. No deity image, no mandala, no lotus. Sets the visual register for the whole app: typography over imagery.</li>
+  </ul>
+</div>
+
+</body>
+</html>

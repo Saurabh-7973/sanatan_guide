@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Chapter List (Screen 04)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ==================== HEADER (compact) ==================== */
+  .ch-header {
+    padding: 4px 24px 18px;
+  }
+  .ch-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    letter-spacing: 0.01em;
+  }
+  .ch-en {
+    font-family: var(--f-serif);
+    font-size: 14px;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .ch-meta {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .ch-meta .num {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 500;
+    margin-right: 1px;
+  }
+  .ch-meta .sep {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    margin: 0 8px 2px;
+    vertical-align: middle;
+  }
+
+  /* ==================== RESUME ROW ==================== */
+  .resume-row {
+    margin: 0 24px 8px;
+    border-radius: 4px;
+    padding: 16px 18px 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* the saffron leaf-thread on the left edge */
+  .resume-row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 2px;
+  }
+
+  .resume-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .resume-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .resume-title {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+
+  .resume-meta {
+    font-family: var(--f-sans);
+    font-size: 11.5px;
+  }
+
+  .resume-arrow {
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* ==================== CHAPTERS LIST ==================== */
+  .chapters-section {
+    margin-top: 18px;
+    padding: 0 24px;
+  }
+
+  .chapters-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid;
+  }
+
+  .chapter-row {
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    transition: opacity 0.18s ease;
+  }
+  .chapter-row:active { opacity: 0.5; }
+
+  /* Devanagari numeral block */
+  .ch-num {
+    flex-shrink: 0;
+    width: 38px;
+    text-align: center;
+    line-height: 1;
+  }
+  .ch-num-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .ch-num-arabic {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+  }
+
+  .ch-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ch-title-deva {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: 0.005em;
+    margin-bottom: 2px;
+  }
+
+  .ch-title-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .ch-row-meta {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .ch-row-meta .verses {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 11.5px;
+    margin-right: 4px;
+  }
+
+  .ch-row-meta .progress {
+    font-weight: 500;
+  }
+
+  .ch-row-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  /* progress in chapter row — micro indicator */
+  .ch-progress-track {
+    height: 1.5px;
+    margin-top: 6px;
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .ch-progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-back { color: var(--d-text-1); }
+
+  .theme-dark .ch-deva { color: var(--d-cream); }
+  .theme-dark .ch-en { color: var(--d-text-2); }
+  .theme-dark .ch-meta { color: var(--d-text-3); }
+  .theme-dark .ch-meta .num { color: var(--d-saffron); }
+  .theme-dark .ch-meta .sep { background: var(--d-saffron); }
+
+  .theme-dark .resume-row {
+    background: linear-gradient(90deg, rgba(232, 130, 12, 0.07), rgba(232, 130, 12, 0.02) 60%, transparent);
+    border: 1px solid var(--d-divider);
+  }
+  .theme-dark .resume-row::before { background: var(--d-saffron); box-shadow: 0 0 6px rgba(232, 130, 12, 0.4); }
+  .theme-dark .resume-label { color: var(--d-saffron); }
+  .theme-dark .resume-title { color: var(--d-cream); }
+  .theme-dark .resume-meta { color: var(--d-text-2); }
+  .theme-dark .resume-arrow { color: var(--d-saffron); }
+
+  .theme-dark .chapters-label { color: var(--d-text-3); border-bottom-color: var(--d-divider); }
+  .theme-dark .chapter-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .ch-num-deva { color: var(--d-saffron); }
+  .theme-dark .ch-num-arabic { color: var(--d-text-3); }
+  .theme-dark .ch-title-deva { color: var(--d-cream); }
+  .theme-dark .ch-title-en { color: var(--d-text-1); }
+  .theme-dark .ch-row-meta { color: var(--d-text-3); }
+  .theme-dark .ch-row-meta .verses { color: var(--d-text-2); }
+  .theme-dark .ch-row-meta .progress { color: var(--d-saffron); }
+  .theme-dark .ch-row-arrow { color: var(--d-text-3); }
+
+  .theme-dark .ch-progress-track { background: var(--d-divider-soft); }
+  .theme-dark .ch-progress-fill { background: var(--d-saffron); }
+
+  /* current chapter — darker number, no saffron */
+  .theme-dark .chapter-row.read .ch-num-deva { color: var(--d-text-3); }
+  .theme-dark .chapter-row.read .ch-title-deva { color: var(--d-text-2); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-back { color: var(--l-text-1); }
+
+  .theme-light .ch-deva { color: var(--l-text-1); }
+  .theme-light .ch-en { color: var(--l-text-2); }
+  .theme-light .ch-meta { color: var(--l-text-3); }
+  .theme-light .ch-meta .num { color: var(--l-saffron); }
+  .theme-light .ch-meta .sep { background: var(--l-saffron); }
+
+  .theme-light .resume-row {
+    background: linear-gradient(90deg, rgba(194, 101, 8, 0.06), rgba(194, 101, 8, 0.015) 60%, transparent);
+    border: 1px solid var(--l-divider);
+  }
+  .theme-light .resume-row::before { background: var(--l-saffron); }
+  .theme-light .resume-label { color: var(--l-saffron); }
+  .theme-light .resume-title { color: var(--l-text-1); }
+  .theme-light .resume-meta { color: var(--l-text-2); }
+  .theme-light .resume-arrow { color: var(--l-saffron); }
+
+  .theme-light .chapters-label { color: var(--l-text-3); border-bottom-color: var(--l-divider); }
+  .theme-light .chapter-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .ch-num-deva { color: var(--l-saffron); }
+  .theme-light .ch-num-arabic { color: var(--l-text-3); }
+  .theme-light .ch-title-deva { color: var(--l-text-1); }
+  .theme-light .ch-title-en { color: var(--l-text-1); }
+  .theme-light .ch-row-meta { color: var(--l-text-3); }
+  .theme-light .ch-row-meta .verses { color: var(--l-text-2); }
+  .theme-light .ch-row-meta .progress { color: var(--l-saffron); }
+  .theme-light .ch-row-arrow { color: var(--l-text-3); }
+
+  .theme-light .ch-progress-track { background: var(--l-divider-soft); }
+  .theme-light .ch-progress-fill { background: var(--l-saffron); }
+
+  /* ==================== STATES ==================== */
+  @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.85; } 100% { opacity: 0.5; } }
+  .skeleton { background: rgba(232, 130, 12, 0.08); border-radius: 2px; animation: shimmer 1.6s ease-in-out infinite; }
+
+  /* ==================== ENTRANCE ANIMATION ==================== */
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .chapter-row { animation: inkSettle 400ms ease-out backwards; }
+  .chapter-row:nth-child(1) { animation-delay: 60ms; }
+  .chapter-row:nth-child(2) { animation-delay: 90ms; }
+  .chapter-row:nth-child(3) { animation-delay: 120ms; }
+  .chapter-row:nth-child(4) { animation-delay: 150ms; }
+  .chapter-row:nth-child(5) { animation-delay: 180ms; }
+  .chapter-row:nth-child(6) { animation-delay: 210ms; }
+  .chapter-row:nth-child(7) { animation-delay: 240ms; }
+  .chapter-row:nth-child(8) { animation-delay: 270ms; }
+
+  @keyframes threadPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(232, 130, 12, 0.4); }
+    50% { box-shadow: 0 0 12px rgba(232, 130, 12, 0.7); }
+  }
+  .resume-row::before {
+    animation: threadPulse 2.4s ease-in-out 1;
+  }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 04 · Chapter List</span></h1>
+  <p>Designed to disappear · resume row as primary action · Devanāgarī numerals · saffron leaf-thread</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · WITH RESUME -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · with resume</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-deva">भगवद्गीता</div>
+          <div class="ch-en">Bhagavad Gītā · The Song of God</div>
+          <div class="ch-meta">
+            <span class="num">18</span>&nbsp;chapters
+            <span class="sep"></span>
+            <span class="num">700</span>&nbsp;verses
+            <span class="sep"></span>
+            <span class="num">1</span>&nbsp;read
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- RESUME ROW -->
+          <div class="resume-row">
+            <div class="resume-body">
+              <div class="resume-label">Continue reading</div>
+              <div class="resume-title">अर्जुनविषादयोग</div>
+              <div class="resume-meta">Chapter 1 · verse 1 of 47</div>
+            </div>
+            <div class="resume-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CHAPTERS -->
+          <div class="chapters-section">
+            <div class="chapters-label">All chapters</div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">१</div>
+                <div class="ch-num-arabic">CH 1</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">अर्जुनविषादयोग</div>
+                <div class="ch-title-en">The Yoga of Arjuna's Grief</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; ~12 min
+                  <span class="progress"> · 1 of 47 read</span>
+                </div>
+                <div class="ch-progress-track">
+                  <div class="ch-progress-fill" style="width: 2.1%;"></div>
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">२</div>
+                <div class="ch-num-arabic">CH 2</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">सांख्ययोग</div>
+                <div class="ch-title-en">The Yoga of Knowledge</div>
+                <div class="ch-row-meta">
+                  <span class="verses">72 verses</span>·&nbsp; ~18 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">३</div>
+                <div class="ch-num-arabic">CH 3</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मयोग</div>
+                <div class="ch-title-en">The Yoga of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">43 verses</span>·&nbsp; ~11 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">४</div>
+                <div class="ch-num-arabic">CH 4</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">ज्ञानकर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">42 verses</span>·&nbsp; ~10 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">५</div>
+                <div class="ch-num-arabic">CH 5</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation</div>
+                <div class="ch-row-meta">
+                  <span class="verses">29 verses</span>·&nbsp; ~7 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">६</div>
+                <div class="ch-num-arabic">CH 6</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">आत्मसंयमयोग</div>
+                <div class="ch-title-en">The Yoga of Self-Control</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; ~12 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">७</div>
+                <div class="ch-num-arabic">CH 7</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">ज्ञानविज्ञानयोग</div>
+                <div class="ch-title-en">The Yoga of Knowledge & Wisdom</div>
+                <div class="ch-row-meta">
+                  <span class="verses">30 verses</span>·&nbsp; ~8 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · NO RESUME (first time) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · first visit</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-deva">श्रीमद्भागवतम्</div>
+          <div class="ch-en">Bhāgavata Purāṇa · The Story of the Lord</div>
+          <div class="ch-meta">
+            <span class="num">12</span>&nbsp;cantos
+            <span class="sep"></span>
+            <span class="num">335</span>&nbsp;chapters
+            <span class="sep"></span>
+            <span class="num">14,031</span>&nbsp;verses
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="chapters-section">
+            <div class="chapters-label">All cantos</div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">१</div>
+                <div class="ch-num-arabic">SK 1</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">प्रथमस्कन्ध</div>
+                <div class="ch-title-en">Creation</div>
+                <div class="ch-row-meta">
+                  <span class="verses">810 verses</span>·&nbsp; 19 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">२</div>
+                <div class="ch-num-arabic">SK 2</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">द्वितीयस्कन्ध</div>
+                <div class="ch-title-en">The Cosmic Manifestation</div>
+                <div class="ch-row-meta">
+                  <span class="verses">393 verses</span>·&nbsp; 10 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">३</div>
+                <div class="ch-num-arabic">SK 3</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">तृतीयस्कन्ध</div>
+                <div class="ch-title-en">The Status Quo</div>
+                <div class="ch-row-meta">
+                  <span class="verses">1,416 verses</span>·&nbsp; 33 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">४</div>
+                <div class="ch-num-arabic">SK 4</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">चतुर्थस्कन्ध</div>
+                <div class="ch-title-en">The Creation of the Fourth Order</div>
+                <div class="ch-row-meta">
+                  <span class="verses">1,453 verses</span>·&nbsp; 31 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">५</div>
+                <div class="ch-num-arabic">SK 5</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">पञ्चमस्कन्ध</div>
+                <div class="ch-title-en">The Creative Impetus</div>
+                <div class="ch-row-meta">
+                  <span class="verses">668 verses</span>·&nbsp; 26 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">६</div>
+                <div class="ch-num-arabic">SK 6</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">षष्ठस्कन्ध</div>
+                <div class="ch-title-en">Prescribed Duties for Mankind</div>
+                <div class="ch-row-meta">
+                  <span class="verses">851 verses</span>·&nbsp; 19 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">७</div>
+                <div class="ch-num-arabic">SK 7</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">सप्तमस्कन्ध</div>
+                <div class="ch-title-en">The Science of God</div>
+                <div class="ch-row-meta">
+                  <span class="verses">750 verses</span>·&nbsp; 15 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">८</div>
+                <div class="ch-num-arabic">SK 8</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">अष्टमस्कन्ध</div>
+                <div class="ch-title-en">Withdrawal of Cosmic Creations</div>
+                <div class="ch-row-meta">
+                  <span class="verses">931 verses</span>·&nbsp; 24 chapters
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · WITH RESUME -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · with resume</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-deva">भगवद्गीता</div>
+          <div class="ch-en">Bhagavad Gītā · The Song of God</div>
+          <div class="ch-meta">
+            <span class="num">18</span>&nbsp;chapters
+            <span class="sep"></span>
+            <span class="num">700</span>&nbsp;verses
+            <span class="sep"></span>
+            <span class="num">1</span>&nbsp;read
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="resume-row">
+            <div class="resume-body">
+              <div class="resume-label">Continue reading</div>
+              <div class="resume-title">अर्जुनविषादयोग</div>
+              <div class="resume-meta">Chapter 1 · verse 1 of 47</div>
+            </div>
+            <div class="resume-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="chapters-section">
+            <div class="chapters-label">All chapters</div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">१</div>
+                <div class="ch-num-arabic">CH 1</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">अर्जुनविषादयोग</div>
+                <div class="ch-title-en">The Yoga of Arjuna's Grief</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; ~12 min
+                  <span class="progress"> · 1 of 47 read</span>
+                </div>
+                <div class="ch-progress-track">
+                  <div class="ch-progress-fill" style="width: 2.1%;"></div>
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">२</div>
+                <div class="ch-num-arabic">CH 2</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">सांख्ययोग</div>
+                <div class="ch-title-en">The Yoga of Knowledge</div>
+                <div class="ch-row-meta">
+                  <span class="verses">72 verses</span>·&nbsp; ~18 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">३</div>
+                <div class="ch-num-arabic">CH 3</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मयोग</div>
+                <div class="ch-title-en">The Yoga of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">43 verses</span>·&nbsp; ~11 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">४</div>
+                <div class="ch-num-arabic">CH 4</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">ज्ञानकर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">42 verses</span>·&nbsp; ~10 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">५</div>
+                <div class="ch-num-arabic">CH 5</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation</div>
+                <div class="ch-row-meta">
+                  <span class="verses">29 verses</span>·&nbsp; ~7 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">६</div>
+                <div class="ch-num-arabic">CH 6</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">आत्मसंयमयोग</div>
+                <div class="ch-title-en">The Yoga of Self-Control</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; ~12 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">७</div>
+                <div class="ch-num-arabic">CH 7</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">ज्ञानविज्ञानयोग</div>
+                <div class="ch-title-en">The Yoga of Knowledge & Wisdom</div>
+                <div class="ch-row-meta">
+                  <span class="verses">30 verses</span>·&nbsp; ~8 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- DARK · MID-PROGRESS -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · mid-progress</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-deva">भगवद्गीता</div>
+          <div class="ch-en">Bhagavad Gītā · The Song of God</div>
+          <div class="ch-meta">
+            <span class="num">18</span>&nbsp;chapters
+            <span class="sep"></span>
+            <span class="num">700</span>&nbsp;verses
+            <span class="sep"></span>
+            <span class="num">186</span>&nbsp;read
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="resume-row">
+            <div class="resume-body">
+              <div class="resume-label">Continue reading</div>
+              <div class="resume-title">कर्मयोग</div>
+              <div class="resume-meta">Chapter 3 · verse 22 of 43</div>
+            </div>
+            <div class="resume-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="chapters-section">
+            <div class="chapters-label">All chapters</div>
+
+            <div class="chapter-row read">
+              <div class="ch-num">
+                <div class="ch-num-deva">१</div>
+                <div class="ch-num-arabic">CH 1</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">अर्जुनविषादयोग</div>
+                <div class="ch-title-en">The Yoga of Arjuna's Grief</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; <span class="progress">complete</span>
+                </div>
+                <div class="ch-progress-track">
+                  <div class="ch-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--d-saffron);">
+                  <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row read">
+              <div class="ch-num">
+                <div class="ch-num-deva">२</div>
+                <div class="ch-num-arabic">CH 2</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">सांख्ययोग</div>
+                <div class="ch-title-en">The Yoga of Knowledge</div>
+                <div class="ch-row-meta">
+                  <span class="verses">72 verses</span>·&nbsp; <span class="progress">complete</span>
+                </div>
+                <div class="ch-progress-track">
+                  <div class="ch-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--d-saffron);">
+                  <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">३</div>
+                <div class="ch-num-arabic">CH 3</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मयोग</div>
+                <div class="ch-title-en">The Yoga of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">43 verses</span>·&nbsp; ~11 min
+                  <span class="progress"> · 22 of 43 read</span>
+                </div>
+                <div class="ch-progress-track">
+                  <div class="ch-progress-fill" style="width: 51%;"></div>
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">४</div>
+                <div class="ch-num-arabic">CH 4</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">ज्ञानकर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation of Action</div>
+                <div class="ch-row-meta">
+                  <span class="verses">42 verses</span>·&nbsp; ~10 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">५</div>
+                <div class="ch-num-arabic">CH 5</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">कर्मसंन्यासयोग</div>
+                <div class="ch-title-en">The Yoga of Renunciation</div>
+                <div class="ch-row-meta">
+                  <span class="verses">29 verses</span>·&nbsp; ~7 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="chapter-row">
+              <div class="ch-num">
+                <div class="ch-num-deva">६</div>
+                <div class="ch-num-arabic">CH 6</div>
+              </div>
+              <div class="ch-body">
+                <div class="ch-title-deva">आत्मसंयमयोग</div>
+                <div class="ch-title-en">The Yoga of Self-Control</div>
+                <div class="ch-row-meta">
+                  <span class="verses">47 verses</span>·&nbsp; ~12 min
+                </div>
+              </div>
+              <div class="ch-row-arrow">
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · loading</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-deva">भगवद्गीता</div>
+          <div class="ch-en">Bhagavad Gītā · The Song of God</div>
+          <div class="ch-meta" style="opacity: 0.4;">
+            <div class="skeleton" style="display: inline-block; height: 10px; width: 200px;"></div>
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="chapters-section">
+            <div class="chapters-label">All chapters</div>
+
+            <div style="padding: 14px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 38px; height: 36px;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 14px; width: 60%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 11px; width: 80%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 9px; width: 40%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 14px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 38px; height: 36px;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 14px; width: 50%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 11px; width: 70%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 9px; width: 35%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 14px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 38px; height: 36px;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 14px; width: 65%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 11px; width: 75%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 9px; width: 45%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 14px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 38px; height: 36px;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 14px; width: 55%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 11px; width: 85%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 9px; width: 40%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 14px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 38px; height: 36px;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 14px; width: 45%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 11px; width: 70%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 9px; width: 38%;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Removed the dotted progress strip across the top.</b> Eighteen dots representing 18 chapters was unreadable as data and arbitrary as decoration. The single chapter-count line in the header carries the same information more clearly.</li>
+    <li><b>Reduced "Bhagavad Gita" header to a compact two-line block.</b> Sanskrit display + italic English subtitle + meta line. No more dominant title that the user has already navigated past.</li>
+    <li><b>Resume row added at the top.</b> When the user has read at least one verse, the chapter they were last in becomes the dominant action — saffron leaf-thread on the left edge, gradient saffron background trailing into the row. One-time pulse animation on screen entry — like the thread catching candlelight.</li>
+    <li><b>Devanāgarī numerals for chapter numbers (१, २, ३ ...).</b> With small Arabic numeral underneath as a literacy fallback. This is the most distinctive heritage detail on the screen — never decorative, always functional.</li>
+    <li><b>Dual-language chapter titles.</b> Devanāgarī chapter title (अर्जुनविषादयोग) + italic English translation underneath. Mirrors Geeta Press / Chinmaya Mission print convention. Information-dense without clutter.</li>
+    <li><b>Per-chapter progress as a hairline.</b> Replaces the empty circular ring that communicated nothing. 1.5px saffron fill on a track underneath the verse-count line. Visible only when the user has actually started a chapter.</li>
+    <li><b>Reading time per chapter ("~12 min").</b> Habit users plan around time, not verse count. Computed from verse count × user's read pace.</li>
+    <li><b>Completed chapters get a checkmark and de-emphasized type.</b> "Read" chapters fade slightly so the eye finds the unread ones first. Standard pattern, executed cleanly.</li>
+    <li><b>Empty state preserved by the absence of resume.</b> First-time visit just shows the chapter list. No empty-state illustration, no "start reading" CTA — chapter 1 is the natural first row.</li>
+  </ul>
+</div>
+
+</body>
+</html>

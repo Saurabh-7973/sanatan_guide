@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — AI Chat (Screen 10)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .topbar-spacer { flex: 1; }
+  .topbar-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ==================== VERSE ANCHOR (sticky top) ==================== */
+  .verse-anchor {
+    flex-shrink: 0;
+    margin: 0 20px 6px;
+    padding: 10px 14px 10px 18px;
+    border-radius: 4px;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .verse-anchor::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 2px;
+  }
+
+  .verse-anchor-coord {
+    flex-shrink: 0;
+    font-family: var(--f-deva);
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .verse-anchor-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .verse-anchor-deva {
+    font-family: var(--f-deva);
+    font-size: 13px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 1px;
+  }
+
+  .verse-anchor-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .verse-anchor-icon {
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  /* ==================== CONVERSATION ==================== */
+  .convo {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 20px 14px;
+    scrollbar-width: none;
+  }
+  .convo::-webkit-scrollbar { display: none; }
+
+  /* AI initial greeting / suggested questions */
+  .ai-opening {
+    margin-bottom: 18px;
+  }
+
+  .ai-opening-prose {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+
+  .ai-opening-label {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin: 18px 0 10px;
+  }
+
+  .ai-suggestion {
+    padding: 12px 16px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-suggestion-text {
+    flex: 1;
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+
+  .ai-suggestion-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  /* ==================== USER MESSAGE ==================== */
+  .msg-user {
+    display: flex;
+    justify-content: flex-end;
+    margin: 14px 0 6px;
+  }
+
+  .msg-user-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 16px 16px 4px 16px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+
+  /* ==================== AI MESSAGE ==================== */
+  .msg-ai {
+    margin: 14px 0;
+    padding: 0 4px;
+  }
+
+  .msg-ai-prose {
+    font-family: var(--f-serif);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+
+  .msg-ai-prose p + p { margin-top: 10px; }
+
+  .msg-ai-prose .term {
+    font-family: var(--f-deva);
+    font-style: normal;
+    font-weight: 500;
+    margin: 0 1px;
+  }
+
+  /* citation card inline in AI reply */
+  .citation {
+    margin: 14px 0 4px;
+    padding: 14px 16px 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .citation-binding {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 6px;
+    height: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .citation-binding::before, .citation-binding::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+
+  .citation-binding .hole {
+    width: 4px;
+    height: 4px;
+    margin: 0 8px;
+    transform: rotate(45deg);
+  }
+
+  .citation-coord {
+    margin-top: 8px;
+    margin-bottom: 6px;
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .citation-coord .dev {
+    font-family: var(--f-deva);
+    font-size: 11px;
+    letter-spacing: 0.005em;
+  }
+
+  .citation-sanskrit {
+    font-family: var(--f-deva);
+    font-size: 13.5px;
+    line-height: 1.45;
+    margin-bottom: 4px;
+  }
+
+  .citation-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* AI message footer — actions */
+  .msg-ai-footer {
+    margin-top: 10px;
+    display: flex;
+    gap: 16px;
+    padding-top: 8px;
+  }
+
+  .msg-ai-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--f-sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  /* ==================== TYPING INDICATOR ==================== */
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0 4px;
+  }
+  @keyframes type-pulse {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  .typing-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    animation: type-pulse 1.4s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ==================== INPUT ==================== */
+  .input-area {
+    flex-shrink: 0;
+    padding: 10px 16px 16px;
+  }
+
+  .input-shell {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    border-radius: 22px;
+    padding: 6px 6px 6px 16px;
+    border: 1px solid;
+    min-height: 44px;
+  }
+
+  .input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 8px 0;
+    resize: none;
+  }
+
+  .input-send {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-back, .theme-dark .topbar-action { color: var(--d-text-1); }
+
+  .theme-dark .verse-anchor {
+    background: linear-gradient(90deg, rgba(232, 130, 12, 0.05), rgba(232, 130, 12, 0.01) 70%, transparent);
+    border-color: var(--d-divider);
+  }
+  .theme-dark .verse-anchor::before { background: var(--d-saffron); box-shadow: 0 0 4px rgba(232, 130, 12, 0.3); }
+  .theme-dark .verse-anchor-coord { color: var(--d-saffron); }
+  .theme-dark .verse-anchor-deva { color: var(--d-cream); }
+  .theme-dark .verse-anchor-en { color: var(--d-text-2); }
+  .theme-dark .verse-anchor-icon { color: var(--d-text-3); }
+
+  .theme-dark .ai-opening-prose { color: var(--d-text-1); }
+  .theme-dark .ai-opening-label { color: var(--d-text-3); }
+  .theme-dark .ai-suggestion {
+    background: var(--d-surface);
+    border-color: var(--d-divider-soft);
+  }
+  .theme-dark .ai-suggestion-text { color: var(--d-text-1); }
+  .theme-dark .ai-suggestion-arrow { color: var(--d-saffron); }
+
+  .theme-dark .msg-user-bubble {
+    background: var(--d-saffron-glow);
+    color: var(--d-cream);
+    border: 1px solid var(--d-divider);
+  }
+
+  .theme-dark .msg-ai-prose { color: var(--d-text-1); }
+  .theme-dark .msg-ai-prose .term { color: var(--d-saffron); }
+
+  .theme-dark .citation {
+    background: var(--d-surface);
+    border: 1px solid var(--d-divider);
+  }
+  .theme-dark .citation-binding::before, .theme-dark .citation-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.4;
+  }
+  .theme-dark .citation-binding .hole { background: var(--d-saffron); }
+  .theme-dark .citation-coord { color: var(--d-saffron); }
+  .theme-dark .citation-coord .dev { color: var(--d-cream); }
+  .theme-dark .citation-sanskrit { color: var(--d-cream); }
+  .theme-dark .citation-en { color: var(--d-text-2); }
+
+  .theme-dark .msg-ai-footer { border-top: 1px dashed var(--d-divider-soft); }
+  .theme-dark .msg-ai-action { color: var(--d-text-3); }
+
+  .theme-dark .typing-dot { background: var(--d-saffron); }
+
+  .theme-dark .input-area { background: var(--d-bg); border-top: 1px solid var(--d-divider-soft); }
+  .theme-dark .input-shell {
+    background: var(--d-surface);
+    border-color: var(--d-divider-soft);
+  }
+  .theme-dark .input-shell.active { border-color: var(--d-saffron); }
+  .theme-dark .input-field { color: var(--d-text-1); }
+  .theme-dark .input-field::placeholder { color: var(--d-text-3); }
+  .theme-dark .input-send { background: var(--d-saffron); color: #1a1208; }
+  .theme-dark .input-send.disabled { background: var(--d-surface-2); color: var(--d-text-3); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-back, .theme-light .topbar-action { color: var(--l-text-1); }
+
+  .theme-light .verse-anchor {
+    background: linear-gradient(90deg, rgba(194, 101, 8, 0.05), rgba(194, 101, 8, 0.01) 70%, transparent);
+    border-color: var(--l-divider);
+  }
+  .theme-light .verse-anchor::before { background: var(--l-saffron); }
+  .theme-light .verse-anchor-coord { color: var(--l-saffron); }
+  .theme-light .verse-anchor-deva { color: var(--l-text-1); }
+  .theme-light .verse-anchor-en { color: var(--l-text-2); }
+  .theme-light .verse-anchor-icon { color: var(--l-text-3); }
+
+  .theme-light .ai-opening-prose { color: var(--l-text-1); }
+  .theme-light .ai-opening-label { color: var(--l-text-3); }
+  .theme-light .ai-suggestion {
+    background: var(--l-surface);
+    border-color: var(--l-divider-soft);
+  }
+  .theme-light .ai-suggestion-text { color: var(--l-text-1); }
+  .theme-light .ai-suggestion-arrow { color: var(--l-saffron); }
+
+  .theme-light .msg-user-bubble {
+    background: var(--l-saffron-glow);
+    color: var(--l-text-1);
+    border: 1px solid var(--l-divider);
+  }
+
+  .theme-light .msg-ai-prose { color: var(--l-text-1); }
+  .theme-light .msg-ai-prose .term { color: var(--l-saffron); }
+
+  .theme-light .citation {
+    background: var(--l-surface);
+    border: 1px solid var(--l-divider);
+  }
+  .theme-light .citation-binding::before, .theme-light .citation-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .citation-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .citation-coord { color: var(--l-saffron); }
+  .theme-light .citation-coord .dev { color: var(--l-text-1); }
+  .theme-light .citation-sanskrit { color: var(--l-text-1); }
+  .theme-light .citation-en { color: var(--l-text-2); }
+
+  .theme-light .msg-ai-footer { border-top: 1px dashed var(--l-divider-soft); }
+  .theme-light .msg-ai-action { color: var(--l-text-3); }
+
+  .theme-light .typing-dot { background: var(--l-saffron); }
+
+  .theme-light .input-area { background: var(--l-bg); border-top: 1px solid var(--l-divider-soft); }
+  .theme-light .input-shell {
+    background: var(--l-surface);
+    border-color: var(--l-divider-soft);
+  }
+  .theme-light .input-shell.active { border-color: var(--l-saffron); }
+  .theme-light .input-field { color: var(--l-text-1); }
+  .theme-light .input-field::placeholder { color: var(--l-text-3); }
+  .theme-light .input-send { background: var(--l-saffron); color: #fff; }
+  .theme-light .input-send.disabled { background: var(--l-divider-soft); color: var(--l-text-3); }
+
+  /* ==================== STATES ==================== */
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg-user, .msg-ai, .ai-opening { animation: msgIn 350ms ease-out backwards; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 10 · AI Chat</span></h1>
+  <p>Verse-anchored · prose AI replies · inline citation cards · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · OPENING (suggested questions) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · opening</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="4" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="9" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="14" r="1.4" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- verse anchor -->
+        <div class="verse-anchor">
+          <div class="verse-anchor-coord">‖१·१‖</div>
+          <div class="verse-anchor-text">
+            <div class="verse-anchor-deva">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="verse-anchor-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+          </div>
+          <div class="verse-anchor-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="convo">
+
+          <div class="ai-opening">
+            <div class="ai-opening-prose">
+              The Gītā opens with a question, not a sermon. Dhṛtarāṣṭra is the blind king — and the blindness is more than physical. Ask anything about this verse.
+            </div>
+
+            <div class="ai-opening-label">Try asking</div>
+
+            <div class="ai-suggestion">
+              <div class="ai-suggestion-text">Why is Dhṛtarāṣṭra called blind?</div>
+              <div class="ai-suggestion-arrow">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="ai-suggestion">
+              <div class="ai-suggestion-text">What does <em style="font-family: var(--f-deva); font-style: normal;">dharmakṣetra</em> mean?</div>
+              <div class="ai-suggestion-arrow">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="ai-suggestion">
+              <div class="ai-suggestion-text">Who is Sañjaya?</div>
+              <div class="ai-suggestion-arrow">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="ai-suggestion">
+              <div class="ai-suggestion-text">How does this verse set up the entire Gītā?</div>
+              <div class="ai-suggestion-arrow">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <div class="input-shell">
+            <textarea class="input-field" placeholder="Ask about this verse..." rows="1"></textarea>
+            <div class="input-send disabled">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l10-5-3 12-3-5-4-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · MID-CONVERSATION WITH CITATION -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · with citation</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="4" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="9" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="14" r="1.4" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="verse-anchor">
+          <div class="verse-anchor-coord">‖१·१‖</div>
+          <div class="verse-anchor-text">
+            <div class="verse-anchor-deva">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="verse-anchor-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+          </div>
+          <div class="verse-anchor-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="convo">
+
+          <div class="msg-user">
+            <div class="msg-user-bubble">What does dharmakṣetra mean?</div>
+          </div>
+
+          <div class="msg-ai">
+            <div class="msg-ai-prose">
+              <p><span class="term">Dharmakṣetra</span> literally means "the field of dharma." It is a compound: <span class="term">dharma</span> (right action, sacred duty) + <span class="term">kṣetra</span> (field, place).</p>
+              <p>But the word does more than describe geography. Kurukṣetra was already a sacred plain in Vedic memory — a place where right and wrong were thought to be more visible, more decided. By calling it <span class="term">dharmakṣetra</span> in the very first word of the Gītā, the text frames everything that follows as a moral question, not a military one.</p>
+            </div>
+
+            <div class="citation">
+              <div class="citation-binding"><div class="hole"></div></div>
+              <div class="citation-coord">
+                <span class="dev">‖१३·१‖</span>
+                <span>Bhagavad Gītā · Chapter 13</span>
+              </div>
+              <div class="citation-sanskrit">इदं शरीरं कौन्तेय क्षेत्रमित्यभिधीयते ।</div>
+              <div class="citation-en">"This body, O son of Kuntī, is called the kṣetra (field)..."</div>
+            </div>
+
+            <div class="msg-ai-prose">
+              <p>Krishna later expands the meaning of <span class="term">kṣetra</span> in chapter 13 — the body itself becomes the field where dharma is practiced. So the opening "field of dharma" foreshadows a teaching that turns inward by the end of the text.</p>
+            </div>
+
+            <div class="msg-ai-footer">
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M3 1h5v9l-2.5-1.5L3 10V1z" stroke="currentColor" stroke-width="1.4"/>
+                </svg>
+                <span>Save</span>
+              </div>
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <circle cx="3" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="9" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4.3 5.4l3-1.8M4.3 6.6l3 1.8" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+                <span>Share</span>
+              </div>
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2.5 5.5L1 4l1.5-1.5M8.5 7.5L10 9l-1.5 1.5M2.5 5.5h6.5a1 1 0 0 0 1-1V3.5a1 1 0 0 0-1-1H4.5M8.5 7.5H2a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1h.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                <span>Regenerate</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="input-area">
+          <div class="input-shell">
+            <textarea class="input-field" placeholder="Ask about this verse..." rows="1"></textarea>
+            <div class="input-send disabled">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l10-5-3 12-3-5-4-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · TYPING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · AI thinking</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="4" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="9" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="14" r="1.4" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="verse-anchor">
+          <div class="verse-anchor-coord">‖१·१‖</div>
+          <div class="verse-anchor-text">
+            <div class="verse-anchor-deva">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="verse-anchor-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+          </div>
+          <div class="verse-anchor-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="convo">
+
+          <div class="msg-user">
+            <div class="msg-user-bubble">Why is Dhṛtarāṣṭra called blind?</div>
+          </div>
+
+          <div class="msg-ai">
+            <div class="msg-ai-prose">
+              <p>Dhṛtarāṣṭra was born physically blind, but the Mahābhārata uses his blindness on multiple levels.</p>
+            </div>
+            <div class="typing">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="input-area">
+          <div class="input-shell">
+            <textarea class="input-field" placeholder="Ask about this verse..." rows="1"></textarea>
+            <div class="input-send disabled">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l10-5-3 12-3-5-4-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- DARK · COMPOSING (input active) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · composing</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="4" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="9" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="14" r="1.4" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="verse-anchor">
+          <div class="verse-anchor-coord">‖१·१‖</div>
+          <div class="verse-anchor-text">
+            <div class="verse-anchor-deva">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="verse-anchor-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+          </div>
+          <div class="verse-anchor-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="convo">
+          <div class="msg-user">
+            <div class="msg-user-bubble">Why is Dhṛtarāṣṭra called blind?</div>
+          </div>
+
+          <div class="msg-ai">
+            <div class="msg-ai-prose">
+              <p>Dhṛtarāṣṭra was born physically blind, but the Mahābhārata uses his blindness on multiple levels.</p>
+              <p>His blindness mirrors a moral blindness — an inability to see the harm his attachment to his sons has caused. By the time the Gītā opens, his refusal to restrain Duryodhana has led the kingdom to the edge of war.</p>
+              <p>Vyāsa offers him divine sight to witness the battle directly. He refuses. He chooses to hear Sañjaya's narration instead — distance preserved, accountability deferred. The blindness is, finally, a choice.</p>
+            </div>
+
+            <div class="msg-ai-footer">
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M3 1h5v9l-2.5-1.5L3 10V1z" stroke="currentColor" stroke-width="1.4"/>
+                </svg>
+                <span>Save</span>
+              </div>
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <circle cx="3" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="9" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4.3 5.4l3-1.8M4.3 6.6l3 1.8" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+                <span>Share</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <div class="input-shell active">
+            <textarea class="input-field" rows="2" style="height: 48px;">And what does that say about us as readers?</textarea>
+            <div class="input-send" style="margin-bottom: 2px;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l10-5-3 12-3-5-4-2z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · MID-CONVERSATION WITH CITATION -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · with citation</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="topbar-action">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="4" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="9" r="1.4" fill="currentColor"/>
+              <circle cx="9" cy="14" r="1.4" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="verse-anchor">
+          <div class="verse-anchor-coord">‖१·१‖</div>
+          <div class="verse-anchor-text">
+            <div class="verse-anchor-deva">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+            <div class="verse-anchor-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+          </div>
+          <div class="verse-anchor-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="convo">
+
+          <div class="msg-user">
+            <div class="msg-user-bubble">What does dharmakṣetra mean?</div>
+          </div>
+
+          <div class="msg-ai">
+            <div class="msg-ai-prose">
+              <p><span class="term">Dharmakṣetra</span> literally means "the field of dharma." It is a compound: <span class="term">dharma</span> (right action, sacred duty) + <span class="term">kṣetra</span> (field, place).</p>
+              <p>But the word does more than describe geography. Kurukṣetra was already a sacred plain in Vedic memory — a place where right and wrong were thought to be more visible, more decided.</p>
+            </div>
+
+            <div class="citation">
+              <div class="citation-binding"><div class="hole"></div></div>
+              <div class="citation-coord">
+                <span class="dev">‖१३·१‖</span>
+                <span>Bhagavad Gītā · Chapter 13</span>
+              </div>
+              <div class="citation-sanskrit">इदं शरीरं कौन्तेय क्षेत्रमित्यभिधीयते ।</div>
+              <div class="citation-en">"This body, O son of Kuntī, is called the kṣetra (field)..."</div>
+            </div>
+
+            <div class="msg-ai-prose">
+              <p>Krishna later expands the meaning of <span class="term">kṣetra</span> in chapter 13 — the body itself becomes the field where dharma is practiced.</p>
+            </div>
+
+            <div class="msg-ai-footer">
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M3 1h5v9l-2.5-1.5L3 10V1z" stroke="currentColor" stroke-width="1.4"/>
+                </svg>
+                <span>Save</span>
+              </div>
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <circle cx="3" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="8.5" cy="9" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4.3 5.4l3-1.8M4.3 6.6l3 1.8" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+                <span>Share</span>
+              </div>
+              <div class="msg-ai-action">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M2.5 5.5L1 4l1.5-1.5M8.5 7.5L10 9l-1.5 1.5M2.5 5.5h6.5a1 1 0 0 0 1-1V3.5a1 1 0 0 0-1-1H4.5M8.5 7.5H2a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1h.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                <span>Regenerate</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="input-area">
+          <div class="input-shell">
+            <textarea class="input-field" placeholder="Ask about this verse..." rows="1"></textarea>
+            <div class="input-send disabled">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7l10-5-3 12-3-5-4-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>The verse is the personality of the screen, not the AI.</b> A persistent saffron-anchored verse strip at the top — same leaf-thread vocabulary as Resume rows on Chapter List and Verse List — keeps the user oriented to which verse the conversation is about. Tap to return to the verse.</li>
+    <li><b>AI replies as flowing serif prose, not bubbles.</b> User messages are rounded compact bubbles (right-aligned sans-serif). AI replies are typeset like commentary in Lora serif italic — the same register as commentary in Verse Detail. The asymmetry tells you "the AI is delivering thought; you're asking questions" without a single label.</li>
+    <li><b>No avatars, no AI sparkles, no "ChatGPT-style" gradient orbs.</b> The AI is in service of the verse, not the show. Modern chat UI conventions, kept clean.</li>
+    <li><b>Verse-specific suggested questions, not generic chips.</b> "Why is Dhṛtarāṣṭra called blind?" / "What does <em>dharmakṣetra</em> mean?" / "Who is Sañjaya?" — these are specific to BG 1.1. Each verse generates its own suggestion set. Teaches users what kinds of questions are worth asking.</li>
+    <li><b>Inline citation cards with the binding-line motif.</b> When the AI references another verse from your offline corpus, it materializes as a small leaf — top binding line + diamond hole + verse coordinate (‖१३·१‖) + Sanskrit + translation. Tappable to navigate. This is your superpower: the AI cites verses from your actual library, not from training data.</li>
+    <li><b>Sanskrit terms inline highlighted in saffron Devanāgarī.</b> When the AI uses a Sanskrit term in its English prose ("<em>dharmakṣetra</em> means..."), it renders in Tiro Devanagari with saffron color. Visible glossary on every line — readers can scan for the terms.</li>
+    <li><b>Reply footer with Save / Share / Regenerate.</b> Standard chat actions, kept minimal. "Save" stores the AI explanation alongside the verse — turning the chat into a permanent commentary on the verse.</li>
+    <li><b>Sticky verse anchor with saffron leaf-thread.</b> The 3px saffron strip on the left edge — same vocabulary as the Resume row on Chapter List and Verse List. The user always sees "you are anchored to this verse, you can return to it."</li>
+    <li><b>Input placeholder reflects scope: "Ask about this verse..."</b> Not "Type a message..." or "Ask anything..." — the chat is bounded, and the placeholder communicates that bound.</li>
+    <li><b>Single typing indicator vocabulary across the app.</b> Three saffron dots pulsing. Same on Verse Detail's "Explain this verse" loading state, on Search's Pandit-thinking state, here on AI Chat. System continuity for AI states throughout.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Verse List (Screen 05)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    position: relative;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ==================== HEADER (very compact) ==================== */
+  .ch-header {
+    padding: 0 24px 14px;
+  }
+
+  .ch-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  .ch-deva {
+    font-family: var(--f-deva);
+    font-size: 18px;
+    line-height: 1.1;
+    letter-spacing: 0.005em;
+  }
+
+  .ch-num {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .ch-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  /* progress hairline */
+  .ch-progress {
+    height: 1.5px;
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .ch-progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  .ch-progress-meta {
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ==================== RESUME ANCHOR ==================== */
+  .resume-anchor {
+    margin: 14px 24px 0;
+    padding: 14px 16px 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .resume-anchor::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 2px;
+  }
+
+  .resume-anchor-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .resume-anchor-label {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .resume-anchor-text {
+    font-family: var(--f-deva);
+    font-size: 14px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .resume-anchor-meta {
+    margin-top: 3px;
+    font-family: var(--f-sans);
+    font-size: 10.5px;
+  }
+
+  /* ==================== VERSE LIST ==================== */
+  .verses-section {
+    margin-top: 14px;
+    padding: 0 24px;
+  }
+
+  .verses-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid;
+  }
+
+  .verse-row {
+    padding: 11px 0 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    position: relative;
+  }
+  .verse-row:active { opacity: 0.55; }
+
+  /* daṇḍa-marked verse number */
+  .verse-mark {
+    flex-shrink: 0;
+    padding-top: 1px;
+    font-family: var(--f-deva);
+    font-size: 14px;
+    line-height: 1.4;
+    min-width: 38px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+
+  .verse-mark .danda {
+    display: inline-block;
+    width: 1px;
+    height: 11px;
+    margin: 0 1px -1px;
+    vertical-align: middle;
+  }
+
+  .verse-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .verse-sanskrit {
+    font-family: var(--f-deva);
+    font-size: 14.5px;
+    line-height: 1.4;
+    letter-spacing: 0.005em;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .verse-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* state indicator on the right */
+  .verse-state {
+    flex-shrink: 0;
+    padding-top: 4px;
+    width: 14px;
+    text-align: center;
+  }
+
+  .verse-state svg { display: block; margin: 0 auto; }
+
+  /* sub-section header for very long chapters */
+  .verse-section-header {
+    margin-top: 18px;
+    padding: 8px 0 10px;
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    border-bottom: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .verse-section-header .deva-num {
+    font-family: var(--f-deva);
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  /* ==================== VERSE JUMPER (sticky right edge) ==================== */
+  .verse-jumper {
+    position: absolute;
+    right: 8px;
+    top: 70px;
+    bottom: 30px;
+    width: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    border-radius: 12px;
+    z-index: 5;
+  }
+
+  .verse-jumper .jump {
+    font-family: var(--f-deva);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+
+  .verse-jumper .jump.active {
+    font-weight: 500;
+    transform: scale(1.2);
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-back { color: var(--d-text-1); }
+
+  .theme-dark .ch-deva { color: var(--d-cream); }
+  .theme-dark .ch-num { color: var(--d-saffron); }
+  .theme-dark .ch-en { color: var(--d-text-2); }
+  .theme-dark .ch-progress { background: var(--d-divider-soft); }
+  .theme-dark .ch-progress-fill { background: var(--d-saffron); }
+  .theme-dark .ch-progress-meta { color: var(--d-text-3); }
+  .theme-dark .ch-progress-meta .saffron { color: var(--d-saffron); }
+
+  .theme-dark .resume-anchor {
+    background: linear-gradient(90deg, rgba(232, 130, 12, 0.07), rgba(232, 130, 12, 0.02) 60%, transparent);
+    border: 1px solid var(--d-divider);
+  }
+  .theme-dark .resume-anchor::before { background: var(--d-saffron); box-shadow: 0 0 6px rgba(232, 130, 12, 0.4); }
+  .theme-dark .resume-anchor-label { color: var(--d-saffron); }
+  .theme-dark .resume-anchor-text { color: var(--d-cream); }
+  .theme-dark .resume-anchor-meta { color: var(--d-text-2); }
+
+  .theme-dark .verses-label { color: var(--d-text-3); border-bottom-color: var(--d-divider); }
+  .theme-dark .verse-section-header { color: var(--d-saffron); border-bottom-color: var(--d-divider); }
+  .theme-dark .verse-section-header .deva-num { color: var(--d-cream); }
+
+  .theme-dark .verse-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .verse-mark { color: var(--d-saffron); }
+  .theme-dark .verse-mark .danda { background: var(--d-saffron); }
+  .theme-dark .verse-sanskrit { color: var(--d-cream); }
+  .theme-dark .verse-en { color: var(--d-text-3); }
+
+  /* read state */
+  .theme-dark .verse-row.read .verse-mark { color: var(--d-text-3); }
+  .theme-dark .verse-row.read .verse-mark .danda { background: var(--d-text-3); }
+  .theme-dark .verse-row.read .verse-sanskrit { color: var(--d-text-2); }
+  .theme-dark .verse-row.read .verse-state { color: var(--d-saffron); }
+
+  /* bookmarked state */
+  .theme-dark .verse-row.bookmarked .verse-state { color: var(--d-saffron); }
+
+  /* unread default state — no icon */
+  .theme-dark .verse-state { color: var(--d-text-3); }
+
+  .theme-dark .verse-jumper {
+    background: rgba(28, 24, 22, 0.6);
+    backdrop-filter: blur(8px);
+  }
+  .theme-dark .verse-jumper .jump { color: var(--d-text-3); }
+  .theme-dark .verse-jumper .jump.active { color: var(--d-saffron); }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-back { color: var(--l-text-1); }
+
+  .theme-light .ch-deva { color: var(--l-text-1); }
+  .theme-light .ch-num { color: var(--l-saffron); }
+  .theme-light .ch-en { color: var(--l-text-2); }
+  .theme-light .ch-progress { background: var(--l-divider-soft); }
+  .theme-light .ch-progress-fill { background: var(--l-saffron); }
+  .theme-light .ch-progress-meta { color: var(--l-text-3); }
+  .theme-light .ch-progress-meta .saffron { color: var(--l-saffron); }
+
+  .theme-light .resume-anchor {
+    background: linear-gradient(90deg, rgba(194, 101, 8, 0.06), rgba(194, 101, 8, 0.015) 60%, transparent);
+    border: 1px solid var(--l-divider);
+  }
+  .theme-light .resume-anchor::before { background: var(--l-saffron); }
+  .theme-light .resume-anchor-label { color: var(--l-saffron); }
+  .theme-light .resume-anchor-text { color: var(--l-text-1); }
+  .theme-light .resume-anchor-meta { color: var(--l-text-2); }
+
+  .theme-light .verses-label { color: var(--l-text-3); border-bottom-color: var(--l-divider); }
+  .theme-light .verse-section-header { color: var(--l-saffron); border-bottom-color: var(--l-divider); }
+  .theme-light .verse-section-header .deva-num { color: var(--l-text-1); }
+
+  .theme-light .verse-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .verse-mark { color: var(--l-saffron); }
+  .theme-light .verse-mark .danda { background: var(--l-saffron); }
+  .theme-light .verse-sanskrit { color: var(--l-text-1); }
+  .theme-light .verse-en { color: var(--l-text-3); }
+
+  .theme-light .verse-row.read .verse-mark { color: var(--l-text-3); }
+  .theme-light .verse-row.read .verse-mark .danda { background: var(--l-text-3); }
+  .theme-light .verse-row.read .verse-sanskrit { color: var(--l-text-2); }
+  .theme-light .verse-row.read .verse-state { color: var(--l-saffron); }
+
+  .theme-light .verse-row.bookmarked .verse-state { color: var(--l-saffron); }
+  .theme-light .verse-state { color: var(--l-text-3); }
+
+  .theme-light .verse-jumper {
+    background: rgba(247, 242, 236, 0.85);
+    backdrop-filter: blur(8px);
+  }
+  .theme-light .verse-jumper .jump { color: var(--l-text-3); }
+  .theme-light .verse-jumper .jump.active { color: var(--l-saffron); }
+
+  /* ==================== STATES ==================== */
+  @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.85; } 100% { opacity: 0.5; } }
+  .skeleton { background: rgba(232, 130, 12, 0.08); border-radius: 2px; animation: shimmer 1.6s ease-in-out infinite; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .verse-row { animation: inkSettle 350ms ease-out backwards; }
+  .verse-row:nth-child(1) { animation-delay: 40ms; }
+  .verse-row:nth-child(2) { animation-delay: 60ms; }
+  .verse-row:nth-child(3) { animation-delay: 80ms; }
+  .verse-row:nth-child(4) { animation-delay: 100ms; }
+  .verse-row:nth-child(5) { animation-delay: 120ms; }
+  .verse-row:nth-child(6) { animation-delay: 140ms; }
+  .verse-row:nth-child(7) { animation-delay: 160ms; }
+  .verse-row:nth-child(8) { animation-delay: 180ms; }
+  .verse-row:nth-child(9) { animation-delay: 200ms; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 05 · Verse List</span></h1>
+  <p>Dense, scannable · daṇḍa verse marks · Devanāgarī verse-jumper for long chapters · five frames</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · DEFAULT (BG Ch 1, 47 verses) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · default</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- compact chapter header -->
+        <div class="ch-header">
+          <div class="ch-line">
+            <div class="ch-deva">अर्जुनविषादयोग</div>
+            <div class="ch-num">CH 1 · BG</div>
+          </div>
+          <div class="ch-en">The Yoga of Arjuna's Grief</div>
+          <div class="ch-progress">
+            <div class="ch-progress-fill" style="width: 2.1%;"></div>
+          </div>
+          <div class="ch-progress-meta">
+            <span><span class="saffron">1</span>&nbsp; of 47 read</span>
+            <span>2%</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- resume anchor — only when relevant -->
+          <div class="resume-anchor">
+            <div class="resume-anchor-body">
+              <div class="resume-anchor-label">Continue</div>
+              <div class="resume-anchor-text">सञ्जय उवाच ।</div>
+              <div class="resume-anchor-meta">Verse 2 — next unread</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--d-saffron); opacity:0.7;">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- verse list -->
+          <div class="verses-section">
+            <div class="verses-label">All verses</div>
+
+            <div class="verse-row read bookmarked">
+              <div class="verse-mark">‖१‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+                <div class="verse-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+              </div>
+              <div class="verse-state">
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="currentColor">
+                  <path d="M0 0h11v14l-5.5-3.5L0 14V0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖२‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">सञ्जय उवाच ।</div>
+                <div class="verse-en">Sañjaya said: Having seen the army of the Pāṇḍavas...</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖३‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">पश्यैतां पाण्डुपुत्राणामाचार्य महतीं...</div>
+                <div class="verse-en">"Behold, O Teacher! this mighty army of the sons of Pāṇḍu..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अत्र शूरा महेष्वासा भीमार्जुनसमा युधि ।</div>
+                <div class="verse-en">"Here are heroes, mighty archers, equal in battle to Bhīma..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖५‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">धृष्टकेतुश्चेकितानः काशिराजश्च...</div>
+                <div class="verse-en">"Dhṛṣṭaketu, Cekitāna, and the valiant king of Kāśī..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖६‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">युधामन्युश्च विक्रान्त उत्तमौजाश्च...</div>
+                <div class="verse-en">"The strong Yudhāmanyu and the brave Uttamaujas..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖७‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अस्माकं तु विशिष्टा ये तान्निबोध...</div>
+                <div class="verse-en">"Know also, O best among the twice-born, the names..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖८‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">भवान्भीष्मश्च कर्णश्च कृपश्च...</div>
+                <div class="verse-en">"Thyself and Bhīṣma, and Karṇa, and Kṛpa..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖९‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अन्ये च बहवः शूरा मदर्थे त्यक्तजीविताः ।</div>
+                <div class="verse-en">"And also many other heroes who have given up their lives..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+
+        <!-- verse jumper (sticky right) -->
+        <div class="verse-jumper">
+          <div class="jump active">१</div>
+          <div class="jump">११</div>
+          <div class="jump">२१</div>
+          <div class="jump">३१</div>
+          <div class="jump">४१</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · LONG CHAPTER (BG Ch 2, 72 verses, with sections) -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · long chapter</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-line">
+            <div class="ch-deva">सांख्ययोग</div>
+            <div class="ch-num">CH 2 · BG</div>
+          </div>
+          <div class="ch-en">The Yoga of Knowledge</div>
+          <div class="ch-progress">
+            <div class="ch-progress-fill" style="width: 27.8%;"></div>
+          </div>
+          <div class="ch-progress-meta">
+            <span><span class="saffron">20</span>&nbsp; of 72 read</span>
+            <span>28%</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="resume-anchor">
+            <div class="resume-anchor-body">
+              <div class="resume-anchor-label">Continue</div>
+              <div class="resume-anchor-text">श्रीभगवानुवाच । अशोच्यानन्वशोचस्त्वम्...</div>
+              <div class="resume-anchor-meta">Verse 11 — next unread</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--d-saffron); opacity:0.7;">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="verses-section">
+
+            <!-- verses 1-10 (read) -->
+            <div class="verse-section-header">
+              <span>Verses 1 — 10</span>
+              <span class="deva-num">‖१–१०‖</span>
+            </div>
+
+            <div class="verse-row read">
+              <div class="verse-mark">‖८‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">न हि प्रपश्यामि ममापनुद्याद्...</div>
+                <div class="verse-en">"I do not see what could remove this grief..."</div>
+              </div>
+              <div class="verse-state">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="verse-row read">
+              <div class="verse-mark">‖९‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">सञ्जय उवाच । एवमुक्त्वा हृषीकेशं...</div>
+                <div class="verse-en">"Sañjaya said: Having spoken thus to Hṛṣīkeśa..."</div>
+              </div>
+              <div class="verse-state">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="verse-row read">
+              <div class="verse-mark">‖१०‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">तमुवाच हृषीकेशः प्रहसन्निव भारत ।</div>
+                <div class="verse-en">"O Bhārata, then Hṛṣīkeśa, as if smiling, said to him..."</div>
+              </div>
+              <div class="verse-state">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- verses 11-20 -->
+            <div class="verse-section-header">
+              <span>Verses 11 — 20 · Sāṅkhya Begins</span>
+              <span class="deva-num">‖११–२०‖</span>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖११‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">श्रीभगवानुवाच । अशोच्यानन्वशोचस्त्वम्...</div>
+                <div class="verse-en">"The Blessed Lord said: You grieve for those..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row bookmarked">
+              <div class="verse-mark">‖१२‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">न त्वेवाहं जातु नासं न त्वं नेमे जनाधिपाः ।</div>
+                <div class="verse-en">"Never was there a time when I did not exist, nor you..."</div>
+              </div>
+              <div class="verse-state">
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="currentColor">
+                  <path d="M0 0h11v14l-5.5-3.5L0 14V0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖१३‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">देहिनोऽस्मिन्यथा देहे कौमारं यौवनं जरा ।</div>
+                <div class="verse-en">"As the embodied soul passes, in this body, from childhood..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖१४‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">मात्रास्पर्शास्तु कौन्तेय शीतोष्णसुखदुःखदाः ।</div>
+                <div class="verse-en">"The contacts of the senses with their objects, O son of Kuntī..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖१५‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">यं हि न व्यथयन्त्येते पुरुषं पुरुषर्षभ ।</div>
+                <div class="verse-en">"That firm man whom these do not afflict, O best among men..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+
+        <div class="verse-jumper">
+          <div class="jump">१</div>
+          <div class="jump active">११</div>
+          <div class="jump">२१</div>
+          <div class="jump">३१</div>
+          <div class="jump">४१</div>
+          <div class="jump">५१</div>
+          <div class="jump">६१</div>
+          <div class="jump">७२</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · DEFAULT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · default</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-line">
+            <div class="ch-deva">अर्जुनविषादयोग</div>
+            <div class="ch-num">CH 1 · BG</div>
+          </div>
+          <div class="ch-en">The Yoga of Arjuna's Grief</div>
+          <div class="ch-progress">
+            <div class="ch-progress-fill" style="width: 2.1%;"></div>
+          </div>
+          <div class="ch-progress-meta">
+            <span><span class="saffron">1</span>&nbsp; of 47 read</span>
+            <span>2%</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="resume-anchor">
+            <div class="resume-anchor-body">
+              <div class="resume-anchor-label">Continue</div>
+              <div class="resume-anchor-text">सञ्जय उवाच ।</div>
+              <div class="resume-anchor-meta">Verse 2 — next unread</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color: var(--l-saffron); opacity:0.7;">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="verses-section">
+            <div class="verses-label">All verses</div>
+
+            <div class="verse-row read bookmarked">
+              <div class="verse-mark">‖१‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">धृतराष्ट्र उवाच । धर्मक्षेत्रे कुरुक्षेत्रे...</div>
+                <div class="verse-en">Dhṛtarāṣṭra said: O Sañjaya, what did my sons...</div>
+              </div>
+              <div class="verse-state">
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="currentColor">
+                  <path d="M0 0h11v14l-5.5-3.5L0 14V0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖२‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">सञ्जय उवाच ।</div>
+                <div class="verse-en">Sañjaya said: Having seen the army of the Pāṇḍavas...</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖३‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">पश्यैतां पाण्डुपुत्राणामाचार्य महतीं...</div>
+                <div class="verse-en">"Behold, O Teacher! this mighty army of the sons of Pāṇḍu..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अत्र शूरा महेष्वासा भीमार्जुनसमा युधि ।</div>
+                <div class="verse-en">"Here are heroes, mighty archers, equal in battle to Bhīma..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖५‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">धृष्टकेतुश्चेकितानः काशिराजश्च...</div>
+                <div class="verse-en">"Dhṛṣṭaketu, Cekitāna, and the valiant king of Kāśī..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖६‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">युधामन्युश्च विक्रान्त उत्तमौजाश्च...</div>
+                <div class="verse-en">"The strong Yudhāmanyu and the brave Uttamaujas..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖७‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अस्माकं तु विशिष्टा ये तान्निबोध...</div>
+                <div class="verse-en">"Know also, O best among the twice-born, the names..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖८‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">भवान्भीष्मश्च कर्णश्च कृपश्च...</div>
+                <div class="verse-en">"Thyself and Bhīṣma, and Karṇa, and Kṛpa..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖९‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">अन्ये च बहवः शूरा मदर्थे त्यक्तजीविताः ।</div>
+                <div class="verse-en">"And also many other heroes who have given up their lives..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+          </div>
+
+          <div style="height: 24px;"></div>
+        </div>
+
+        <div class="verse-jumper">
+          <div class="jump active">१</div>
+          <div class="jump">११</div>
+          <div class="jump">२१</div>
+          <div class="jump">३१</div>
+          <div class="jump">४१</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: STATES ==================== -->
+<div class="row">
+
+  <!-- VERSE JUMPER ACTIVE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · jumper active</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-line">
+            <div class="ch-deva">सांख्ययोग</div>
+            <div class="ch-num">CH 2 · BG</div>
+          </div>
+          <div class="ch-en">The Yoga of Knowledge</div>
+          <div class="ch-progress">
+            <div class="ch-progress-fill" style="width: 27.8%;"></div>
+          </div>
+          <div class="ch-progress-meta">
+            <span><span class="saffron">20</span>&nbsp; of 72 read</span>
+            <span>28%</span>
+          </div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="verses-section">
+            <div class="verse-section-header">
+              <span>Verses 41 — 50</span>
+              <span class="deva-num">‖४१–५०‖</span>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४१‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">व्यवसायात्मिका बुद्धिरेकेह कुरुनन्दन ।</div>
+                <div class="verse-en">"In this path, O joy of the Kurus, the resolute intellect..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४२‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">यामिमां पुष्पितां वाचं प्रवदन्त्यविपश्चितः ।</div>
+                <div class="verse-en">"This flowery speech, which the unwise utter..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४३‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">कामात्मानः स्वर्गपरा जन्मकर्मफलप्रदाम् ।</div>
+                <div class="verse-en">"Full of desires, holding heaven as their highest goal..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४४‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">भोगैश्वर्यप्रसक्तानां तयापहृतचेतसाम् ।</div>
+                <div class="verse-en">"For those who are deeply attached to pleasure and power..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४५‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">त्रैगुण्यविषया वेदा निस्त्रैगुण्यो भवार्जुन ।</div>
+                <div class="verse-en">"The Vedas deal with the three guṇas, O Arjuna..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४६‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">यावानर्थ उदपाने सर्वतः सम्प्लुतोदके ।</div>
+                <div class="verse-en">"To the brāhmaṇa who has known the Self, all the Vedas..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४७‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।</div>
+                <div class="verse-en">"Your right is to action alone, never to its fruits..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+            <div class="verse-row">
+              <div class="verse-mark">‖४८‖</div>
+              <div class="verse-body">
+                <div class="verse-sanskrit">योगस्थः कुरु कर्माणि सङ्गं त्यक्त्वा धनञ्जय ।</div>
+                <div class="verse-en">"Perform action, O Dhanañjaya, being steadfast in yoga..."</div>
+              </div>
+              <div class="verse-state"></div>
+            </div>
+
+          </div>
+          <div style="height: 24px;"></div>
+        </div>
+
+        <!-- jumper with active+overlay tooltip showing the dragged position -->
+        <div class="verse-jumper" style="background: rgba(28, 24, 22, 0.85); width: 26px;">
+          <div class="jump">१</div>
+          <div class="jump">११</div>
+          <div class="jump">२१</div>
+          <div class="jump">३१</div>
+          <div class="jump active" style="font-size: 14px;">४१</div>
+          <div class="jump">५१</div>
+          <div class="jump">६१</div>
+          <div class="jump">७२</div>
+        </div>
+
+        <!-- jumper tooltip -->
+        <div style="position:absolute; right: 38px; top: 50%; transform: translateY(-50%); padding: 10px 16px; background: var(--d-saffron); color: #1a1208; border-radius: 4px; font-family: var(--f-deva); font-size: 18px; font-weight: 500; box-shadow: 0 4px 16px rgba(232, 130, 12, 0.4);">
+          ‖४५‖
+          <span style="position:absolute; right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg); width: 10px; height: 10px; background: var(--d-saffron);"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · loading</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ch-header">
+          <div class="ch-line">
+            <div class="ch-deva">अर्जुनविषादयोग</div>
+            <div class="ch-num">CH 1 · BG</div>
+          </div>
+          <div class="ch-en">The Yoga of Arjuna's Grief</div>
+          <div class="ch-progress" style="opacity: 0.4;">
+            <div class="skeleton" style="height: 1.5px; width: 100%; border-radius: 1px;"></div>
+          </div>
+          <div class="ch-progress-meta" style="opacity: 0.4;">
+            <div class="skeleton" style="height: 8px; width: 80px;"></div>
+            <div class="skeleton" style="height: 8px; width: 30px;"></div>
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="verses-section">
+            <div class="verses-label">All verses</div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 90%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 75%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 65%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 80%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 85%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 70%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 80%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 65%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 70%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 85%;"></div>
+              </div>
+            </div>
+
+            <div style="padding: 11px 0; border-bottom: 1px solid var(--d-divider-soft); display: flex; gap: 14px; align-items: flex-start;">
+              <div class="skeleton" style="width: 38px; height: 14px; flex-shrink: 0;"></div>
+              <div style="flex: 1;">
+                <div class="skeleton" style="height: 13px; width: 75%; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="height: 10px; width: 70%;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Daṇḍa-marked verse numbers (‖१‖, ‖२‖...).</b> The double-vertical-bar is the verse-end mark in every Sanskrit manuscript — using it as the verse-number container is functional, not decorative. Instantly recognizable to Sanskrit readers; quietly distinctive to everyone else.</li>
+    <li><b>Sanskrit incipit dominates the row, English helps recognition.</b> Reversed the previous hierarchy — Sanskrit is primary (where the verse <em>lives</em>), English is the recognition aid in italic serif underneath.</li>
+    <li><b>Compact two-line chapter header instead of the previous 100px-tall block.</b> Sanskrit chapter title + chapter number (right-aligned) on line 1, English subtitle on line 2, hairline progress beneath. Fits in &lt;90px including padding.</li>
+    <li><b>Resume anchor surfaces the next unread verse.</b> Same saffron leaf-thread treatment as Chapter List for system continuity. Shows the actual verse incipit, not just "verse 2."</li>
+    <li><b>Verse jumper for long chapters.</b> Sticky right-edge column with Devanāgarī decade markers (१, ११, २१, ३१...). Drag to scroll, with a saffron tooltip showing the verse you're hovering at. Like iOS Contacts alpha-scroll, but with verse decades. Essential for the Mahābhārata's 300-verse chapters.</li>
+    <li><b>Sub-section headers ("Verses 11—20 · Sāṅkhya Begins").</b> For very long chapters, breaks the list into traditional verse-decade sections. Editor-curated section labels add literary navigation: "where does the philosophy actually start?"</li>
+    <li><b>Removed the bookmark icon column entirely.</b> Empty bookmark icons next to 46 unbookmarked verses were pure noise. Now: bookmarked verses show a small saffron bookmark; everything else shows nothing. The state of "not bookmarked" doesn't need a UI element.</li>
+    <li><b>Three glance-level states: read / unread / bookmarked.</b> Read verses get a small saffron checkmark and slightly de-emphasized type. Bookmarked verses get a saffron bookmark icon. Unread is the default — no marker. Three states, one column.</li>
+    <li><b>Density increased.</b> Verse rows compress to ~58px (vs ~70px on Chapter List). Users scanning 47 or 300 verses need density; users scanning 18 chapters can afford breathing room.</li>
+  </ul>
+</div>
+
+</body>
+</html>
