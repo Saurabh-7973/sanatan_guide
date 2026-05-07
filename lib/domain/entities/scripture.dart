@@ -123,6 +123,82 @@ extension ScriptureX on Scripture {
         Scripture.mahanirvana => 'Mahanirvana Tantra',
       };
 
+  /// Two- or three-letter abbreviation used in compact chapter/verse-list
+  /// headers (e.g. `BG 1`, `MB 6.25`). Mirrors how scriptures are cited in
+  /// scholarly editions.
+  String get shortCode => switch (this) {
+        Scripture.bhagavadGita => 'BG',
+        Scripture.rigveda => 'RV',
+        Scripture.samaveda => 'SV',
+        Scripture.yajurveda => 'YV',
+        Scripture.atharvaveda => 'AV',
+        Scripture.ishaUpanishad => 'IśU',
+        Scripture.kenaUpanishad => 'KeU',
+        Scripture.kathaUpanishad => 'KaU',
+        Scripture.prasnaUpanishad => 'PrU',
+        Scripture.mundakaUpanishad => 'MuU',
+        Scripture.mandukyaUpanishad => 'MāU',
+        Scripture.taittiriyaUpanishad => 'TaU',
+        Scripture.aitareyaUpanishad => 'AiU',
+        Scripture.chandogyaUpanishad => 'ChU',
+        Scripture.brihadaranyakaUpanishad => 'BĀU',
+        Scripture.shvetashvataraUpanishad => 'ŚvU',
+        Scripture.kaushitakiUpanishad => 'KauU',
+        Scripture.maitrayaniUpanishad => 'MaiU',
+        Scripture.yogaSutras => 'YS',
+        Scripture.brahmasutras => 'BS',
+        Scripture.hathaYogaPradipika => 'HYP',
+        Scripture.ramayana => 'Rām',
+        Scripture.mahabharata => 'Mbh',
+        Scripture.vishnuPurana => 'ViP',
+        Scripture.deviBhagavataPurana => 'DBhP',
+        Scripture.bhagavataPurana => 'BhP',
+        Scripture.markandeya => 'MkP',
+        Scripture.vishnuSahasranama => 'VSN',
+        Scripture.arthashastra => 'AŚ',
+        Scripture.tirukkural => 'TK',
+        Scripture.manusmriti => 'Manu',
+        Scripture.mahanirvana => 'MNT',
+      };
+
+  /// The label for a single navigable unit beneath this scripture, in
+  /// display-ready English plural form. Used as the section header above
+  /// chapter rows ("ALL CHAPTERS", "ALL CANTOS", etc.).
+  String get unitLabel => switch (this) {
+        Scripture.rigveda || Scripture.atharvaveda => 'maṇḍalas',
+        Scripture.samaveda || Scripture.yajurveda => 'kāṇḍas',
+        Scripture.bhagavataPurana ||
+        Scripture.deviBhagavataPurana ||
+        Scripture.markandeya ||
+        Scripture.vishnuPurana =>
+          'cantos',
+        Scripture.yogaSutras => 'pādas',
+        Scripture.hathaYogaPradipika => 'upadeśas',
+        Scripture.manusmriti => 'adhyāyas',
+        Scripture.brahmasutras => 'adhyāyas',
+        Scripture.mahabharata => 'parvas',
+        Scripture.ramayana => 'kāṇḍas',
+        _ => 'chapters',
+      };
+
+  /// The two-letter code prefix for a single navigable unit. Used in the
+  /// per-row Arabic fallback ("CH 1", "MD 1", "SK 1", etc.).
+  String get unitCode => switch (this) {
+        Scripture.rigveda || Scripture.atharvaveda => 'MD',
+        Scripture.samaveda || Scripture.yajurveda => 'KN',
+        Scripture.bhagavataPurana ||
+        Scripture.deviBhagavataPurana ||
+        Scripture.markandeya ||
+        Scripture.vishnuPurana =>
+          'SK',
+        Scripture.yogaSutras => 'PD',
+        Scripture.hathaYogaPradipika => 'UP',
+        Scripture.manusmriti || Scripture.brahmasutras => 'AD',
+        Scripture.mahabharata => 'PV',
+        Scripture.ramayana => 'KN',
+        _ => 'CH',
+      };
+
   static Scripture fromCode(String code) {
     return Scripture.values.firstWhere(
       (s) => s.code == code,
