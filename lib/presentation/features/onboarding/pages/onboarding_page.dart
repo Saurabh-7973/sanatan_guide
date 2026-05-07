@@ -355,39 +355,35 @@ class _ReminderStepState extends State<_ReminderStep> {
               border: Border.all(color: divider, width: 1),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'REMIND ME AT',
                   style: AppText.sectionLabel(color: text3),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: Spacing.md),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: _pickTime,
-                      child: Text(
-                        '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
-                        style: TextStyle(
-                          fontFamily: Fonts.serif,
-                          fontSize: 38,
-                          fontWeight: FontWeight.w500,
-                          height: 1,
-                          color: saffron,
-                        ),
-                      ),
+                GestureDetector(
+                  onTap: _pickTime,
+                  child: Text(
+                    '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(
+                      fontFamily: Fonts.serif,
+                      fontSize: 56,
+                      fontWeight: FontWeight.w500,
+                      height: 1,
+                      color: saffron,
                     ),
-                    const Spacer(),
-                    _PeriodToggle(
-                      isAm: _isAm,
-                      isDark: isDark,
-                      surface2: surface2,
-                      saffron: saffron,
-                      text3: text3,
-                      onChanged: _setPeriod,
-                    ),
-                  ],
+                  ),
+                ),
+                const SizedBox(height: Spacing.lg),
+                _PeriodToggle(
+                  isAm: _isAm,
+                  isDark: isDark,
+                  surface2: surface2,
+                  saffron: saffron,
+                  text3: text3,
+                  onChanged: _setPeriod,
                 ),
               ],
             ),

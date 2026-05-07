@@ -67,28 +67,36 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 destinations: [
                   NavigationDestination(
                     icon: _NavIcon(
-                      painter: _SunriseIconPainter(color: iconColor(0)),
+                      painter: _SunRaysIconPainter(color: iconColor(0)),
                     ),
                     selectedIcon: const _NavIcon(
-                      painter: _SunriseIconPainter(color: AppColors.saffron),
+                      painter: _SunRaysIconPainter(color: AppColors.saffron),
                     ),
                     label: 'Today',
                   ),
                   NavigationDestination(
-                    icon: _NavIcon(
-                      painter: _LotusIconPainter(color: iconColor(1)),
+                    icon: Icon(
+                      Icons.location_on_outlined,
+                      size: 22,
+                      color: iconColor(1),
                     ),
-                    selectedIcon: const _NavIcon(
-                      painter: _LotusIconPainter(color: AppColors.saffron),
+                    selectedIcon: const Icon(
+                      Icons.location_on,
+                      size: 22,
+                      color: AppColors.saffron,
                     ),
                     label: 'Practice',
                   ),
                   NavigationDestination(
-                    icon: _NavIcon(
-                      painter: _ScrollIconPainter(color: iconColor(2)),
+                    icon: Icon(
+                      Icons.menu_book_outlined,
+                      size: 22,
+                      color: iconColor(2),
                     ),
-                    selectedIcon: const _NavIcon(
-                      painter: _ScrollIconPainter(color: AppColors.saffron),
+                    selectedIcon: const Icon(
+                      Icons.menu_book_rounded,
+                      size: 22,
+                      color: AppColors.saffron,
                     ),
                     label: 'Texts',
                   ),
@@ -117,149 +125,53 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-// ── Today — sunrise arc ───────────────────────────────────────────────────
-// Horizon line + semicircle arc above it + 3 short rays
+// ── Today — sun with downward rays ───────────────────────────────────────
+// Top half-disc (filled) + 5 short rays radiating down/sideways
 
-class _SunriseIconPainter extends CustomPainter {
-  const _SunriseIconPainter({required this.color});
+class _SunRaysIconPainter extends CustomPainter {
+  const _SunRaysIconPainter({required this.color});
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()
+    final stroke = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round;
+    final fill = Paint()..color = color;
 
     final cx = size.width / 2;
-    final baseY = size.height * 0.62;
+    final baseY = size.height * 0.55;
+    const r = 4.5;
 
-    // Horizon line
-    canvas.drawLine(Offset(cx - 9, baseY), Offset(cx + 9, baseY), p);
-
-    // Sunrise semicircle
+    // Filled half-disc (sun above horizon)
     canvas.drawArc(
-      Rect.fromCircle(center: Offset(cx, baseY), radius: 5.5),
+      Rect.fromCircle(center: Offset(cx, baseY), radius: r),
       math.pi,
       math.pi,
-      false,
-      p,
+      true,
+      fill,
     );
 
-    // Three rays: left / top / right
-    const rayLen = 2.8;
-    const rayGap = 1.6;
-    const r = 5.5;
-    for (final angle in [math.pi * 0.75, math.pi * 0.5, math.pi * 0.25]) {
+    // 5 downward rays — fan at 30°, 60°, 90°, 120°, 150° (below horizon)
+    const rayGap = 2.2;
+    const rayLen = 3.4;
+    for (final deg in [30.0, 60.0, 90.0, 120.0, 150.0]) {
+      final ang = deg * math.pi / 180;
       final start = Offset(
-        cx + (r + rayGap) * math.cos(angle),
-        baseY + (r + rayGap) * math.sin(angle),
+        cx + (r + rayGap) * math.cos(ang),
+        baseY + (r + rayGap) * math.sin(ang),
       );
       final end = Offset(
-        cx + (r + rayGap + rayLen) * math.cos(angle),
-        baseY + (r + rayGap + rayLen) * math.sin(angle),
+        cx + (r + rayGap + rayLen) * math.cos(ang),
+        baseY + (r + rayGap + rayLen) * math.sin(ang),
       );
-      canvas.drawLine(start, end, p);
+      canvas.drawLine(start, end, stroke);
     }
   }
 
   @override
-  bool shouldRepaint(_SunriseIconPainter old) => old.color != color;
+  bool shouldRepaint(_SunRaysIconPainter old) => old.color != color;
 }
 
-// ── Practice — lotus silhouette ───────────────────────────────────────────
-// Three upward petal arcs emanating from a common base
-
-class _LotusIconPainter extends CustomPainter {
-  const _LotusIconPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
-      ..strokeCap = StrokeCap.round;
-
-    final cx = size.width / 2;
-    final cy = size.height * 0.56;
-
-    // Centre petal — tall arc straight up
-    final centerPath = Path()
-      ..moveTo(cx, cy)
-      ..cubicTo(cx - 4, cy - 9, cx + 4, cy - 9, cx, cy);
-    canvas.drawPath(centerPath, p);
-
-    // Left petal — arc opening left-up
-    final leftPath = Path()
-      ..moveTo(cx, cy)
-      ..cubicTo(cx - 8, cy - 7, cx - 9, cy - 1, cx, cy);
-    canvas.drawPath(leftPath, p);
-
-    // Right petal — mirror of left
-    final rightPath = Path()
-      ..moveTo(cx, cy)
-      ..cubicTo(cx + 8, cy - 7, cx + 9, cy - 1, cx, cy);
-    canvas.drawPath(rightPath, p);
-
-    // Stem base line
-    canvas.drawLine(
-      Offset(cx - 8, cy + 1),
-      Offset(cx + 8, cy + 1),
-      p,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_LotusIconPainter old) => old.color != color;
-}
-
-// ── Texts — open scroll ───────────────────────────────────────────────────
-// Rectangle with vertical spine + three text-lines on left half
-
-class _ScrollIconPainter extends CustomPainter {
-  const _ScrollIconPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
-      ..strokeCap = StrokeCap.round;
-
-    final cx = size.width / 2;
-    final top = size.height * 0.2;
-    final bottom = size.height * 0.82;
-    final left = cx - 8.5;
-    final right = cx + 8.5;
-
-    // Outer rectangle
-    final rrect = RRect.fromRectAndRadius(
-      Rect.fromLTRB(left, top, right, bottom),
-      const Radius.circular(2),
-    );
-    canvas.drawRRect(rrect, p);
-
-    // Vertical spine
-    canvas.drawLine(Offset(cx, top), Offset(cx, bottom), p);
-
-    // Three text lines on right half
-    final lineColor = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..strokeCap = StrokeCap.round;
-
-    final midH = (bottom - top) / 2 + top;
-    for (final y in [midH - 4.0, midH, midH + 4.0]) {
-      canvas.drawLine(Offset(cx + 2.5, y), Offset(right - 2.5, y), lineColor);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ScrollIconPainter old) => old.color != color;
-}
