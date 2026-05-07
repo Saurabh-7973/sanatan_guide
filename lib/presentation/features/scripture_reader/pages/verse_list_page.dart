@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -683,7 +684,7 @@ class _VerseStateGlyph extends StatelessWidget {
 // Verse jumper (sticky right)
 // ─────────────────────────────────────────────────────────────────────────
 
-class _VerseJumper extends StatelessWidget {
+class _VerseJumper extends StatefulWidget {
   const _VerseJumper({
     required this.verseCount,
     required this.isDark,
@@ -694,9 +695,16 @@ class _VerseJumper extends StatelessWidget {
   final bool isDark;
   final void Function(int verseNum) onTap;
 
+  @override
+  State<_VerseJumper> createState() => _VerseJumperState();
+}
+
+class _VerseJumperState extends State<_VerseJumper> {
+  int? _activeIndex;
+
   int get _step {
-    if (verseCount >= 500) return 50;
-    if (verseCount >= 200) return 20;
+    if (widget.verseCount >= 500) return 50;
+    if (widget.verseCount >= 200) return 20;
     return 10;
   }
 
@@ -704,49 +712,67 @@ class _VerseJumper extends StatelessWidget {
     final step = _step;
     final raw = <int>[1];
     var n = step;
-    while (n <= verseCount && raw.length < 8) {
+    while (n <= widget.verseCount && raw.length < 8) {
       raw.add(n);
       n += step;
     }
     return raw;
   }
 
+  void _hit(double localY, double height, List<int> markers) {
+    if (markers.isEmpty) return;
+    final clamped = localY.clamp(0.0, height);
+    final ratio = height > 0 ? clamped / height : 0.0;
+    final idx = (ratio * markers.length).floor().clamp(0, markers.length - 1);
+    if (idx != _activeIndex) {
+      setState(() => _activeIndex = idx);
+      widget.onTap(markers[idx]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final surface = isDark
+    final surface = widget.isDark
         ? DColors.surface.withValues(alpha: 0.6)
         : LColors.surface.withValues(alpha: 0.85);
-    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final text3 = widget.isDark ? DColors.text3 : LColors.text3;
+    final saffron = widget.isDark ? DColors.saffron : LColors.saffron;
     final markers = _markers;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: BackdropOverlay(
-        color: surface,
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
           width: 22,
+          color: surface,
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (final n in markers)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onTap(n),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Text(
-                      arabicToDevanagari(n),
-                      style: TextStyle(
-                        fontFamily: Fonts.deva,
-                        fontSize: 11,
-                        height: 1,
-                        color: text3,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragStart: (d) =>
+                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
+                onVerticalDragUpdate: (d) =>
+                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
+                onVerticalDragEnd: (_) =>
+                    setState(() => _activeIndex = null),
+                onTapDown: (d) =>
+                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    for (var i = 0; i < markers.length; i++)
+                      _JumperLabel(
+                        text: arabicToDevanagari(markers[i]),
+                        active: _activeIndex == i,
+                        activeColor: saffron,
+                        idleColor: text3,
                       ),
-                    ),
-                  ),
+                  ],
                 ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -754,16 +780,38 @@ class _VerseJumper extends StatelessWidget {
   }
 }
 
-class BackdropOverlay extends StatelessWidget {
-  const BackdropOverlay({super.key, required this.color, required this.child});
-  final Color color;
-  final Widget child;
+class _JumperLabel extends StatelessWidget {
+  const _JumperLabel({
+    required this.text,
+    required this.active,
+    required this.activeColor,
+    required this.idleColor,
+  });
+
+  final String text;
+  final bool active;
+  final Color activeColor;
+  final Color idleColor;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(color: color),
-      child: child,
+    return AnimatedScale(
+      scale: active ? 1.2 : 1.0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontFamily: Fonts.deva,
+            fontSize: 11,
+            height: 1,
+            fontWeight: active ? FontWeight.w500 : FontWeight.w400,
+            color: active ? activeColor : idleColor,
+          ),
+        ),
+      ),
     );
   }
 }
