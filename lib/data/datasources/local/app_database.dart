@@ -147,6 +147,21 @@ Future<QueryExecutor> openAppDatabaseConnection() async {
   final dbFolder = await getApplicationDocumentsDirectory();
   final dbFile = File(path.join(dbFolder.path, 'sanatan_guide.db'));
 
+  // Size sentinel: bundled DB is ~65 MB. Anything < 1 MB is a stale/empty
+  // remnant from a previously failed extract — wipe + re-extract.
+  const minViableBytes = 1 * 1024 * 1024;
+  final exists = dbFile.existsSync();
+  final tooSmall = exists && dbFile.lengthSync() < minViableBytes;
+  if (tooSmall) {
+    AppLogger.instance.w(
+      'Runtime DB at ${dbFile.path} is ${dbFile.lengthSync()} bytes — '
+      'treating as stale and re-extracting from bundled .gz.',
+    );
+    try {
+      await dbFile.delete();
+    } catch (_) {}
+  }
+
   if (!dbFile.existsSync()) {
     try {
       final compressed = await rootBundle.load('assets/db/sanatan_guide.db.gz');

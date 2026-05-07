@@ -55,12 +55,19 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     return '$reversed,$last3';
   }
 
-  static int _totalVerses() => _kFamilies
-      .expand((f) => f.scriptures)
-      .fold(0, (sum, s) => sum + s.verseCount);
+  static int _totalVerses() {
+    final fromFamilies = _kFamilies
+        .expand((f) => f.scriptures)
+        .fold(0, (sum, s) => sum + s.verseCount);
+    final fromVedas = _kVedas.fold(0, (sum, s) => sum + s.verseCount);
+    return fromFamilies + fromVedas + _kMukhyaUpanishads.verseCount;
+  }
 
-  static int _totalScriptures() =>
-      _kFamilies.fold(0, (sum, f) => sum + f.scriptures.length);
+  static int _totalScriptures() {
+    final fromFamilies =
+        _kFamilies.fold(0, (sum, f) => sum + f.scriptures.length);
+    return fromFamilies + _kVedas.length + 1;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -388,7 +395,6 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          color: bgTint,
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 14),
           decoration: BoxDecoration(
             color: bgTint,
