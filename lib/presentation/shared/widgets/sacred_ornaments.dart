@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 
 /// Pure-paint ornaments rooted in Hindu manuscript / temple geometry.
@@ -170,8 +171,8 @@ class _ToranaPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final strokeAlpha = isDark ? 0.55 : 0.30;
-    final fillAlpha   = isDark ? 0.85 : 0.55;
-    final curlAlpha   = isDark ? 0.42 : 0.22;
+    final fillAlpha = isDark ? 0.85 : 0.55;
+    final curlAlpha = isDark ? 0.42 : 0.22;
 
     final stroke = Paint()
       ..style = PaintingStyle.stroke
@@ -315,9 +316,9 @@ class _VinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final ruleAlpha  = isDark ? 0.40 : 0.30;
+    final ruleAlpha = isDark ? 0.40 : 0.30;
     final petalAlpha = isDark ? 0.70 : 0.55;
-    final dotAlpha   = isDark ? 0.75 : 0.60;
+    final dotAlpha = isDark ? 0.75 : 0.60;
 
     final cy = size.height / 2;
     final cx = size.width / 2;
@@ -340,13 +341,15 @@ class _VinePainter extends CustomPainter {
 
     const rosetteR = 6.0;
     canvas.drawLine(Offset(0, cy), Offset(cx - rosetteR - 8, cy), rule);
-    canvas.drawLine(Offset(cx + rosetteR + 8, cy), Offset(size.width, cy), rule);
+    canvas.drawLine(
+        Offset(cx + rosetteR + 8, cy), Offset(size.width, cy), rule);
     canvas.drawCircle(Offset(0, cy), 1.2, dot);
     canvas.drawCircle(Offset(size.width, cy), 1.2, dot);
 
     for (var i = 0; i < 4; i++) {
       final a = i * math.pi / 2;
-      final tip = Offset(cx + math.cos(a) * rosetteR, cy + math.sin(a) * rosetteR);
+      final tip =
+          Offset(cx + math.cos(a) * rosetteR, cy + math.sin(a) * rosetteR);
       final n = Offset(-math.sin(a), math.cos(a));
       final ctrl1 = Offset(cx, cy) + n * (rosetteR * 0.6);
       final ctrl2 = Offset(cx, cy) - n * (rosetteR * 0.6);
@@ -476,137 +479,94 @@ class _JaaliPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _JaaliPainter old) =>
-      old.color != color ||
-      old.baseOpacity != baseOpacity ||
-      old.cell != cell;
+      old.color != color || old.baseOpacity != baseOpacity || old.cell != cell;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  LotusMedallion
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Circular badge with eight stroke petals around a deep-red bindu and a
-/// numeric label. Replaces flat verse-number chips. Use for chapter/verse
-/// reference markers on hero cards or section heads.
+/// Lotus seal — small page-opener ornament marking the start of a verse.
+/// Pure app palette (saffron / deep-red / gold / cream): 8 lotus petals
+/// with 5-stop gradient, 8 saffron accent petals between, gold inner band
+/// with 8 dots, and a deep-red bindu at centre. Hand-tuned SVG designed
+/// to read cleanly at 64px. When [label] is provided it is overlaid on a
+/// small cream disc covering the bindu; when omitted the raw seal shows.
 class LotusMedallion extends StatelessWidget {
   const LotusMedallion({
     super.key,
-    required this.label,
-    this.size = 44,
+    this.label,
+    this.size = 64,
   });
 
-  final String label;
+  final String? label;
   final double size;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final petalColor = isDark ? AppColors.saffronOnDark : AppColors.saffron;
-    const centerColor = AppColors.deepRed;
+    final art = SvgPicture.asset(
+      'assets/ornaments/lotus_seal.svg',
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+    );
+    final hasLabel = label != null && label!.isNotEmpty;
+    final discSize = size * 0.32;
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(
-            size: Size.square(size),
-            painter: _LotusPainter(
-              petalColor: petalColor,
-              centerColor: centerColor,
+          if (isDark)
+            ColorFiltered(
+              colorFilter: const ColorFilter.matrix(<double>[
+                0.95, 0, 0, 0, 0,
+                0, 0.90, 0, 0, 0,
+                0, 0, 0.82, 0, 0,
+                0, 0, 0, 1, 0,
+              ]),
+              child: art,
+            )
+          else
+            art,
+          if (hasLabel)
+            Container(
+              width: discSize,
+              height: discSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: isDark
+                      ? const [
+                          AppColors.surfaceElevated,
+                          AppColors.surfaceDark,
+                        ]
+                      : const [AppColors.cream, AppColors.surfaceVariant],
+                ),
+                border: Border.all(
+                  color: AppColors.deepRed.withValues(alpha: 0.6),
+                  width: 1.0,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                label!,
+                style: TextStyle(
+                  fontSize: size * 0.18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.deepRed,
+                  height: 1.0,
+                  letterSpacing: 0.2,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: size * 0.32,
-              fontWeight: FontWeight.w700,
-              color: centerColor,
-              height: 1.0,
-              letterSpacing: 0.2,
-            ),
-          ),
         ],
       ),
     );
   }
-}
-
-class _LotusPainter extends CustomPainter {
-  _LotusPainter({required this.petalColor, required this.centerColor});
-
-  final Color petalColor;
-  final Color centerColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = math.min(size.width, size.height) / 2;
-
-    final petal = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.9
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..color = petalColor.withValues(alpha: 0.85);
-
-    final ring = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.7
-      ..color = petalColor.withValues(alpha: 0.55);
-
-    final centerFill = Paint()
-      ..style = PaintingStyle.fill
-      ..color = centerColor.withValues(alpha: 0.12);
-
-    // Outer + inner rings
-    canvas.drawCircle(c, r * 0.96, ring);
-    canvas.drawCircle(c, r * 0.78, ring);
-    // Centre disc fill (deep-red wash)
-    canvas.drawCircle(c, r * 0.78, centerFill);
-
-    // 8 petals between r*0.78 and r*0.96 — alternate orientations
-    const petals = 8;
-    final petalLen = r * 0.18;
-    final petalBase = r * 0.78;
-    for (var i = 0; i < petals; i++) {
-      final a = (math.pi * 2 / petals) * i - math.pi / 2;
-      final dir = Offset(math.cos(a), math.sin(a));
-      final n = Offset(-dir.dy, dir.dx);
-      final base = c + dir * petalBase;
-      final tip = c + dir * (petalBase + petalLen);
-      final w = petalLen * 0.45;
-      final path = Path()
-        ..moveTo(base.dx, base.dy)
-        ..quadraticBezierTo(
-          (base + n * w).dx,
-          (base + n * w).dy,
-          tip.dx,
-          tip.dy,
-        )
-        ..quadraticBezierTo(
-          (base - n * w).dx,
-          (base - n * w).dy,
-          base.dx,
-          base.dy,
-        );
-      canvas.drawPath(path, petal);
-    }
-
-    // Tiny dots between petals (inner ring)
-    final dot = Paint()
-      ..style = PaintingStyle.fill
-      ..color = petalColor.withValues(alpha: 0.7);
-    for (var i = 0; i < petals; i++) {
-      final a = (math.pi * 2 / petals) * i + math.pi / petals - math.pi / 2;
-      final p = c + Offset(math.cos(a), math.sin(a)) * (r * 0.87);
-      canvas.drawCircle(p, 0.9, dot);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _LotusPainter old) =>
-      old.petalColor != petalColor || old.centerColor != centerColor;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -652,7 +612,7 @@ class _KalashPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final strokeAlpha = isDark ? 0.65 : 0.45;
-    final fillAlpha   = isDark ? 0.85 : 0.65;
+    final fillAlpha = isDark ? 0.85 : 0.65;
 
     final stroke = Paint()
       ..style = PaintingStyle.stroke
@@ -840,7 +800,8 @@ class _GangaWavePainter extends CustomPainter {
     );
 
     // Ghats silhouettes
-    final ghatsColor = isDark ? const Color(0xFF0F0508) : const Color(0xFFD4C4B0);
+    final ghatsColor =
+        isDark ? const Color(0xFF0F0508) : const Color(0xFFD4C4B0);
     final ghatsPaint = Paint()
       ..style = PaintingStyle.fill
       ..color = ghatsColor.withValues(alpha: isDark ? 0.85 : 0.40);
@@ -977,21 +938,26 @@ class _SeedlingPainter extends CustomPainter {
     // Left leaf
     final leftLeaf = Path()
       ..moveTo(cx, h * 0.42)
-      ..cubicTo(cx - w * 0.30, h * 0.30, cx - w * 0.38, h * 0.12, cx - w * 0.12, h * 0.10)
+      ..cubicTo(cx - w * 0.30, h * 0.30, cx - w * 0.38, h * 0.12, cx - w * 0.12,
+          h * 0.10)
       ..cubicTo(cx + w * 0.04, h * 0.10, cx + w * 0.02, h * 0.30, cx, h * 0.42);
     canvas.drawPath(leftLeaf, stroke);
 
     // Right leaf (slightly smaller)
     final rightLeaf = Path()
       ..moveTo(cx, h * 0.42)
-      ..cubicTo(cx + w * 0.26, h * 0.32, cx + w * 0.32, h * 0.16, cx + w * 0.10, h * 0.14)
+      ..cubicTo(cx + w * 0.26, h * 0.32, cx + w * 0.32, h * 0.16, cx + w * 0.10,
+          h * 0.14)
       ..cubicTo(cx - w * 0.02, h * 0.14, cx - w * 0.01, h * 0.32, cx, h * 0.42);
     canvas.drawPath(rightLeaf, strokeFaint);
 
     // Root forks
-    canvas.drawLine(Offset(cx, h * 0.88), Offset(cx - w * 0.18, h), strokeFaint);
-    canvas.drawLine(Offset(cx, h * 0.88), Offset(cx + w * 0.18, h), strokeFaint);
-    canvas.drawLine(Offset(cx, h * 0.92), Offset(cx - w * 0.08, h), strokeFaint);
+    canvas.drawLine(
+        Offset(cx, h * 0.88), Offset(cx - w * 0.18, h), strokeFaint);
+    canvas.drawLine(
+        Offset(cx, h * 0.88), Offset(cx + w * 0.18, h), strokeFaint);
+    canvas.drawLine(
+        Offset(cx, h * 0.92), Offset(cx - w * 0.08, h), strokeFaint);
   }
 
   @override
@@ -1055,7 +1021,8 @@ class _DiyaPainter extends CustomPainter {
     canvas.drawPath(spout, stroke);
 
     // Wick
-    canvas.drawLine(Offset(cx * 0.92, h * 0.58), Offset(cx * 0.92, h * 0.44), stroke);
+    canvas.drawLine(
+        Offset(cx * 0.92, h * 0.58), Offset(cx * 0.92, h * 0.44), stroke);
 
     // Flame (teardrop)
     final flame = Path()
@@ -1124,8 +1091,10 @@ class _ScrollPainter extends CustomPainter {
     canvas.drawRRect(body, stroke);
 
     // Curl lines
-    canvas.drawLine(Offset(w * 0.12, h * 0.20), Offset(w * 0.88, h * 0.20), faint);
-    canvas.drawLine(Offset(w * 0.12, h * 0.80), Offset(w * 0.88, h * 0.80), faint);
+    canvas.drawLine(
+        Offset(w * 0.12, h * 0.20), Offset(w * 0.88, h * 0.20), faint);
+    canvas.drawLine(
+        Offset(w * 0.12, h * 0.80), Offset(w * 0.88, h * 0.80), faint);
 
     // Text lines on scroll
     final lineY = [0.34, 0.46, 0.58, 0.70];
@@ -1194,7 +1163,15 @@ class _PeacockPainter extends CustomPainter {
   final bool tailFolded;
 
   static const _featherAngles = [
-    -65.0, -48.0, -32.0, -16.0, 0.0, 16.0, 32.0, 48.0, 65.0,
+    -65.0,
+    -48.0,
+    -32.0,
+    -16.0,
+    0.0,
+    16.0,
+    32.0,
+    48.0,
+    65.0,
   ];
 
   @override
@@ -1406,9 +1383,12 @@ class _ForestDapplePainter extends CustomPainter {
   final Color color;
 
   static const _circles = [
-    (0.08, 0.08, 0.14, 0.30), (0.85, 0.06, 0.16, 0.25),
-    (0.50, 0.04, 0.10, 0.20), (0.20, 0.85, 0.18, 0.15),
-    (0.80, 0.88, 0.16, 0.15), (0.35, 0.40, 0.22, 0.10),
+    (0.08, 0.08, 0.14, 0.30),
+    (0.85, 0.06, 0.16, 0.25),
+    (0.50, 0.04, 0.10, 0.20),
+    (0.20, 0.85, 0.18, 0.15),
+    (0.80, 0.88, 0.16, 0.15),
+    (0.35, 0.40, 0.22, 0.10),
   ];
 
   @override
@@ -1443,7 +1423,8 @@ class NalandaArchBackdrop extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _NalandaArchPainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _NalandaArchPainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1470,17 +1451,24 @@ class _NalandaArchPainter extends CustomPainter {
       final archPath = Path()
         ..moveTo(cx - spanW * 0.48, h)
         ..cubicTo(
-          cx - spanW * 0.48, h * 0.4,
-          cx - spanW * 0.28, h * 0.05,
-          cx, h * 0.05,
+          cx - spanW * 0.48,
+          h * 0.4,
+          cx - spanW * 0.28,
+          h * 0.05,
+          cx,
+          h * 0.05,
         )
         ..cubicTo(
-          cx + spanW * 0.28, h * 0.05,
-          cx + spanW * 0.48, h * 0.4,
-          cx + spanW * 0.48, h,
+          cx + spanW * 0.28,
+          h * 0.05,
+          cx + spanW * 0.48,
+          h * 0.4,
+          cx + spanW * 0.48,
+          h,
         );
       canvas.drawPath(archPath, stroke);
-      canvas.drawCircle(Offset(cx, h * 0.05), 2.0, stroke..style = PaintingStyle.fill);
+      canvas.drawCircle(
+          Offset(cx, h * 0.05), 2.0, stroke..style = PaintingStyle.fill);
       stroke.style = PaintingStyle.stroke;
     }
 
@@ -1507,7 +1495,8 @@ class PalmLeafBorder extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _PalmLeafBorderPainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _PalmLeafBorderPainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1531,13 +1520,16 @@ class _PalmLeafBorderPainter extends CustomPainter {
 
     const spacing = 16.0;
     for (var x = spacing; x < w; x += spacing) {
-      canvas.drawLine(Offset(x, cy), Offset(x + 6, cy - size.height * 0.4), stroke);
-      canvas.drawLine(Offset(x, cy), Offset(x + 6, cy + size.height * 0.4), stroke);
+      canvas.drawLine(
+          Offset(x, cy), Offset(x + 6, cy - size.height * 0.4), stroke);
+      canvas.drawLine(
+          Offset(x, cy), Offset(x + 6, cy + size.height * 0.4), stroke);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _PalmLeafBorderPainter old) => old.color != color;
+  bool shouldRepaint(covariant _PalmLeafBorderPainter old) =>
+      old.color != color;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1580,13 +1572,17 @@ class _PrasadTrayPainter extends CustomPainter {
       ..color = color.withValues(alpha: 0.35);
 
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, cy + h * 0.10), width: w * 0.80, height: h * 0.22),
+      Rect.fromCenter(
+          center: Offset(cx, cy + h * 0.10), width: w * 0.80, height: h * 0.22),
       stroke,
     );
 
     for (final r in [0.30, 0.45, 0.60]) {
       canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy + h * 0.10), width: w * r, height: h * r * 0.25),
+        Rect.fromCenter(
+            center: Offset(cx, cy + h * 0.10),
+            width: w * r,
+            height: h * r * 0.25),
         faint,
       );
     }
@@ -1604,7 +1600,8 @@ class _PrasadTrayPainter extends CustomPainter {
     }
   }
 
-  void _drawLotus(Canvas canvas, Offset center, double r, Paint stroke, Paint faint) {
+  void _drawLotus(
+      Canvas canvas, Offset center, double r, Paint stroke, Paint faint) {
     for (var i = 0; i < 6; i++) {
       final angle = i * math.pi / 3;
       final tipDir = Offset(math.cos(angle), math.sin(angle));
@@ -1613,12 +1610,16 @@ class _PrasadTrayPainter extends CustomPainter {
       final path = Path()
         ..moveTo(center.dx, center.dy)
         ..quadraticBezierTo(
-          (center + n * (r * 0.55)).dx, (center + n * (r * 0.55)).dy,
-          tip.dx, tip.dy,
+          (center + n * (r * 0.55)).dx,
+          (center + n * (r * 0.55)).dy,
+          tip.dx,
+          tip.dy,
         )
         ..quadraticBezierTo(
-          (center - n * (r * 0.55)).dx, (center - n * (r * 0.55)).dy,
-          center.dx, center.dy,
+          (center - n * (r * 0.55)).dx,
+          (center - n * (r * 0.55)).dy,
+          center.dx,
+          center.dy,
         );
       canvas.drawPath(path, faint);
     }
@@ -1698,7 +1699,8 @@ class TempleStaircaseBackdrop extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _TempleStaircasePainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _TempleStaircasePainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1725,13 +1727,16 @@ class _TempleStaircasePainter extends CustomPainter {
     for (var i = 0; i < steps; i++) {
       final x = i * stepW;
       final y = h - (i + 1) * stepH;
-      canvas.drawLine(Offset(x, y + stepH), Offset(x + stepW, y + stepH), stroke);
-      canvas.drawLine(Offset(x + stepW, y + stepH), Offset(x + stepW, y), stroke);
+      canvas.drawLine(
+          Offset(x, y + stepH), Offset(x + stepW, y + stepH), stroke);
+      canvas.drawLine(
+          Offset(x + stepW, y + stepH), Offset(x + stepW, y), stroke);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _TempleStaircasePainter old) => old.isDark != isDark;
+  bool shouldRepaint(covariant _TempleStaircasePainter old) =>
+      old.isDark != isDark;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1746,7 +1751,8 @@ class PeepalTreeBackdrop extends StatelessWidget {
     final color = isDark ? AppColors.saffronOnDark : AppColors.saffron;
     return IgnorePointer(
       child: SizedBox.expand(
-        child: CustomPaint(painter: _PeepalTreePainter(color: color, isDark: isDark)),
+        child: CustomPaint(
+            painter: _PeepalTreePainter(color: color, isDark: isDark)),
       ),
     );
   }
@@ -1778,8 +1784,10 @@ class _PeepalTreePainter extends CustomPainter {
     );
 
     final branches = [
-      (0.50, 0.55, 0.28, 0.32), (0.50, 0.55, 0.72, 0.32),
-      (0.50, 0.55, 0.50, 0.30), (0.28, 0.32, 0.16, 0.14),
+      (0.50, 0.55, 0.28, 0.32),
+      (0.50, 0.55, 0.72, 0.32),
+      (0.50, 0.55, 0.50, 0.30),
+      (0.28, 0.32, 0.16, 0.14),
       (0.72, 0.32, 0.84, 0.14),
     ];
     stroke.strokeWidth = 0.8;
@@ -1788,13 +1796,20 @@ class _PeepalTreePainter extends CustomPainter {
     }
 
     final leafPositions = [
-      (0.50, 0.20), (0.30, 0.18), (0.70, 0.18), (0.20, 0.26),
-      (0.80, 0.26), (0.40, 0.12), (0.60, 0.12), (0.50, 0.08),
+      (0.50, 0.20),
+      (0.30, 0.18),
+      (0.70, 0.18),
+      (0.20, 0.26),
+      (0.80, 0.26),
+      (0.40, 0.12),
+      (0.60, 0.12),
+      (0.50, 0.08),
     ];
     for (final (fx, fy) in leafPositions) {
       final lc = Offset(w * fx, h * fy);
       final lr = w * 0.042;
-      canvas.drawOval(Rect.fromCenter(center: lc, width: lr * 2, height: lr * 2.6), fill);
+      canvas.drawOval(
+          Rect.fromCenter(center: lc, width: lr * 2, height: lr * 2.6), fill);
       final tipPath = Path()
         ..moveTo(lc.dx - lr * 0.3, lc.dy + lr * 1.1)
         ..lineTo(lc.dx, lc.dy + lr * 1.8)
@@ -1821,7 +1836,8 @@ class DhyanaAsanaBackdrop extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _DhyanaAsanaPainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _DhyanaAsanaPainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1845,13 +1861,16 @@ class _DhyanaAsanaPainter extends CustomPainter {
     final cx = w * 0.50;
 
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, h * 0.78), width: w * 0.30, height: h * 0.16),
+      Rect.fromCenter(
+          center: Offset(cx, h * 0.78), width: w * 0.30, height: h * 0.16),
       stroke,
     );
     canvas.drawLine(Offset(cx, h * 0.70), Offset(cx, h * 0.36), stroke);
     canvas.drawCircle(Offset(cx, h * 0.26), h * 0.11, stroke);
-    canvas.drawLine(Offset(cx, h * 0.58), Offset(cx - w * 0.10, h * 0.72), stroke);
-    canvas.drawLine(Offset(cx, h * 0.58), Offset(cx + w * 0.10, h * 0.72), stroke);
+    canvas.drawLine(
+        Offset(cx, h * 0.58), Offset(cx - w * 0.10, h * 0.72), stroke);
+    canvas.drawLine(
+        Offset(cx, h * 0.58), Offset(cx + w * 0.10, h * 0.72), stroke);
 
     final smokeX = cx - w * 0.20;
     for (var i = 0; i < 3; i++) {
@@ -1859,14 +1878,20 @@ class _DhyanaAsanaPainter extends CustomPainter {
       final smokePath = Path()
         ..moveTo(smokeX + xOff, h * 0.90)
         ..cubicTo(
-          smokeX + xOff - w * 0.02, h * 0.75,
-          smokeX + xOff + w * 0.03, h * 0.60,
-          smokeX + xOff, h * 0.45,
+          smokeX + xOff - w * 0.02,
+          h * 0.75,
+          smokeX + xOff + w * 0.03,
+          h * 0.60,
+          smokeX + xOff,
+          h * 0.45,
         )
         ..cubicTo(
-          smokeX + xOff - w * 0.03, h * 0.30,
-          smokeX + xOff + w * 0.02, h * 0.15,
-          smokeX + xOff, h * 0.02,
+          smokeX + xOff - w * 0.03,
+          h * 0.30,
+          smokeX + xOff + w * 0.02,
+          h * 0.15,
+          smokeX + xOff,
+          h * 0.02,
         );
       canvas.drawPath(
         smokePath,
@@ -1893,7 +1918,8 @@ class OilLampRowDivider extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 28,
-      child: CustomPaint(painter: _OilLampRowPainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _OilLampRowPainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1913,8 +1939,10 @@ class _OilLampRowPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = color.withValues(alpha: alpha);
 
-    canvas.drawLine(Offset(0, size.height / 2), Offset(w * 0.30, size.height / 2), stroke);
-    canvas.drawLine(Offset(w * 0.70, size.height / 2), Offset(w, size.height / 2), stroke);
+    canvas.drawLine(
+        Offset(0, size.height / 2), Offset(w * 0.30, size.height / 2), stroke);
+    canvas.drawLine(
+        Offset(w * 0.70, size.height / 2), Offset(w, size.height / 2), stroke);
 
     final lampPositions = [w * 0.38, w * 0.50, w * 0.62];
     for (final lx in lampPositions) {
@@ -1922,7 +1950,8 @@ class _OilLampRowPainter extends CustomPainter {
     }
   }
 
-  void _drawMiniDiya(Canvas canvas, double cx, double cy, double r, Paint stroke) {
+  void _drawMiniDiya(
+      Canvas canvas, double cx, double cy, double r, Paint stroke) {
     final bowl = Path()
       ..moveTo(cx - r, cy)
       ..cubicTo(cx - r, cy + r * 0.6, cx - r * 0.4, cy + r, cx, cy + r)
@@ -1931,7 +1960,8 @@ class _OilLampRowPainter extends CustomPainter {
     canvas.drawPath(bowl, stroke);
     final flame = Path()
       ..moveTo(cx, cy)
-      ..cubicTo(cx - r * 0.3, cy - r * 0.7, cx - r * 0.2, cy - r * 1.4, cx, cy - r * 1.5)
+      ..cubicTo(cx - r * 0.3, cy - r * 0.7, cx - r * 0.2, cy - r * 1.4, cx,
+          cy - r * 1.5)
       ..cubicTo(cx + r * 0.2, cy - r * 1.4, cx + r * 0.3, cy - r * 0.7, cx, cy);
     canvas.drawPath(flame, stroke);
   }
@@ -1954,7 +1984,8 @@ class InscriptionBorderBackdrop extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: CustomPaint(painter: _InscriptionBorderPainter(color: color, isDark: isDark)),
+      child: CustomPaint(
+          painter: _InscriptionBorderPainter(color: color, isDark: isDark)),
     );
   }
 }
@@ -1991,10 +2022,16 @@ class _InscriptionBorderPainter extends CustomPainter {
         final path = Path()
           ..moveTo(center.dx, center.dy)
           ..quadraticBezierTo(
-            (center + n * 5).dx, (center + n * 5).dy, tip.dx, tip.dy,
+            (center + n * 5).dx,
+            (center + n * 5).dy,
+            tip.dx,
+            tip.dy,
           )
           ..quadraticBezierTo(
-            (center - n * 5).dx, (center - n * 5).dy, center.dx, center.dy,
+            (center - n * 5).dx,
+            (center - n * 5).dy,
+            center.dx,
+            center.dy,
           );
         canvas.drawPath(path, stroke);
       }
@@ -2009,7 +2046,8 @@ class _InscriptionBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _InscriptionBorderPainter old) => old.isDark != isDark;
+  bool shouldRepaint(covariant _InscriptionBorderPainter old) =>
+      old.isDark != isDark;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2053,7 +2091,8 @@ class _TempleStairsIconPainter extends CustomPainter {
       final x = w * 0.10 + i * (w * 0.18);
       final y = h * 0.90 - i * (h * 0.18);
       canvas.drawLine(Offset(x, y), Offset(x + w * 0.22, y), stroke);
-      canvas.drawLine(Offset(x + w * 0.22, y), Offset(x + w * 0.22, y - h * 0.18), stroke);
+      canvas.drawLine(
+          Offset(x + w * 0.22, y), Offset(x + w * 0.22, y - h * 0.18), stroke);
     }
     final temple = Path()
       ..moveTo(w * 0.82, h * 0.18)
@@ -2063,7 +2102,8 @@ class _TempleStairsIconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TempleStairsIconPainter old) => old.color != color;
+  bool shouldRepaint(covariant _TempleStairsIconPainter old) =>
+      old.color != color;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2109,8 +2149,10 @@ class _DiamondKnotPainter extends CustomPainter {
       ..lineTo(cx - w * 0.32, cy)
       ..close();
     canvas.drawPath(diamond, stroke);
-    canvas.drawLine(Offset(cx, cy - h * 0.22), Offset(cx, cy + h * 0.22), stroke);
-    canvas.drawLine(Offset(cx - w * 0.18, cy), Offset(cx + w * 0.18, cy), stroke);
+    canvas.drawLine(
+        Offset(cx, cy - h * 0.22), Offset(cx, cy + h * 0.22), stroke);
+    canvas.drawLine(
+        Offset(cx - w * 0.18, cy), Offset(cx + w * 0.18, cy), stroke);
     for (final pos in [
       Offset(cx, cy - h * 0.38),
       Offset(cx + w * 0.32, cy),
