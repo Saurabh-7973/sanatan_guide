@@ -1098,18 +1098,35 @@ _LeafEntry _resolveEntry(EnrichedBookmark b) {
   ];
   final sanskrit = b.sanskritPreview?.split('\n').first.trim() ?? '';
   final english = b.englishPreview?.split('\n').first.trim();
+  final unitName = _unitNameFor(scripture);
+  final unitNum = b.bookNum ?? b.chapterNum ?? 0;
   return _LeafEntry(
     scripture: scripture,
     scriptureCode: b.scriptureCode ?? 'bhagavad_gita',
     scriptureName: scripture?.displayName ?? 'Scripture',
     shortCode: scripture?.shortCode ?? '',
-    unitLabel: scripture != null
-        ? 'CHAPTER ${b.chapterNum ?? '—'}'
-        : 'CHAPTER ${b.chapterNum ?? '—'}',
+    unitLabel: unitNum > 0
+        ? '$unitName $unitNum'.toUpperCase()
+        : unitName.toUpperCase(),
     coordPartsDeva: coordParts.map(arabicToDevanagari).toList(),
     sanskritPreview: sanskrit.isEmpty ? '—' : sanskrit,
     englishPreview: (english == null || english.isEmpty) ? null : english,
   );
+}
+
+/// Singular form of the scripture's unit (Chapter, Canto, Maṇḍala, …).
+String _unitNameFor(Scripture? s) {
+  if (s == null) return 'Chapter';
+  return switch (s.unitLabel) {
+    'cantos' => 'Skanda',
+    'maṇḍalas' => 'Maṇḍala',
+    'kāṇḍas' => 'Kāṇḍa',
+    'pādas' => 'Pāda',
+    'upadeśas' => 'Upadeśa',
+    'adhyāyas' => 'Adhyāya',
+    'parvas' => 'Parva',
+    _ => 'Chapter',
+  };
 }
 
 String _formatCoord(_LeafEntry entry, bool showShortCode) {

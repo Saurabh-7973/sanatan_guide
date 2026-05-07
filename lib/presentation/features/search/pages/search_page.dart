@@ -108,6 +108,7 @@ class _SearchPageState extends ConsumerState<SearchPage>
                       _setQuery(q);
                       _commitRecent(q);
                     },
+                    onPandit: () => _focusNode.requestFocus(),
                   ),
                 ),
               ],
@@ -251,6 +252,7 @@ class _SearchBody extends ConsumerWidget {
     required this.expandedGroups,
     required this.onToggleGroup,
     required this.onPickRecent,
+    required this.onPandit,
   });
 
   final String query;
@@ -258,12 +260,17 @@ class _SearchBody extends ConsumerWidget {
   final Set<String> expandedGroups;
   final void Function(String key) onToggleGroup;
   final void Function(String) onPickRecent;
+  final VoidCallback onPandit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      return _EmptyBody(isDark: isDark, onPickRecent: onPickRecent);
+      return _EmptyBody(
+        isDark: isDark,
+        onPickRecent: onPickRecent,
+        onPandit: onPandit,
+      );
     }
 
     final coord = parseScriptureCoordinate(trimmed);
@@ -300,10 +307,15 @@ class _SearchBody extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────────────────
 
 class _EmptyBody extends ConsumerWidget {
-  const _EmptyBody({required this.isDark, required this.onPickRecent});
+  const _EmptyBody({
+    required this.isDark,
+    required this.onPickRecent,
+    required this.onPandit,
+  });
 
   final bool isDark;
   final void Function(String) onPickRecent;
+  final VoidCallback onPandit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -359,7 +371,7 @@ class _EmptyBody extends ConsumerWidget {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
-          child: _PanditCta(isDark: isDark),
+          child: _PanditCta(isDark: isDark, onTap: onPandit),
         ),
       ],
     );
@@ -516,8 +528,9 @@ class _SuggestRow extends StatelessWidget {
 }
 
 class _PanditCta extends StatelessWidget {
-  const _PanditCta({required this.isDark});
+  const _PanditCta({required this.isDark, required this.onTap});
   final bool isDark;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -525,13 +538,21 @@ class _PanditCta extends StatelessWidget {
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final divider = isDark ? DColors.divider : LColors.divider;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
-      decoration: BoxDecoration(
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(4),
+      child: InkWell(
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: divider, width: 1),
-      ),
-      child: Row(
+        splashColor: Colors.transparent,
+        highlightColor: saffron.withValues(alpha: 0.04),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: divider, width: 1),
+          ),
+          child: Row(
         children: [
           Container(
             width: 32,
@@ -586,6 +607,8 @@ class _PanditCta extends StatelessWidget {
             color: saffron.withValues(alpha: 0.7),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
