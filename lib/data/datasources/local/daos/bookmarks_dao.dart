@@ -19,10 +19,11 @@ class BookmarksDao extends DatabaseAccessor<AppDatabase>
         ]))
       .watch();
 
-  /// Bookmarks enriched with first line of Sanskrit + scripture code.
+  /// Bookmarks enriched with Sanskrit, English, and verse coordinates.
   Stream<List<EnrichedBookmark>> watchAllEnriched() {
     final q = customSelect(
-      'SELECT b.verse_id, b.saved_at, v.sanskrit, v.scripture '
+      'SELECT b.verse_id, b.saved_at, v.sanskrit, v.english, '
+      'v.scripture, v.chapter_num, v.verse_num, v.book_num '
       'FROM bookmarks b LEFT JOIN verses v ON b.verse_id = v.id '
       'ORDER BY b.saved_at DESC',
       readsFrom: {bookmarksTable, db.versesTable},
@@ -32,7 +33,11 @@ class BookmarksDao extends DatabaseAccessor<AppDatabase>
             verseId: r.read<String>('verse_id'),
             savedAt: r.read<DateTime>('saved_at'),
             sanskritPreview: r.readNullable<String>('sanskrit'),
+            englishPreview: r.readNullable<String>('english'),
             scriptureCode: r.readNullable<String>('scripture'),
+            chapterNum: r.readNullable<int>('chapter_num'),
+            verseNum: r.readNullable<int>('verse_num'),
+            bookNum: r.readNullable<int>('book_num'),
           );
         }).toList());
   }
@@ -80,11 +85,19 @@ class EnrichedBookmark {
     required this.verseId,
     required this.savedAt,
     this.sanskritPreview,
+    this.englishPreview,
     this.scriptureCode,
+    this.chapterNum,
+    this.verseNum,
+    this.bookNum,
   });
 
   final String verseId;
   final DateTime savedAt;
   final String? sanskritPreview;
+  final String? englishPreview;
   final String? scriptureCode;
+  final int? chapterNum;
+  final int? verseNum;
+  final int? bookNum;
 }
