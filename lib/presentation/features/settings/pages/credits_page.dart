@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/core/constants/content_credits.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 
@@ -17,7 +17,12 @@ class CreditsPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text('Credits & attributions', style: context.ts.displayMedium),
         centerTitle: false,
         leading: IconButton(
@@ -25,23 +30,27 @@ class CreditsPage extends StatelessWidget {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
       ),
-      body: ListView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(
-          left: AppSpacing.pagePadding,
-          right: AppSpacing.pagePadding,
-          top: AppSpacing.md,
-          bottom: AppSpacing.xxl,
-        ),
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          const SizedBox(
-            height: 32,
-            child: InscriptionBorderBackdrop(),
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.only(
+                left: AppSpacing.pagePadding,
+                right: AppSpacing.pagePadding,
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+                bottom: AppSpacing.xxl,
+              ),
+              children: [
+                const _DisclaimerBanner(),
+                const SizedBox(height: AppSpacing.xl),
+                ..._groupedCreditWidgets(context, isDark),
+              ],
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          const _DisclaimerBanner(),
-          const SizedBox(height: AppSpacing.xl),
-          ..._groupedCreditWidgets(context, isDark),
         ],
       ),
     );

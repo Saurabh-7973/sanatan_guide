@@ -6,7 +6,7 @@ import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/verse_preview_tile.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -20,7 +20,12 @@ class BookmarksPage extends ConsumerWidget {
     final bookmarksAsync = ref.watch(enrichedBookmarksProvider);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back',
@@ -46,15 +51,29 @@ class BookmarksPage extends ConsumerWidget {
             ),
         ],
       ),
-      body: bookmarksAsync.when(
-        loading: () => const BookmarkShimmer(),
-        error: (e, _) => ErrorStateWidget(
-          onRetry: () => ref.invalidate(enrichedBookmarksProvider),
-        ),
-        data: (bookmarks) {
-          if (bookmarks.isEmpty) return const _EmptyState();
-          return _BookmarkList(bookmarks: bookmarks);
-        },
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+              ),
+              child: bookmarksAsync.when(
+                loading: () => const BookmarkShimmer(),
+                error: (e, _) => ErrorStateWidget(
+                  onRetry: () => ref.invalidate(enrichedBookmarksProvider),
+                ),
+                data: (bookmarks) {
+                  if (bookmarks.isEmpty) return const _EmptyState();
+                  return _BookmarkList(bookmarks: bookmarks);
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -67,32 +86,47 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tint = isDark ? AppColors.saffronOnDark : AppColors.saffron;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const PrasadTrayIllustration(size: 160),
-            const SizedBox(height: AppSpacing.lg),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: tint.withValues(alpha: isDark ? 0.18 : 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.bookmark_border_rounded,
+                size: 36,
+                color: tint,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
             Text(
-              'Your offerings await',
-              style: context.ts.bodyLarge,
+              'Saved verses appear here',
+              style: context.ts.displayMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Bookmark any verse to keep it\nclose, like a flower at the altar.',
+              'Tap the bookmark icon on any verse\nto keep it close.',
               style: context.ts.caption,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),
-            TextButton.icon(
+            FilledButton.icon(
               onPressed: () => context.go('/browse'),
-              icon: const Icon(Icons.menu_book_outlined, size: 18),
+              icon: const Icon(Icons.menu_book_rounded, size: 18),
               label: const Text('Browse the library'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.saffron,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.saffron,
+                foregroundColor: AppColors.onSaffron,
               ),
             ),
           ],

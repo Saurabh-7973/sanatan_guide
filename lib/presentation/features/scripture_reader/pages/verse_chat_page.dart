@@ -6,7 +6,7 @@ import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -149,7 +149,12 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     final state = ref.watch(verseDetailProvider(widget.verseId));
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -162,24 +167,36 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
           ],
         ),
         centerTitle: false,
-        flexibleSpace: const IgnorePointer(
-          child: DhyanaAsanaBackdrop(),
-        ),
       ),
       resizeToAvoidBottomInset: true,
-      body: state.when(
-        loading: () => const VerseDetailShimmer(),
-        error: (_, __) => const Center(child: Text('Could not load verse.')),
-        data: (either) => either.fold(
-          (failure) => Center(child: Text(failure.message)),
-          (verse) => _ChatMessages(
-            verse: verse,
-            messages: _messages,
-            loading: _loading,
-            error: _error,
-            scrollController: _scrollController,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+              ),
+              child: state.when(
+                loading: () => const VerseDetailShimmer(),
+                error: (_, __) =>
+                    const Center(child: Text('Could not load verse.')),
+                data: (either) => either.fold(
+                  (failure) => Center(child: Text(failure.message)),
+                  (verse) => _ChatMessages(
+                    verse: verse,
+                    messages: _messages,
+                    loading: _loading,
+                    error: _error,
+                    scrollController: _scrollController,
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: state.whenData((either) => either.fold(
         (_) => null,

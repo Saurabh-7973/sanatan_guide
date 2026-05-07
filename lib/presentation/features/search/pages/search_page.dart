@@ -9,7 +9,7 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/features/search/providers/search_provider.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/verse_preview_tile.dart';
@@ -61,7 +61,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     });
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -101,9 +106,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               ),
               prefixIcon: const Padding(
                 padding: EdgeInsets.all(12),
-                child: PeacockIllustration(
-                  singleFeather: true,
+                child: Icon(
+                  Icons.search_rounded,
                   size: 20,
+                  color: AppColors.saffron,
                 ),
               ),
               suffixIcon: query.isNotEmpty
@@ -137,10 +143,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         ),
         actions: const [SizedBox(width: AppSpacing.md)],
       ),
-      body: Column(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          const _FilterChips(),
-          Expanded(child: _SearchBody(query: query)),
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+              ),
+              child: Column(
+                children: [
+                  const _FilterChips(),
+                  Expanded(child: _SearchBody(query: query)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -247,20 +267,36 @@ class _EmptyPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tint = isDark ? AppColors.saffronOnDark : AppColors.saffron;
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const PeacockIllustration(size: 200),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: tint.withValues(alpha: isDark ? 0.18 : 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.search_rounded, size: 36, color: tint),
+            ),
             const SizedBox(height: AppSpacing.xl),
             Text(
               'Explore the scriptures',
               style: context.ts.displayMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
+            Container(
+              width: 32,
+              height: 2,
+              color: tint.withValues(alpha: 0.7),
+            ),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'Search by Sanskrit words, English phrases,\nor spiritual concepts.',
               style: context.ts.caption,
@@ -331,20 +367,22 @@ class _NoResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tint = isDark ? AppColors.saffronOnDark : AppColors.saffron;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              '·',
-              style: TextStyle(
-                fontFamily: 'Lora',
-                fontSize: 72,
-                color: AppColors.warmGrey50,
-                height: 1,
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: tint.withValues(alpha: isDark ? 0.16 : 0.10),
+                shape: BoxShape.circle,
               ),
+              child: Icon(Icons.search_off_rounded, size: 30, color: tint),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(

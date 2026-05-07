@@ -4,7 +4,7 @@ import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -17,14 +17,32 @@ class FestivalCalendarPage extends ConsumerWidget {
     final festivalsAsync = ref.watch(festivalsProvider);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text('Festival Calendar'),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      body: festivalsAsync.when(
-        loading: () => const FestivalShimmer(),
-        error: (_, __) => _FestivalBody(festivals: festivals2026),
-        data: (festivals) => _FestivalBody(festivals: festivals),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+              ),
+              child: festivalsAsync.when(
+                loading: () => const FestivalShimmer(),
+                error: (_, __) => _FestivalBody(festivals: festivals2026),
+                data: (festivals) => _FestivalBody(festivals: festivals),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -156,7 +174,11 @@ class _FestivalTile extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Hero(
               tag: 'festival_emoji_${festival.id}',
-              child: const DiyaFlameIcon(size: 24),
+              child: Icon(
+                Icons.local_fire_department_rounded,
+                size: 24,
+                color: muted ? AppColors.textSecondary : AppColors.saffron,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -255,22 +277,46 @@ class _FestivalDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tint = isDark ? AppColors.saffronOnDark : AppColors.saffron;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.pagePadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Hero(
-              tag: 'festival_emoji_${festival.id}',
-              child: const DiyaFlameIcon(size: 56),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const WarmBackdrop(),
+          SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.pagePadding,
+              kToolbarHeight + MediaQuery.paddingOf(context).top,
+              AppSpacing.pagePadding,
+              AppSpacing.pagePadding,
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Hero(
+                  tag: 'festival_emoji_${festival.id}',
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: tint.withValues(alpha: isDark ? 0.18 : 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.local_fire_department_rounded,
+                      size: 36,
+                      color: tint,
+                    ),
+                  ),
+                ),
             const SizedBox(height: AppSpacing.md),
             Text(festival.name, style: context.ts.displayLarge),
             const SizedBox(height: AppSpacing.xs),
@@ -347,8 +393,10 @@ class _FestivalDetailPage extends StatelessWidget {
               );
             }),
             const SizedBox(height: AppSpacing.xxl),
-          ],
-        ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -13,7 +13,7 @@ import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -190,9 +190,7 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: IgnorePointer(child: PeepalTreeBackdrop()),
-          ),
+          const Positioned.fill(child: WarmBackdrop()),
           state.when(
         loading: () => const ModuleReaderShimmer(),
         error: (e, _) => const ErrorStateWidget(),

@@ -7,7 +7,7 @@ import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
@@ -20,28 +20,44 @@ class LearningPathPage extends ConsumerWidget {
     final state = ref.watch(modulesProvider);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text('Your Path', style: context.ts.displayMedium),
         centerTitle: false,
-        flexibleSpace: const IgnorePointer(
-          child: TempleStaircaseBackdrop(),
-        ),
       ),
-      body: state.when(
-        loading: () => const LearningPathShimmer(),
-        error: (e, _) => ErrorStateWidget(
-          onRetry: () => ref.invalidate(modulesProvider),
-        ),
-        data: (either) => either.fold(
-          (failure) => ErrorStateWidget(message: failure.message),
-          (modules) {
-            final level1 = modules.where((m) => m.level == 1).toList()
-              ..sort((a, b) => a.sequence.compareTo(b.sequence));
-            final level2 = modules.where((m) => m.level == 2).toList()
-              ..sort((a, b) => a.sequence.compareTo(b.sequence));
-            return _ModuleList(level1: level1, level2: level2);
-          },
-        ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+              ),
+              child: state.when(
+                loading: () => const LearningPathShimmer(),
+                error: (e, _) => ErrorStateWidget(
+                  onRetry: () => ref.invalidate(modulesProvider),
+                ),
+                data: (either) => either.fold(
+                  (failure) => ErrorStateWidget(message: failure.message),
+                  (modules) {
+                    final level1 = modules.where((m) => m.level == 1).toList()
+                      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+                    final level2 = modules.where((m) => m.level == 2).toList()
+                      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+                    return _ModuleList(level1: level1, level2: level2);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

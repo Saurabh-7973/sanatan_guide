@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/credits_page.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
@@ -26,7 +26,12 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(l10n.settingsTitle, style: context.ts.displayMedium),
         centerTitle: false,
         leading: IconButton(
@@ -34,44 +39,71 @@ class SettingsPage extends ConsumerWidget {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
       ),
-      body: ListView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          _SectionHeader(title: l10n.settingsSectionAppearance),
-          const _ThemeTile(),
-          const _FontSizeTile(),
-          const OilLampRowDivider(),
-          _SectionHeader(title: l10n.settingsSectionLanguage),
-          const _LanguageTile(),
-          const OilLampRowDivider(),
-          _SectionHeader(title: l10n.settingsSectionNotifications),
-          const _NotificationTimeTile(),
-          const OilLampRowDivider(),
-          _SectionHeader(title: l10n.settingsSectionData),
-          const _ClearHistoryTile(),
-          const OilLampRowDivider(),
-          _SectionHeader(title: l10n.settingsSectionReading),
-          const _ExperienceLevelTile(),
-          const OilLampRowDivider(),
-          _SectionHeader(title: l10n.settingsSectionAbout),
-          const _AppVersionTile(),
-          const _CreditsTile(),
-          _LinkTile(
-            title: l10n.settingsPrivacyPolicy,
-            icon: Icons.privacy_tip_outlined,
-            url:
-                'https://gist.github.com/Saurabh-7973/96cf400ffbbbece5ece2d5d4c3f0a16c',
+          const WarmBackdrop(),
+          SafeArea(
+            top: false,
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.only(
+                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+                bottom: AppSpacing.xxl,
+              ),
+              children: [
+                _SectionHeader(title: l10n.settingsSectionAppearance),
+                const _ThemeTile(),
+                const _FontSizeTile(),
+                const _SoftDivider(),
+                _SectionHeader(title: l10n.settingsSectionLanguage),
+                const _LanguageTile(),
+                const _SoftDivider(),
+                _SectionHeader(title: l10n.settingsSectionNotifications),
+                const _NotificationTimeTile(),
+                const _SoftDivider(),
+                _SectionHeader(title: l10n.settingsSectionData),
+                const _ClearHistoryTile(),
+                const _SoftDivider(),
+                _SectionHeader(title: l10n.settingsSectionReading),
+                const _ExperienceLevelTile(),
+                const _SoftDivider(),
+                _SectionHeader(title: l10n.settingsSectionAbout),
+                const _AppVersionTile(),
+                const _CreditsTile(),
+                _LinkTile(
+                  title: l10n.settingsPrivacyPolicy,
+                  icon: Icons.privacy_tip_outlined,
+                  url:
+                      'https://gist.github.com/Saurabh-7973/96cf400ffbbbece5ece2d5d4c3f0a16c',
+                ),
+                _LinkTile(
+                  title: l10n.settingsTermsOfService,
+                  icon: Icons.description_outlined,
+                  url:
+                      'https://gist.github.com/Saurabh-7973/04966e0f9717bba119ddf13e951d3df5',
+                ),
+                const _FeedbackTile(),
+              ],
+            ),
           ),
-          _LinkTile(
-            title: l10n.settingsTermsOfService,
-            icon: Icons.description_outlined,
-            url:
-                'https://gist.github.com/Saurabh-7973/04966e0f9717bba119ddf13e951d3df5',
-          ),
-          const _FeedbackTile(),
         ],
       ),
+    );
+  }
+}
+
+class _SoftDivider extends StatelessWidget {
+  const _SoftDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pagePadding,
+        vertical: AppSpacing.sm,
+      ),
+      child: Divider(height: 1, thickness: 1, color: AppColors.border),
     );
   }
 }
