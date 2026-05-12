@@ -62,10 +62,12 @@ class LColors {
 // FONT FAMILIES
 // ============================================================
 class Fonts {
+  // These must match the `family:` names declared in pubspec.yaml exactly,
+  // or Flutter silently falls back to a system font.
   static const sans = 'Outfit';
   static const serif = 'Lora';
-  static const deva = 'Tiro Devanagari Sanskrit';
-  static const devaUI = 'Noto Sans Devanagari';
+  static const deva = 'TiroDevanagari';
+  static const devaUI = 'NotoSansDevanagari';
 }
 
 // ============================================================
