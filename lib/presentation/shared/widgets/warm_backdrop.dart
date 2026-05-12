@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Subtle saffron radial fade used as the common backdrop across stripped
 /// screens (search, bookmarks, festivals, library, learning, module reader,
@@ -28,11 +29,15 @@ class WarmBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final base = isDark ? AppColors.saffronOnDark : AppColors.saffron;
+    // Light mode wants the muted brown-saffron (#C26508), NOT the vivid
+    // dark-mode orange (#E8820C) — at the vivid one even a few percent reads
+    // distinctly yellow over the near-white cream. The mockups' light wash is
+    // `rgba(194,101,8, 0.04), transparent 50%` over #FDFAF6.
+    final base = isDark ? AppColors.saffronOnDark : LColors.saffron;
     final scaffold = isDark ? AppColors.bgDark : AppColors.cream;
 
-    final topAlpha = (isDark ? 0.14 : 0.12) * intensity;
-    final midAlpha = (isDark ? 0.04 : 0.04) * intensity;
+    final topAlpha = (isDark ? 0.14 : 0.05) * intensity;
+    final midAlpha = (isDark ? 0.04 : 0.015) * intensity;
 
     // A BoxDecoration with both `color` and `gradient` paints only the gradient
     // (a Paint ignores `color` when a shader is set), so the opaque scaffold

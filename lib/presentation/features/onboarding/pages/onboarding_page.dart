@@ -80,8 +80,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           fit: StackFit.expand,
           children: [
             // Same dawn wash the migrated screens use; the mockup's screen
-            // background is a 4%-saffron radial over the cream base.
-            const WarmBackdrop(intensity: 0.33),
+            // background is a faint saffron radial over the cream base.
+            const WarmBackdrop(),
             SafeArea(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 280),
