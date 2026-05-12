@@ -709,6 +709,10 @@ class _ScriptureRow extends StatelessWidget {
                     TextSpan(
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        // Outfit lacks the dot-below Tamil-romanisation letters
+                        // (ḷ, ṟ) used in names like "Tiruvaḷḷuvar"; fall back to
+                        // Lora, which carries the full IAST set.
+                        fontFamilyFallback: const [Fonts.serif],
                         fontSize: 11,
                         height: 1.4,
                         color: text3,
