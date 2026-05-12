@@ -9,6 +9,7 @@ import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/daily_reminder_provider.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
@@ -75,44 +76,52 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       },
       child: Scaffold(
         backgroundColor: bg,
-        body: SafeArea(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 280),
-            transitionBuilder: (child, animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.06, 0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOut,
-                  )),
-                  child: child,
-                ),
-              );
-            },
-            child: _step == 0
-                ? _WelcomeStep(
-                    key: const ValueKey('welcome'),
-                    isDark: isDark,
-                    selectedLevel: _selectedLevel,
-                    onSelect: (level) =>
-                        setState(() => _selectedLevel = level),
-                    onContinue: _continueFromWelcome,
-                    onSkip: _skipFromWelcome,
-                  )
-                : _ReminderStep(
-                    key: const ValueKey('reminder'),
-                    isDark: isDark,
-                    onEnable: (time) => _finishOnboarding(
-                      reminderEnabled: true,
-                      reminderTime: time,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Same dawn wash the migrated screens use; the mockup's screen
+            // background is a 4%-saffron radial over the cream base.
+            const WarmBackdrop(intensity: 0.33),
+            SafeArea(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 280),
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.06, 0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOut,
+                      )),
+                      child: child,
                     ),
-                    onSkip: () => _finishOnboarding(reminderEnabled: false),
-                  ),
-          ),
+                  );
+                },
+                child: _step == 0
+                    ? _WelcomeStep(
+                        key: const ValueKey('welcome'),
+                        isDark: isDark,
+                        selectedLevel: _selectedLevel,
+                        onSelect: (level) =>
+                            setState(() => _selectedLevel = level),
+                        onContinue: _continueFromWelcome,
+                        onSkip: _skipFromWelcome,
+                      )
+                    : _ReminderStep(
+                        key: const ValueKey('reminder'),
+                        isDark: isDark,
+                        onEnable: (time) => _finishOnboarding(
+                          reminderEnabled: true,
+                          reminderTime: time,
+                        ),
+                        onSkip: () => _finishOnboarding(reminderEnabled: false),
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -154,107 +163,116 @@ class _WelcomeStep extends StatelessWidget {
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: Spacing.xxxl),
-          Center(
-            child: Text(
-              '॥ श्री गणेशाय नमः ॥',
-              style: AppText
-                  .invocation(saffronColor: saffron)
-                  .copyWith(color: saffron.withValues(alpha: 0.5)),
-            ),
-          ),
-          const SizedBox(height: Spacing.xl),
-          _StepDots(active: 0, isDark: isDark),
-          const SizedBox(height: Spacing.xxl),
-          Center(
-            child: Text(
-              'ॐ',
-              style: TextStyle(
-                fontFamily: Fonts.deva,
-                fontSize: 68,
-                color: saffron,
-                height: 1,
-                shadows: isDark
-                    ? const [
-                        Shadow(
-                          color: Color(0x4DE8820C),
-                          blurRadius: 24,
-                        ),
-                      ]
-                    : null,
+    return _FillableScrollColumn(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: Spacing.xxxl),
+            Center(
+              child: Text(
+                '॥ श्री गणेशाय नमः ॥',
+                style: AppText.invocation(saffronColor: saffron)
+                    .copyWith(color: saffron.withValues(alpha: 0.5)),
               ),
             ),
-          ),
-          const SizedBox(height: Spacing.lg),
-          Center(
-            child: Text(
-              'Sanatan Guide',
-              style: AppText.screenTitle(color: text1).copyWith(fontSize: 32),
+            const SizedBox(height: Spacing.xl),
+            _StepDots(active: 0, isDark: isDark),
+            const SizedBox(height: Spacing.xxl),
+            Center(
+              child: Text(
+                'ॐ',
+                style: TextStyle(
+                  fontFamily: Fonts.deva,
+                  fontSize: 68,
+                  color: saffron,
+                  height: 1,
+                  shadows: isDark
+                      ? const [
+                          Shadow(
+                            color: Color(0x4DE8820C),
+                            blurRadius: 24,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          Center(
-            child: Text(
-              'A reader for Hindu scripture — fully offline, with deep textual care.',
-              style: AppText.subtitle(color: text2),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: Spacing.lg),
-          Center(
-            child: SizedBox(
-              width: 64,
-              child: BindingLine(isDark: isDark, diamondSize: 4, sideGap: 6),
-            ),
-          ),
-          const SizedBox(height: Spacing.xxxl),
-          Text(
-            'TELL US WHERE TO BEGIN',
-            style: AppText.sectionLabel(color: text3),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: Spacing.sm),
-          Text(
-            'How familiar are you with the scriptures?',
-            style: AppText.subtitle(color: text2).copyWith(fontSize: 14.5),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: Spacing.xl),
-          for (final level in UserExperienceLevel.values) ...[
-            _LevelCard(
-              level: level,
-              description: _levelCopy[level]!,
-              selected: selectedLevel == level,
-              isDark: isDark,
-              onTap: () => onSelect(level),
+            const SizedBox(height: Spacing.lg),
+            Center(
+              child: Text(
+                'Sanatan Guide',
+                style: AppText.screenTitle(color: text1).copyWith(fontSize: 32),
+              ),
             ),
             const SizedBox(height: Spacing.sm + 2),
-          ],
-          const Spacer(),
-          _PrimaryButton(
-            label: 'Continue',
-            isDark: isDark,
-            enabled: selectedLevel != null,
-            trailing: const Icon(Icons.arrow_forward, size: 14),
-            onTap: onContinue,
-          ),
-          const SizedBox(height: Spacing.md),
-          Center(
-            child: TextButton(
-              onPressed: onSkip,
-              child: Text(
-                'SKIP FOR NOW',
-                style: AppText.textButton(color: text3),
+            Center(
+              child: Padding(
+                // The mockup's tagline sits in a slightly narrower column than
+                // the hero block, which is what makes it break right after the
+                // comma onto a second line.
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
+                child: Text(
+                  'A reader for Hindu scripture — fully offline, with deep textual care.',
+                  style: AppText.subtitle(color: text2)
+                      .copyWith(fontSize: 15, height: 1.5),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: Spacing.lg),
-        ],
+            const SizedBox(height: Spacing.xl + 2),
+            Center(
+              child: SizedBox(
+                width: 64,
+                child: BindingLine(isDark: isDark, diamondSize: 4, sideGap: 5),
+              ),
+            ),
+            const SizedBox(height: Spacing.xxxl),
+            Text(
+              'TELL US WHERE TO BEGIN',
+              style: AppText.sectionLabel(color: text3),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: Spacing.sm),
+            Text(
+              'How familiar are you with the scriptures?',
+              style: AppText.subtitle(color: text1).copyWith(
+                  fontSize: 18, fontWeight: FontWeight.w500, height: 1.35),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: Spacing.xl),
+            for (final level in UserExperienceLevel.values) ...[
+              _LevelCard(
+                level: level,
+                description: _levelCopy[level]!,
+                selected: selectedLevel == level,
+                isDark: isDark,
+                onTap: () => onSelect(level),
+              ),
+              const SizedBox(height: Spacing.sm + 2),
+            ],
+            const Spacer(),
+            _PrimaryButton(
+              label: 'Continue',
+              isDark: isDark,
+              enabled: selectedLevel != null,
+              trailing: const Icon(Icons.arrow_forward, size: 14),
+              onTap: onContinue,
+            ),
+            const SizedBox(height: Spacing.md),
+            Center(
+              child: TextButton(
+                onPressed: onSkip,
+                child: Text(
+                  'SKIP FOR NOW',
+                  style: AppText.textButton(color: text3),
+                ),
+              ),
+            ),
+            const SizedBox(height: Spacing.lg),
+          ],
+        ),
       ),
     );
   }
@@ -312,102 +330,128 @@ class _ReminderStepState extends State<_ReminderStep> {
     final isDark = widget.isDark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final surface = isDark ? DColors.surface : LColors.surface;
-    final surface2 = isDark ? DColors.surface2 : LColors.surface2;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final divider = isDark ? DColors.divider : LColors.divider;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: Spacing.xxxl + Spacing.lg),
-          _StepDots(active: 1, isDark: isDark),
-          const SizedBox(height: Spacing.xxxl + Spacing.xxxl),
-          Center(child: _BellGlyph(saffron: saffron)),
-          const SizedBox(height: Spacing.xl),
-          Center(
-            child: Text(
-              'A verse a day',
-              style: AppText.screenTitle(color: text1).copyWith(fontSize: 26),
-            ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          Center(
-            child: Text(
-              'A short morning notification with one verse — chosen for the day. '
-              'You can change or silence it any time.',
-              style: AppText.subtitle(color: text2).copyWith(fontSize: 14.5),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: Spacing.xxxl),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.xl,
-              vertical: Spacing.lg,
-            ),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(Radii.card),
-              border: Border.all(color: divider, width: 1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'REMIND ME AT',
-                  style: AppText.sectionLabel(color: text3),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: Spacing.md),
-                GestureDetector(
-                  onTap: _pickTime,
-                  child: Text(
-                    '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(
-                      fontFamily: Fonts.serif,
-                      fontSize: 56,
-                      fontWeight: FontWeight.w500,
-                      height: 1,
-                      color: saffron,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: Spacing.lg),
-                _PeriodToggle(
-                  isAm: _isAm,
-                  isDark: isDark,
-                  surface2: surface2,
-                  saffron: saffron,
-                  text3: text3,
-                  onChanged: _setPeriod,
-                ),
-              ],
-            ),
-          ),
-          const Spacer(),
-          _PrimaryButton(
-            label: 'Enable reminder',
-            isDark: isDark,
-            enabled: true,
-            onTap: () => widget.onEnable(_time),
-          ),
-          const SizedBox(height: Spacing.md),
-          Center(
-            child: TextButton(
-              onPressed: widget.onSkip,
+    return _FillableScrollColumn(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: Spacing.xxxl + Spacing.lg),
+            _StepDots(active: 1, isDark: isDark),
+            const SizedBox(height: Spacing.xxxl + Spacing.xxxl),
+            Center(child: _BellGlyph(saffron: saffron)),
+            const SizedBox(height: Spacing.xl),
+            Center(
               child: Text(
-                'NOT NOW',
-                style: AppText.textButton(color: text3),
+                'A verse a day',
+                style: AppText.screenTitle(color: text1).copyWith(fontSize: 26),
               ),
             ),
-          ),
-          const SizedBox(height: Spacing.lg),
-        ],
+            const SizedBox(height: Spacing.sm),
+            Center(
+              child: Text(
+                'A short morning notification with one verse — chosen for the day. '
+                'You can change or silence it any time.',
+                style: AppText.subtitle(color: text2).copyWith(fontSize: 14.5),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: Spacing.xxxl),
+            Container(
+              padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+              decoration: BoxDecoration(
+                color: surface,
+                borderRadius: BorderRadius.circular(Radii.card),
+                border: Border.all(color: divider, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'REMIND ME AT',
+                    style: AppText.sectionLabel(color: text3),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 14),
+                  GestureDetector(
+                    onTap: _pickTime,
+                    child: Text(
+                      '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w500,
+                        height: 1,
+                        color: saffron,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _PeriodToggle(
+                    isAm: _isAm,
+                    isDark: isDark,
+                    inactiveBg: dividerSoft,
+                    saffron: saffron,
+                    text3: text3,
+                    onChanged: _setPeriod,
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            _PrimaryButton(
+              label: 'Enable reminder',
+              isDark: isDark,
+              enabled: true,
+              onTap: () => widget.onEnable(_time),
+            ),
+            const SizedBox(height: Spacing.md),
+            Center(
+              child: TextButton(
+                onPressed: widget.onSkip,
+                child: Text(
+                  'NOT NOW',
+                  style: AppText.textButton(color: text3),
+                ),
+              ),
+            ),
+            const SizedBox(height: Spacing.lg),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+// ============================================================
+// Fillable scroll column
+// ============================================================
+
+/// Wraps onboarding step content so it pins its bottom actions to the foot of
+/// the viewport on tall screens but scrolls gracefully on short ones — instead
+/// of a `RenderFlex` overflow when the content is taller than the screen.
+class _FillableScrollColumn extends StatelessWidget {
+  const _FillableScrollColumn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(child: child),
+          ),
+        );
+      },
     );
   }
 }
@@ -465,6 +509,7 @@ class _LevelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final surface = isDark ? DColors.surface : LColors.surface;
     final divider = isDark ? DColors.divider : LColors.divider;
     final softDivider = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
@@ -476,13 +521,9 @@ class _LevelCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.fromLTRB(
-          Spacing.lg + Spacing.xs,
-          Spacing.lg,
-          Spacing.lg + Spacing.xs,
-          Spacing.lg,
-        ),
+        padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
         decoration: BoxDecoration(
+          color: surface,
           borderRadius: BorderRadius.circular(Radii.card),
           border: Border.all(
             color: selected ? divider : softDivider,
@@ -493,7 +534,7 @@ class _LevelCard extends StatelessWidget {
           children: [
             if (selected)
               Positioned(
-                left: -(Spacing.lg + Spacing.xs),
+                left: -22,
                 top: 12,
                 bottom: 12,
                 child: LeafThread(
@@ -512,7 +553,7 @@ class _LevelCard extends StatelessWidget {
                         style: AppText.moduleTitle(color: text1)
                             .copyWith(fontSize: 16),
                       ),
-                      const SizedBox(height: Spacing.xs + 1),
+                      const SizedBox(height: 2),
                       Text(
                         description,
                         style: AppText.moduleDesc(color: text2)
@@ -565,8 +606,8 @@ class _Radio extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           scale: selected ? 1 : 0,
           child: Container(
-            width: 8,
-            height: 8,
+            width: 9,
+            height: 9,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: saffron,
@@ -588,9 +629,10 @@ class _BellGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Mockup: a 64px ring at 40% over an 80px halo at 15%, 22px bell inside.
     return SizedBox(
-      width: 64,
-      height: 64,
+      width: 80,
+      height: 80,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -598,25 +640,25 @@ class _BellGlyph extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: saffron.withValues(alpha: 0.18),
+                color: saffron.withValues(alpha: 0.15),
                 width: 1,
               ),
             ),
           ),
           Container(
-            width: 50,
-            height: 50,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: saffron.withValues(alpha: 0.3),
+                color: saffron.withValues(alpha: 0.4),
                 width: 1,
               ),
             ),
           ),
           Icon(
-            Icons.notifications_none_rounded,
-            size: 26,
+            Icons.notifications_none,
+            size: 22,
             color: saffron,
           ),
         ],
@@ -632,7 +674,7 @@ class _PeriodToggle extends StatelessWidget {
   const _PeriodToggle({
     required this.isAm,
     required this.isDark,
-    required this.surface2,
+    required this.inactiveBg,
     required this.saffron,
     required this.text3,
     required this.onChanged,
@@ -640,7 +682,7 @@ class _PeriodToggle extends StatelessWidget {
 
   final bool isAm;
   final bool isDark;
-  final Color surface2;
+  final Color inactiveBg;
   final Color saffron;
   final Color text3;
   final ValueChanged<bool> onChanged;
@@ -651,8 +693,9 @@ class _PeriodToggle extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _periodButton(label: 'AM', active: isAm, onTap: () => onChanged(true)),
-        const SizedBox(width: Spacing.xs),
-        _periodButton(label: 'PM', active: !isAm, onTap: () => onChanged(false)),
+        const SizedBox(width: 6),
+        _periodButton(
+            label: 'PM', active: !isAm, onTap: () => onChanged(false)),
       ],
     );
   }
@@ -667,17 +710,15 @@ class _PeriodToggle extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.md,
-          vertical: 6,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? glow : surface2,
-          borderRadius: BorderRadius.circular(Radii.pill),
+          color: active ? glow : inactiveBg,
+          borderRadius: BorderRadius.circular(14),
         ),
         child: Text(
           label,
-          style: AppText.pill(color: active ? saffron : text3),
+          style: AppText.pill(color: active ? saffron : text3)
+              .copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.66),
         ),
       ),
     );

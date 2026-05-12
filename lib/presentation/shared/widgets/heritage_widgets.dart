@@ -17,32 +17,24 @@ class BindingLine extends StatelessWidget {
   const BindingLine({
     super.key,
     required this.isDark,
-    this.diamondSize = 5,
-    this.sideGap = 10,
+    this.diamondSize = 4,
+    this.sideGap = 5,
   });
 
   @override
   Widget build(BuildContext context) {
-    final lineColor = isDark
-        ? DColors.saffronDeep.withValues(alpha: 0.4)
-        : LColors.saffronDeep.withValues(alpha: 0.4);
-    final dotColor = isDark ? DColors.saffron : LColors.saffronDeep;
+    // Two solid divider-colour hairlines flanking a saffron diamond — the
+    // "incised rule" of the mockups (incised-rule), not a faded gradient.
+    final lineColor = isDark ? DColors.divider : LColors.divider;
+    final dotColor = isDark ? DColors.saffron : LColors.saffron;
+
+    Widget rule() => Expanded(child: Container(height: 1, color: lineColor));
 
     return SizedBox(
       height: 12,
       child: Row(
         children: [
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, lineColor, Colors.transparent],
-                  stops: const [0, 0.5, 1],
-                ),
-              ),
-            ),
-          ),
+          rule(),
           SizedBox(width: sideGap),
           Transform.rotate(
             angle: 0.785398,
@@ -53,17 +45,7 @@ class BindingLine extends StatelessWidget {
             ),
           ),
           SizedBox(width: sideGap),
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, lineColor, Colors.transparent],
-                  stops: const [0, 0.5, 1],
-                ),
-              ),
-            ),
-          ),
+          rule(),
         ],
       ),
     );
@@ -159,7 +141,9 @@ class DandaCoord extends StatelessWidget {
     required this.isDark,
     this.fontSize = 13,
     this.colorOverride,
-  }) : parts = const [], _chapter = chapter, _verse = verse;
+  })  : parts = const [],
+        _chapter = chapter,
+        _verse = verse;
 
   /// Multi-part coord: ‖a·b·c‖ (e.g. Upanishad sections)
   const DandaCoord.multipart({
@@ -175,7 +159,16 @@ class DandaCoord extends StatelessWidget {
   final int _verse;
 
   static const _devNumerals = [
-    '०', '१', '२', '३', '४', '५', '६', '७', '८', '९',
+    '०',
+    '१',
+    '२',
+    '३',
+    '४',
+    '५',
+    '६',
+    '७',
+    '८',
+    '९',
   ];
 
   static String toDevanagari(int n) {
@@ -187,8 +180,7 @@ class DandaCoord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = colorOverride ??
-        (isDark ? DColors.saffron : LColors.saffron);
+    final color = colorOverride ?? (isDark ? DColors.saffron : LColors.saffron);
 
     final coordText = parts.isNotEmpty
         ? parts.map(toDevanagari).join('·')
