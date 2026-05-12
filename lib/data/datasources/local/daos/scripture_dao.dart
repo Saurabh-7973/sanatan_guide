@@ -88,6 +88,21 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
             ..where((t) => t.verseId.equals(verseId)))
           .getSingleOrNull();
 
+  /// Inserts or replaces the AI-generated explanation for [verseId].
+  Future<void> upsertVerseExplanation({
+    required String verseId,
+    required String explanationText,
+    required String modelVersion,
+  }) =>
+      into(db.verseExplanationsTable).insertOnConflictUpdate(
+        VerseExplanationsTableCompanion.insert(
+          verseId: verseId,
+          explanationText: explanationText,
+          generatedAt: DateTime.now(),
+          modelVersion: modelVersion,
+        ),
+      );
+
   /// Scholarly commentaries for a verse, grouped in insertion order.
   /// Returns an empty list when none are seeded for [verseId].
   Future<List<CommentariesTableData>> getCommentariesByVerseId(

@@ -380,6 +380,120 @@ final class VerseCommentariesFamily extends $Family
   String toString() => r'verseCommentariesProvider';
 }
 
+@ProviderFor(verseChapterPosition)
+final verseChapterPositionProvider = VerseChapterPositionFamily._();
+
+final class VerseChapterPositionProvider extends $FunctionalProvider<
+        AsyncValue<
+            ({
+              int index,
+              int total,
+            })?>,
+        ({
+          int index,
+          int total,
+        })?,
+        FutureOr<
+            ({
+              int index,
+              int total,
+            })?>>
+    with
+        $FutureModifier<
+            ({
+              int index,
+              int total,
+            })?>,
+        $FutureProvider<
+            ({
+              int index,
+              int total,
+            })?> {
+  VerseChapterPositionProvider._(
+      {required VerseChapterPositionFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'verseChapterPositionProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$verseChapterPositionHash();
+
+  @override
+  String toString() {
+    return r'verseChapterPositionProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<
+      ({
+        int index,
+        int total,
+      })?> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<
+      ({
+        int index,
+        int total,
+      })?> create(Ref ref) {
+    final argument = this.argument as String;
+    return verseChapterPosition(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is VerseChapterPositionProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$verseChapterPositionHash() =>
+    r'59ffd1f61d51e2ca0e2dee31a4464964d0db8aff';
+
+final class VerseChapterPositionFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<
+                ({
+                  int index,
+                  int total,
+                })?>,
+            String> {
+  VerseChapterPositionFamily._()
+      : super(
+          retry: null,
+          name: r'verseChapterPositionProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  VerseChapterPositionProvider call(
+    String verseId,
+  ) =>
+      VerseChapterPositionProvider._(argument: verseId, from: this);
+
+  @override
+  String toString() => r'verseChapterPositionProvider';
+}
+
 @ProviderFor(adjacentVerseIds)
 final adjacentVerseIdsProvider = AdjacentVerseIdsFamily._();
 

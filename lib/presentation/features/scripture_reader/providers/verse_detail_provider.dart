@@ -120,6 +120,44 @@ Future<List<Commentary>> verseCommentaries(Ref ref, String verseId) async {
   ];
 }
 
+// ── Verse position in chapter ─────────────────────────────────────────────
+// 1-based index of the verse within its chapter + the chapter's verse count,
+// for the verse-detail progress rail. Null when the position can't be
+// determined (single-unit scriptures, or no chapter metadata).
+
+@riverpod
+Future<({int index, int total})?> verseChapterPosition(
+  Ref ref,
+  String verseId,
+) async {
+  final parts = verseId.split('.');
+  // Bhagavad Gītā: contiguous 1..N verses per chapter, metadata is static.
+  if (parts.length == 3 && parts[0].toUpperCase() == 'BG') {
+    final ch = int.tryParse(parts[1]);
+    final v = int.tryParse(parts[2]);
+    if (ch != null && v != null && ch >= 1 && ch <= 18) {
+      final total = BhagavadGitaChapters.byNumber(ch).verseCount;
+      if (total <= 0) return null;
+      return (index: v.clamp(1, total), total: total);
+    }
+  }
+
+  final db = await ref.watch(appDatabaseProvider.future);
+  final row = await db.scriptureDao.getVerseById(verseId);
+  if (row == null) return null;
+
+  final verses = await db.scriptureDao.getChapter(
+    scriptureCode: row.scripture,
+    chapterNum: row.chapterNum,
+    bookNum: row.bookNum,
+  );
+  if (verses.isEmpty) return null;
+  final sorted = [...verses]..sort((a, b) => a.verseNum.compareTo(b.verseNum));
+  final idx = sorted.indexWhere((e) => e.id == verseId);
+  if (idx < 0) return null;
+  return (index: idx + 1, total: sorted.length);
+}
+
 // ── Adjacent verse IDs ────────────────────────────────────────────────────
 // Prev/next in canonical (book_num, chapter_num, verse_num, id) order in DB.
 
