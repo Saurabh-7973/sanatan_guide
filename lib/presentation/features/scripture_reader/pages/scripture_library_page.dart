@@ -142,9 +142,8 @@ class _Header extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
 
-    final verses =
-        _ScriptureLibraryPageState._indianFormat(
-            _ScriptureLibraryPageState._totalVerses());
+    final verses = _ScriptureLibraryPageState._indianFormat(
+        _ScriptureLibraryPageState._totalVerses());
     final scriptures = _ScriptureLibraryPageState._totalScriptures();
 
     return Padding(
@@ -234,8 +233,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = isDark ? DColors.surface : LColors.surface;
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -248,7 +246,7 @@ class _SearchBar extends StatelessWidget {
         final iconColor = isFocused ? saffron : text3;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
           child: Container(
             height: 44,
             padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -274,8 +272,19 @@ class _SearchBar extends StatelessWidget {
                       color: text1,
                     ),
                     decoration: InputDecoration(
+                      // The app's inputDecorationTheme supplies a filled,
+                      // rounded OutlineInputBorder; without overriding every
+                      // border slot (not just `border`) it paints a second box
+                      // inside this pill.
                       isCollapsed: true,
+                      filled: false,
+                      contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
                       hintText: 'Find a scripture...',
                       hintStyle: TextStyle(
                         fontFamily: Fonts.sans,
@@ -314,44 +323,63 @@ class _FamilyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A persistent header needs a fixed extent, so size it to the worst case:
+    // a two-line description + the Devanāgarī name + the English/meta row +
+    // the inter-element gaps — with the text-driven blocks scaled by the user's
+    // text-size setting so the accessibility path doesn't clip.
+    final textScaler = MediaQuery.textScalerOf(context);
+    final headerHeight = 46.0 + textScaler.scale(88.0);
+
     return CustomScrollView(
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
       slivers: [
-        const SliverPadding(padding: EdgeInsets.only(top: 12)),
-        for (final family in _kFamilies) ...[
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _FamilyHeaderDelegate(family: family, isDark: isDark),
-          ),
-          if (family.kind == _FamilyKind.shruti)
-            _VedasGridSliver(isDark: isDark)
-          else
-            SliverList.builder(
-              itemCount: family.scriptures.length,
-              itemBuilder: (context, i) {
-                return _ScriptureRow(
-                  isDark: isDark,
-                  scripture: family.scriptures[i],
-                  isLast: i == family.scriptures.length - 1,
+        const SliverPadding(padding: EdgeInsets.only(top: 32)),
+        // One SliverMainAxisGroup per family: the pinned header sticks to the
+        // viewport top *while its own family's content is on screen*, then the
+        // group clips it away so the next family's header takes over — instead
+        // of every header piling up at the top (vanilla pinned slivers stack;
+        // they don't push each other off).
+        for (final family in _kFamilies)
+          SliverMainAxisGroup(
+            slivers: [
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _FamilyHeaderDelegate(
                   family: family,
-                );
-              },
-            ),
-          if (family.kind == _FamilyKind.shruti)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: _ScriptureRow(
                   isDark: isDark,
-                  scripture: _kMukhyaUpanishads,
-                  isLast: true,
-                  family: family,
+                  height: headerHeight,
                 ),
               ),
-            ),
-        ],
+              if (family.kind == _FamilyKind.shruti)
+                _VedasGridSliver(isDark: isDark)
+              else
+                SliverList.builder(
+                  itemCount: family.scriptures.length,
+                  itemBuilder: (context, i) {
+                    return _ScriptureRow(
+                      isDark: isDark,
+                      scripture: family.scriptures[i],
+                      isLast: i == family.scriptures.length - 1,
+                      family: family,
+                    );
+                  },
+                ),
+              if (family.kind == _FamilyKind.shruti)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: _ScriptureRow(
+                      isDark: isDark,
+                      scripture: _kMukhyaUpanishads,
+                      isLast: true,
+                      family: family,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
       ],
     );
@@ -362,22 +390,27 @@ class _FamilyList extends StatelessWidget {
 // _FamilyHeaderDelegate — sticky pinned header w/ blur
 // ============================================================
 class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _FamilyHeaderDelegate({required this.family, required this.isDark});
+  _FamilyHeaderDelegate({
+    required this.family,
+    required this.isDark,
+    required this.height,
+  });
 
   final _Family family;
   final bool isDark;
-
-  static const double _height = 96;
-
-  @override
-  double get minExtent => _height;
+  final double height;
 
   @override
-  double get maxExtent => _height;
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
 
   @override
   bool shouldRebuild(_FamilyHeaderDelegate oldDelegate) =>
-      oldDelegate.family != family || oldDelegate.isDark != isDark;
+      oldDelegate.family != family ||
+      oldDelegate.isDark != isDark ||
+      oldDelegate.height != height;
 
   @override
   Widget build(
@@ -391,80 +424,87 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
         ? const Color.fromRGBO(15, 15, 15, 0.85)
         : const Color.fromRGBO(253, 250, 246, 0.9);
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 14),
-          decoration: BoxDecoration(
-            color: bgTint,
-            border: Border(
-              bottom: BorderSide(color: divider, width: 1),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                family.devaName,
-                style: TextStyle(
-                  fontFamily:
-                      family.kind == _FamilyKind.tamil ? Fonts.sans : Fonts.deva,
-                  fontSize: 22,
-                  height: 1,
-                  letterSpacing: 0.44,
-                  color: saffron,
-                ),
+    // The built widget MUST fill the full `maxExtent`: a persistent header
+    // whose child is shorter than maxExtent produces an invalid SliverGeometry
+    // (layoutExtent > paintExtent) and the whole CustomScrollView refuses to
+    // render — i.e. a blank Library page.
+    return SizedBox.expand(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 14),
+            decoration: BoxDecoration(
+              color: bgTint,
+              border: Border(
+                bottom: BorderSide(color: divider, width: 1),
               ),
-              const SizedBox(height: 4),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Expanded(
-                    child: Text(
-                      family.englishLabel,
-                      style: TextStyle(
-                        fontFamily: Fonts.serif,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.13,
-                        color: text1,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  family.devaName,
+                  style: TextStyle(
+                    fontFamily: family.kind == _FamilyKind.tamil
+                        ? Fonts.sans
+                        : Fonts.deva,
+                    fontSize: 22,
+                    height: 1,
+                    letterSpacing: 0.44,
+                    color: saffron,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        family.englishLabel,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.13,
+                          color: text1,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    family.metaLabel,
+                    const SizedBox(width: 12),
+                    Text(
+                      family.metaLabel,
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.98,
+                        color: text3,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(right: 40),
+                  child: Text(
+                    family.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: Fonts.sans,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.98,
-                      color: text3,
+                      fontFamily: Fonts.serif,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12.5,
+                      height: 1.5,
+                      color: text2,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(right: 40),
-                child: Text(
-                  family.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: Fonts.serif,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 12.5,
-                    height: 1.5,
-                    color: text2,
-                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -483,7 +523,7 @@ class _VedasGridSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
       sliver: SliverGrid.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -509,8 +549,7 @@ class _VedaCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = isDark ? DColors.surface : LColors.surface;
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -589,8 +628,7 @@ class _ScriptureRow extends StatelessWidget {
 
   Color _glyphColor() {
     return switch (family.kind) {
-      _FamilyKind.shruti =>
-        isDark ? DColors.saffron : LColors.saffron,
+      _FamilyKind.shruti => isDark ? DColors.saffron : LColors.saffron,
       _FamilyKind.itihasa ||
       _FamilyKind.purana ||
       _FamilyKind.dharmasastra =>
@@ -604,8 +642,7 @@ class _ScriptureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
@@ -678,7 +715,8 @@ class _ScriptureRow extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
+                          text:
+                              '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
                           style: TextStyle(
                             fontFamily: Fonts.serif,
                             fontStyle: FontStyle.italic,
@@ -756,6 +794,7 @@ class _SearchResults extends StatelessWidget {
         if (m.scripture.devaName.contains(query)) return 2;
         return 3;
       }
+
       return score(a).compareTo(score(b));
     });
     return out;
@@ -768,8 +807,7 @@ class _SearchResults extends StatelessWidget {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
     if (matches.isEmpty) {
       return _EmptyResults(query: query, isDark: isDark);
@@ -853,8 +891,9 @@ class _SearchResultRow extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily:
-                      family.kind == _FamilyKind.tamil ? Fonts.sans : Fonts.deva,
+                  fontFamily: family.kind == _FamilyKind.tamil
+                      ? Fonts.sans
+                      : Fonts.deva,
                   fontSize: 14,
                   color: text3,
                 ),
@@ -897,8 +936,7 @@ class _SearchResultRow extends StatelessWidget {
     );
   }
 
-  static Widget _highlighted(
-      String text, String query, Color hl, Color base) {
+  static Widget _highlighted(String text, String query, Color hl, Color base) {
     final lower = text.toLowerCase();
     final idx = lower.indexOf(query);
     final baseStyle = TextStyle(
@@ -997,8 +1035,7 @@ class _EmptyResults extends StatelessWidget {
 // Data — 6 families + scripture catalog
 // ============================================================
 
-String _indianFmtStatic(int n) =>
-    _ScriptureLibraryPageState._indianFormat(n);
+String _indianFmtStatic(int n) => _ScriptureLibraryPageState._indianFormat(n);
 
 enum _FamilyKind { shruti, itihasa, purana, darshana, dharmasastra, tamil }
 
@@ -1114,8 +1151,7 @@ const _kFamilies = <_Family>[
     englishLabel: 'Itihāsa — the great epics',
     metaLabel: '3 TEXTS',
     shortLabel: 'ITIHĀSA',
-    description:
-        'Stories that happened — Rāma, the Pāṇḍavas, the Gītā within.',
+    description: 'Stories that happened — Rāma, the Pāṇḍavas, the Gītā within.',
     scriptures: [
       _Scripture(
         id: 'bhagavad_gita',
@@ -1239,8 +1275,7 @@ const _kFamilies = <_Family>[
     englishLabel: 'Tamil sacred corpus',
     metaLabel: '1 TEXT',
     shortLabel: 'TAMIL',
-    description:
-        'The southern stream — ethics in couplets, devotion in song.',
+    description: 'The southern stream — ethics in couplets, devotion in song.',
     scriptures: [
       _Scripture(
         id: 'tirukkural',
