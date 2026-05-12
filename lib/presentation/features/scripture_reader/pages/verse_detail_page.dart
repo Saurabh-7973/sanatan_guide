@@ -185,7 +185,6 @@ class _VerseDetailPageState extends ConsumerState<VerseDetailPage> {
                 (verse) {
                   _lastKnownTitle = verse.scripture.displayNameSafe;
                   return _VerseBody(
-                    key: ValueKey(verse.id),
                     verse: verse,
                     prevId: adjacent?.prevId,
                     nextId: adjacent?.nextId,
@@ -625,7 +624,6 @@ class _UtilAction extends StatelessWidget {
 
 class _VerseBody extends ConsumerStatefulWidget {
   const _VerseBody({
-    super.key,
     required this.verse,
     required this.prevId,
     required this.nextId,
@@ -666,10 +664,24 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
       ..addListener(() {
         if (!_noteFocusNode.hasFocus) {
           _saveTimer?.cancel();
-          unawaited(_persistNote(_noteController.text));
+          unawaited(_persistNoteFor(verse, _noteController.text));
         }
       });
     _recordReading(verse);
+  }
+
+  @override
+  void didUpdateWidget(covariant _VerseBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.verse.id != widget.verse.id) {
+      _saveTimer?.cancel();
+      unawaited(_persistNoteFor(oldWidget.verse, _noteController.text));
+      _noteController.text = widget.verse.noteText ?? '';
+      _selectedWord = null;
+      _explaining = false;
+      _explainError = null;
+      _recordReading(widget.verse);
+    }
   }
 
   @override
@@ -735,19 +747,20 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
 
   void _onNoteChanged(String value) {
     _saveTimer?.cancel();
+    final v = verse;
     _saveTimer =
-        Timer(const Duration(milliseconds: 600), () => _persistNote(value));
+        Timer(const Duration(milliseconds: 600), () => _persistNoteFor(v, value));
     setState(() {});
   }
 
-  Future<void> _persistNote(String value) async {
+  Future<void> _persistNoteFor(Verse v, String value) async {
     try {
       final repo = await ref.read(scriptureRepositoryProvider.future);
       final trimmed = value.trim().isEmpty ? null : value.trim();
-      await repo.updateVerseNote(verse.id, trimmed);
-      if (mounted) ref.invalidate(verseDetailProvider(verse.id));
+      await repo.updateVerseNote(v.id, trimmed);
+      if (mounted) ref.invalidate(verseDetailProvider(v.id));
     } catch (e, st) {
-      AppLogger.instance.w('persistNote failed for ${verse.id}', e, st);
+      AppLogger.instance.w('persistNote failed for ${v.id}', e, st);
     }
   }
 
@@ -763,7 +776,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         onChanged: _onNoteChanged,
         onDone: () {
           _saveTimer?.cancel();
-          unawaited(_persistNote(_noteController.text));
+          unawaited(_persistNoteFor(verse, _noteController.text));
           _noteFocusNode.unfocus();
           Navigator.of(sheetCtx).pop();
         },
