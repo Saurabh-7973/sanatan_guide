@@ -34,19 +34,25 @@ class WarmBackdrop extends StatelessWidget {
     final topAlpha = (isDark ? 0.14 : 0.12) * intensity;
     final midAlpha = (isDark ? 0.04 : 0.04) * intensity;
 
+    // A BoxDecoration with both `color` and `gradient` paints only the gradient
+    // (a Paint ignores `color` when a shader is set), so the opaque scaffold
+    // base must be a separate layer beneath the translucent radial wash —
+    // otherwise transparent-Scaffold screens bleed through to clear-black.
     return IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: scaffold,
-          gradient: RadialGradient(
-            center: const Alignment(0, -1.1),
-            radius: 1.1,
-            colors: [
-              base.withValues(alpha: topAlpha),
-              base.withValues(alpha: midAlpha),
-              base.withValues(alpha: 0),
-            ],
-            stops: const [0.0, 0.5, 1.0],
+      child: ColoredBox(
+        color: scaffold,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: const Alignment(0, -1.1),
+              radius: 1.1,
+              colors: [
+                base.withValues(alpha: topAlpha),
+                base.withValues(alpha: midAlpha),
+                base.withValues(alpha: 0),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
         ),
       ),
