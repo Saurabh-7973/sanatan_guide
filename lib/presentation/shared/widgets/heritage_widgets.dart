@@ -14,17 +14,24 @@ class BindingLine extends StatelessWidget {
   final double diamondSize;
   final double sideGap;
 
+  /// Palm-leaf folio binding: the rules fade to transparent at the outer
+  /// edges and run saffron-deep toward the centre diamond (verse-detail leaf).
+  /// When false (default) the rules are a flat divider-colour hairline — the
+  /// "incised rule" used on Home / Onboarding.
+  final bool faded;
+
   const BindingLine({
     super.key,
     required this.isDark,
     this.diamondSize = 4,
     this.sideGap = 5,
+    this.faded = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Two solid divider-colour hairlines flanking a saffron diamond — the
-    // "incised rule" of the mockups (incised-rule), not a faded gradient.
+    if (faded) return _buildFaded();
+
     final lineColor = isDark ? DColors.divider : LColors.divider;
     final dotColor = isDark ? DColors.saffron : LColors.saffron;
 
@@ -46,6 +53,56 @@ class BindingLine extends StatelessWidget {
           ),
           SizedBox(width: sideGap),
           rule(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFaded() {
+    final ruleColor = isDark
+        ? DColors.saffronDeep
+        : LColors.saffronDeep.withValues(alpha: 0.4);
+    final dotColor = isDark ? DColors.saffron : LColors.saffronDeep;
+
+    Widget rule({required bool fadeLeft}) => Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: fadeLeft
+                    ? [Colors.transparent, ruleColor]
+                    : [ruleColor, Colors.transparent],
+              ),
+            ),
+          ),
+        );
+
+    return SizedBox(
+      height: 14,
+      child: Row(
+        children: [
+          rule(fadeLeft: true),
+          SizedBox(width: sideGap),
+          Transform.rotate(
+            angle: 0.785398,
+            child: Container(
+              width: diamondSize,
+              height: diamondSize,
+              decoration: BoxDecoration(
+                color: dotColor,
+                boxShadow: isDark
+                    ? [
+                        BoxShadow(
+                          color: DColors.saffron.withValues(alpha: 0.4),
+                          blurRadius: 6,
+                        ),
+                      ]
+                    : null,
+              ),
+            ),
+          ),
+          SizedBox(width: sideGap),
+          rule(fadeLeft: false),
         ],
       ),
     );

@@ -4,13 +4,11 @@ import 'package:sanatan_guide/core/utils/verse_text.dart';
 void main() {
   group('stripVedicAccents', () {
     test('removes U+0951 (udatta) and U+0952 (anudatta) marks', () {
-      // Note: the current impl also strips anusvara (U+0902), so "अग्निं"
-      // (with anusvara) becomes "अग्नि" (without). Documented here as the
-      // de-facto behaviour; revisit if a future reading-mode needs to
-      // preserve anusvara.
+      // Strips the stress signs but keeps anusvāra (U+0902) — it's part of
+      // the word ("अग्निं" stays "अग्निं", not "अग्नि").
       expect(
         stripVedicAccents('अ॑ग्निं॒ ई॑ळे'),
-        'अग्नि ईळे',
+        'अग्निं ईळे',
       );
     });
 

@@ -1,13 +1,15 @@
-/// Strips Vedic svara / combining marks for a cleaner reading pass.
+/// Strips Vedic svara / accent marks for a cleaner reading pass.
 ///
-/// Removes Unicode combining Devanagari accents (U+0951, U+0952), extended
-/// Vedic signs (U+1CD0–U+1CFF), and zero-width Devanagari modifiers
-/// (U+0900–U+0902). Also collapses runs of whitespace.
+/// Removes the combining Devanagari stress signs udātta (U+0951) and anudātta
+/// (U+0952) and the Vedic Extensions block (U+1CD0–U+1CFF). Standard
+/// nasalisation marks — anusvāra (U+0902) and candrabindu (U+0901) — are
+/// *kept*: they change the word, not just the recitation. Also collapses runs
+/// of whitespace.
 ///
 /// Idempotent — calling twice returns the same output.
 String stripVedicAccents(String text) {
   return text
-      .replaceAll(RegExp(r'[॒॑᳐-᳿ऀ-ं]'), '')
+      .replaceAll(RegExp(r'[॒॑᳐-᳿]'), '')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 }

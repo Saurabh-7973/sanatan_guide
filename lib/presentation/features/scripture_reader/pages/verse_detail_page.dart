@@ -14,6 +14,7 @@ import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/core/utils/explain_question.dart';
+import 'package:sanatan_guide/core/utils/verse_text.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/data/datasources/local/app_database_provider.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
@@ -30,11 +31,42 @@ import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
-/// Strips Vedic svara / combining marks for a cleaner reading pass.
-String stripVedicAccents(String text) => text
-    .replaceAll(RegExp(r'[॒॑᳐-᳿ऀ-ं]'), '')
-    .replaceAll(RegExp(r'\s+'), ' ')
-    .trim();
+/// Cleans `verse.sanskrit` for the reading pass while keeping the manuscript's
+/// metrical line breaks: drops Vedic svara marks (via [stripVedicAccents]),
+/// normalises ASCII pipes to Devanāgarī daṇḍas (`|` → `।`, `||` → `॥`),
+/// collapses runs of spaces inside a line, and preserves the `\n` between pādas.
+String readingSanskrit(String raw) => raw
+    .replaceAll('||', '॥')
+    .replaceAll('|', '।')
+    .split('\n')
+    .map(stripVedicAccents)
+    .where((line) => line.isNotEmpty)
+    .join('\n');
+
+/// Splits cleaned Sanskrit into display lines: honours the source's `\n`
+/// breaks; if the verse is a single line, breaks it after each daṇḍa
+/// (`।` / `॥`) so a śloka still reads as separate pādas.
+List<String> sanskritDisplayLines(String cleaned) {
+  final byNewline =
+      cleaned.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty);
+  if (byNewline.length > 1) return byNewline.toList(growable: false);
+
+  final single = byNewline.isEmpty ? '' : byNewline.first;
+  if (single.isEmpty) return const [];
+  final out = <String>[];
+  final buf = StringBuffer();
+  for (final rune in single.runes) {
+    final ch = String.fromCharCode(rune);
+    buf.write(ch);
+    if (ch == '।' || ch == '॥') {
+      out.add(buf.toString().trim());
+      buf.clear();
+    }
+  }
+  final tail = buf.toString().trim();
+  if (tail.isNotEmpty) out.add(tail);
+  return out.isEmpty ? [single] : out;
+}
 
 /// Roman numeral for small chapter numbers (1–3999); plain Arabic otherwise.
 String _roman(int n) {
@@ -1120,7 +1152,7 @@ class _Leaf extends StatelessWidget {
                 ),
                 const SizedBox(height: Spacing.sectionV),
                 _SanskritWords(
-                  text: stripVedicAccents(verse.sanskrit),
+                  text: readingSanskrit(verse.sanskrit),
                   wordMeanings: verse.wordMeanings,
                   size: sanskritSize,
                   baseColor: cream,
@@ -1131,12 +1163,19 @@ class _Leaf extends StatelessWidget {
               ],
             ),
           ),
-          Positioned(top: 0, left: 0, right: 0, child: BindingLine(isDark: isDark)),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: BindingLine(
+                isDark: isDark, faded: true, diamondSize: 6, sideGap: 12),
+          ),
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: BindingLine(isDark: isDark),
+            child: BindingLine(
+                isDark: isDark, faded: true, diamondSize: 6, sideGap: 12),
           ),
           if (selectedWord != null)
             Positioned(
@@ -1178,19 +1217,36 @@ class _SanskritWords extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = AppText.sanskritBody(color: baseColor, size: size)
         .copyWith(height: 1.95, letterSpacing: 0.1);
+    final lines = sanskritDisplayLines(text);
     final meanings = wordMeanings ?? const <WordMeaning>[];
+
     if (meanings.isEmpty) {
-      // No word breakdown — render the whole verse as one block (keeps the
-      // manuscript line breaks present in [text]).
-      return Text(text, textAlign: TextAlign.center, style: base, locale: const Locale('sa'));
+      // No word breakdown — one centred line per pāda.
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final line in lines)
+            Text(line,
+                textAlign: TextAlign.center,
+                style: base,
+                locale: const Locale('sa')),
+        ],
+      );
     }
 
     final byWord = <String, WordMeaning>{
       for (final wm in meanings) wm.word.trim(): wm,
     };
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [for (final line in lines) _wordLine(line, base, byWord)],
+    );
+  }
 
+  Widget _wordLine(
+      String line, TextStyle base, Map<String, WordMeaning> byWord) {
     final children = <Widget>[];
-    for (final token in text.split(RegExp(r'\s+'))) {
+    for (final token in line.split(RegExp(r'\s+'))) {
       if (token.isEmpty) continue;
       final core = token.replaceAll(_danda, '');
       final tail = token.substring(core.length);
@@ -1221,7 +1277,6 @@ class _SanskritWords extends StatelessWidget {
         children.add(Text(tail, style: base, locale: const Locale('sa')));
       }
     }
-
     return Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -1574,12 +1629,19 @@ class _LoadingBody extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                    top: 0, left: 0, right: 0, child: BindingLine(isDark: isDark)),
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: BindingLine(
+                      isDark: isDark, faded: true, diamondSize: 6, sideGap: 12),
+                ),
                 Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: BindingLine(isDark: isDark)),
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: BindingLine(
+                      isDark: isDark, faded: true, diamondSize: 6, sideGap: 12),
+                ),
               ],
             ),
           ),

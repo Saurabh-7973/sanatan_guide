@@ -57,3 +57,7 @@ NATIVE_AD_UNIT_ID=
 INTERSTITIAL_AD_UNIT_ID=
 APP_OPEN_AD_UNIT_ID=
 .dart_defines
+
+# Claude Code transient runtime files
+.claude/scheduled_tasks.lock
+.claude/*.lock
