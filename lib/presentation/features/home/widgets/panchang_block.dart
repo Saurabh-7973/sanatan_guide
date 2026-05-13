@@ -25,9 +25,7 @@ class PanchangBlock extends StatelessWidget {
     final cream = isDark ? DColors.cream : LColors.text1;
 
     final today = now ?? DateTime.now();
-    final greeting = isFirstDay
-        ? 'Welcome'
-        : greetingForTimeOfDay(today);
+    final greeting = isFirstDay ? 'Welcome' : greetingForTimeOfDay(today);
     final greetingLine =
         greetingName == null ? greeting : '$greeting, $greetingName';
 
@@ -118,18 +116,32 @@ class _PanchangLine extends StatelessWidget {
       color: cream,
     );
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Flexible(
-          child: Text(
-            '$month  ·  $paksha $tithi  ·  $vara',
-            style: base,
-            textAlign: TextAlign.center,
-            softWrap: true,
+    // The mockup separates panchang segments with a 4 px saffron dot, not a
+    // type-coloured "·" glyph (which renders larger and in the text colour).
+    WidgetSpan dot() => WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 2),
+            child: Container(
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: saffron),
+            ),
           ),
-        ),
-      ],
+        );
+
+    return Text.rich(
+      TextSpan(
+        style: base,
+        children: [
+          TextSpan(text: month),
+          dot(),
+          TextSpan(text: '$paksha $tithi'),
+          dot(),
+          TextSpan(text: vara),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

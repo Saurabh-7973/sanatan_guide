@@ -68,8 +68,7 @@ class _VerseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = isDark ? DColors.surface : LColors.surface;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final saffronDeep =
-        isDark ? DColors.saffronDeep : LColors.saffronDeep;
+    final saffronDeep = isDark ? DColors.saffronDeep : LColors.saffronDeep;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -127,11 +126,14 @@ class _VerseCard extends StatelessWidget {
                 letterSpacing: 0.11,
                 color: cream,
               ),
-            ).animate().fadeIn(
+            )
+                .animate()
+                .fadeIn(
                   duration: 700.ms,
                   delay: 100.ms,
                   curve: Curves.easeOut,
-                ).slideY(
+                )
+                .slideY(
                   begin: 0.05,
                   end: 0,
                   duration: 700.ms,
@@ -140,9 +142,7 @@ class _VerseCard extends StatelessWidget {
                 ),
             const SizedBox(height: 22),
             _DividerLabel(
-              label: isFirstDay
-                  ? _firstDaySource(verse)
-                  : 'TRANSLATION',
+              label: isFirstDay ? _firstDaySource(verse) : 'TRANSLATION',
               isDark: isDark,
               divider: divider,
               text3: text3,
@@ -157,11 +157,14 @@ class _VerseCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: AppText.translation(color: text2, size: 14.5),
                 ),
-              ).animate().fadeIn(
+              )
+                  .animate()
+                  .fadeIn(
                     duration: 700.ms,
                     delay: 300.ms,
                     curve: Curves.easeOut,
-                  ).slideY(
+                  )
+                  .slideY(
                     begin: 0.05,
                     end: 0,
                     duration: 700.ms,

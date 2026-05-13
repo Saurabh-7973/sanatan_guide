@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/router/app_routes.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
+/// Bottom-nav scaffold matching screen-01: a rounded surface bar with three
+/// tab *cells* — the selected cell (icon + label together) sits in a rounded
+/// saffron-glow pill, not just the icon.
 class ScaffoldWithNavBar extends StatelessWidget {
   const ScaffoldWithNavBar({super.key, required this.child});
 
@@ -11,9 +14,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/learn')) {
-      return 1;
-    }
+    if (location.startsWith('/learn')) return 1;
     if (location.startsWith('/browse') ||
         location.startsWith(AppRoutes.bookmarks)) {
       return 2;
@@ -21,20 +22,14 @@ class ScaffoldWithNavBar extends StatelessWidget {
     return 0;
   }
 
-  void _onDestinationSelected(BuildContext context, int index) {
+  void _go(BuildContext context, int index) {
     switch (index) {
       case 0:
-        {
-          context.go('/home');
-        }
+        context.go('/home');
       case 1:
-        {
-          context.go('/learn');
-        }
+        context.go('/learn');
       case 2:
-        {
-          context.go(AppRoutes.browse);
-        }
+        context.go(AppRoutes.browse);
     }
   }
 
@@ -42,88 +37,93 @@ class ScaffoldWithNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedIndex = _selectedIndex(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
     const inactive = AppColors.warmGrey50;
 
-    Widget icon(int index, _NavGlyph glyph) => _NavIcon(
-          painter: _NavIconPainter(
-            glyph: glyph,
-            color: selectedIndex == index ? AppColors.saffron : inactive,
+    Widget tab(int i, _NavGlyph glyph, String label) {
+      final active = selectedIndex == i;
+      final fg = active ? saffron : inactive;
+      return Expanded(
+        child: InkWell(
+          onTap: () => _go(context, i),
+          borderRadius: BorderRadius.circular(22),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 8),
+            decoration: BoxDecoration(
+              color: active ? glow : Colors.transparent,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CustomPaint(
+                    painter: _NavIconPainter(glyph: glyph, color: fg),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Outfit',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.44,
+                    color: fg,
+                  ),
+                ),
+              ],
+            ),
           ),
-        );
+        ),
+      );
+    }
 
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        // Non-home tab → go home; home tab → allow exit via double-back (default)
-        if (selectedIndex != 0) {
-          context.go('/home');
-        }
+        if (selectedIndex != 0) context.go('/home');
       },
       child: Scaffold(
         body: child,
         bottomNavigationBar: SafeArea(
+          top: false,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSheet),
-              child: NavigationBar(
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (i) =>
-                    _onDestinationSelected(context, i),
-                backgroundColor:
-                    isDark ? AppColors.surfaceDark : AppColors.surface,
-                indicatorColor: AppColors.saffron.withValues(alpha: 0.12),
-                surfaceTintColor: Colors.transparent,
-                elevation: isDark ? 0 : 4,
-                shadowColor: isDark
-                    ? Colors.transparent
-                    : Colors.black.withValues(alpha: 0.08),
-                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                  final selected = states.contains(WidgetState.selected);
-                  return TextStyle(
-                    fontFamily: 'Outfit',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.04 * 11,
-                    color: selected ? AppColors.saffron : inactive,
-                  );
-                }),
-                destinations: [
-                  NavigationDestination(
-                    icon: icon(0, _NavGlyph.sun),
-                    label: 'Today',
-                  ),
-                  NavigationDestination(
-                    icon: icon(1, _NavGlyph.flame),
-                    label: 'Practice',
-                  ),
-                  NavigationDestination(
-                    icon: icon(2, _NavGlyph.books),
-                    label: 'Texts',
-                  ),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: surface,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+              ),
+              child: Row(
+                children: [
+                  tab(0, _NavGlyph.sun, 'Today'),
+                  const SizedBox(width: 4),
+                  tab(1, _NavGlyph.flame, 'Practice'),
+                  const SizedBox(width: 4),
+                  tab(2, _NavGlyph.books, 'Texts'),
                 ],
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Nav icon wrapper ──────────────────────────────────────────────────────
-
-class _NavIcon extends StatelessWidget {
-  const _NavIcon({required this.painter});
-  final CustomPainter painter;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(24, 24),
-      painter: painter,
     );
   }
 }
@@ -152,7 +152,6 @@ class _NavIconPainter extends CustomPainter {
 
     switch (glyph) {
       case _NavGlyph.sun:
-        // circle r=3.5 at (11,11) + 8 short rays
         canvas.drawCircle(p(11, 11), 3.5 * u, stroke(1.6));
         const rays = [
           [11.0, 4.0, 11.0, 5.5], // N

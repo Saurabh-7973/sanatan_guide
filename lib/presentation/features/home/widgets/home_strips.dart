@@ -37,10 +37,9 @@ class ContinueStrip extends ConsumerWidget {
 
     return _StripShell(
       isDark: isDark,
-      icon: Icons.menu_book_outlined,
-      label: streak > 0
-          ? 'CONTINUE  ·  $streak DAY STREAK'
-          : 'CONTINUE READING',
+      glyph: _StripGlyph.resume,
+      label:
+          streak > 0 ? 'CONTINUE  ·  $streak DAY STREAK' : 'CONTINUE READING',
       title: '${scripture.displayName} · $verseLabel',
       progressBeads: beadsFilled,
       onTap: () => context.push(
@@ -98,10 +97,11 @@ class PathStrip extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 12),
           child: _StripShell(
             isDark: isDark,
-            icon: Icons.terrain_outlined,
+            glyph: _StripGlyph.ascent,
             label: 'YOUR PATH  ·  FOUNDATIONS',
             title: next.title,
-            meta: '${next.estimatedMinutes} min  ·  module $position of ${list.length}',
+            meta:
+                '${next.estimatedMinutes} min  ·  module $position of ${list.length}',
             completedCount: completedCount,
             onTap: () => context.push('/learn/${next.id}'),
           ),
@@ -124,14 +124,11 @@ class FestivalPill extends ConsumerWidget {
     final upcoming = _firstUpcoming(list);
     if (upcoming == null) return const SizedBox.shrink();
 
-    final daysUntil = upcoming.date
-        .difference(DateTime.now())
-        .inDays
-        .clamp(0, 9999);
+    final daysUntil =
+        upcoming.date.difference(DateTime.now()).inDays.clamp(0, 9999);
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final surface = isDark ? DColors.surface : LColors.surface;
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
 
@@ -220,7 +217,7 @@ class FestivalPill extends ConsumerWidget {
 class _StripShell extends StatelessWidget {
   const _StripShell({
     required this.isDark,
-    required this.icon,
+    required this.glyph,
     required this.label,
     required this.title,
     required this.onTap,
@@ -230,7 +227,7 @@ class _StripShell extends StatelessWidget {
   });
 
   final bool isDark;
-  final IconData icon;
+  final _StripGlyph glyph;
   final String label;
   final String title;
   final String? meta;
@@ -241,11 +238,9 @@ class _StripShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final saffronGlow =
-        isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    final saffronGlow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
     final surface = isDark ? DColors.surface : LColors.surface;
-    final dividerSoft =
-        isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -270,7 +265,13 @@ class _StripShell extends StatelessWidget {
                 color: saffronGlow,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 18, color: saffron),
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CustomPaint(
+                  painter: _StripGlyphPainter(glyph: glyph, color: saffron),
+                ),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -381,6 +382,60 @@ class _ProgressBeads extends StatelessWidget {
       ],
     );
   }
+}
+
+// ============================================================
+// _StripGlyph — the screen-01 strip icons (18-unit viewBox)
+// ============================================================
+enum _StripGlyph { resume, ascent }
+
+class _StripGlyphPainter extends CustomPainter {
+  const _StripGlyphPainter({required this.glyph, required this.color});
+
+  final _StripGlyph glyph;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 18.0; // mockup viewBox is 18×18
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5 * u
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    switch (glyph) {
+      case _StripGlyph.resume:
+        // M2 3.5h6a3 3 0 0 1 3 3v8  +  M16 3.5h-2a3 3 0 0 0-3 3v8
+        final left = Path()
+          ..moveTo(2 * u, 3.5 * u)
+          ..lineTo(8 * u, 3.5 * u)
+          ..arcToPoint(Offset(11 * u, 6.5 * u), radius: Radius.circular(3 * u))
+          ..lineTo(11 * u, 14.5 * u);
+        final right = Path()
+          ..moveTo(16 * u, 3.5 * u)
+          ..lineTo(14 * u, 3.5 * u)
+          ..arcToPoint(Offset(11 * u, 6.5 * u),
+              radius: Radius.circular(3 * u), clockwise: false)
+          ..lineTo(11 * u, 14.5 * u);
+        canvas
+          ..drawPath(left, stroke)
+          ..drawPath(right, stroke);
+      case _StripGlyph.ascent:
+        // M9 2v14  +  M3 9l6-7 6 7  (an up-arrow)
+        canvas.drawLine(Offset(9 * u, 2 * u), Offset(9 * u, 16 * u), stroke);
+        final chevron = Path()
+          ..moveTo(3 * u, 9 * u)
+          ..lineTo(9 * u, 2 * u)
+          ..lineTo(15 * u, 9 * u);
+        canvas.drawPath(chevron, stroke);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_StripGlyphPainter old) =>
+      old.color != color || old.glyph != glyph;
 }
 
 // ============================================================
