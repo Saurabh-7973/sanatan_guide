@@ -24,6 +24,7 @@ import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmark
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/verse_detail_glyphs.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart'
     as font_prefs;
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
@@ -389,7 +390,7 @@ class _TopBar extends StatelessWidget {
             _CircleButton(
               isDark: isDark,
               onTap: onShare ?? () {},
-              child: Icon(Icons.ios_share_rounded, size: 18, color: text1),
+              child: ShareNetworkGlyph(color: text1, size: 18),
             ),
           ] else
             const SizedBox(width: 72),
@@ -527,7 +528,7 @@ class _UtilBar extends StatelessWidget {
               onTap: prevId == null ? null : () => nav(prevId!),
             ),
             _UtilAction(
-              icon: Icons.translate_rounded,
+              glyphBuilder: (c) => TranslationEyeGlyph(color: c, size: 16),
               label: 'Translation',
               text: text2,
               active: translationOn,
@@ -536,13 +537,13 @@ class _UtilBar extends StatelessWidget {
               onTap: enabled ? onToggleTranslation : null,
             ),
             _UtilAction(
-              icon: Icons.headphones_rounded,
+              glyphBuilder: (c) => ListenClockGlyph(color: c, size: 16),
               label: 'Listen',
               text: text2,
               onTap: null, // audio not bundled yet
             ),
             _UtilAction(
-              icon: Icons.edit_note_rounded,
+              glyphBuilder: (c) => NotesCaretGlyph(color: c, size: 16),
               label: 'Notes',
               text: hasNote ? saffron : text2,
               onTap: enabled ? onOpenNotes : null,
@@ -600,7 +601,7 @@ class _UtilNav extends StatelessWidget {
 
 class _UtilAction extends StatelessWidget {
   const _UtilAction({
-    required this.icon,
+    required this.glyphBuilder,
     required this.label,
     required this.text,
     this.active = false,
@@ -609,7 +610,7 @@ class _UtilAction extends StatelessWidget {
     required this.onTap,
   });
 
-  final IconData icon;
+  final Widget Function(Color color) glyphBuilder;
   final String label;
   final Color text;
   final bool active;
@@ -638,7 +639,7 @@ class _UtilAction extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 16, color: c),
+                glyphBuilder(c),
                 const SizedBox(width: 6),
                 Text(label, style: AppText.pill(color: c).copyWith(fontSize: 11)),
               ],
@@ -2019,10 +2020,10 @@ class _BookmarkAction extends ConsumerWidget {
         await dao.toggleBookmark(verseId);
         if (!isBookmarked) AnalyticsService.verseBookmarked(verseId);
       },
-      child: Icon(
-        isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-        size: 18,
+      child: RibbonBookmarkGlyph(
         color: isBookmarked ? saffron : text1,
+        filled: isBookmarked,
+        size: 18,
       )
           .animate(key: ValueKey(isBookmarked))
           .scale(

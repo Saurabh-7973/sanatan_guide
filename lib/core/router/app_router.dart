@@ -23,6 +23,7 @@ import 'package:sanatan_guide/presentation/shared/widgets/scaffold_with_nav_bar.
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart' as dt;
 import 'package:shimmer/shimmer.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -171,30 +172,39 @@ class _SplashPage extends ConsumerStatefulWidget {
 }
 
 class _SplashPageState extends ConsumerState<_SplashPage> {
+  bool? _onboardingComplete;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigate(context, ref);
-    });
+    _resolve();
   }
 
-  Future<void> _navigate(BuildContext context, WidgetRef ref) async {
-    await Future<void>.delayed(const Duration(milliseconds: 800));
+  Future<void> _resolve() async {
+    // Read the onboarding flag first so the shimmer can match the screen the
+    // user is about to land on (Home skeleton vs Onboarding skeleton).
     final isComplete = await OnboardingService.isComplete();
-    if (context.mounted) {
-      if (isComplete) {
-        context.go('/home');
-      } else {
-        context.go('/onboarding');
-      }
+    if (!mounted) return;
+    setState(() => _onboardingComplete = isComplete);
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    if (isComplete) {
+      context.go('/home');
+    } else {
+      context.go('/onboarding');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _HomeSplashShimmer(),
+    return Scaffold(
+      body: switch (_onboardingComplete) {
+        true => const _HomeSplashShimmer(),
+        false => const _OnboardingSplashShimmer(),
+        // Brief gap (~one prefs read) before we know which skeleton to draw;
+        // native splash is still fading so a blank Scaffold is invisible here.
+        null => const SizedBox.shrink(),
+      },
     );
   }
 }
@@ -257,7 +267,96 @@ CustomTransitionPage<void> _fadeSlideUpTransition(
   );
 }
 
-// ── Splash shimmer ────────────────────────────────────────────────────────
+// ── Splash shimmers ───────────────────────────────────────────────────────
+
+/// Skeleton matching screen-11 onboarding (Welcome step) so first-launch users
+/// don't see a flash of the Home shimmer before the onboarding page renders.
+class _OnboardingSplashShimmer extends StatelessWidget {
+  const _OnboardingSplashShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Shimmer.fromColors(
+      baseColor: isDark ? AppColors.surfaceDark : AppColors.surfaceVariant,
+      highlightColor: isDark ? AppColors.surfaceElevated : AppColors.surface,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: dt.Spacing.xxl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: dt.Spacing.xxxl),
+              // Invocation (॥ श्री गणेशाय नमः ॥)
+              const Center(
+                child: ShimmerLine(height: 12, width: 140, borderRadius: 4),
+              ),
+              const SizedBox(height: dt.Spacing.xl),
+              // Two step dots
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ShimmerLine(height: 6, width: 6, borderRadius: 3),
+                  SizedBox(width: 10),
+                  ShimmerLine(height: 6, width: 6, borderRadius: 3),
+                ],
+              ),
+              const SizedBox(height: dt.Spacing.xxl),
+              // ॐ glyph block
+              const Center(
+                child: ShimmerLine(height: 68, width: 68, borderRadius: 14),
+              ),
+              const SizedBox(height: dt.Spacing.lg),
+              // Sanatan Guide title
+              const Center(
+                child: ShimmerLine(height: 28, width: 200, borderRadius: 6),
+              ),
+              const SizedBox(height: 10),
+              // Two-line tagline
+              const Center(
+                child: ShimmerLine(height: 14, width: 280, borderRadius: 4),
+              ),
+              const SizedBox(height: dt.Spacing.xs),
+              const Center(
+                child: ShimmerLine(height: 14, width: 200, borderRadius: 4),
+              ),
+              const SizedBox(height: 22),
+              // Binding ornament
+              const Center(
+                child: ShimmerLine(height: 4, width: 64, borderRadius: 2),
+              ),
+              const SizedBox(height: dt.Spacing.xxxl),
+              // Section label
+              const Center(
+                child: ShimmerLine(height: 11, width: 140, borderRadius: 4),
+              ),
+              const SizedBox(height: dt.Spacing.sm),
+              // Question line
+              const Center(
+                child: ShimmerLine(height: 18, width: 260, borderRadius: 4),
+              ),
+              const SizedBox(height: dt.Spacing.xl),
+              // Three level cards
+              for (var i = 0; i < 3; i++) ...const [
+                ShimmerLine(height: 78, borderRadius: 12),
+                SizedBox(height: 10),
+              ],
+              const Spacer(),
+              // Continue button
+              const ShimmerLine(height: 52, borderRadius: 26),
+              const SizedBox(height: dt.Spacing.md),
+              // Skip text
+              const Center(
+                child: ShimmerLine(height: 12, width: 96, borderRadius: 4),
+              ),
+              const SizedBox(height: dt.Spacing.lg),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _HomeSplashShimmer extends StatelessWidget {
   const _HomeSplashShimmer();
