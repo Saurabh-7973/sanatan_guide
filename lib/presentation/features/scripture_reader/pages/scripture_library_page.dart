@@ -74,30 +74,81 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? DColors.bg : LColors.bg;
 
+    // Worst-case header height (used by every pinned family delegate). Sized
+    // for a two-line description + Devanāgarī name + English/meta row +
+    // gaps, with the text-driven blocks scaled by the user's text-size
+    // setting so the accessibility path doesn't clip.
+    final textScaler = MediaQuery.textScalerOf(context);
+    final headerHeight = 46.0 + textScaler.scale(88.0);
+
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            _Header(isDark: isDark),
-            _SearchBar(
-              isDark: isDark,
-              controller: _ctrl,
-              focus: _focus,
-              query: _query,
-              onChanged: _onQueryChanged,
-              onClear: _clearQuery,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          slivers: [
+            SliverToBoxAdapter(child: _Header(isDark: isDark)),
+            SliverToBoxAdapter(
+              child: _SearchBar(
+                isDark: isDark,
+                controller: _ctrl,
+                focus: _focus,
+                query: _query,
+                onChanged: _onQueryChanged,
+                onClear: _clearQuery,
+              ),
             ),
-            Expanded(
-              child: _query.isEmpty
-                  ? _FamilyList(isDark: isDark)
-                  : _SearchResults(
-                      isDark: isDark,
-                      query: _query,
-                      onTap: (id) => _openScripture(context, id),
+            if (_query.isEmpty) ...[
+              const SliverPadding(padding: EdgeInsets.only(top: 32)),
+              for (final family in _kFamilies)
+                SliverMainAxisGroup(
+                  slivers: [
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _FamilyHeaderDelegate(
+                        family: family,
+                        isDark: isDark,
+                        height: headerHeight,
+                      ),
                     ),
-            ),
+                    if (family.kind == _FamilyKind.shruti)
+                      _VedasGridSliver(isDark: isDark)
+                    else
+                      SliverList.builder(
+                        itemCount: family.scriptures.length,
+                        itemBuilder: (context, i) {
+                          return _ScriptureRow(
+                            isDark: isDark,
+                            scripture: family.scriptures[i],
+                            isLast: i == family.scriptures.length - 1,
+                            family: family,
+                          );
+                        },
+                      ),
+                    if (family.kind == _FamilyKind.shruti)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: _ScriptureRow(
+                            isDark: isDark,
+                            scripture: _kMukhyaUpanishads,
+                            isLast: true,
+                            family: family,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+            ] else
+              _SearchResultsSliver(
+                isDark: isDark,
+                query: _query,
+                onTap: (id) => _openScripture(context, id),
+              ),
           ],
         ),
       ),
@@ -309,79 +360,6 @@ class _SearchBar extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-// ============================================================
-// FamilyList — sticky family headers + content per family
-// ============================================================
-class _FamilyList extends StatelessWidget {
-  const _FamilyList({required this.isDark});
-
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    // A persistent header needs a fixed extent, so size it to the worst case:
-    // a two-line description + the Devanāgarī name + the English/meta row +
-    // the inter-element gaps — with the text-driven blocks scaled by the user's
-    // text-size setting so the accessibility path doesn't clip.
-    final textScaler = MediaQuery.textScalerOf(context);
-    final headerHeight = 46.0 + textScaler.scale(88.0);
-
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
-      ),
-      slivers: [
-        const SliverPadding(padding: EdgeInsets.only(top: 32)),
-        // One SliverMainAxisGroup per family: the pinned header sticks to the
-        // viewport top *while its own family's content is on screen*, then the
-        // group clips it away so the next family's header takes over — instead
-        // of every header piling up at the top (vanilla pinned slivers stack;
-        // they don't push each other off).
-        for (final family in _kFamilies)
-          SliverMainAxisGroup(
-            slivers: [
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _FamilyHeaderDelegate(
-                  family: family,
-                  isDark: isDark,
-                  height: headerHeight,
-                ),
-              ),
-              if (family.kind == _FamilyKind.shruti)
-                _VedasGridSliver(isDark: isDark)
-              else
-                SliverList.builder(
-                  itemCount: family.scriptures.length,
-                  itemBuilder: (context, i) {
-                    return _ScriptureRow(
-                      isDark: isDark,
-                      scripture: family.scriptures[i],
-                      isLast: i == family.scriptures.length - 1,
-                      family: family,
-                    );
-                  },
-                ),
-              if (family.kind == _FamilyKind.shruti)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: _ScriptureRow(
-                      isDark: isDark,
-                      scripture: _kMukhyaUpanishads,
-                      isLast: true,
-                      family: family,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
-      ],
     );
   }
 }
@@ -651,6 +629,12 @@ class _ScriptureRow extends StatelessWidget {
 
     final isTamilScript = family.kind == _FamilyKind.tamil;
 
+    // Hindi line height: 17 * 1.2 = 20.4. Diamond is 8×8; centering on that
+    // line puts the glyph at (20.4 - 8) / 2 ≈ 6 from the row top — same as
+    // the Devanāgarī shirorekha, so the glyph reads as "owned by" the Hindi
+    // line, not floating between Hindi and English.
+    const devaLineHeight = 17.0 * 1.2;
+
     return InkWell(
       onTap: () => _openScripture(context, scripture.id),
       child: Container(
@@ -665,14 +649,16 @@ class _ScriptureRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Transform.rotate(
-                angle: 0.785398,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  color: _glyphColor(),
+            SizedBox(
+              height: devaLineHeight,
+              child: Center(
+                child: Transform.rotate(
+                  angle: 0.785398,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    color: _glyphColor(),
+                  ),
                 ),
               ),
             ),
@@ -746,11 +732,14 @@ class _ScriptureRow extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 6, left: 8),
-              child: Icon(
-                Icons.chevron_right_rounded,
-                size: 16,
-                color: text3.withValues(alpha: 0.4),
+              padding: const EdgeInsets.only(left: 8),
+              child: SizedBox(
+                height: devaLineHeight,
+                child: Center(
+                  child: _MockupChevron(
+                    color: text3.withValues(alpha: 0.4),
+                  ),
+                ),
               ),
             ),
           ],
@@ -761,10 +750,95 @@ class _ScriptureRow extends StatelessWidget {
 }
 
 // ============================================================
-// SearchResults — replaces family list when query non-empty
+// Diacritic-insensitive normalization for IAST + casefolding
 // ============================================================
-class _SearchResults extends StatelessWidget {
-  const _SearchResults({
+//
+// "gi" should match "Gītā". Approach: strip every IAST combining-mark and the
+// pre-composed diacritic letters down to their bare ASCII form, then casefold.
+// We do the normalization on a per-codeunit basis (cheap) instead of pulling in
+// a full Unicode NFD library, since the corpus is bounded and the substitution
+// table is short.
+
+const Map<String, String> _iastMap = {
+  // Long vowels and macron-bearing vowels
+  'ā': 'a', 'Ā': 'a',
+  'ī': 'i', 'Ī': 'i',
+  'ū': 'u', 'Ū': 'u',
+  'ē': 'e', 'Ē': 'e',
+  'ō': 'o', 'Ō': 'o',
+  // Vocalic r / l
+  'ṛ': 'r', 'Ṛ': 'r',
+  'ṝ': 'r', 'Ṝ': 'r',
+  'ḷ': 'l', 'Ḷ': 'l',
+  'ḹ': 'l', 'Ḹ': 'l',
+  // Anusvāra, visarga
+  'ṃ': 'm', 'Ṃ': 'm',
+  'ḥ': 'h', 'Ḥ': 'h',
+  // Sibilants, retroflex, palatal
+  'ś': 's', 'Ś': 's',
+  'ṣ': 's', 'Ṣ': 's',
+  'ṭ': 't', 'Ṭ': 't',
+  'ḍ': 'd', 'Ḍ': 'd',
+  'ṇ': 'n', 'Ṇ': 'n',
+  'ñ': 'n', 'Ñ': 'n',
+  'ṅ': 'n', 'Ṅ': 'n',
+  // Tamil-romanisation extras
+  'ṟ': 'r', 'Ṟ': 'r',
+};
+
+/// Lowercase ASCII fold of [s] for case- and diacritic-insensitive match.
+String _foldDiacritics(String s) {
+  final buf = StringBuffer();
+  for (final ch in s.characters) {
+    final mapped = _iastMap[ch];
+    buf.write((mapped ?? ch).toLowerCase());
+  }
+  return buf.toString();
+}
+
+/// Finds [q] (already folded) in the folded form of [text] and returns the
+/// index *in the original `text`*. -1 when no match.
+int _foldedIndexOf(String text, String q) {
+  if (q.isEmpty) return -1;
+  // Build the folded form once + a parallel map: foldedIndex -> originalIndex.
+  // Each original character maps to its first folded codeunit; the IAST table
+  // is one-to-one so length stays equal.
+  final originalIndex = <int>[];
+  final folded = StringBuffer();
+  var i = 0;
+  for (final ch in text.characters) {
+    final mapped = _iastMap[ch] ?? ch;
+    for (final _ in mapped.toLowerCase().codeUnits) {
+      originalIndex.add(i);
+    }
+    folded.write(mapped.toLowerCase());
+    i += ch.length;
+  }
+  final hit = folded.toString().indexOf(q);
+  if (hit < 0) return -1;
+  return originalIndex[hit];
+}
+
+/// Length of the original-string span that corresponds to a folded match of
+/// length [qLen] starting at original index [origIdx]. Walks character-by-
+/// character so combined characters get included whole.
+int _foldedSpanLength(String text, int origIdx, int qLen) {
+  var consumed = 0;
+  var taken = 0;
+  for (final ch in text.substring(origIdx).characters) {
+    if (consumed >= qLen) break;
+    final mapped = _iastMap[ch] ?? ch;
+    consumed += mapped.length;
+    taken += ch.length;
+  }
+  return taken;
+}
+
+// ============================================================
+// SearchResults — sliver list shown in place of family list
+// ============================================================
+class _SearchResultsSliver extends StatelessWidget {
+  const _SearchResultsSliver({
     required this.isDark,
     required this.query,
     required this.onTap,
@@ -775,16 +849,17 @@ class _SearchResults extends StatelessWidget {
   final ValueChanged<String> onTap;
 
   List<_SearchMatch> _findMatches() {
-    final q = query.toLowerCase();
+    final q = _foldDiacritics(query);
     final out = <_SearchMatch>[];
     for (final family in _kFamilies) {
       final scriptures = family.kind == _FamilyKind.shruti
           ? [..._kVedas, _kMukhyaUpanishads]
           : family.scriptures;
       for (final s in scriptures) {
-        final inEn = s.englishName.toLowerCase().contains(q);
+        final inEn = _foldDiacritics(s.englishName).contains(q);
         final inDeva = s.devaName.contains(query);
-        final inAlias = s.aliases.any((a) => a.toLowerCase().contains(q));
+        final inAlias =
+            s.aliases.any((a) => _foldDiacritics(a).contains(q));
         if (inEn || inDeva || inAlias) {
           out.add(_SearchMatch(scripture: s, family: family));
         }
@@ -792,7 +867,7 @@ class _SearchResults extends StatelessWidget {
     }
     out.sort((a, b) {
       int score(_SearchMatch m) {
-        final en = m.scripture.englishName.toLowerCase();
+        final en = _foldDiacritics(m.scripture.englishName);
         if (en.startsWith(q)) return 0;
         if (en.contains(q)) return 1;
         if (m.scripture.devaName.contains(query)) return 2;
@@ -814,11 +889,12 @@ class _SearchResults extends StatelessWidget {
     final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
     if (matches.isEmpty) {
-      return _EmptyResults(query: query, isDark: isDark);
+      return SliverToBoxAdapter(
+        child: _EmptyResults(query: query, isDark: isDark),
+      );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.zero,
+    return SliverList.builder(
       itemCount: matches.length + 1,
       itemBuilder: (context, i) {
         if (i == 0) {
@@ -929,11 +1005,7 @@ class _SearchResultRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 16,
-              color: text3.withValues(alpha: 0.4),
-            ),
+            _MockupChevron(color: text3.withValues(alpha: 0.4)),
           ],
         ),
       ),
@@ -941,8 +1013,6 @@ class _SearchResultRow extends StatelessWidget {
   }
 
   static Widget _highlighted(String text, String query, Color hl, Color base) {
-    final lower = text.toLowerCase();
-    final idx = lower.indexOf(query);
     final baseStyle = TextStyle(
       fontFamily: Fonts.serif,
       fontSize: 14,
@@ -952,16 +1022,18 @@ class _SearchResultRow extends StatelessWidget {
       color: hl,
       fontWeight: FontWeight.w500,
     );
-    if (idx < 0 || query.isEmpty) {
-      return Text(text, style: baseStyle);
-    }
+    if (query.isEmpty) return Text(text, style: baseStyle);
+
+    final q = _foldDiacritics(query);
+    final idx = _foldedIndexOf(text, q);
+    if (idx < 0) return Text(text, style: baseStyle);
+    final span = _foldedSpanLength(text, idx, q.length);
     return Text.rich(
       TextSpan(
         children: [
           TextSpan(text: text.substring(0, idx), style: baseStyle),
-          TextSpan(
-              text: text.substring(idx, idx + query.length), style: hlStyle),
-          TextSpan(text: text.substring(idx + query.length), style: baseStyle),
+          TextSpan(text: text.substring(idx, idx + span), style: hlStyle),
+          TextSpan(text: text.substring(idx + span), style: baseStyle),
         ],
       ),
     );
@@ -1293,3 +1365,45 @@ const _kFamilies = <_Family>[
     ],
   ),
 ];
+
+// ============================================================
+// _MockupChevron — 8×14 stroke chevron matching screen-03 SVG
+// ============================================================
+class _MockupChevron extends StatelessWidget {
+  const _MockupChevron({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 8,
+      height: 14,
+      child: CustomPaint(painter: _MockupChevronPainter(color: color)),
+    );
+  }
+}
+
+class _MockupChevronPainter extends CustomPainter {
+  const _MockupChevronPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true;
+    final path = Path()
+      ..moveTo(1, 1)
+      ..lineTo(7, 7)
+      ..lineTo(1, 13);
+    canvas.drawPath(path, stroke);
+  }
+
+  @override
+  bool shouldRepaint(_MockupChevronPainter old) => old.color != color;
+}
