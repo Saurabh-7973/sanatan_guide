@@ -103,32 +103,34 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
             ),
             if (_query.isEmpty) ...[
               const SliverPadding(padding: EdgeInsets.only(top: 32)),
-              for (final family in _kFamilies)
+              for (var i = 0; i < _kFamilies.length; i++) ...[
+                if (i > 0)
+                  const SliverPadding(padding: EdgeInsets.only(top: 32)),
                 SliverMainAxisGroup(
                   slivers: [
                     SliverPersistentHeader(
                       pinned: true,
                       delegate: _FamilyHeaderDelegate(
-                        family: family,
+                        family: _kFamilies[i],
                         isDark: isDark,
                         height: headerHeight,
                       ),
                     ),
-                    if (family.kind == _FamilyKind.shruti)
+                    if (_kFamilies[i].kind == _FamilyKind.shruti)
                       _VedasGridSliver(isDark: isDark)
                     else
                       SliverList.builder(
-                        itemCount: family.scriptures.length,
-                        itemBuilder: (context, i) {
+                        itemCount: _kFamilies[i].scriptures.length,
+                        itemBuilder: (context, j) {
                           return _ScriptureRow(
                             isDark: isDark,
-                            scripture: family.scriptures[i],
-                            isLast: i == family.scriptures.length - 1,
-                            family: family,
+                            scripture: _kFamilies[i].scriptures[j],
+                            isLast: j == _kFamilies[i].scriptures.length - 1,
+                            family: _kFamilies[i],
                           );
                         },
                       ),
-                    if (family.kind == _FamilyKind.shruti)
+                    if (_kFamilies[i].kind == _FamilyKind.shruti)
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
@@ -136,12 +138,13 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
                             isDark: isDark,
                             scripture: _kMukhyaUpanishads,
                             isLast: true,
-                            family: family,
+                            family: _kFamilies[i],
                           ),
                         ),
                       ),
                   ],
                 ),
+              ],
               const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
             ] else
               _SearchResultsSliver(
@@ -640,9 +643,10 @@ class _ScriptureRow extends StatelessWidget {
 
     // Align diamond + chevron with the English-line center per the mockup:
     // Hindi (17·1.2 = 20.4) + 3 gap + (English-line 15·1.25 = 18.75) / 2.
-    // Glyph (8 h) lands at top inset 20.4 + 3 + (18.75 − 8) / 2 ≈ 29.
+    // Glyph (12 h) lands at top inset 20.4 + 3 + (18.75 − 12) / 2 ≈ 27.
     // Chevron (14 h) lands at top inset 20.4 + 3 + (18.75 − 14) / 2 ≈ 26.
-    const diamondTop = 29.0;
+    const diamondSize = 12.0;
+    const diamondTop = 27.0;
     const chevronTop = 26.0;
 
     return InkWell(
@@ -660,8 +664,8 @@ class _ScriptureRow extends StatelessWidget {
                   child: Transform.rotate(
                     angle: 0.785398,
                     child: Container(
-                      width: 8,
-                      height: 8,
+                      width: diamondSize,
+                      height: diamondSize,
                       color: _glyphColor(),
                     ),
                   ),
