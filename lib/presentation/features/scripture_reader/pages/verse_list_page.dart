@@ -321,6 +321,7 @@ class _LoadedBody extends ConsumerWidget {
             right: 8,
             top: 70,
             bottom: 30,
+            width: 140,
             child: _VerseJumper(
               verseCount: total,
               isDark: isDark,
@@ -884,6 +885,7 @@ class _VerseJumper extends StatefulWidget {
 
 class _VerseJumperState extends State<_VerseJumper> {
   int? _activeIndex;
+  double? _dragY; // localY of last drag — drives the tooltip y-position.
   // Visible while scrolling or actively dragging the rail; fades out after
   // 1.4 s of idle. Mirrors the "scrollbar appears on scroll only" pattern.
   bool _visible = false;
@@ -916,6 +918,7 @@ class _VerseJumperState extends State<_VerseJumper> {
       setState(() {
         _visible = false;
         _activeIndex = null;
+        _dragY = null;
       });
     });
   }
@@ -944,6 +947,7 @@ class _VerseJumperState extends State<_VerseJumper> {
     final ratio = height > 0 ? clamped / height : 0.0;
     final idx = (ratio * markers.length).floor().clamp(0, markers.length - 1);
     _bumpVisibility();
+    setState(() => _dragY = clamped);
     if (idx != _activeIndex) {
       setState(() => _activeIndex = idx);
       widget.onTap(markers[idx]);
@@ -953,11 +957,13 @@ class _VerseJumperState extends State<_VerseJumper> {
   @override
   Widget build(BuildContext context) {
     final surface = widget.isDark
-        ? DColors.surface.withValues(alpha: 0.6)
+        ? DColors.surface.withValues(alpha: _activeIndex != null ? 0.85 : 0.6)
         : LColors.surface.withValues(alpha: 0.85);
     final text3 = widget.isDark ? DColors.text3 : LColors.text3;
     final saffron = widget.isDark ? DColors.saffron : LColors.saffron;
     final markers = _markers;
+    final dragging = _activeIndex != null && _dragY != null;
+    final railWidth = dragging ? 26.0 : 22.0;
 
     return IgnorePointer(
       ignoring: !_visible,
@@ -965,47 +971,159 @@ class _VerseJumperState extends State<_VerseJumper> {
         opacity: _visible ? 1.0 : 0.0,
         duration: Duration(milliseconds: _visible ? 160 : 400),
         curve: Curves.easeOut,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(
-              width: 22,
-              color: surface,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: LayoutBuilder(
-            builder: (context, constraints) {
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onVerticalDragStart: (d) =>
-                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
-                onVerticalDragUpdate: (d) =>
-                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
-                onVerticalDragEnd: (_) =>
-                    setState(() => _activeIndex = null),
-                onTapDown: (d) =>
-                    _hit(d.localPosition.dy, constraints.maxHeight, markers),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    for (var i = 0; i < markers.length; i++)
-                      _JumperLabel(
-                        text: arabicToDevanagari(markers[i]),
-                        active: _activeIndex == i,
-                        activeColor: saffron,
-                        idleColor: text3,
-                      ),
-                  ],
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    curve: Curves.easeOut,
+                    width: railWidth,
+                    color: surface,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onVerticalDragStart: (d) => _hit(
+                            d.localPosition.dy,
+                            constraints.maxHeight,
+                            markers,
+                          ),
+                          onVerticalDragUpdate: (d) => _hit(
+                            d.localPosition.dy,
+                            constraints.maxHeight,
+                            markers,
+                          ),
+                          onVerticalDragEnd: (_) =>
+                              setState(() => _activeIndex = null),
+                          onTapDown: (d) => _hit(
+                            d.localPosition.dy,
+                            constraints.maxHeight,
+                            markers,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              for (var i = 0; i < markers.length; i++)
+                                _JumperLabel(
+                                  text: arabicToDevanagari(markers[i]),
+                                  active: _activeIndex == i,
+                                  activeColor: saffron,
+                                  idleColor: text3,
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              );
-            },
               ),
             ),
-          ),
+            if (dragging)
+              Positioned(
+                right: railWidth + 8,
+                top: (_dragY! - 18).clamp(0.0, double.infinity),
+                child: _JumperTooltip(
+                  verseNum: _activeVerseNum(markers) ?? markers[_activeIndex!],
+                  saffron: saffron,
+                  isDark: widget.isDark,
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
+
+  /// Verse number under the finger — interpolates between decade markers
+  /// instead of snapping, so the tooltip slides smoothly while dragging.
+  int? _activeVerseNum(List<int> markers) {
+    if (_dragY == null || markers.isEmpty) return null;
+    final box = context.findRenderObject();
+    if (box is! RenderBox) return null;
+    final height = box.size.height;
+    final ratio = (_dragY! / height).clamp(0.0, 1.0);
+    final v = (ratio * widget.verseCount).round().clamp(1, widget.verseCount);
+    return v;
+  }
+}
+
+class _JumperTooltip extends StatelessWidget {
+  const _JumperTooltip({
+    required this.verseNum,
+    required this.saffron,
+    required this.isDark,
+  });
+  final int verseNum;
+  final Color saffron;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final inkText = isDark ? const Color(0xFF1A1208) : DColors.cream;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          decoration: BoxDecoration(
+            color: saffron,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color: saffron.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            '‖${arabicToDevanagari(verseNum)}‖',
+            style: TextStyle(
+              fontFamily: Fonts.deva,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: inkText,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 8,
+          height: 10,
+          child: CustomPaint(painter: _TooltipNotchPainter(color: saffron)),
+        ),
+      ],
+    );
+  }
+}
+
+class _TooltipNotchPainter extends CustomPainter {
+  const _TooltipNotchPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color;
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, size.height / 2)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, p);
+  }
+
+  @override
+  bool shouldRepaint(_TooltipNotchPainter old) => old.color != color;
 }
 
 class _JumperLabel extends StatelessWidget {
