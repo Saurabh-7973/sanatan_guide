@@ -425,6 +425,10 @@ class _ChapterListHeader extends StatelessWidget {
           DefaultTextStyle(
             style: TextStyle(
               fontFamily: Fonts.sans,
+              // Outfit lacks uppercase IAST glyphs (Ṇ, Ḍ, Ṣ, Ṭ, …);
+              // fall back to Lora so "KĀṆḌAS", "MAṆḌALAS" etc. don't
+              // render with tofu boxes in the toUpperCase() output.
+              fontFamilyFallback: const [Fonts.serif],
               fontSize: 10,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.22 * 10,
@@ -615,6 +619,7 @@ class _ResumeRow extends StatelessWidget {
                             _resumeMetaText(unitLabelSingular),
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: const [Fonts.serif],
                               fontSize: 11.5,
                               color: text2,
                             ),
@@ -670,6 +675,7 @@ class _ChaptersLabel extends StatelessWidget {
         'ALL ${scripture.unitLabel.toUpperCase()}',
         style: TextStyle(
           fontFamily: Fonts.sans,
+          fontFamilyFallback: const [Fonts.serif],
           fontSize: 9.5,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.28 * 9.5,
