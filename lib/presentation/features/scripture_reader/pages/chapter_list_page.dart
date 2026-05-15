@@ -16,6 +16,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/c
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -91,7 +92,7 @@ class _ChapterListPageState extends ConsumerState<ChapterListPage>
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const _MockupBackChevron(),
+          icon: const MockupBackChevron(),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -627,7 +628,7 @@ class _ResumeRow extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _MockupResumeArrow(
+                    MockupResumeArrow(
                       color: saffron.withValues(alpha: 0.6),
                     ),
                   ],
@@ -1008,7 +1009,7 @@ class _ChapterRowArrow extends StatelessWidget {
       return Icon(Icons.check_circle_outline_rounded,
           size: 14, color: saffron);
     }
-    return _MockupRowChevron(color: text3.withValues(alpha: 0.4));
+    return MockupRowChevron(color: text3.withValues(alpha: 0.4));
   }
 }
 
@@ -1114,122 +1115,3 @@ class _ErrorBody extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Mockup SVG-spec icons — keep stroke widths/sizes locked to screen-04 spec.
-// ─────────────────────────────────────────────────────────────────────────
-
-class _MockupBackChevron extends StatelessWidget {
-  const _MockupBackChevron();
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).brightness == Brightness.dark
-        ? DColors.text1
-        : LColors.text1;
-    return SizedBox(
-      width: 20,
-      height: 20,
-      child: CustomPaint(painter: _BackChevronPainter(color: color)),
-    );
-  }
-}
-
-class _BackChevronPainter extends CustomPainter {
-  const _BackChevronPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final path = Path()
-      ..moveTo(12, 4)
-      ..lineTo(6, 10)
-      ..lineTo(12, 16);
-    canvas.drawPath(path, p);
-  }
-
-  @override
-  bool shouldRepaint(_BackChevronPainter old) => old.color != color;
-}
-
-class _MockupRowChevron extends StatelessWidget {
-  const _MockupRowChevron({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 8,
-      height: 14,
-      child: CustomPaint(painter: _RowChevronPainter(color: color)),
-    );
-  }
-}
-
-class _RowChevronPainter extends CustomPainter {
-  const _RowChevronPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final path = Path()
-      ..moveTo(1, 1)
-      ..lineTo(7, 7)
-      ..lineTo(1, 13);
-    canvas.drawPath(path, p);
-  }
-
-  @override
-  bool shouldRepaint(_RowChevronPainter old) => old.color != color;
-}
-
-class _MockupResumeArrow extends StatelessWidget {
-  const _MockupResumeArrow({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 14,
-      height: 14,
-      child: CustomPaint(painter: _ResumeArrowPainter(color: color)),
-    );
-  }
-}
-
-class _ResumeArrowPainter extends CustomPainter {
-  const _ResumeArrowPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    // Shaft.
-    canvas.drawLine(const Offset(2, 7), const Offset(12, 7), p);
-    // Arrowhead.
-    final head = Path()
-      ..moveTo(8, 3)
-      ..lineTo(12, 7)
-      ..lineTo(8, 11);
-    canvas.drawPath(head, p);
-  }
-
-  @override
-  bool shouldRepaint(_ResumeArrowPainter old) => old.color != color;
-}

@@ -245,8 +245,12 @@ class DandaCoord extends StatelessWidget {
 
     return Text(
       '‖$coordText‖',
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.visible,
       style: AppText.dandaCoord(saffronColor: color).copyWith(
         fontSize: fontSize,
+        letterSpacing: -0.02 * fontSize,
       ),
     );
   }

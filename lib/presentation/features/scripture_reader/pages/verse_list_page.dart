@@ -15,6 +15,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/c
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -96,7 +97,7 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded),
+          icon: const MockupBackChevron(),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -187,6 +188,88 @@ class _LoadedBody extends ConsumerWidget {
   Verse? get _nextUnread =>
       verses.firstWhereOrNull((v) => v.readCount == 0);
 
+  /// Decade-style section grouping for long chapters. ≤10 verses gets a single
+  /// "ALL VERSES" label; bigger chapters get "Verses N — M" headers per group.
+  /// Group size scales so we don't end up with 184 sub-headers on Ṛgveda M1.
+  int get _groupSize {
+    final n = verses.length;
+    if (n <= 200) return 10;
+    if (n <= 500) return 25;
+    return 50;
+  }
+
+  List<Widget> _buildListSlivers() {
+    if (verses.length <= 10) {
+      return [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          sliver: SliverToBoxAdapter(child: _VersesLabel(isDark: isDark)),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          sliver: SliverList.builder(
+            itemCount: verses.length,
+            itemBuilder: (context, i) => _verseTile(verses[i], i),
+          ),
+        ),
+      ];
+    }
+
+    final size = _groupSize;
+    final entries = <_ListItem>[];
+    var currentGroup = -1;
+    for (var i = 0; i < verses.length; i++) {
+      final v = verses[i];
+      final group = (v.verseNum - 1) ~/ size;
+      if (group != currentGroup) {
+        final start = group * size + 1;
+        final end = (group + 1) * size;
+        entries.add(_HeaderItem(start, end));
+        currentGroup = group;
+      }
+      entries.add(_VerseItem(v, i));
+    }
+
+    return [
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        sliver: SliverList.builder(
+          itemCount: entries.length,
+          itemBuilder: (context, i) {
+            final e = entries[i];
+            return switch (e) {
+              _HeaderItem(:final start, :final end) => _VerseSectionHeader(
+                  start: start,
+                  end: end,
+                  isDark: isDark,
+                ),
+              _VerseItem(:final verse, :final index) =>
+                _verseTile(verse, index),
+            };
+          },
+        ),
+      ),
+    ];
+  }
+
+  Widget _verseTile(Verse v, int orderIndex) {
+    final row = KeyedSubtree(
+      key: ValueKey<int>(v.verseNum),
+      child: _VerseRow(
+        verse: v,
+        scriptureId: scriptureId,
+        isDark: isDark,
+      ),
+    );
+    if (orderIndex < 10) {
+      return row
+          .animate(delay: Duration(milliseconds: 40 + 20 * orderIndex))
+          .fadeIn(duration: 350.ms)
+          .slideY(begin: 0.02, end: 0, duration: 350.ms);
+    }
+    return row;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final readCount =
@@ -227,45 +310,9 @@ class _LoadedBody extends ConsumerWidget {
                 ),
               ),
             const SliverToBoxAdapter(child: SizedBox(height: 14)),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverToBoxAdapter(
-                child: _VersesLabel(isDark: isDark),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverList.builder(
-                itemCount: verses.length,
-                itemBuilder: (context, i) {
-                  final v = verses[i];
-                  final row = KeyedSubtree(
-                    key: ValueKey<int>(v.verseNum),
-                    child: _VerseRow(
-                      verse: v,
-                      scriptureId: scriptureId,
-                      isDark: isDark,
-                    ),
-                  );
-                  // Only the first 10 rows get a fade-in/slide-up entrance;
-                  // beyond that it just adds animation cost as the user
-                  // scrolls into new rows.
-                  if (i < 10) {
-                    return row
-                        .animate(
-                          delay: Duration(milliseconds: 40 + 20 * i),
-                        )
-                        .fadeIn(duration: 350.ms)
-                        .slideY(
-                          begin: 0.02,
-                          end: 0,
-                          duration: 350.ms,
-                        );
-                  }
-                  return row;
-                },
-              ),
-            ),
+            // Section breakdown: very long chapters interleave decade headers
+            // ("Verses 11 — 20" + ‖११–२०‖) instead of a single ALL VERSES rule.
+            ..._buildListSlivers(),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
@@ -541,11 +588,7 @@ class _ResumeAnchor extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 14,
-                    color: saffron.withValues(alpha: 0.7),
-                  ),
+                  MockupResumeArrow(color: saffron.withValues(alpha: 0.7)),
                 ],
               ),
             ],
@@ -582,6 +625,80 @@ class _VersesLabel extends StatelessWidget {
           letterSpacing: 0.28 * 9.5,
           color: text3,
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Sub-section header — "Verses 11 — 20" + ‖११–२०‖ for long chapters
+// ─────────────────────────────────────────────────────────────────────────
+
+sealed class _ListItem {
+  const _ListItem();
+}
+
+class _HeaderItem extends _ListItem {
+  const _HeaderItem(this.start, this.end);
+  final int start;
+  final int end;
+}
+
+class _VerseItem extends _ListItem {
+  const _VerseItem(this.verse, this.index);
+  final Verse verse;
+  final int index;
+}
+
+class _VerseSectionHeader extends StatelessWidget {
+  const _VerseSectionHeader({
+    required this.start,
+    required this.end,
+    required this.isDark,
+  });
+
+  final int start;
+  final int end;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final devaRange =
+        '‖${arabicToDevanagari(start)}–${arabicToDevanagari(end)}‖';
+    return Container(
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 10),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: divider, width: 1)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Text(
+              'VERSES $start — $end',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.32 * 9,
+                color: saffron,
+              ),
+            ),
+          ),
+          Text(
+            devaRange,
+            style: TextStyle(
+              fontFamily: Fonts.deva,
+              fontSize: 13,
+              height: 1.0,
+              color: cream,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -641,13 +758,13 @@ class _VerseRow extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 38,
+                width: 42,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 1),
                   child: DandaCoord.multipart(
                     parts: [verse.verseNum],
                     isDark: isDark,
-                    fontSize: 14,
+                    fontSize: 13,
                     colorOverride: dandaColor,
                   ),
                 ),
@@ -785,15 +902,21 @@ class _VerseJumperState extends State<_VerseJumper> {
     super.dispose();
   }
 
-  void _onScroll() {
+  void _onScroll() => _bumpVisibility();
+
+  // Surface the rail on any interaction and tear it back down after idle.
+  // Mirrors iOS-style scrollbars: visible only while in use.
+  void _bumpVisibility() {
     if (!_visible) {
       setState(() => _visible = true);
     }
     _idleTimer?.cancel();
     _idleTimer = Timer(const Duration(milliseconds: 1400), () {
       if (!mounted) return;
-      if (_activeIndex != null) return; // keep visible while dragging.
-      setState(() => _visible = false);
+      setState(() {
+        _visible = false;
+        _activeIndex = null;
+      });
     });
   }
 
@@ -820,6 +943,7 @@ class _VerseJumperState extends State<_VerseJumper> {
     final clamped = localY.clamp(0.0, height);
     final ratio = height > 0 ? clamped / height : 0.0;
     final idx = (ratio * markers.length).floor().clamp(0, markers.length - 1);
+    _bumpVisibility();
     if (idx != _activeIndex) {
       setState(() => _activeIndex = idx);
       widget.onTap(markers[idx]);
@@ -935,9 +1059,21 @@ class _LoadingBody extends StatelessWidget {
   final int chapterNum;
   final bool isDark;
 
+  // Skeleton-row widths per spec frame: bars sized 70–90% / 65–85% to mimic
+  // varied verse incipits rather than a uniform grey block.
+  static const _bodyWidths = <(double, double)>[
+    (0.90, 0.75),
+    (0.65, 0.80),
+    (0.85, 0.70),
+    (0.80, 0.65),
+    (0.70, 0.85),
+    (0.75, 0.70),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final shimmerColor = saffron.withValues(alpha: 0.08);
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -949,34 +1085,77 @@ class _LoadingBody extends StatelessWidget {
           total: 0,
           isDark: isDark,
         ),
+        Opacity(
+          opacity: 0.4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              _ShimmerBar(
+                widthFraction: 1,
+                height: 1.5,
+                color: shimmerColor,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _ShimmerBar(width: 80, height: 8, color: shimmerColor),
+                  _ShimmerBar(width: 30, height: 8, color: shimmerColor),
+                ],
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 14),
         _VersesLabel(isDark: isDark),
-        for (int i = 0; i < 8; i++) _VerseRowSkeleton(color: shimmerColor),
+        for (final widths in _bodyWidths)
+          _VerseRowSkeleton(
+            color: shimmerColor,
+            divider: dividerSoft,
+            primary: widths.$1,
+            secondary: widths.$2,
+          ),
       ],
     );
   }
 }
 
 class _VerseRowSkeleton extends StatelessWidget {
-  const _VerseRowSkeleton({required this.color});
+  const _VerseRowSkeleton({
+    required this.color,
+    required this.divider,
+    required this.primary,
+    required this.secondary,
+  });
   final Color color;
+  final Color divider;
+  final double primary;
+  final double secondary;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.fromLTRB(0, 11, 0, 12),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: divider, width: 1)),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ShimmerBar(width: 38, height: 18, color: color),
+          _ShimmerBar(width: 38, height: 14, color: color),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ShimmerBar(widthFraction: 0.6, height: 14, color: color),
+                _ShimmerBar(widthFraction: primary, height: 13, color: color),
                 const SizedBox(height: 6),
-                _ShimmerBar(widthFraction: 0.8, height: 11, color: color),
+                _ShimmerBar(
+                  widthFraction: secondary,
+                  height: 10,
+                  color: color,
+                ),
               ],
             ),
           ),
