@@ -239,9 +239,19 @@ class _Header extends StatelessWidget {
                   ),
                 ),
                 const TextSpan(text: '  VERSES'),
-                TextSpan(
-                  text: '   ·   ',
-                  style: TextStyle(color: saffron),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: saffron,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
                 ),
                 TextSpan(
                   text: '$scriptures',
@@ -643,10 +653,10 @@ class _ScriptureRow extends StatelessWidget {
 
     // Align diamond + chevron with the English-line center per the mockup:
     // Hindi (17·1.2 = 20.4) + 3 gap + (English-line 15·1.25 = 18.75) / 2.
-    // Glyph (12 h) lands at top inset 20.4 + 3 + (18.75 − 12) / 2 ≈ 27.
+    // Glyph (8 h) lands at top inset 20.4 + 3 + (18.75 − 8) / 2 ≈ 29.
     // Chevron (14 h) lands at top inset 20.4 + 3 + (18.75 − 14) / 2 ≈ 26.
-    const diamondSize = 12.0;
-    const diamondTop = 27.0;
+    const diamondSize = 8.0;
+    const diamondTop = 29.0;
     const chevronTop = 26.0;
 
     return InkWell(
