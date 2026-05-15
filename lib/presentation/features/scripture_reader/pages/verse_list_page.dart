@@ -425,7 +425,11 @@ class _ResumeAnchor extends StatelessWidget {
     final gradStart = saffron.withValues(alpha: isDark ? 0.07 : 0.06);
     final gradMid = saffron.withValues(alpha: isDark ? 0.02 : 0.015);
 
-    final incipit = verse.sanskrit.split('\n').first.trim();
+    final rawIncipit = verse.sanskrit.split('\n').first.trim();
+    // Empty Sanskrit shouldn't happen in practice (the field is required on
+    // Verse), but guard the resume card so it doesn't render a blank row if
+    // a verse upstream is mid-digitization.
+    final incipit = rawIncipit.isNotEmpty ? rawIncipit : '—';
 
     return Material(
       color: Colors.transparent,

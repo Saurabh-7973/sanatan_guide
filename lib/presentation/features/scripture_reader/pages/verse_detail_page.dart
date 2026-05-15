@@ -966,45 +966,48 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: Spacing.xxxl),
-                  _SectionRule(label: 'Translation', isDark: isDark),
-                  const SizedBox(height: Spacing.md),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24 + 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          (verse.english ?? '').trim(),
-                          style: AppText.translation(
-                            color: isDark ? DColors.text1 : LColors.text1,
-                            size: 16 * sanskritScale,
-                          ),
-                        )
-                            .animate(target: 1)
-                            .fadeIn(duration: 700.ms, delay: 380.ms)
-                            .slideY(
-                              begin: 0.02,
-                              end: 0,
-                              duration: 700.ms,
-                              delay: 380.ms,
-                              curve: Curves.easeOut,
+                  if (verse.english?.trim().isNotEmpty ?? false) ...[
+                    const SizedBox(height: Spacing.xxxl),
+                    _SectionRule(label: 'Translation', isDark: isDark),
+                    const SizedBox(height: Spacing.md),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24 + 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            verse.english!.trim(),
+                            style: AppText.translation(
+                              color: isDark ? DColors.text1 : LColors.text1,
+                              size: 16 * sanskritScale,
                             ),
-                        if (_translatorName(verse) != null) ...[
-                          const SizedBox(height: Spacing.md),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              '— ${_translatorName(verse)}',
-                              style: AppText.metaLabel(
-                                color: isDark ? DColors.text3 : LColors.text3,
+                          )
+                              .animate(target: 1)
+                              .fadeIn(duration: 700.ms, delay: 380.ms)
+                              .slideY(
+                                begin: 0.02,
+                                end: 0,
+                                duration: 700.ms,
+                                delay: 380.ms,
+                                curve: Curves.easeOut,
+                              ),
+                          if (_translatorName(verse) != null) ...[
+                            const SizedBox(height: Spacing.md),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                '— ${_translatorName(verse)}',
+                                style: AppText.metaLabel(
+                                  color:
+                                      isDark ? DColors.text3 : LColors.text3,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                   const SizedBox(height: Spacing.xxl),
                   _explainSection(isDark, cachedExp?.explanationText),
                   const SizedBox(height: Spacing.sm),

@@ -79,6 +79,9 @@ class _VerseCard extends StatelessWidget {
         : '${verse.scripture.displayName} · ${verse.chapterNum} · ${verse.verseNum}';
     final ctaText = isFirstDay ? 'BEGIN READING' : 'READ FULL VERSE';
     final translation = verse.english?.trim() ?? '';
+    final sanskritBody = verse.sanskrit.trim().isNotEmpty
+        ? verse.sanskrit.trim()
+        : '—';
 
     return GestureDetector(
       onTap: onTap,
@@ -117,7 +120,7 @@ class _VerseCard extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              verse.sanskrit.trim(),
+              sanskritBody,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: Fonts.deva,
@@ -140,14 +143,21 @@ class _VerseCard extends StatelessWidget {
                   delay: 100.ms,
                   curve: Curves.easeOut,
                 ),
-            const SizedBox(height: 22),
-            _DividerLabel(
-              label: isFirstDay ? _firstDaySource(verse) : 'TRANSLATION',
-              isDark: isDark,
-              divider: divider,
-              text3: text3,
-              saffron: saffron,
-            ),
+            // Drop the "— TRANSLATION —" divider entirely when there is no
+            // translation body to render under it (otherwise the hero card
+            // ends with an orphan rule). The first-day "source" label
+            // always renders since the source name doesn't depend on
+            // verse.english.
+            if (isFirstDay || translation.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              _DividerLabel(
+                label: isFirstDay ? _firstDaySource(verse) : 'TRANSLATION',
+                isDark: isDark,
+                divider: divider,
+                text3: text3,
+                saffron: saffron,
+              ),
+            ],
             const SizedBox(height: 22),
             if (translation.isNotEmpty)
               Padding(
