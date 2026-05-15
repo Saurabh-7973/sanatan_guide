@@ -885,6 +885,7 @@ class _VerseJumper extends StatefulWidget {
 
 class _VerseJumperState extends State<_VerseJumper> {
   int? _activeIndex;
+  int? _activeVerse; // verse number under the finger (interpolated).
   double? _dragY; // localY of last drag — drives the tooltip y-position.
   // Visible while scrolling or actively dragging the rail; fades out after
   // 1.4 s of idle. Mirrors the "scrollbar appears on scroll only" pattern.
@@ -918,6 +919,7 @@ class _VerseJumperState extends State<_VerseJumper> {
       setState(() {
         _visible = false;
         _activeIndex = null;
+        _activeVerse = null;
         _dragY = null;
       });
     });
@@ -946,12 +948,19 @@ class _VerseJumperState extends State<_VerseJumper> {
     final clamped = localY.clamp(0.0, height);
     final ratio = height > 0 ? clamped / height : 0.0;
     final idx = (ratio * markers.length).floor().clamp(0, markers.length - 1);
+    // Jump to the *interpolated* verse the finger is over, not the nearest
+    // decade marker. Otherwise dragging shows ‖२६‖ in the tooltip but the
+    // list snaps to verse 21 because that's the closest decade.
+    final verse = (ratio * widget.verseCount)
+        .round()
+        .clamp(1, widget.verseCount);
     _bumpVisibility();
-    setState(() => _dragY = clamped);
-    if (idx != _activeIndex) {
-      setState(() => _activeIndex = idx);
-      widget.onTap(markers[idx]);
-    }
+    setState(() {
+      _dragY = clamped;
+      _activeIndex = idx;
+      _activeVerse = verse;
+    });
+    widget.onTap(verse);
   }
 
   @override
@@ -1033,7 +1042,7 @@ class _VerseJumperState extends State<_VerseJumper> {
                 right: railWidth + 8,
                 top: (_dragY! - 18).clamp(0.0, double.infinity),
                 child: _JumperTooltip(
-                  verseNum: _activeVerseNum(markers) ?? markers[_activeIndex!],
+                  verseNum: _activeVerse ?? markers[_activeIndex!],
                   saffron: saffron,
                   isDark: widget.isDark,
                 ),
@@ -1044,17 +1053,6 @@ class _VerseJumperState extends State<_VerseJumper> {
     );
   }
 
-  /// Verse number under the finger — interpolates between decade markers
-  /// instead of snapping, so the tooltip slides smoothly while dragging.
-  int? _activeVerseNum(List<int> markers) {
-    if (_dragY == null || markers.isEmpty) return null;
-    final box = context.findRenderObject();
-    if (box is! RenderBox) return null;
-    final height = box.size.height;
-    final ratio = (_dragY! / height).clamp(0.0, 1.0);
-    final v = (ratio * widget.verseCount).round().clamp(1, widget.verseCount);
-    return v;
-  }
 }
 
 class _JumperTooltip extends StatelessWidget {
