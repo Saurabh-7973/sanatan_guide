@@ -557,8 +557,7 @@ class _ResumeRow extends StatelessWidget {
             bookNum: chapter.bookNum,
           ),
         ),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
+        child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             border: Border.all(color: divider, width: 1),
@@ -567,63 +566,67 @@ class _ResumeRow extends StatelessWidget {
               stops: const [0, 0.6, 1],
             ),
           ),
+          // Stack lives OUTSIDE any inner padding so `left: 0` lands at the
+          // card's actual left edge — not 22 px inside it where the content
+          // padding starts.
           child: Stack(
             children: [
-              // Leaf-thread sits at the card's left edge (3 px wide saffron
-              // rule + dark-mode glow), per spec.
               Positioned(
                 left: 0,
                 top: 12,
                 bottom: 12,
                 child: LeafThread(isDark: isDark, pulseOnce: true),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'CONTINUE READING',
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.24 * 9.5,
-                            color: saffron,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'CONTINUE READING',
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.24 * 9.5,
+                              color: saffron,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          chapter.devaTitle ?? chapter.enTitle,
-                          style: TextStyle(
-                            fontFamily: chapter.devaTitle != null
-                                ? Fonts.deva
-                                : Fonts.serif,
-                            fontSize: 16,
-                            height: 1.2,
-                            color: cream,
+                          const SizedBox(height: 4),
+                          Text(
+                            chapter.devaTitle ?? chapter.enTitle,
+                            style: TextStyle(
+                              fontFamily: chapter.devaTitle != null
+                                  ? Fonts.deva
+                                  : Fonts.serif,
+                              fontSize: 16,
+                              height: 1.2,
+                              color: cream,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          _resumeMetaText(unitLabelSingular),
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontSize: 11.5,
-                            color: text2,
+                          const SizedBox(height: 3),
+                          Text(
+                            _resumeMetaText(unitLabelSingular),
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 11.5,
+                              color: text2,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  _MockupResumeArrow(
-                    color: saffron.withValues(alpha: 0.6),
-                  ),
-                ],
+                    _MockupResumeArrow(
+                      color: saffron.withValues(alpha: 0.6),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
