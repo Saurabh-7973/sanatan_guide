@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -18,6 +18,18 @@ import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart'
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+
+/// Returns the first line of [text] whose trimmed form is non-empty, or
+/// an empty string if every line is blank. Useful when the canonical first
+/// line is metadata / anuvāka heading and the actual content begins on the
+/// second line (some Ṛgveda / Atharvaveda rows look like that).
+String _firstNonBlankLine(String text) {
+  for (final line in text.split('\n')) {
+    final t = line.trim();
+    if (t.isNotEmpty) return t;
+  }
+  return '';
+}
 
 class VerseListPage extends ConsumerStatefulWidget {
   const VerseListPage({
@@ -185,47 +197,77 @@ class _LoadedBody extends ConsumerWidget {
 
     return Stack(
       children: [
-        ListView(
+        // SliverList.builder lazily builds rows as they scroll into view.
+        // Eager ListView(children: List.generate(verses.length, ...)) was
+        // building 1,839 _VerseRow widgets + 1,839 .animate() controllers
+        // upfront for Rigveda Maṇḍala 1, which hung the build and rendered
+        // a blank "ALL VERSES" page.
+        CustomScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.only(bottom: 24),
-          children: [
-            _ChapterHeader(
-              scriptureId: scriptureId,
-              chapterNum: chapterNum,
-              read: read,
-              total: total,
-              isDark: isDark,
+          slivers: [
+            SliverToBoxAdapter(
+              child: _ChapterHeader(
+                scriptureId: scriptureId,
+                chapterNum: chapterNum,
+                read: read,
+                total: total,
+                isDark: isDark,
+              ),
             ),
             if (next != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-                child: _ResumeAnchor(
-                  scriptureId: scriptureId,
-                  verse: next,
-                  isDark: isDark,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                  child: _ResumeAnchor(
+                    scriptureId: scriptureId,
+                    verse: next,
+                    isDark: isDark,
+                  ),
                 ),
               ),
-            const SizedBox(height: 14),
-            Padding(
+            const SliverToBoxAdapter(child: SizedBox(height: 14)),
+            SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: _VersesLabel(isDark: isDark),
+              sliver: SliverToBoxAdapter(
+                child: _VersesLabel(isDark: isDark),
+              ),
             ),
-            ...List.generate(verses.length, (i) {
-              final v = verses[i];
-              final key = verseRowKeys.putIfAbsent(v.verseNum, GlobalKey.new);
-              return Padding(
-                key: key,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _VerseRow(
-                  verse: v,
-                  scriptureId: scriptureId,
-                  isDark: isDark,
-                ),
-              )
-                  .animate(delay: Duration(milliseconds: 40 + 20 * math.min(i, 9)))
-                  .fadeIn(duration: 350.ms)
-                  .slideY(begin: 0.02, end: 0, duration: 350.ms);
-            }),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              sliver: SliverList.builder(
+                itemCount: verses.length,
+                itemBuilder: (context, i) {
+                  final v = verses[i];
+                  final key =
+                      verseRowKeys.putIfAbsent(v.verseNum, GlobalKey.new);
+                  final row = KeyedSubtree(
+                    key: key,
+                    child: _VerseRow(
+                      verse: v,
+                      scriptureId: scriptureId,
+                      isDark: isDark,
+                    ),
+                  );
+                  // Only the first 10 rows get a fade-in/slide-up entrance;
+                  // beyond that it just adds animation cost as the user
+                  // scrolls into new rows.
+                  if (i < 10) {
+                    return row
+                        .animate(
+                          delay: Duration(milliseconds: 40 + 20 * i),
+                        )
+                        .fadeIn(duration: 350.ms)
+                        .slideY(
+                          begin: 0.02,
+                          end: 0,
+                          duration: 350.ms,
+                        );
+                  }
+                  return row;
+                },
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
         if (showJumper)
@@ -236,6 +278,7 @@ class _LoadedBody extends ConsumerWidget {
             child: _VerseJumper(
               verseCount: total,
               isDark: isDark,
+              scrollController: scrollController,
               onTap: onJump,
             ),
           ),
@@ -575,9 +618,14 @@ class _VerseRow extends ConsumerWidget {
     final dandaColor = isRead && !isBookmarked ? text3 : saffron;
     final sanskritColor = isRead ? text2 : cream;
 
-    final skLine = verse.sanskrit.split('\n').first.trim();
-    final enLine = verse.english?.split('\n').first.trim() ?? '';
-    final sanskritDisplay = skLine.isNotEmpty ? skLine : '—';
+    // Pick the first non-blank Sanskrit line — some verses store a meta /
+    // anuvāka header on the first line and the actual mantra on the second.
+    final skLine = _firstNonBlankLine(verse.sanskrit);
+    final enLine = _firstNonBlankLine(verse.english ?? '');
+    // When Sanskrit isn't available, surface the translation as the primary
+    // line (two lines, serif italic) instead of rendering an em-dash with a
+    // cramped one-line preview below it.
+    final translationOnly = skLine.isEmpty && enLine.isNotEmpty;
 
     return Material(
       color: Colors.transparent,
@@ -607,39 +655,52 @@ class _VerseRow extends ConsumerWidget {
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      sanskritDisplay,
-                      style: TextStyle(
-                        fontFamily: Fonts.deva,
-                        fontSize: 14.5,
-                        height: 1.4,
-                        letterSpacing: 0.005 * 14.5,
-                        color: sanskritColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (enLine.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(
+                child: translationOnly
+                    ? Text(
                         enLine,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
                           fontStyle: FontStyle.italic,
-                          fontSize: 12,
-                          height: 1.4,
-                          color: text3,
+                          fontSize: 13.5,
+                          height: 1.45,
+                          color: sanskritColor,
                         ),
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            skLine,
+                            style: TextStyle(
+                              fontFamily: Fonts.deva,
+                              fontSize: 14.5,
+                              height: 1.4,
+                              letterSpacing: 0.005 * 14.5,
+                              color: sanskritColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (enLine.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              enLine,
+                              style: TextStyle(
+                                fontFamily: Fonts.serif,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 12,
+                                height: 1.4,
+                                color: text3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
-                  ],
-                ),
               ),
               const SizedBox(width: 8),
               SizedBox(
@@ -692,11 +753,13 @@ class _VerseJumper extends StatefulWidget {
   const _VerseJumper({
     required this.verseCount,
     required this.isDark,
+    required this.scrollController,
     required this.onTap,
   });
 
   final int verseCount;
   final bool isDark;
+  final ScrollController scrollController;
   final void Function(int verseNum) onTap;
 
   @override
@@ -705,6 +768,36 @@ class _VerseJumper extends StatefulWidget {
 
 class _VerseJumperState extends State<_VerseJumper> {
   int? _activeIndex;
+  // Visible while scrolling or actively dragging the rail; fades out after
+  // 1.4 s of idle. Mirrors the "scrollbar appears on scroll only" pattern.
+  bool _visible = false;
+  Timer? _idleTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    _idleTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_visible) {
+      setState(() => _visible = true);
+    }
+    _idleTimer?.cancel();
+    _idleTimer = Timer(const Duration(milliseconds: 1400), () {
+      if (!mounted) return;
+      if (_activeIndex != null) return; // keep visible while dragging.
+      setState(() => _visible = false);
+    });
+  }
+
 
   int get _step {
     if (widget.verseCount >= 500) return 50;
@@ -743,15 +836,21 @@ class _VerseJumperState extends State<_VerseJumper> {
     final saffron = widget.isDark ? DColors.saffron : LColors.saffron;
     final markers = _markers;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          width: 22,
-          color: surface,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: LayoutBuilder(
+    return IgnorePointer(
+      ignoring: !_visible,
+      child: AnimatedOpacity(
+        opacity: _visible ? 1.0 : 0.0,
+        duration: Duration(milliseconds: _visible ? 160 : 400),
+        curve: Curves.easeOut,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              width: 22,
+              color: surface,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: LayoutBuilder(
             builder: (context, constraints) {
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -777,6 +876,8 @@ class _VerseJumperState extends State<_VerseJumper> {
                 ),
               );
             },
+              ),
+            ),
           ),
         ),
       ),

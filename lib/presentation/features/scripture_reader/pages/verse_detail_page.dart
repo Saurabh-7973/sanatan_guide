@@ -966,7 +966,11 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                       ),
                     ),
                   ],
-                  if (verse.english?.trim().isNotEmpty ?? false) ...[
+                  // Skip the separate "Translation" section when the leaf
+                  // is already showing the translation in place of the
+                  // empty Sanskrit body.
+                  if ((verse.english?.trim().isNotEmpty ?? false) &&
+                      readingSanskrit(verse.sanskrit).trim().isNotEmpty) ...[
                     const SizedBox(height: Spacing.xxxl),
                     _SectionRule(label: 'Translation', isDark: isDark),
                     const SizedBox(height: Spacing.md),
@@ -1138,7 +1142,15 @@ class _Leaf extends StatelessWidget {
   Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.cream;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
     final vPad = compressed ? 20.0 : 28.0;
+
+    // When a verse has no Sanskrit body (still being digitized), surface the
+    // translation inside the binding card itself instead of leaving the leaf
+    // empty and showing the translation in a separate section below.
+    final sanskritBody = readingSanskrit(verse.sanskrit).trim();
+    final translationOnly = sanskritBody.isEmpty &&
+        (verse.english?.trim().isNotEmpty ?? false);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -1155,15 +1167,28 @@ class _Leaf extends StatelessWidget {
                       .copyWith(fontWeight: FontWeight.w600, letterSpacing: 2.8),
                 ),
                 const SizedBox(height: Spacing.sectionV),
-                _SanskritWords(
-                  text: readingSanskrit(verse.sanskrit),
-                  wordMeanings: verse.wordMeanings,
-                  size: sanskritSize,
-                  baseColor: cream,
-                  saffron: saffron,
-                  selectedWord: selectedWord,
-                  onSelectWord: onSelectWord,
-                ),
+                if (translationOnly)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      verse.english!.trim(),
+                      textAlign: TextAlign.center,
+                      style: AppText.translation(
+                        color: text1,
+                        size: 17 * (sanskritSize / 24.0),
+                      ).copyWith(height: 1.6),
+                    ),
+                  )
+                else
+                  _SanskritWords(
+                    text: readingSanskrit(verse.sanskrit),
+                    wordMeanings: verse.wordMeanings,
+                    size: sanskritSize,
+                    baseColor: cream,
+                    saffron: saffron,
+                    selectedWord: selectedWord,
+                    onSelectWord: onSelectWord,
+                  ),
               ],
             ),
           ),
