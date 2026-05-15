@@ -234,8 +234,11 @@ extension ScriptureX on Scripture {
   /// display-ready English plural form. Used as the section header above
   /// chapter rows ("ALL CHAPTERS", "ALL CANTOS", etc.).
   String get unitLabel => switch (this) {
-        Scripture.rigveda || Scripture.atharvaveda => 'maṇḍalas',
-        Scripture.samaveda || Scripture.yajurveda => 'kāṇḍas',
+        Scripture.rigveda => 'maṇḍalas',
+        Scripture.atharvaveda ||
+        Scripture.samaveda ||
+        Scripture.yajurveda =>
+          'kāṇḍas',
         Scripture.bhagavataPurana ||
         Scripture.deviBhagavataPurana ||
         Scripture.markandeya ||
@@ -253,8 +256,11 @@ extension ScriptureX on Scripture {
   /// The two-letter code prefix for a single navigable unit. Used in the
   /// per-row Arabic fallback ("CH 1", "MD 1", "SK 1", etc.).
   String get unitCode => switch (this) {
-        Scripture.rigveda || Scripture.atharvaveda => 'MD',
-        Scripture.samaveda || Scripture.yajurveda => 'KN',
+        Scripture.rigveda => 'MD',
+        Scripture.atharvaveda ||
+        Scripture.samaveda ||
+        Scripture.yajurveda =>
+          'KN',
         Scripture.bhagavataPurana ||
         Scripture.deviBhagavataPurana ||
         Scripture.markandeya ||
