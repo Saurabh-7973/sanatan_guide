@@ -410,77 +410,83 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 14),
-            decoration: BoxDecoration(
-              color: bgTint,
-              border: Border(
-                bottom: BorderSide(color: divider, width: 1),
-              ),
-            ),
+          child: ColoredBox(
+            color: bgTint,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  family.devaName,
-                  style: TextStyle(
-                    fontFamily: family.kind == _FamilyKind.tamil
-                        ? Fonts.sans
-                        : Fonts.deva,
-                    fontSize: 22,
-                    height: 1,
-                    letterSpacing: 0.44,
-                    color: saffron,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        family.englishLabel,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        family.devaName,
                         style: TextStyle(
-                          fontFamily: Fonts.serif,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.13,
-                          color: text1,
+                          fontFamily: family.kind == _FamilyKind.tamil
+                              ? Fonts.sans
+                              : Fonts.deva,
+                          fontSize: 22,
+                          height: 1,
+                          letterSpacing: 0.44,
+                          color: saffron,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      family.metaLabel,
-                      style: TextStyle(
-                        fontFamily: Fonts.sans,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.98,
-                        color: text3,
+                      const SizedBox(height: 4),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              family.englishLabel,
+                              style: TextStyle(
+                                fontFamily: Fonts.serif,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.13,
+                                color: text1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            family.metaLabel,
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.98,
+                              color: text3,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.only(right: 40),
-                  child: Text(
-                    family.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: Fonts.serif,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12.5,
-                      height: 1.5,
-                      color: text2,
-                    ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 40),
+                        child: Text(
+                          family.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: Fonts.serif,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12.5,
+                            height: 1.5,
+                            color: text2,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                // Full-width hairline so the underline reaches the screen
+                // edges, not the 24 px gutter.
+                Container(height: 1, color: divider),
               ],
             ),
           ),
@@ -629,121 +635,113 @@ class _ScriptureRow extends StatelessWidget {
 
     final isTamilScript = family.kind == _FamilyKind.tamil;
 
-    // Hindi line height: 17 * 1.2 = 20.4. Diamond is 8×8; centering on that
-    // line puts the glyph at (20.4 - 8) / 2 ≈ 6 from the row top — same as
-    // the Devanāgarī shirorekha, so the glyph reads as "owned by" the Hindi
-    // line, not floating between Hindi and English.
-    const devaLineHeight = 17.0 * 1.2;
-
+    // Anchor the diamond on the Devanāgarī shirorekha — a 2 px top inset
+    // lands the 8×8 glyph at the upper crossbar of the Hindi character so the
+    // row reads as "diamond → Hindi name", not "diamond → English transliteration".
     return InkWell(
       onTap: () => _openScripture(context, scripture.id),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-        decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(color: dividerSoft, width: 1),
-                ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: devaLineHeight,
-              child: Center(
-                child: Transform.rotate(
-                  angle: 0.785398,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    color: _glyphColor(),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    scripture.devaName,
-                    style: TextStyle(
-                      fontFamily: isTamilScript ? Fonts.sans : Fonts.deva,
-                      fontSize: isTamilScript ? 15 : 17,
-                      height: 1.2,
-                      letterSpacing: 0.085,
-                      color: cream,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Transform.rotate(
+                    angle: 0.785398,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      color: _glyphColor(),
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    scripture.englishName,
-                    style: TextStyle(
-                      fontFamily: Fonts.serif,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.075,
-                      height: 1.25,
-                      color: text1,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                        fontFamily: Fonts.sans,
-                        // Outfit lacks the dot-below Tamil-romanisation letters
-                        // (ḷ, ṟ) used in names like "Tiruvaḷḷuvar"; fall back to
-                        // Lora, which carries the full IAST set.
-                        fontFamilyFallback: const [Fonts.serif],
-                        fontSize: 11,
-                        height: 1.4,
-                        color: text3,
-                      ),
-                      children: [
-                        TextSpan(
-                          text:
-                              '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
-                          style: TextStyle(
-                            fontFamily: Fonts.serif,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 12,
-                            color: text2,
-                          ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        scripture.devaName,
+                        style: TextStyle(
+                          fontFamily: isTamilScript ? Fonts.sans : Fonts.deva,
+                          fontSize: isTamilScript ? 15 : 17,
+                          height: 1.2,
+                          letterSpacing: 0.085,
+                          color: cream,
                         ),
-                        if (scripture.subdivision != null)
-                          TextSpan(text: '  ·  ${scripture.subdivision}'),
-                        if (scripture.versesRead > 0)
-                          TextSpan(
-                            text:
-                                '  ·  ${scripture.versesRead} verse${scripture.versesRead == 1 ? '' : 's'} read',
-                            style: TextStyle(
-                              color: saffron,
-                              fontWeight: FontWeight.w500,
-                            ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        scripture.englishName,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.075,
+                          height: 1.25,
+                          color: text1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text.rich(
+                        TextSpan(
+                          style: TextStyle(
+                            fontFamily: Fonts.sans,
+                            // Outfit lacks the dot-below Tamil-romanisation
+                            // letters (ḷ, ṟ) used in names like "Tiruvaḷḷuvar";
+                            // fall back to Lora for the full IAST set.
+                            fontFamilyFallback: const [Fonts.serif],
+                            fontSize: 11,
+                            height: 1.4,
+                            color: text3,
                           ),
-                      ],
-                    ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
+                              style: TextStyle(
+                                fontFamily: Fonts.serif,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 12,
+                                color: text2,
+                              ),
+                            ),
+                            if (scripture.subdivision != null)
+                              TextSpan(text: '  ·  ${scripture.subdivision}'),
+                            if (scripture.versesRead > 0)
+                              TextSpan(
+                                text:
+                                    '  ·  ${scripture.versesRead} verse${scripture.versesRead == 1 ? '' : 's'} read',
+                                style: TextStyle(
+                                  color: saffron,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: SizedBox(
-                height: devaLineHeight,
-                child: Center(
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, top: 2),
                   child: _MockupChevron(
                     color: text3.withValues(alpha: 0.4),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // Edge-to-edge hairline so dividers reach the screen edges instead
+          // of stopping at the 24 px content gutter.
+          if (!isLast)
+            Container(height: 1, color: dividerSoft),
+        ],
       ),
     );
   }
