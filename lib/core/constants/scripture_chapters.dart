@@ -13,6 +13,7 @@ class ChapterMeta {
     required this.enTitle,
     this.subtitle,
     this.verseCount,
+    this.chapterCount,
     this.bookNum,
   });
 
@@ -22,6 +23,10 @@ class ChapterMeta {
   final String enTitle;
   final String? subtitle;
   final int? verseCount;
+  // Only set for canto/skanda-level rollups (Bhāgavata Purāṇa style) where
+  // each row aggregates many chapters. Drives the "{verses} verses ·
+  // {chapters} chapters" row meta.
+  final int? chapterCount;
 }
 
 /// Returns hard-coded chapter metadata for the given scripture, or null when
@@ -30,6 +35,92 @@ List<ChapterMeta>? scriptureChaptersFor(String scriptureId) =>
     _chapters[scriptureId];
 
 const Map<String, List<ChapterMeta>> _chapters = {
+  'bhagavata_purana': [
+    ChapterMeta(
+      chapterNum: 1,
+      devaTitle: 'प्रथम स्कन्ध',
+      enTitle: 'Creation',
+      chapterCount: 19,
+      verseCount: 810,
+    ),
+    ChapterMeta(
+      chapterNum: 2,
+      devaTitle: 'द्वितीय स्कन्ध',
+      enTitle: 'The Cosmic Manifestation',
+      chapterCount: 10,
+      verseCount: 393,
+    ),
+    ChapterMeta(
+      chapterNum: 3,
+      devaTitle: 'तृतीय स्कन्ध',
+      enTitle: 'The Status Quo',
+      chapterCount: 33,
+      verseCount: 1416,
+    ),
+    ChapterMeta(
+      chapterNum: 4,
+      devaTitle: 'चतुर्थ स्कन्ध',
+      enTitle: 'The Creation of the Fourth Order',
+      chapterCount: 31,
+      verseCount: 1450,
+    ),
+    ChapterMeta(
+      chapterNum: 5,
+      devaTitle: 'पञ्चम स्कन्ध',
+      enTitle: 'The Creative Impetus',
+      chapterCount: 26,
+      verseCount: 668,
+    ),
+    ChapterMeta(
+      chapterNum: 6,
+      devaTitle: 'षष्ठ स्कन्ध',
+      enTitle: 'Prescribed Duties for Mankind',
+      chapterCount: 19,
+      verseCount: 855,
+    ),
+    ChapterMeta(
+      chapterNum: 7,
+      devaTitle: 'सप्तम स्कन्ध',
+      enTitle: 'The Science of God',
+      chapterCount: 15,
+      verseCount: 750,
+    ),
+    ChapterMeta(
+      chapterNum: 8,
+      devaTitle: 'अष्टम स्कन्ध',
+      enTitle: 'Withdrawal of the Cosmic Creations',
+      chapterCount: 24,
+      verseCount: 929,
+    ),
+    ChapterMeta(
+      chapterNum: 9,
+      devaTitle: 'नवम स्कन्ध',
+      enTitle: 'Liberation',
+      chapterCount: 24,
+      verseCount: 962,
+    ),
+    ChapterMeta(
+      chapterNum: 10,
+      devaTitle: 'दशम स्कन्ध',
+      enTitle: 'The Summum Bonum',
+      chapterCount: 90,
+      verseCount: 3948,
+    ),
+    ChapterMeta(
+      chapterNum: 11,
+      devaTitle: 'एकादश स्कन्ध',
+      enTitle: 'General History',
+      chapterCount: 31,
+      verseCount: 1360,
+    ),
+    ChapterMeta(
+      chapterNum: 12,
+      devaTitle: 'द्वादश स्कन्ध',
+      enTitle: 'The Age of Deterioration',
+      chapterCount: 13,
+      verseCount: 564,
+    ),
+  ],
   'yoga_sutras': [
     ChapterMeta(
       chapterNum: 1,

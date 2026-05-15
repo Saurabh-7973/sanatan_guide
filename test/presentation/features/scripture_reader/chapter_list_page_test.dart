@@ -83,7 +83,7 @@ void main() {
   );
 
   testWidgets(
-    'incomplete chapters show chevron_right (no check)',
+    'incomplete chapters show no check icon',
     (tester) async {
       await tester.pumpWidget(_bgHarness(
         readCounts: List.filled(18, 0),
@@ -92,8 +92,9 @@ void main() {
       await tester.pumpAndSettle(const Duration(milliseconds: 700));
 
       expect(find.byIcon(Icons.check_circle_outline_rounded), findsNothing);
-      // 18 chapters; viewport probably renders ~5–7 visible — at minimum 1.
-      expect(find.byIcon(Icons.chevron_right_rounded), findsWidgets);
+      // Row chevron is a custom-painted 8×14 stroke matching the mockup —
+      // no longer an Icon, so we can't byIcon-match it. Absence of the
+      // completed-state check is what proves we're on the chevron path.
     },
   );
 

@@ -91,7 +91,7 @@ class _ChapterListPageState extends ConsumerState<ChapterListPage>
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded),
+          icon: const _MockupBackChevron(),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -266,7 +266,11 @@ class _LoadedBody extends ConsumerWidget {
             0,
     ];
 
-    final totalChapters = entries.length;
+    final totalUnits = entries.length;
+    final hasRollup = entries.any((e) => e.chapterCount != null);
+    final totalChapters = hasRollup
+        ? entries.fold<int>(0, (acc, e) => acc + (e.chapterCount ?? 0))
+        : totalUnits;
     final totalVerses = entries.fold<int>(
       0,
       (acc, e) => acc + (e.verseCount ?? 0),
@@ -289,7 +293,8 @@ class _LoadedBody extends ConsumerWidget {
       children: [
         _ChapterListHeader(
           scripture: scripture,
-          totalChapters: totalChapters,
+          totalUnits: totalUnits,
+          totalChapters: hasRollup ? totalChapters : null,
           totalVerses: totalVerses,
           readChapters: readChapters,
           isDark: isDark,
@@ -358,6 +363,7 @@ class _LoadedBody extends ConsumerWidget {
 class _ChapterListHeader extends StatelessWidget {
   const _ChapterListHeader({
     required this.scripture,
+    required this.totalUnits,
     required this.totalChapters,
     required this.totalVerses,
     required this.readChapters,
@@ -365,7 +371,11 @@ class _ChapterListHeader extends StatelessWidget {
   });
 
   final Scripture scripture;
-  final int totalChapters;
+  // Top-level unit count (e.g. 12 cantos, 18 chapters, 10 maṇḍalas).
+  final int totalUnits;
+  // Aggregate chapter count when the unit is a canto/skanda rollup; null when
+  // the unit IS a chapter (so we don't show "18 chapters · 18 chapters").
+  final int? totalChapters;
   final int totalVerses;
   final int readChapters;
   final bool isDark;
@@ -377,6 +387,14 @@ class _ChapterListHeader extends StatelessWidget {
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final unit = scripture.unitLabel;
+
+    final parts = <(String, String)>[
+      ('$totalUnits', unit.toUpperCase()),
+      if (totalChapters != null && totalChapters! > 0)
+        (_fmt(totalChapters!), 'CHAPTERS'),
+      if (totalVerses > 0) (_fmt(totalVerses), 'VERSES'),
+      if (readChapters > 0) ('$readChapters', 'READ'),
+    ];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 4, 24, 18),
@@ -412,18 +430,26 @@ class _ChapterListHeader extends StatelessWidget {
               letterSpacing: 0.22 * 10,
               color: text3,
             ),
-            child: _MetaLine(
-              parts: [
-                ('$totalChapters', unit.toUpperCase()),
-                if (totalVerses > 0) ('$totalVerses', 'VERSES'),
-                ('$readChapters', 'READ'),
-              ],
-              saffron: saffron,
-            ),
+            child: _MetaLine(parts: parts, saffron: saffron),
           ),
         ],
       ),
     );
+  }
+
+  static String _fmt(int n) {
+    // Indian grouping (lakh/crore) — matches the home/library stats line.
+    final s = n.toString();
+    if (s.length <= 3) return s;
+    final last3 = s.substring(s.length - 3);
+    final rest = s.substring(0, s.length - 3);
+    final buf = StringBuffer();
+    for (var i = 0; i < rest.length; i++) {
+      buf.write(rest[i]);
+      final remain = rest.length - i - 1;
+      if (remain > 0 && remain % 2 == 0) buf.write(',');
+    }
+    return '$buf,$last3';
   }
 }
 
@@ -543,8 +569,10 @@ class _ResumeRow extends StatelessWidget {
           ),
           child: Stack(
             children: [
+              // Leaf-thread sits at the card's left edge (3 px wide saffron
+              // rule + dark-mode glow), per spec.
               Positioned(
-                left: -22,
+                left: 0,
                 top: 12,
                 bottom: 12,
                 child: LeafThread(isDark: isDark, pulseOnce: true),
@@ -592,9 +620,7 @@ class _ResumeRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 14,
+                  _MockupResumeArrow(
                     color: saffron.withValues(alpha: 0.6),
                   ),
                 ],
@@ -850,7 +876,7 @@ class _MetaText extends StatelessWidget {
     if (hasVerseCount) {
       spans.add(
         TextSpan(
-          text: '${entry.verseCount} verses',
+          text: '${_fmt(entry.verseCount!)} verses',
           style: base.copyWith(
             fontFamily: Fonts.serif,
             fontStyle: FontStyle.italic,
@@ -868,6 +894,16 @@ class _MetaText extends StatelessWidget {
               fontWeight: FontWeight.w500,
               color: saffron,
             ),
+          ),
+        );
+      } else if (entry.chapterCount != null && entry.chapterCount! > 0) {
+        // Canto-rollup row — chapter count is more informative than a
+        // ~minutes-to-read estimate against thousands of verses.
+        spans.add(TextSpan(text: ' ·  ', style: base));
+        spans.add(
+          TextSpan(
+            text: '${entry.chapterCount} chapters',
+            style: base,
           ),
         );
       } else {
@@ -897,6 +933,20 @@ class _MetaText extends StatelessWidget {
       maxLines: hasVerseCount ? 1 : 2,
       overflow: TextOverflow.ellipsis,
     );
+  }
+
+  static String _fmt(int n) {
+    final s = n.toString();
+    if (s.length <= 3) return s;
+    final last3 = s.substring(s.length - 3);
+    final rest = s.substring(0, s.length - 3);
+    final buf = StringBuffer();
+    for (var i = 0; i < rest.length; i++) {
+      buf.write(rest[i]);
+      final remain = rest.length - i - 1;
+      if (remain > 0 && remain % 2 == 0) buf.write(',');
+    }
+    return '$buf,$last3';
   }
 }
 
@@ -949,11 +999,7 @@ class _ChapterRowArrow extends StatelessWidget {
       return Icon(Icons.check_circle_outline_rounded,
           size: 14, color: saffron);
     }
-    return Icon(
-      Icons.chevron_right_rounded,
-      size: 18,
-      color: text3.withValues(alpha: 0.6),
-    );
+    return _MockupRowChevron(color: text3.withValues(alpha: 0.4));
   }
 }
 
@@ -976,7 +1022,8 @@ class _LoadingBody extends StatelessWidget {
       children: [
         _ChapterListHeader(
           scripture: scripture,
-          totalChapters: 0,
+          totalUnits: 0,
+          totalChapters: null,
           totalVerses: 0,
           readChapters: 0,
           isDark: isDark,
@@ -1056,4 +1103,124 @@ class _ErrorBody extends ConsumerWidget {
       onRetry: () => ref.invalidate(chapterOutlinesProvider(scriptureId)),
     );
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Mockup SVG-spec icons — keep stroke widths/sizes locked to screen-04 spec.
+// ─────────────────────────────────────────────────────────────────────────
+
+class _MockupBackChevron extends StatelessWidget {
+  const _MockupBackChevron();
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).brightness == Brightness.dark
+        ? DColors.text1
+        : LColors.text1;
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: CustomPaint(painter: _BackChevronPainter(color: color)),
+    );
+  }
+}
+
+class _BackChevronPainter extends CustomPainter {
+  const _BackChevronPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final path = Path()
+      ..moveTo(12, 4)
+      ..lineTo(6, 10)
+      ..lineTo(12, 16);
+    canvas.drawPath(path, p);
+  }
+
+  @override
+  bool shouldRepaint(_BackChevronPainter old) => old.color != color;
+}
+
+class _MockupRowChevron extends StatelessWidget {
+  const _MockupRowChevron({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 8,
+      height: 14,
+      child: CustomPaint(painter: _RowChevronPainter(color: color)),
+    );
+  }
+}
+
+class _RowChevronPainter extends CustomPainter {
+  const _RowChevronPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final path = Path()
+      ..moveTo(1, 1)
+      ..lineTo(7, 7)
+      ..lineTo(1, 13);
+    canvas.drawPath(path, p);
+  }
+
+  @override
+  bool shouldRepaint(_RowChevronPainter old) => old.color != color;
+}
+
+class _MockupResumeArrow extends StatelessWidget {
+  const _MockupResumeArrow({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 14,
+      height: 14,
+      child: CustomPaint(painter: _ResumeArrowPainter(color: color)),
+    );
+  }
+}
+
+class _ResumeArrowPainter extends CustomPainter {
+  const _ResumeArrowPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    // Shaft.
+    canvas.drawLine(const Offset(2, 7), const Offset(12, 7), p);
+    // Arrowhead.
+    final head = Path()
+      ..moveTo(8, 3)
+      ..lineTo(12, 7)
+      ..lineTo(8, 11);
+    canvas.drawPath(head, p);
+  }
+
+  @override
+  bool shouldRepaint(_ResumeArrowPainter old) => old.color != color;
 }
