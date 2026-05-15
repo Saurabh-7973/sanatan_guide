@@ -50,7 +50,7 @@ class VerseListPage extends ConsumerStatefulWidget {
 class _VerseListPageState extends ConsumerState<VerseListPage>
     with NavLoggerMixin<VerseListPage> {
   final _scrollController = ScrollController();
-  final _verseRowKeys = <int, GlobalKey>{};
+  int _verseCount = 0;
 
   @override
   String get screenName =>
@@ -62,15 +62,18 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
     super.dispose();
   }
 
+  // Offset-based jump: GlobalKey + ensureVisible collides under SliverList
+  // recycling on large lists (Rigveda M1 = 1,839 rows). Approximate jump
+  // is good enough for the rail; user can scroll-tune from there.
   void _scrollToVerse(int verseNum) {
-    final key = _verseRowKeys[verseNum];
-    final ctx = key?.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      duration: const Duration(milliseconds: 300),
+    if (!_scrollController.hasClients || _verseCount == 0) return;
+    final pos = _scrollController.position;
+    final fraction = ((verseNum - 1) / _verseCount).clamp(0.0, 1.0);
+    final target = pos.maxScrollExtent * fraction;
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 350),
       curve: Curves.easeOut,
-      alignment: 0.05,
     );
   }
 
@@ -137,6 +140,7 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
                   (verses) {
                     final sorted = [...verses]
                       ..sort((a, b) => a.verseNum.compareTo(b.verseNum));
+                    _verseCount = sorted.length;
                     return _LoadedBody(
                       verses: sorted,
                       scriptureId: widget.scriptureId,
@@ -144,7 +148,6 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
                       bookNum: widget.bookNum,
                       isDark: isDark,
                       scrollController: _scrollController,
-                      verseRowKeys: _verseRowKeys,
                       onJump: _scrollToVerse,
                     );
                   },
@@ -170,7 +173,6 @@ class _LoadedBody extends ConsumerWidget {
     required this.bookNum,
     required this.isDark,
     required this.scrollController,
-    required this.verseRowKeys,
     required this.onJump,
   });
 
@@ -180,7 +182,6 @@ class _LoadedBody extends ConsumerWidget {
   final int? bookNum;
   final bool isDark;
   final ScrollController scrollController;
-  final Map<int, GlobalKey> verseRowKeys;
   final void Function(int verseNum) onJump;
 
   Verse? get _nextUnread =>
@@ -238,10 +239,8 @@ class _LoadedBody extends ConsumerWidget {
                 itemCount: verses.length,
                 itemBuilder: (context, i) {
                   final v = verses[i];
-                  final key =
-                      verseRowKeys.putIfAbsent(v.verseNum, GlobalKey.new);
                   final row = KeyedSubtree(
-                    key: key,
+                    key: ValueKey<int>(v.verseNum),
                     child: _VerseRow(
                       verse: v,
                       scriptureId: scriptureId,
