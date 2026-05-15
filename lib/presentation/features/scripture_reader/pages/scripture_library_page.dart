@@ -484,9 +484,12 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
                     ],
                   ),
                 ),
-                // Full-width hairline so the underline reaches the screen
-                // edges, not the 24 px gutter.
-                Container(height: 1, color: divider),
+                // Content-width hairline — matches the 24 px gutter that
+                // contains the title/subtitle/meta block.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(height: 1, color: divider),
+                ),
               ],
             ),
           ),
@@ -635,9 +638,13 @@ class _ScriptureRow extends StatelessWidget {
 
     final isTamilScript = family.kind == _FamilyKind.tamil;
 
-    // Anchor the diamond on the Devanāgarī shirorekha — a 2 px top inset
-    // lands the 8×8 glyph at the upper crossbar of the Hindi character so the
-    // row reads as "diamond → Hindi name", not "diamond → English transliteration".
+    // Align diamond + chevron with the English-line center per the mockup:
+    // Hindi (17·1.2 = 20.4) + 3 gap + (English-line 15·1.25 = 18.75) / 2.
+    // Glyph (8 h) lands at top inset 20.4 + 3 + (18.75 − 8) / 2 ≈ 29.
+    // Chevron (14 h) lands at top inset 20.4 + 3 + (18.75 − 14) / 2 ≈ 26.
+    const diamondTop = 29.0;
+    const chevronTop = 26.0;
+
     return InkWell(
       onTap: () => _openScripture(context, scripture.id),
       child: Column(
@@ -649,7 +656,7 @@ class _ScriptureRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 2),
+                  padding: const EdgeInsets.only(top: diamondTop),
                   child: Transform.rotate(
                     angle: 0.785398,
                     child: Container(
@@ -729,7 +736,7 @@ class _ScriptureRow extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 8, top: 2),
+                  padding: const EdgeInsets.only(left: 8, top: chevronTop),
                   child: _MockupChevron(
                     color: text3.withValues(alpha: 0.4),
                   ),
@@ -737,10 +744,13 @@ class _ScriptureRow extends StatelessWidget {
               ],
             ),
           ),
-          // Edge-to-edge hairline so dividers reach the screen edges instead
-          // of stopping at the 24 px content gutter.
+          // Content-width hairline — matches the 24 px gutter the row text
+          // sits in, not the screen edges.
           if (!isLast)
-            Container(height: 1, color: dividerSoft),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(height: 1, color: dividerSoft),
+            ),
         ],
       ),
     );
