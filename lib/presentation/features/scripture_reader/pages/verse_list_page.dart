@@ -216,6 +216,7 @@ class _LoadedBody extends ConsumerWidget {
     }
 
     final size = _groupSize;
+    final lastVerseNum = verses.last.verseNum;
     final entries = <_ListItem>[];
     var currentGroup = -1;
     for (var i = 0; i < verses.length; i++) {
@@ -223,7 +224,9 @@ class _LoadedBody extends ConsumerWidget {
       final group = (v.verseNum - 1) ~/ size;
       if (group != currentGroup) {
         final start = group * size + 1;
-        final end = (group + 1) * size;
+        // Clamp the decade's end to the actual last verse, so Karma Yoga
+        // (43 verses) shows "VERSES 41 — 43" instead of "41 — 50".
+        final end = ((group + 1) * size).clamp(start, lastVerseNum);
         entries.add(_HeaderItem(start, end));
         currentGroup = group;
       }
