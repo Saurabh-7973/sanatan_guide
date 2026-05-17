@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Scripture Library — Śruti / Smṛti taxonomy in 6 families.
@@ -92,13 +93,24 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
           slivers: [
             SliverToBoxAdapter(child: _Header(isDark: isDark)),
             SliverToBoxAdapter(
-              child: _SearchBar(
-                isDark: isDark,
-                controller: _ctrl,
-                focus: _focus,
-                query: _query,
-                onChanged: _onQueryChanged,
-                onClear: _clearQuery,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _SearchBar(
+                      isDark: isDark,
+                      controller: _ctrl,
+                      focus: _focus,
+                      query: _query,
+                      onChanged: _onQueryChanged,
+                      onClear: _clearQuery,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 14, right: 8),
+                    child: LibraryTopBarActions(),
+                  ),
+                ],
               ),
             ),
             if (_query.isEmpty) ...[
