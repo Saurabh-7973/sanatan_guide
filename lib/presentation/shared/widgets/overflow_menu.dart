@@ -49,10 +49,10 @@ class _OverflowMenu extends StatelessWidget {
     final sep = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
 
+    // Exactly three items, per screen-13 mockup. (Festivals reached from the
+    // Home "Upcoming Parva" card; general AI chat from Search.)
     const items = <_Item>[
       _Item('Settings', '/settings', _drawGear),
-      _Item('Festivals & Calendar', '/festivals', _drawCalendar),
-      _Item('Ask the Pandit', '/chat', _drawOm),
       _Item('Send feedback', '/feedback', _drawPlane),
       _Item('About this app', '/credits', _drawInfo),
     ];
@@ -188,30 +188,6 @@ void _drawGear(Canvas c, Size s, Color col) {
   c.drawLine(p(11.8, 11.8), p(12.8, 12.8), _s(col, u));
   c.drawLine(p(3.2, 12.8), p(4.2, 11.8), _s(col, u));
   c.drawLine(p(11.8, 4.2), p(12.8, 3.2), _s(col, u));
-}
-
-void _drawCalendar(Canvas c, Size s, Color col) {
-  final u = s.width / 16;
-  c.drawRRect(
-    RRect.fromLTRBR(2 * u, 3 * u, 14 * u, 14 * u, Radius.circular(u)),
-    _s(col, u),
-  );
-  c.drawLine(Offset(2 * u, 6 * u), Offset(14 * u, 6 * u), _s(col, u));
-}
-
-void _drawOm(Canvas c, Size s, Color col) {
-  final tp = TextPainter(
-    text: TextSpan(
-      text: 'ॐ',
-      style: TextStyle(
-        fontFamily: Fonts.deva,
-        fontSize: 13 * (s.width / 16),
-        color: col,
-      ),
-    ),
-    textDirection: TextDirection.ltr,
-  )..layout();
-  tp.paint(c, Offset((s.width - tp.width) / 2, (s.height - tp.height) / 2));
 }
 
 void _drawPlane(Canvas c, Size s, Color col) {
