@@ -1,12 +1,13 @@
 // lib/presentation/features/settings/pages/credits_page.dart
 //
-// Credits & Attributions — heritage spec 13 Part B. Sūtra-numbered domain
-// sections + Bṛhadāraṇyaka lineage footer. Scripture data from contentCredits;
-// tool data from appToolCredits.
+// Credits & Attributions — heritage spec 13 Part B. Fixed back-bar (no overlay,
+// no collision), sūtra-numbered domain sections, saffron <em> term, exact
+// external-link arrow, uppercase letter-spaced meta, Bṛhadāraṇyaka footer.
 
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/core/constants/content_credits.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -18,7 +19,9 @@ class _Row {
     required this.description,
     required this.meta,
     required this.linksOut,
+    this.term,
   });
+  final String? term;
   final String title;
   final String description;
   final String meta;
@@ -38,10 +41,10 @@ List<_Section> _buildSections() {
         .where((c) => c.section == s)
         .map((c) => _Row(
               title: c.displayName,
-              description: c.translators.join(' · '),
-              meta: c.licenseNote == null
-                  ? '${c.source} · ${c.licenseLabel}'
-                  : '${c.source} · ${c.licenseLabel} · ${c.licenseNote}',
+              description: c.licenseNote == null
+                  ? c.translators.join(' · ')
+                  : '${c.translators.join(' · ')}. ${c.licenseNote}',
+              meta: '${c.source} · ${c.licenseLabel}',
               linksOut: c.source.contains('.'),
             ))
         .toList();
@@ -51,6 +54,7 @@ List<_Section> _buildSections() {
     'Tools used in preparing this app',
     appToolCredits
         .map((t) => _Row(
+              term: t.term,
               title: t.title,
               description: t.description,
               meta: t.meta,
@@ -67,12 +71,11 @@ class CreditsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
     final sections = _buildSections();
 
     final blocks = <Widget>[
       _Hero(isDark: isDark),
-      const SizedBox(height: 28),
+      const SizedBox(height: 26),
     ];
     var animIndex = 0;
     for (final section in sections) {
@@ -88,37 +91,46 @@ class CreditsPage extends StatelessWidget {
           ),
         ));
       }
-      blocks.add(const SizedBox(height: 28));
+      blocks.add(const SizedBox(height: 26));
     }
     blocks.add(_LineageFooter(isDark: isDark));
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: text1),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
           SafeArea(
-            top: false,
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
-                bottom: 32,
-              ),
-              children: blocks,
+            child: Column(
+              children: [
+                // Fixed topbar (mockup .credits-topbar: flex-shrink:0, no
+                // title) — content scrolls BELOW it, no overlay collision.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 8),
+                  child: Row(
+                    children: [
+                      InkResponse(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        radius: 22,
+                        child: const SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Center(child: MockupBackChevron()),
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 32),
+                    children: blocks,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -135,38 +147,41 @@ class _Hero extends StatelessWidget {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('श्रद्धा · WITH GRATITUDE',
-            style: AppText.sectionLabel(color: saffron)),
-        const SizedBox(height: 12),
-        Text(
-          'Credits & Attributions',
-          style: TextStyle(
-            fontFamily: Fonts.serif,
-            fontSize: 26,
-            fontWeight: FontWeight.w500,
-            height: 1.15,
-            letterSpacing: -0.5,
-            color: text1,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('श्रद्धा · WITH GRATITUDE',
+              style: AppText.sectionLabel(color: saffron)),
+          const SizedBox(height: 6),
+          Text(
+            'Credits & Attributions',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontSize: 26,
+              fontWeight: FontWeight.w500,
+              height: 1.15,
+              letterSpacing: -0.52,
+              color: text1,
+            ),
           ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          'Every verse in this app comes from a real academic source. '
-          'Nothing is invented. The texts are public domain; the '
-          'digitisation work that made them readable is not. We '
-          'acknowledge it here.',
-          style: TextStyle(
-            fontFamily: Fonts.serif,
-            fontStyle: FontStyle.italic,
-            fontSize: 14,
-            height: 1.6,
-            color: text2,
+          const SizedBox(height: 10),
+          Text(
+            'Every verse in this app comes from a real academic source. '
+            'Nothing is invented. The texts are public domain; the '
+            'digitisation work that made them readable is not. We '
+            'acknowledge it here.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 14,
+              height: 1.6,
+              color: text2,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -180,8 +195,8 @@ class _SectionHeader extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final divider = isDark ? DColors.divider : LColors.divider;
     return Container(
-      padding: const EdgeInsets.only(bottom: 8),
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: divider)),
       ),
@@ -212,6 +227,7 @@ class _CreditRow extends StatelessWidget {
     final sep = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         border:
             showDivider ? Border(bottom: BorderSide(color: sep)) : null,
@@ -220,15 +236,19 @@ class _CreditRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 16,
-            child: Text(
-              numeral,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: Fonts.deva,
-                fontSize: 14,
-                color: saffron,
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: SizedBox(
+              width: 16,
+              child: Text(
+                numeral,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: Fonts.deva,
+                  fontSize: 14,
+                  height: 1.2,
+                  color: saffron,
+                ),
               ),
             ),
           ),
@@ -237,13 +257,25 @@ class _CreditRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  row.title,
+                Text.rich(
+                  TextSpan(children: [
+                    if (row.term != null)
+                      TextSpan(
+                        text: '${row.term} ',
+                        style: TextStyle(
+                          fontFamily: Fonts.deva,
+                          fontWeight: FontWeight.w500,
+                          color: saffron,
+                        ),
+                      ),
+                    TextSpan(text: row.title),
+                  ]),
                   style: TextStyle(
                     fontFamily: Fonts.serif,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
+                    letterSpacing: -0.075,
                     color: text1,
                   ),
                 ),
@@ -259,20 +291,62 @@ class _CreditRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(row.meta, style: AppText.meta(color: text3, size: 9.5)),
+                Text(
+                  row.meta.toUpperCase(),
+                  style: TextStyle(
+                    fontFamily: Fonts.sans,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.71, // 0.18em at 9.5px
+                    color: text3,
+                  ),
+                ),
               ],
             ),
           ),
           if (row.linksOut)
             Padding(
-              padding: const EdgeInsets.only(left: 10, top: 2),
-              child: Icon(Icons.north_east,
-                  size: 11, color: text3.withValues(alpha: 0.6)),
+              padding: const EdgeInsets.only(left: 10, top: 4),
+              child: Opacity(
+                opacity: 0.4,
+                child: SizedBox(
+                  width: 11,
+                  height: 11,
+                  child: CustomPaint(
+                    painter: _ExternalArrowPainter(color: text3),
+                  ),
+                ),
+              ),
             ),
         ],
       ),
     );
   }
+}
+
+/// Mockup `.credit-link-arrow`: 11×11, paths M4 1h6v6 + M10 1L4 7, sw 1.4.
+class _ExternalArrowPainter extends CustomPainter {
+  const _ExternalArrowPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 11.0;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4 * u
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final corner = Path()
+      ..moveTo(4 * u, 1 * u)
+      ..lineTo(10 * u, 1 * u)
+      ..lineTo(10 * u, 7 * u);
+    canvas.drawPath(corner, p);
+    canvas.drawLine(Offset(10 * u, 1 * u), Offset(4 * u, 7 * u), p);
+  }
+
+  @override
+  bool shouldRepaint(_ExternalArrowPainter old) => old.color != color;
 }
 
 class _LineageFooter extends StatelessWidget {
@@ -285,7 +359,7 @@ class _LineageFooter extends StatelessWidget {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     return Container(
-      margin: const EdgeInsets.only(top: 28),
+      margin: const EdgeInsets.fromLTRB(24, 28, 24, 0),
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: surface,

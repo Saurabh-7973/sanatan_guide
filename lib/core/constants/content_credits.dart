@@ -346,9 +346,12 @@ class AppToolCredit {
     required this.title,
     required this.description,
     required this.meta,
+    this.term,
     this.linksOut = false,
   });
 
+  /// Leading emphasised term rendered in saffron (mockup `.credit-title em`).
+  final String? term;
   final String title;
   final String description;
   final String meta;
@@ -359,7 +362,8 @@ class AppToolCredit {
 
 const List<AppToolCredit> appToolCredits = [
   AppToolCredit(
-    title: 'GRETIL — Göttingen Register of Electronic Texts in Indian Languages',
+    term: 'GRETIL',
+    title: 'Göttingen Register of Electronic Texts in Indian Languages',
     description:
         'Source Sanskrit e-texts for several Vedas, Upaniṣads, the '
         'Bhāgavata Purāṇa and the Yoga Sūtras.',
@@ -367,24 +371,25 @@ const List<AppToolCredit> appToolCredits = [
     linksOut: true,
   ),
   AppToolCredit(
-    title: 'sacred-texts.com — Ralph T.H. Griffith & others',
+    term: 'sacred-texts.com',
+    title: 'Ralph T.H. Griffith & other public-domain translations',
     description:
-        'Public-domain English Vedic and epic translations digitised by the '
-        'Internet Sacred Text Archive.',
+        'English Vedic and epic translations digitised by the Internet '
+        'Sacred Text Archive.',
     meta: 'sacred-texts.com · Public domain',
     linksOut: true,
   ),
   AppToolCredit(
-    title: 'Project Madurai',
-    description:
-        'Digitised the Tirukkuṛaḷ and other classical Tamil texts.',
+    term: 'Project Madurai',
+    title: 'Classical Tamil electronic texts',
+    description: 'Digitised the Tirukkuṛaḷ and other classical Tamil texts.',
     meta: 'projectmadurai.org · Free electronic texts',
     linksOut: true,
   ),
   AppToolCredit(
-    title: 'indic-transliteration',
-    description:
-        'IAST ↔ Devanāgarī transliteration used throughout the reader.',
+    term: 'indic-transliteration',
+    title: 'IAST ↔ Devanāgarī transliteration',
+    description: 'Used throughout the reader for script conversion.',
     meta: 'Open source · MIT',
     linksOut: true,
   ),
