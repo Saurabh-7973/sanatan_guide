@@ -107,7 +107,7 @@ mockup rewrites.
 |---|---|---|---|---|
 | **S1 ✅** | **Navigation keystone** | — | `2026-05-17-navigation-keystone.md` (✅ DONE 2026-05-17) | Home/Library topbar + 5-item overflow; `/feedback` & `/chat` routes added; bottom nav only on Home/Practice/Texts; Settings/Credits/Bookmarks/Festivals reachable |
 | **S2 ✅** | Credits redesign | S1 | `2026-05-17-credits-redesign.md` (✅ DONE 2026-05-17) | `credits_page.dart` rewritten to spec 13 Part B; sūtra numerals, domain sections, BindingLine + blessing footer; all required sources; both themes; reachable via overflow "About" |
-| **S3** | Feedback screen | S1 | `2026-05-17-feedback-screen.md` | New `/feedback`; State A (4 kinds) → State B (compose); mailto submit; device-info default ON, reply default OFF; both themes |
+| **S3 ✅** | Feedback screen | S1 | `2026-05-17-feedback-screen.md` (✅ DONE 2026-05-17) | New `/feedback`; State A (4 kinds) → State B (compose); mailto submit; device-info default ON, reply default OFF; both themes. Stub still serves /chat (S6 deletes it). |
 | **S4** | Settings rewrite | S1 | `2026-05-17-settings-rewrite.md` | Rewritten to screen-09 mockup; Appearance/Reading/Notifications/Data/About/Reset; `sanskritFontSizeProvider` (SharedPreferences) added; Credits + Feedback rows; both themes |
 | **S5** | Verse Detail: Notes + Share | S4 (font provider) | `2026-05-17-verse-detail-notes-share.md` | Notes bottom sheet (Drift `notes` table, 200 ch, shows on Bookmarks); Share bottom sheet (3-format chooser, canonical strings, deep link); Listen icon removed |
 | **S6** | AI Chat general mode | S1 | `2026-05-17-ai-chat-general.md` | `/chat` general mode (no verse anchor; ॐ + "ASK THE PANDIT"); empty state + 4 chips; reachable from overflow + Search; verse-anchored unaffected |
