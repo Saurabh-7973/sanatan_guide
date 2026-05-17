@@ -26,4 +26,10 @@ abstract final class AppRoutes {
 
   // Settings (future)
   static const String settings = '/settings';
+
+  // Feedback (real screen lands in S3)
+  static const String feedback = '/feedback';
+
+  // General AI chat — no verse anchor (real screen lands in S6)
+  static const String chatGeneral = '/chat';
 }

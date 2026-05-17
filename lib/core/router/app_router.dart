@@ -19,6 +19,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/pages/verse
 import 'package:sanatan_guide/presentation/features/scripture_reader/pages/verse_list_page.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/credits_page.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/settings_page.dart';
+import 'package:sanatan_guide/presentation/shared/pages/coming_soon_page.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/scaffold_with_nav_bar.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -123,6 +124,48 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           const SearchPage(),
         ),
       ),
+      // ── Out of the bottom-nav shell (brief §3.1: nav only on the 3 tab
+      //    roots). Pushed on the root navigator → back-button chrome. ──
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.bookmarks,
+        pageBuilder: (_, state) =>
+            _fadeSlideUpTransition(state, const BookmarksPage()),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.festivals,
+        pageBuilder: (_, state) =>
+            _fadeSlideUpTransition(state, const FestivalCalendarPage()),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.settings,
+        pageBuilder: (_, state) =>
+            _fadeSlideUpTransition(state, const SettingsPage()),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/credits',
+        pageBuilder: (_, state) =>
+            _fadeSlideUpTransition(state, const CreditsPage()),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.feedback,
+        pageBuilder: (_, state) => _fadeSlideUpTransition(
+          state,
+          const ComingSoonPage(title: 'Send feedback'),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.chatGeneral,
+        pageBuilder: (_, state) => _fadeSlideUpTransition(
+          state,
+          const ComingSoonPage(title: 'Ask the Pandit'),
+        ),
+      ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => ScaffoldWithNavBar(child: child),
@@ -136,24 +179,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const LearningPathPage(),
           ),
           GoRoute(
-            path: AppRoutes.festivals,
-            builder: (_, __) => const FestivalCalendarPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.bookmarks,
-            builder: (_, __) => const BookmarksPage(),
-          ),
-          GoRoute(
             path: AppRoutes.browse,
             builder: (_, __) => const ScriptureLibraryPage(),
-          ),
-          GoRoute(
-            path: '/settings',
-            builder: (_, __) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/credits',
-            builder: (_, __) => const CreditsPage(),
           ),
         ],
       ),

@@ -15,10 +15,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/learn')) return 1;
-    if (location.startsWith('/browse') ||
-        location.startsWith(AppRoutes.bookmarks)) {
-      return 2;
-    }
+    if (location.startsWith('/browse')) return 2;
     return 0;
   }
 

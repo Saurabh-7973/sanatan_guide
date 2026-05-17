@@ -856,7 +856,7 @@ class _EmptyBody extends StatelessWidget {
         const SizedBox(height: 28),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => context.go('/library'),
+          onTap: () => context.go('/browse'),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
