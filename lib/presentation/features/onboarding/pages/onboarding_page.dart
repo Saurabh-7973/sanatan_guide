@@ -521,7 +521,6 @@ class _LevelCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
         decoration: BoxDecoration(
           color: surface,
           borderRadius: BorderRadius.circular(Radii.card),
@@ -530,45 +529,50 @@ class _LevelCard extends StatelessWidget {
             width: 1,
           ),
         ),
+        // Stack OUTSIDE inner padding so `left: 0` lands on the card's real
+        // left edge (not clipped by Stack.hardEdge). Start mark on every
+        // card, like the continue card; pulse only the selected one.
         child: Stack(
           children: [
-            if (selected)
-              Positioned(
-                left: -22,
-                top: 12,
-                bottom: 12,
-                child: LeafThread(
-                  isDark: isDark,
-                  pulseOnce: true,
-                ),
+            Positioned(
+              left: 0,
+              top: 12,
+              bottom: 12,
+              child: LeafThread(
+                isDark: isDark,
+                pulseOnce: selected,
               ),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        level.displayTitle,
-                        style: AppText.moduleTitle(color: text1)
-                            .copyWith(fontSize: 16),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        description,
-                        style: AppText.moduleDesc(color: text2)
-                            .copyWith(fontSize: 13),
-                      ),
-                    ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          level.displayTitle,
+                          style: AppText.moduleTitle(color: text1)
+                              .copyWith(fontSize: 16),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          description,
+                          style: AppText.moduleDesc(color: text2)
+                              .copyWith(fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: Spacing.md),
-                _Radio(
-                  selected: selected,
-                  saffron: saffron,
-                  inactive: text3,
-                ),
-              ],
+                  const SizedBox(width: Spacing.md),
+                  _Radio(
+                    selected: selected,
+                    saffron: saffron,
+                    inactive: text3,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
