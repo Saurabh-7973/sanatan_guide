@@ -9,6 +9,7 @@ import 'package:sanatan_guide/presentation/features/home/widgets/home_strips.dar
 import 'package:sanatan_guide/presentation/features/home/widgets/panchang_block.dart';
 import 'package:sanatan_guide/presentation/features/home/widgets/verse_hero_card.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Home — the "Today" tab.
@@ -66,35 +67,42 @@ class _HomePageState extends ConsumerState<HomePage> {
         onRefresh: _refresh,
         child: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            padding: const EdgeInsets.fromLTRB(
-              Spacing.xxl,
-              0,
-              Spacing.xxl,
-              Spacing.xxxl,
-            ),
-            child: Column(
-              children: isFirstDay
-                  ? [
-                      const PanchangBlock(isFirstDay: true),
-                      const VerseHeroCard(isFirstDay: true),
-                      const SizedBox(height: 28),
-                      _FirstDayCta(isDark: isDark),
-                      const SizedBox(height: 18),
-                      _BrowseLibraryLink(isDark: isDark),
-                    ]
-                  : const [
-                      PanchangBlock(),
-                      VerseHeroCard(),
-                      SizedBox(height: 24),
-                      ContinueStrip(),
-                      PathStrip(),
-                      FestivalPill(),
-                    ],
-            ),
+          child: Column(
+            children: [
+              const HomeTopBar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(
+                    Spacing.xxl,
+                    0,
+                    Spacing.xxl,
+                    Spacing.xxxl,
+                  ),
+                  child: Column(
+                    children: isFirstDay
+                        ? [
+                            const PanchangBlock(isFirstDay: true),
+                            const VerseHeroCard(isFirstDay: true),
+                            const SizedBox(height: 28),
+                            _FirstDayCta(isDark: isDark),
+                            const SizedBox(height: 18),
+                            _BrowseLibraryLink(isDark: isDark),
+                          ]
+                        : const [
+                            PanchangBlock(),
+                            VerseHeroCard(),
+                            SizedBox(height: 24),
+                            ContinueStrip(),
+                            PathStrip(),
+                            FestivalPill(),
+                          ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
