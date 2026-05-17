@@ -1254,9 +1254,12 @@ class _SanskritWords extends StatelessWidget {
     final meanings = wordMeanings ?? const <WordMeaning>[];
 
     if (meanings.isEmpty) {
-      // No word breakdown — one centred line per pāda.
+      // No word breakdown — one centred line per pāda. stretch + textAlign
+      // makes the centring deterministic regardless of parent width (the
+      // AI-commentary-expanded state changes the available width).
       return Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final line in lines)
             Text(line,
@@ -1310,12 +1313,18 @@ class _SanskritWords extends StatelessWidget {
         children.add(Text(tail, style: base, locale: const Locale('sa')));
       }
     }
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 7,
-      runSpacing: 2,
-      children: children,
+    // Full width so WrapAlignment.center actually centres the run instead
+    // of shrink-wrapping to content (which left-aligned BG 1.1 once the AI
+    // commentary expanded and changed the available width).
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 7,
+        runSpacing: 2,
+        children: children,
+      ),
     );
   }
 }
