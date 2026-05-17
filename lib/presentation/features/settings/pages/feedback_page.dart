@@ -425,7 +425,9 @@ class _Compose extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            kind.title,
+                            // Mockup pill uses the concise label ("Text
+                            // error"), not the long row title.
+                            kind.mailTag,
                             style: TextStyle(
                               fontFamily: Fonts.sans,
                               fontSize: 11,
@@ -440,7 +442,7 @@ class _Compose extends StatelessWidget {
                     const Spacer(),
                     Flexible(
                       child: Text(
-                        version,
+                        version.toUpperCase(),
                         textAlign: TextAlign.right,
                         overflow: TextOverflow.ellipsis,
                         style: AppText.metaLabel(color: text3),
@@ -715,6 +717,7 @@ class _PillDocPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final u = size.width / 10.0; // mockup pill icon viewBox 10
+    final s = _stroke(color, u, 1.3);
     canvas.drawPath(
       Path()
         ..moveTo(2 * u, 2.5 * u)
@@ -722,8 +725,11 @@ class _PillDocPainter extends CustomPainter {
         ..lineTo(8 * u, 7.5 * u)
         ..lineTo(2 * u, 7.5 * u)
         ..close(),
-      _stroke(color, u, 1.3),
+      s,
     );
+    // Two text lines inside the doc: M3.5 4.5h3 M3.5 6h2
+    canvas.drawLine(Offset(3.5 * u, 4.5 * u), Offset(6.5 * u, 4.5 * u), s);
+    canvas.drawLine(Offset(3.5 * u, 6 * u), Offset(5.5 * u, 6 * u), s);
   }
 
   @override
