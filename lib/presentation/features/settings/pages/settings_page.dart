@@ -574,15 +574,8 @@ class _FeedbackTile extends StatelessWidget {
       ),
       leading: const Icon(Icons.feedback_outlined, color: AppColors.warmGrey50),
       title: Text('Send Feedback', style: context.ts.bodyMedium),
-      trailing: const Icon(Icons.mail_outline, size: 18, color: AppColors.textSecondary),
-      onTap: () => launchUrl(
-        Uri(
-          scheme: 'mailto',
-          path: 'saurabh7973business@gmail.com',
-          queryParameters: {'subject': 'Sanatan Guide Feedback'},
-        ),
-        mode: LaunchMode.externalApplication,
-      ),
+      trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.textSecondary),
+      onTap: () => context.push('/feedback'),
     );
   }
 }
