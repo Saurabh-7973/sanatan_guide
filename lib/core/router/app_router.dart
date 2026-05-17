@@ -399,10 +399,33 @@ class _HomeSplashShimmer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── AppBar (64px toolbar) ─────────────────────────────────────
+            // ── HomeTopBar (सनातन brand + search/bookmark/⋯) ──────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 6, 16, 14),
+              child: Row(
+                children: [
+                  const ShimmerLine(height: 22, width: 62, borderRadius: 6),
+                  const Spacer(),
+                  for (var i = 0; i < 3; i++)
+                    const SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Center(
+                        child: ShimmerLine(
+                          height: 20,
+                          width: 20,
+                          borderRadius: 10,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // ── Greeting + panchang (PanchangBlock) ───────────────────────
             const Padding(
               padding: EdgeInsets.fromLTRB(
-                AppSpacing.pagePadding, 16,
+                AppSpacing.pagePadding, 4,
                 AppSpacing.pagePadding, 0,
               ),
               child: Column(
