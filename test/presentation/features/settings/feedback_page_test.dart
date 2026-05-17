@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/feedback_page.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 
 void main() {
   testWidgets('State A shows 4 kinds; tapping one → compose', (tester) async {
@@ -17,7 +18,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Text or translation error'), findsWidgets);
-    expect(find.text('Send'), findsOneWidget);
+    expect(find.text('SEND'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'BG 2.47 typo');
     await tester.pump();
@@ -31,7 +32,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('WHAT KIND OF FEEDBACK?'), findsNothing);
 
-    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.tap(find.byType(MockupBackChevron));
     await tester.pumpAndSettle();
     expect(find.text('WHAT KIND OF FEEDBACK?'), findsOneWidget);
   });

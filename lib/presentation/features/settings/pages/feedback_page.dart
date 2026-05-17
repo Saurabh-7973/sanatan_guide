@@ -1,12 +1,14 @@
 // lib/presentation/features/settings/pages/feedback_page.dart
 //
-// Send Feedback — heritage spec 13 Part C. State A (pick kind) → State B
-// (compose) → mailto submission.
+// Send Feedback — heritage spec 13 Part C. Fixed back-bar (no overlay), exact
+// mockup kind glyphs, transparent borderless textarea, uppercase Send with
+// paper-plane. State A (pick kind) → State B (compose) → mailto.
 
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -67,8 +69,8 @@ class FeedbackPage extends StatefulWidget {
 class _FeedbackPageState extends State<FeedbackPage> {
   FeedbackKind? _kind;
   final _controller = TextEditingController();
-  bool _attachDeviceInfo = true; // spec: default ON
-  bool _allowReply = false; // spec: default OFF (privacy)
+  bool _attachDeviceInfo = true;
+  bool _allowReply = false;
   String _version = '';
 
   @override
@@ -119,7 +121,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   void _back() {
     if (_kind != null) {
-      setState(() => _kind = null); // State B → State A
+      setState(() => _kind = null);
     } else {
       Navigator.of(context).maybePop();
     }
@@ -128,42 +130,54 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: text1),
-          onPressed: _back,
-        ),
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
           SafeArea(
-            top: false,
-            child: _kind == null
-                ? _PickKind(
-                    isDark: isDark,
-                    onPick: (k) => setState(() => _kind = k),
-                  )
-                : _Compose(
-                    isDark: isDark,
-                    kind: _kind!,
-                    controller: _controller,
-                    version: _version,
-                    attachDeviceInfo: _attachDeviceInfo,
-                    allowReply: _allowReply,
-                    onToggleDeviceInfo: (v) =>
-                        setState(() => _attachDeviceInfo = v),
-                    onToggleReply: (v) => setState(() => _allowReply = v),
-                    onSend: _send,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 8),
+                  child: Row(
+                    children: [
+                      InkResponse(
+                        onTap: _back,
+                        radius: 22,
+                        child: const SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Center(child: MockupBackChevron()),
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
                   ),
+                ),
+                Expanded(
+                  child: _kind == null
+                      ? _PickKind(
+                          isDark: isDark,
+                          onPick: (k) => setState(() => _kind = k),
+                        )
+                      : _Compose(
+                          isDark: isDark,
+                          kind: _kind!,
+                          controller: _controller,
+                          version: _version,
+                          attachDeviceInfo: _attachDeviceInfo,
+                          allowReply: _allowReply,
+                          onToggleDeviceInfo: (v) =>
+                              setState(() => _attachDeviceInfo = v),
+                          onToggleReply: (v) =>
+                              setState(() => _allowReply = v),
+                          onSend: _send,
+                        ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -219,20 +233,12 @@ class _PickKind extends StatelessWidget {
   final ValueChanged<FeedbackKind> onPick;
   @override
   Widget build(BuildContext context) {
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
-    final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final divider = isDark ? DColors.divider : LColors.divider;
     final sep = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: kToolbarHeight + MediaQuery.paddingOf(context).top,
-        bottom: 32,
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       children: [
         _Hero(
           isDark: isDark,
@@ -240,9 +246,9 @@ class _PickKind extends StatelessWidget {
           prose: 'We read every message. The app is built and maintained by '
               'one person — your reports and ideas shape what comes next.',
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 26),
         Container(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: divider))),
           child: Text('WHAT KIND OF FEEDBACK?',
@@ -251,10 +257,7 @@ class _PickKind extends StatelessWidget {
         for (var i = 0; i < FeedbackKind.values.length; i++)
           _KindRow(
             kind: FeedbackKind.values[i],
-            saffron: saffron,
-            text1: text1,
-            text2: text2,
-            divider: divider,
+            isDark: isDark,
             border: i == FeedbackKind.values.length - 1 ? null : sep,
             onTap: () => onPick(FeedbackKind.values[i]),
           ),
@@ -266,30 +269,23 @@ class _PickKind extends StatelessWidget {
 class _KindRow extends StatelessWidget {
   const _KindRow({
     required this.kind,
-    required this.saffron,
-    required this.text1,
-    required this.text2,
-    required this.divider,
+    required this.isDark,
     required this.border,
     required this.onTap,
   });
   final FeedbackKind kind;
-  final Color saffron;
-  final Color text1;
-  final Color text2;
-  final Color divider;
+  final bool isDark;
   final Color? border;
   final VoidCallback onTap;
 
-  IconData get _icon => switch (kind) {
-        FeedbackKind.bug => Icons.error_outline,
-        FeedbackKind.idea => Icons.star_outline,
-        FeedbackKind.textError => Icons.description_outlined,
-        FeedbackKind.other => Icons.chat_bubble_outline,
-      };
-
   @override
   Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
+
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -308,7 +304,15 @@ class _KindRow extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: divider),
               ),
-              child: Icon(_icon, size: 14, color: saffron),
+              child: Center(
+                child: SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CustomPaint(
+                    painter: _KindGlyphPainter(kind: kind, color: saffron),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -338,7 +342,15 @@ class _KindRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, size: 18, color: text2),
+            const SizedBox(width: 10),
+            Opacity(
+              opacity: 0.4,
+              child: SizedBox(
+                width: 10,
+                height: 14,
+                child: CustomPaint(painter: _ChevronPainter(color: text3)),
+              ),
+            ),
           ],
         ),
       ),
@@ -382,18 +394,13 @@ class _Compose extends StatelessWidget {
         Expanded(
           child: ListView(
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: kToolbarHeight + MediaQuery.paddingOf(context).top,
-              bottom: 24,
-            ),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
             children: [
               _Hero(
                   isDark: isDark, title: kind.title, prose: kind.composeProse),
               const SizedBox(height: 22),
               Container(
-                padding: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
                   border: Border(bottom: BorderSide(color: divider)),
                 ),
@@ -406,8 +413,29 @@ class _Compose extends StatelessWidget {
                         color: saffron,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child:
-                          Text(kind.title, style: AppText.pill(color: onSaffron)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 10,
+                            height: 10,
+                            child: CustomPaint(
+                              painter: _PillDocPainter(color: onSaffron),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            kind.title,
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.66,
+                              color: onSaffron,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const Spacer(),
                     Flexible(
@@ -433,9 +461,18 @@ class _Compose extends StatelessWidget {
                   color: text1,
                 ),
                 decoration: InputDecoration(
+                  // Kill the global inputDecorationTheme box leak — the mockup
+                  // textarea is transparent + borderless.
                   isCollapsed: true,
+                  filled: false,
+                  fillColor: Colors.transparent,
                   contentPadding: const EdgeInsets.symmetric(vertical: 18),
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
                   hintText: kind.placeholder,
                   hintStyle: TextStyle(
                     fontFamily: Fonts.serif,
@@ -463,20 +500,39 @@ class _Compose extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-          child: SizedBox(
-            width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+          child: Opacity(
+            opacity: hasText ? 1 : 0.4,
             child: Material(
-              color: hasText ? saffron : saffron.withValues(alpha: 0.3),
+              color: saffron,
               borderRadius: BorderRadius.circular(28),
               child: InkWell(
                 borderRadius: BorderRadius.circular(28),
                 onTap: hasText ? onSend : null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  child: Center(
-                    child: Text('Send',
-                        style: AppText.primaryButton(color: onSaffron)),
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'SEND',
+                        style: TextStyle(
+                          fontFamily: Fonts.sans,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.82,
+                          color: onSaffron,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      SizedBox(
+                        width: 13,
+                        height: 13,
+                        child: CustomPaint(
+                          painter: _SendPlanePainter(color: onSaffron),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -537,7 +593,8 @@ class _Check extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontFamily: Fonts.sans,
-                  fontSize: 13,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
                   color: text2,
                 ),
               ),
@@ -547,4 +604,150 @@ class _Check extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Exact mockup glyph painters ───────────────────────────────────────────
+
+Paint _stroke(Color c, double u, [double w = 1.4]) => Paint()
+  ..color = c
+  ..style = PaintingStyle.stroke
+  ..strokeWidth = w * u
+  ..strokeCap = StrokeCap.round
+  ..strokeJoin = StrokeJoin.round;
+
+class _KindGlyphPainter extends CustomPainter {
+  const _KindGlyphPainter({required this.kind, required this.color});
+  final FeedbackKind kind;
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 14.0; // mockup kind svg viewBox 14
+    Offset p(double x, double y) => Offset(x * u, y * u);
+    final s = _stroke(color, u);
+    switch (kind) {
+      case FeedbackKind.bug:
+        // circle r5.5 + M7 4.5v3 M7 9.5v0.5
+        canvas.drawCircle(p(7, 7), 5.5 * u, s);
+        canvas.drawLine(p(7, 4.5), p(7, 7.5), s);
+        canvas.drawLine(p(7, 9.5), p(7, 10), s);
+      case FeedbackKind.idea:
+        // star
+        final pts = [
+          [7.0, 1.5],
+          [8.7, 5.0],
+          [12.5, 5.5],
+          [9.7, 8.2],
+          [10.4, 12.0],
+          [7.0, 10.2],
+          [3.6, 12.0],
+          [4.3, 8.2],
+          [1.5, 5.5],
+          [5.3, 5.0],
+        ];
+        final path = Path()..moveTo(pts[0][0] * u, pts[0][1] * u);
+        for (final pt in pts.skip(1)) {
+          path.lineTo(pt[0] * u, pt[1] * u);
+        }
+        path.close();
+        canvas.drawPath(path, s);
+      case FeedbackKind.textError:
+        // doc rect + 2 lines
+        canvas.drawPath(
+          Path()
+            ..moveTo(2 * u, 3.5 * u)
+            ..lineTo(12 * u, 3.5 * u)
+            ..lineTo(12 * u, 10.5 * u)
+            ..lineTo(2 * u, 10.5 * u)
+            ..close(),
+          s,
+        );
+        canvas.drawLine(p(4.5, 6), p(9.5, 6), s);
+        canvas.drawLine(p(4.5, 8), p(7.5, 8), s);
+      case FeedbackKind.other:
+        // speech blob + dash
+        canvas.drawPath(
+          Path()
+            ..moveTo(3 * u, 7 * u)
+            ..cubicTo(3 * u, 9 * u, 5 * u, 11 * u, 7 * u, 11 * u)
+            ..cubicTo(9 * u, 11 * u, 11 * u, 9 * u, 11 * u, 7 * u)
+            ..cubicTo(11 * u, 5 * u, 9 * u, 3 * u, 7 * u, 3 * u)
+            ..cubicTo(5 * u, 3 * u, 3 * u, 5 * u, 3 * u, 7 * u)
+            ..close(),
+          s,
+        );
+        canvas.drawLine(p(5.5, 7), p(8.5, 7), s);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_KindGlyphPainter o) =>
+      o.kind != kind || o.color != color;
+}
+
+class _ChevronPainter extends CustomPainter {
+  const _ChevronPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final ux = size.width / 10.0;
+    final uy = size.height / 14.0;
+    canvas.drawPath(
+      Path()
+        ..moveTo(2 * ux, 1 * uy)
+        ..lineTo(8 * ux, 7 * uy)
+        ..lineTo(2 * ux, 13 * uy),
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6 * ux
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ChevronPainter o) => o.color != color;
+}
+
+class _PillDocPainter extends CustomPainter {
+  const _PillDocPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 10.0; // mockup pill icon viewBox 10
+    canvas.drawPath(
+      Path()
+        ..moveTo(2 * u, 2.5 * u)
+        ..lineTo(8 * u, 2.5 * u)
+        ..lineTo(8 * u, 7.5 * u)
+        ..lineTo(2 * u, 7.5 * u)
+        ..close(),
+      _stroke(color, u, 1.3),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_PillDocPainter o) => o.color != color;
+}
+
+class _SendPlanePainter extends CustomPainter {
+  const _SendPlanePainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 13.0; // mockup send svg viewBox 13
+    canvas.drawPath(
+      Path()
+        ..moveTo(2 * u, 6.5 * u)
+        ..lineTo(11 * u, 2 * u)
+        ..lineTo(8.5 * u, 13 * u)
+        ..lineTo(5.5 * u, 8 * u)
+        ..lineTo(2 * u, 6.5 * u)
+        ..close(),
+      _stroke(color, u, 1.5),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SendPlanePainter o) => o.color != color;
 }
