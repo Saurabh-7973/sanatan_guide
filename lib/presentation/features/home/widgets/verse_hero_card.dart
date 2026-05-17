@@ -79,9 +79,8 @@ class _VerseCard extends StatelessWidget {
         : '${verse.scripture.displayName} · ${verse.chapterNum} · ${verse.verseNum}';
     final ctaText = isFirstDay ? 'BEGIN READING' : 'READ FULL VERSE';
     final translation = verse.english?.trim() ?? '';
-    final sanskritBody = verse.sanskrit.trim().isNotEmpty
-        ? verse.sanskrit.trim()
-        : '—';
+    final sanskritBody =
+        verse.sanskrit.trim().isNotEmpty ? verse.sanskrit.trim() : '—';
 
     return GestureDetector(
       onTap: onTap,
@@ -111,7 +110,8 @@ class _VerseCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            BindingLine(isDark: isDark),
+            BindingLine(
+                isDark: isDark, faded: true, diamondSize: 6, sideGap: 10),
             const SizedBox(height: 14),
             _VerseMeta(
               text: meta,
@@ -197,7 +197,8 @@ class _VerseCard extends StatelessWidget {
                   curve: Curves.easeOut,
                 ),
             const SizedBox(height: 14),
-            BindingLine(isDark: isDark),
+            BindingLine(
+                isDark: isDark, faded: true, diamondSize: 6, sideGap: 10),
           ],
         ),
       ),
