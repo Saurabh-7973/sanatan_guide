@@ -397,7 +397,9 @@ class _ChapterHeader extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: Fonts.deva,
                     fontSize: 18,
-                    height: 1.1,
+                    // 1.1 clipped the Devanāgarī top mātrā on the chapter
+                    // title; Devanāgarī needs a taller line box.
+                    height: 1.4,
                     letterSpacing: 0.005 * 18,
                     color: cream,
                   ),
@@ -548,7 +550,7 @@ class _ResumeAnchor extends StatelessWidget {
                 left: -20,
                 top: 10,
                 bottom: 10,
-                child: LeafThread(isDark: isDark),
+                child: LeafThread(isDark: isDark, pulseOnce: true),
               ),
               Row(
                 children: [
