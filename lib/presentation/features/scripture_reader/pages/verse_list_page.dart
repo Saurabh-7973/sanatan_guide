@@ -185,8 +185,7 @@ class _LoadedBody extends ConsumerWidget {
   final ScrollController scrollController;
   final void Function(int verseNum) onJump;
 
-  Verse? get _nextUnread =>
-      verses.firstWhereOrNull((v) => v.readCount == 0);
+  Verse? get _nextUnread => verses.firstWhereOrNull((v) => v.readCount == 0);
 
   /// Decade-style section grouping for long chapters. ≤10 verses gets a single
   /// "ALL VERSES" label; bigger chapters get "Verses N — M" headers per group.
@@ -534,8 +533,7 @@ class _ResumeAnchor extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: saffron.withValues(alpha: 0.04),
         onTap: () => context.push('/browse/$scriptureId/verse/${verse.id}'),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
+        child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             border: Border.all(color: divider, width: 1),
@@ -544,58 +542,63 @@ class _ResumeAnchor extends StatelessWidget {
               stops: const [0, 0.6, 1],
             ),
           ),
+          // Stack OUTSIDE inner padding so `left: 0` lands on the card's
+          // real left edge (not clipped). Mirrors chapter-list continue.
           child: Stack(
             children: [
               Positioned(
-                left: -20,
-                top: 10,
-                bottom: 10,
+                left: 0,
+                top: 12,
+                bottom: 12,
                 child: LeafThread(isDark: isDark, pulseOnce: true),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'CONTINUE',
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.24 * 9,
-                            color: saffron,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'CONTINUE',
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.24 * 9,
+                              color: saffron,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          incipit,
-                          style: TextStyle(
-                            fontFamily: Fonts.deva,
-                            fontSize: 14,
-                            height: 1.3,
-                            color: cream,
+                          const SizedBox(height: 4),
+                          Text(
+                            incipit,
+                            style: TextStyle(
+                              fontFamily: Fonts.deva,
+                              fontSize: 14,
+                              height: 1.3,
+                              color: cream,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          'Verse ${verse.verseNum} — next unread',
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontSize: 10.5,
-                            color: text2,
+                          const SizedBox(height: 3),
+                          Text(
+                            'Verse ${verse.verseNum} — next unread',
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontSize: 10.5,
+                              color: text2,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  MockupResumeArrow(color: saffron.withValues(alpha: 0.7)),
-                ],
+                    const SizedBox(width: 8),
+                    MockupResumeArrow(color: saffron.withValues(alpha: 0.7)),
+                  ],
+                ),
               ),
             ],
           ),
@@ -930,7 +933,6 @@ class _VerseJumperState extends State<_VerseJumper> {
     });
   }
 
-
   int get _step {
     if (widget.verseCount >= 500) return 50;
     if (widget.verseCount >= 200) return 20;
@@ -956,9 +958,8 @@ class _VerseJumperState extends State<_VerseJumper> {
     // Jump to the *interpolated* verse the finger is over, not the nearest
     // decade marker. Otherwise dragging shows ‖२६‖ in the tooltip but the
     // list snaps to verse 21 because that's the closest decade.
-    final verse = (ratio * widget.verseCount)
-        .round()
-        .clamp(1, widget.verseCount);
+    final verse =
+        (ratio * widget.verseCount).round().clamp(1, widget.verseCount);
     _bumpVisibility();
     setState(() {
       _dragY = clamped;
@@ -1057,7 +1058,6 @@ class _VerseJumperState extends State<_VerseJumper> {
       ),
     );
   }
-
 }
 
 class _JumperTooltip extends StatelessWidget {
