@@ -367,7 +367,8 @@ class _TopBar extends StatelessWidget {
                     fontStyle: FontStyle.italic,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    height: 1.0,
+                    // 1.0 clipped the Devanāgarī/macron mātrā on the title.
+                    height: 1.2,
                     color: text1,
                   ),
                 ),
@@ -378,7 +379,10 @@ class _TopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: devaCoord
+                      // devUI is height:1.0 — Devanāgarī top mātrā clips at
+                      // that tight box; give the chapter-name line air.
                       ? AppText.devUI(color: text3, size: 12)
+                          .copyWith(height: 1.45)
                       : AppText.meta(color: text3, size: 9.5)
                           .copyWith(letterSpacing: 2.0),
                 ),
