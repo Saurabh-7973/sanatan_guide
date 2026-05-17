@@ -338,3 +338,64 @@ const List<ScriptureCredit> contentCredits = [
     license: ContentLicense.publicDomain,
   ),
 ];
+
+/// A non-scripture credit: digitisation sources, libraries, fonts, stack.
+/// Rendered in the "Tools used in preparing this app" section of Credits.
+class AppToolCredit {
+  const AppToolCredit({
+    required this.title,
+    required this.description,
+    required this.meta,
+    this.linksOut = false,
+  });
+
+  final String title;
+  final String description;
+  final String meta;
+
+  /// Renders the external-link arrow when true (row points to a public site).
+  final bool linksOut;
+}
+
+const List<AppToolCredit> appToolCredits = [
+  AppToolCredit(
+    title: 'GRETIL — Göttingen Register of Electronic Texts in Indian Languages',
+    description:
+        'Source Sanskrit e-texts for several Vedas, Upaniṣads, the '
+        'Bhāgavata Purāṇa and the Yoga Sūtras.',
+    meta: 'Universität Göttingen · Public domain',
+    linksOut: true,
+  ),
+  AppToolCredit(
+    title: 'sacred-texts.com — Ralph T.H. Griffith & others',
+    description:
+        'Public-domain English Vedic and epic translations digitised by the '
+        'Internet Sacred Text Archive.',
+    meta: 'sacred-texts.com · Public domain',
+    linksOut: true,
+  ),
+  AppToolCredit(
+    title: 'Project Madurai',
+    description:
+        'Digitised the Tirukkuṛaḷ and other classical Tamil texts.',
+    meta: 'projectmadurai.org · Free electronic texts',
+    linksOut: true,
+  ),
+  AppToolCredit(
+    title: 'indic-transliteration',
+    description:
+        'IAST ↔ Devanāgarī transliteration used throughout the reader.',
+    meta: 'Open source · MIT',
+    linksOut: true,
+  ),
+  AppToolCredit(
+    title: 'Tiro Devanagari Sanskrit · Lora · Outfit · Noto Sans Devanagari',
+    description: 'The four typefaces this app is set in.',
+    meta: 'SIL Open Font License 1.1',
+  ),
+  AppToolCredit(
+    title: 'Flutter · Riverpod · Drift',
+    description: 'The framework, state layer and local database.',
+    meta: 'BSD · MIT · Apache 2.0',
+  ),
+];
