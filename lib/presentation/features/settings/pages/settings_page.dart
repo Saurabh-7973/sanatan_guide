@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:sanatan_guide/presentation/features/settings/pages/credits_page.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
@@ -601,9 +601,7 @@ class _CreditsTile extends StatelessWidget {
       leading: const Icon(Icons.auto_stories_outlined, color: AppColors.textSecondary),
       title: Text('Credits & Attributions', style: context.ts.bodyMedium),
       trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.textSecondary),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const CreditsPage()),
-      ),
+      onTap: () => context.push('/credits'),
     );
   }
 }
