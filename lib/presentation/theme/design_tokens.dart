@@ -154,4 +154,20 @@ class Glows {
       blurRadius: 4,
     ),
   ];
+
+  static const List<BoxShadow> overflowMenuDark = [
+    BoxShadow(
+      color: Color(0x80000000),
+      blurRadius: 24,
+      offset: Offset(0, 8),
+    ),
+  ];
+
+  static const List<BoxShadow> overflowMenuLight = [
+    BoxShadow(
+      color: Color(0x1F2A1E14),
+      blurRadius: 20,
+      offset: Offset(0, 6),
+    ),
+  ];
 }
