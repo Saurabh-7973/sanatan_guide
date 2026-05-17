@@ -425,8 +425,10 @@ class _HomeSplashShimmer extends StatelessWidget {
             // ── Greeting + panchang (PanchangBlock) ───────────────────────
             const Padding(
               padding: EdgeInsets.fromLTRB(
-                AppSpacing.pagePadding, 4,
-                AppSpacing.pagePadding, 0,
+                AppSpacing.pagePadding,
+                4,
+                AppSpacing.pagePadding,
+                0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,8 +445,10 @@ class _HomeSplashShimmer extends StatelessWidget {
               child: SingleChildScrollView(
                 physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.pagePadding, AppSpacing.xl,
-                  AppSpacing.pagePadding, AppSpacing.xxxl,
+                  AppSpacing.pagePadding,
+                  AppSpacing.xl,
+                  AppSpacing.pagePadding,
+                  AppSpacing.xxxl,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,15 +461,21 @@ class _HomeSplashShimmer extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              ShimmerLine(height: 10, width: 110, borderRadius: 4),
+                              ShimmerLine(
+                                  height: 10, width: 110, borderRadius: 4),
                               Spacer(),
-                              ShimmerLine(height: 12, width: 60, borderRadius: 4),
+                              ShimmerLine(
+                                  height: 12, width: 60, borderRadius: 4),
                             ],
                           ),
                           SizedBox(height: AppSpacing.lg),
-                          Center(child: ShimmerLine(height: 22, width: 240, borderRadius: 6)),
+                          Center(
+                              child: ShimmerLine(
+                                  height: 22, width: 240, borderRadius: 6)),
                           SizedBox(height: AppSpacing.sm),
-                          Center(child: ShimmerLine(height: 22, width: 180, borderRadius: 6)),
+                          Center(
+                              child: ShimmerLine(
+                                  height: 22, width: 180, borderRadius: 6)),
                           SizedBox(height: AppSpacing.lg),
                           ShimmerLine(height: 14, borderRadius: 4),
                           SizedBox(height: AppSpacing.xs),
@@ -481,9 +491,11 @@ class _HomeSplashShimmer extends StatelessWidget {
                     // ── Panchang row ──────────────────────────────────────
                     Row(
                       children: [
-                        const ShimmerLine(height: 22, width: 22, borderRadius: 11),
+                        const ShimmerLine(
+                            height: 22, width: 22, borderRadius: 11),
                         const SizedBox(width: AppSpacing.sm),
-                        ShimmerLine(height: 14, width: w * 0.55, borderRadius: 4),
+                        ShimmerLine(
+                            height: 14, width: w * 0.55, borderRadius: 4),
                       ],
                     ),
 
@@ -492,11 +504,14 @@ class _HomeSplashShimmer extends StatelessWidget {
                     // ── Festival row ──────────────────────────────────────
                     Row(
                       children: [
-                        const ShimmerLine(height: 22, width: 22, borderRadius: 11),
+                        const ShimmerLine(
+                            height: 22, width: 22, borderRadius: 11),
                         const SizedBox(width: AppSpacing.sm),
-                        ShimmerLine(height: 14, width: w * 0.38, borderRadius: 4),
+                        ShimmerLine(
+                            height: 14, width: w * 0.38, borderRadius: 4),
                         const Spacer(),
-                        const ShimmerLine(height: 12, width: 56, borderRadius: 4),
+                        const ShimmerLine(
+                            height: 12, width: 56, borderRadius: 4),
                       ],
                     ),
 
@@ -514,11 +529,14 @@ class _HomeSplashShimmer extends StatelessWidget {
                     // ── Continue reading row ──────────────────────────────
                     Row(
                       children: [
-                        const ShimmerLine(height: 18, width: 18, borderRadius: 9),
+                        const ShimmerLine(
+                            height: 18, width: 18, borderRadius: 9),
                         const SizedBox(width: AppSpacing.sm),
-                        ShimmerLine(height: 13, width: w * 0.55, borderRadius: 4),
+                        ShimmerLine(
+                            height: 13, width: w * 0.55, borderRadius: 4),
                         const Spacer(),
-                        const ShimmerLine(height: 12, width: 12, borderRadius: 2),
+                        const ShimmerLine(
+                            height: 12, width: 12, borderRadius: 2),
                       ],
                     ),
 
@@ -527,6 +545,49 @@ class _HomeSplashShimmer extends StatelessWidget {
                     // ── Streak footer ─────────────────────────────────────
                     const ShimmerLine(height: 13, width: 180, borderRadius: 4),
                   ],
+                ),
+              ),
+            ),
+
+            // ── Bottom nav (matches ScaffoldWithNavBar) ──────────────────
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < 3; i++) ...[
+                        if (i > 0) const SizedBox(width: 4),
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 8),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ShimmerLine(
+                                  height: 22,
+                                  width: 22,
+                                  borderRadius: 11,
+                                ),
+                                SizedBox(height: 5),
+                                ShimmerLine(
+                                  height: 9,
+                                  width: 34,
+                                  borderRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
