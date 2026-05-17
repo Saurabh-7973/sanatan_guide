@@ -288,34 +288,39 @@ class _LoadedBody extends ConsumerWidget {
         // building 1,839 _VerseRow widgets + 1,839 .animate() controllers
         // upfront for Rigveda Maṇḍala 1, which hung the build and rendered
         // a blank "ALL VERSES" page.
-        CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: _ChapterHeader(
-                scriptureId: scriptureId,
-                chapterNum: chapterNum,
-                read: read,
-                total: total,
-                isDark: isDark,
+        Column(
+          children: [
+            // Pinned header — only the resume + verse list scrolls.
+            _ChapterHeader(
+              scriptureId: scriptureId,
+              chapterNum: chapterNum,
+              read: read,
+              total: total,
+              isDark: isDark,
+            ),
+            Expanded(
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  if (next != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+                        child: _ResumeAnchor(
+                          scriptureId: scriptureId,
+                          verse: next,
+                          isDark: isDark,
+                        ),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                  // Section breakdown: very long chapters interleave decade headers
+                  // ("Verses 11 — 20" + ‖११–२०‖) instead of a single ALL VERSES rule.
+                  ..._buildListSlivers(),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
               ),
             ),
-            if (next != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-                  child: _ResumeAnchor(
-                    scriptureId: scriptureId,
-                    verse: next,
-                    isDark: isDark,
-                  ),
-                ),
-              ),
-            const SliverToBoxAdapter(child: SizedBox(height: 14)),
-            // Section breakdown: very long chapters interleave decade headers
-            // ("Verses 11 — 20" + ‖११–२०‖) instead of a single ALL VERSES rule.
-            ..._buildListSlivers(),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
         if (showJumper)

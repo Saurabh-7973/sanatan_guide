@@ -285,13 +285,12 @@ class _LoadedBody extends ConsumerWidget {
     final lastRead = lastReadAsync.value;
     final showResume =
         lastRead != null && lastRead.scriptureCode == scripture.code;
-    final resumeChapter = showResume
-        ? _resumeChapterFor(lastRead.verseId)
-        : null;
+    final resumeChapter =
+        showResume ? _resumeChapterFor(lastRead.verseId) : null;
 
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 24),
+    return Column(
       children: [
+        // Pinned header — only the resume + chapter list scrolls.
         _ChapterListHeader(
           scripture: scripture,
           totalUnits: totalUnits,
@@ -300,41 +299,48 @@ class _LoadedBody extends ConsumerWidget {
           readChapters: readChapters,
           isDark: isDark,
         ),
-        if (showResume && resumeChapter != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-            child: _ResumeRow(
-              scripture: scripture,
-              chapter: resumeChapter,
-              verseNum: _resumeVerseNumFor(lastRead.verseId),
-              isDark: isDark,
-            ),
-          ),
-        const SizedBox(height: 18),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: _ChaptersLabel(scripture: scripture, isDark: isDark),
-        ),
-        ...List.generate(entries.length, (i) {
-          final entry = entries[i];
-          final read = i < readCounts.length ? readCounts[i] : 0;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: _ChapterRow(
-              entry: entry,
-              scripture: scripture,
-              readCount: read,
-              isDark: isDark,
-            ),
-          )
-              .animate(
-                delay: Duration(
-                  milliseconds: 60 + 30 * math.min(i, 7),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              if (showResume && resumeChapter != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                  child: _ResumeRow(
+                    scripture: scripture,
+                    chapter: resumeChapter,
+                    verseNum: _resumeVerseNumFor(lastRead.verseId),
+                    isDark: isDark,
+                  ),
                 ),
-              )
-              .fadeIn(duration: 400.ms)
-              .slideY(begin: 0.025, end: 0, duration: 400.ms);
-        }),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _ChaptersLabel(scripture: scripture, isDark: isDark),
+              ),
+              ...List.generate(entries.length, (i) {
+                final entry = entries[i];
+                final read = i < readCounts.length ? readCounts[i] : 0;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _ChapterRow(
+                    entry: entry,
+                    scripture: scripture,
+                    readCount: read,
+                    isDark: isDark,
+                  ),
+                )
+                    .animate(
+                      delay: Duration(
+                        milliseconds: 60 + 30 * math.min(i, 7),
+                      ),
+                    )
+                    .fadeIn(duration: 400.ms)
+                    .slideY(begin: 0.025, end: 0, duration: 400.ms);
+              }),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1006,8 +1012,7 @@ class _ChapterRowArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isComplete) {
-      return Icon(Icons.check_circle_outline_rounded,
-          size: 14, color: saffron);
+      return Icon(Icons.check_circle_outline_rounded, size: 14, color: saffron);
     }
     return MockupRowChevron(color: text3.withValues(alpha: 0.4));
   }
@@ -1114,4 +1119,3 @@ class _ErrorBody extends ConsumerWidget {
     );
   }
 }
-
