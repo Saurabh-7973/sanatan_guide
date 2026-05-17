@@ -114,6 +114,16 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
       routerConfig: router,
+      // App-wide: tapping anywhere outside a focused text field dismisses
+      // the keyboard / drops focus.
+      builder: (context, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          final focus = FocusManager.instance.primaryFocus;
+          if (focus != null && focus.hasFocus) focus.unfocus();
+        },
+        child: child,
+      ),
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

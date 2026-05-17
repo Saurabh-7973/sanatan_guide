@@ -152,11 +152,17 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
     }
 
     // Build FTS5 query: each word gets prefix matching (term*)
-    // "karma yoga" → "karma* yoga*" (implicit AND)
+    // "karma yoga" → "karma* yoga*" (implicit AND).
+    // Strip every non letter/digit (incl. Devanāgarī-safe) so FTS5 special
+    // chars never reach the parser — e.g. "bg 2.47" would otherwise become
+    // `2.47*` and throw `fts5: syntax error near "."`. Coordinate queries
+    // are handled separately by the search screen's direct-match path.
     final ftsQuery = query
         .split(RegExp(r'\s+'))
+        .map((w) =>
+            w.replaceAll(RegExp(r'[^\p{L}\p{N}]', unicode: true), ''))
         .where((w) => w.isNotEmpty)
-        .map((w) => '${w.replaceAll('"', '')}*')
+        .map((w) => '$w*')
         .join(' ');
 
     if (ftsQuery.isEmpty) return [];
