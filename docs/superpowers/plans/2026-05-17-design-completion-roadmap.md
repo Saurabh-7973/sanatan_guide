@@ -108,7 +108,7 @@ mockup rewrites.
 | **S1 ✅** | **Navigation keystone** | — | `2026-05-17-navigation-keystone.md` (✅ DONE 2026-05-17) | Home/Library topbar + 5-item overflow; `/feedback` & `/chat` routes added; bottom nav only on Home/Practice/Texts; Settings/Credits/Bookmarks/Festivals reachable |
 | **S2 ✅** | Credits redesign | S1 | `2026-05-17-credits-redesign.md` (✅ DONE 2026-05-17) | `credits_page.dart` rewritten to spec 13 Part B; sūtra numerals, domain sections, BindingLine + blessing footer; all required sources; both themes; reachable via overflow "About" |
 | **S3 ✅** | Feedback screen | S1 | `2026-05-17-feedback-screen.md` (✅ DONE 2026-05-17) | New `/feedback`; State A (4 kinds) → State B (compose); mailto submit; device-info default ON, reply default OFF; both themes. Stub still serves /chat (S6 deletes it). |
-| **S4** | Settings rewrite | S1 | `2026-05-17-settings-rewrite.md` | Rewritten to screen-09 mockup; Appearance/Reading/Notifications/Data/About/Reset; `sanskritFontSizeProvider` (SharedPreferences) added; Credits + Feedback rows; both themes |
+| **S4 ◧** | Settings rewrite | S1 | `2026-05-17-settings-rewrite.md` + spec `11_settings_spec.md` | **Functional gap FIXED + committed** (Settings→Feedback now `/feedback`; audit #13 verified already-satisfied via `fontSizeProvider`→Verse Detail). **Visual restyle PLANNED, execution deferred** to a fresh session (607-line file; plan + spec durable). |
 | **S5** | Verse Detail: Notes + Share | S4 (font provider) | `2026-05-17-verse-detail-notes-share.md` | Notes bottom sheet (Drift `notes` table, 200 ch, shows on Bookmarks); Share bottom sheet (3-format chooser, canonical strings, deep link); Listen icon removed |
 | **S6** | AI Chat general mode | S1 | `2026-05-17-ai-chat-general.md` | `/chat` general mode (no verse anchor; ॐ + "ASK THE PANDIT"); empty state + 4 chips; reachable from overflow + Search; verse-anchored unaffected |
 | **S7** | Festivals rewrite | S1 | `2026-05-17-festivals-rewrite.md` | Almanac column (not cards) to screen-08; panchāṅga banner; iron-red `dIronRedBright` festival names; filter strip; Festival detail page; bundled 5-yr panchāṅga data verified |
@@ -152,3 +152,8 @@ Each subsystem plan, written immediately before its build, will contain:
   bottom sheet — extend, don't duplicate.
 - **Spec-folder fork** is resolved by D3 but the physical copy of spec 13 into
   `.claude/screen_specs/` is S1 Task 0; specs 10–12, 14 are Task 0 of their plans.
+- **Bookmark export deferred:** screen-09 shows an "Export bookmarks" row but no
+  export mechanism exists. S4 renders it as a safe deferred row (no fake tap).
+  Real export is a separate future subsystem if the user wants it.
+- **On-device visual smoke owed** for S1–S3 + S4 functional fix (agent cannot
+  drive a device). Recommended before executing the S4 restyle + S5–S8.
