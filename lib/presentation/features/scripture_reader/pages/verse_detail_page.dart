@@ -1252,24 +1252,8 @@ class _SanskritWords extends StatelessWidget {
         .copyWith(height: 1.95, letterSpacing: 0.1);
     final lines = sanskritDisplayLines(text);
     final meanings = wordMeanings ?? const <WordMeaning>[];
-
-    if (meanings.isEmpty) {
-      // No word breakdown — one centred line per pāda. stretch + textAlign
-      // makes the centring deterministic regardless of parent width (the
-      // AI-commentary-expanded state changes the available width).
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final line in lines)
-            Text(line,
-                textAlign: TextAlign.center,
-                style: base,
-                locale: const Locale('sa')),
-        ],
-      );
-    }
-
+    // Every word is tappable (highlight + callout) even when the DB has no
+    // per-word gloss for this verse — the callout degrades gracefully.
     final byWord = <String, WordMeaning>{
       for (final wm in meanings) wm.word.trim(): wm,
     };
@@ -1286,12 +1270,14 @@ class _SanskritWords extends StatelessWidget {
       if (token.isEmpty) continue;
       final core = token.replaceAll(_danda, '');
       final tail = token.substring(core.length);
-      final wm = byWord[core];
-      if (wm == null) {
+      if (core.isEmpty) {
         children.add(Text(token, style: base, locale: const Locale('sa')));
         continue;
       }
-      final selected = wm == selectedWord;
+      // Use the stored gloss if present; otherwise a bare entry so the tap
+      // still highlights the word and opens the callout.
+      final wm = byWord[core] ?? WordMeaning(word: core, meaning: '');
+      final selected = selectedWord?.word == core;
       children.add(
         GestureDetector(
           onTap: () => onSelectWord(selected ? null : wm),
@@ -1372,9 +1358,17 @@ class _WordCallout extends StatelessWidget {
                 style: AppText.commentary(color: saffron, size: 12)),
           ],
           const SizedBox(height: 8),
-          Text(word.meaning,
-              style: AppText.translation(color: text2, size: 13)
-                  .copyWith(height: 1.5)),
+          Text(
+            word.meaning.trim().isNotEmpty
+                ? word.meaning
+                : 'Word-by-word gloss not available for this verse yet.',
+            style: AppText.translation(color: text2, size: 13).copyWith(
+              height: 1.5,
+              fontStyle: word.meaning.trim().isEmpty
+                  ? FontStyle.italic
+                  : FontStyle.normal,
+            ),
+          ),
           const SizedBox(height: 10),
           Container(height: 1, color: dividerSoft),
         ],
