@@ -73,12 +73,14 @@ void main() {
     expect(find.text('कर्म'), findsOneWidget);
   });
 
-  testWidgets('empty state shows Pandit CTA', (tester) async {
+  testWidgets('Pandit CTA hidden when GEMINI_API_KEY is not set',
+      (tester) async {
+    // Tests run without --dart-define=GEMINI_API_KEY → GeminiService
+    // disabled, so the AI CTA must not render (same gate as verse-detail).
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
 
-    expect(find.text('ASK THE PANDIT'), findsOneWidget);
-    expect(find.text('ॐ'), findsOneWidget);
+    expect(find.text('ASK THE PANDIT'), findsNothing);
   });
 
   testWidgets('Recent section renders saved queries when present',
