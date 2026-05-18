@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/utils/coordinate_parser.dart';
 import 'package:sanatan_guide/core/utils/devanagari.dart';
 import 'package:sanatan_guide/core/utils/nav_logger.dart';
@@ -534,6 +535,10 @@ class _PanditCta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // AI feature — hidden until a GEMINI_API_KEY is provided, same gate as
+    // the verse-detail "Explain this verse" CTA.
+    if (!GeminiService.isEnabled) return const SizedBox.shrink();
+
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final divider = isDark ? DColors.divider : LColors.divider;
