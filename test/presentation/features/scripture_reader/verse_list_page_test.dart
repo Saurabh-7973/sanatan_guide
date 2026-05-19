@@ -70,6 +70,23 @@ void main() {
     expect(find.byType(BackdropFilter), findsOneWidget);
   });
 
+  testWidgets(
+      'decade header has no theme suffix without an API key (no regression)',
+      (tester) async {
+    final verses = [for (var i = 1; i <= 12; i++) _v(n: i)];
+    await tester.pumpWidget(
+      _harness(verses: verses, bookmarkIds: const {}),
+    );
+    await tester.pumpAndSettle(const Duration(milliseconds: 600));
+
+    // Tests carry no GEMINI_API_KEY → _VerseSectionHeader must render the
+    // plain range, byte-identical to the pre-#8 behaviour. (Only the first
+    // decade header is on-screen; the SliverList builds the rest lazily.)
+    expect(find.text('VERSES 1 — 10'), findsOneWidget);
+    expect(find.textContaining('VERSES 1 — 10 ·'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('bookmarked verse shows bookmark glyph', (tester) async {
     final verses = [_v(n: 1, isBookmarked: true)];
     await tester.pumpWidget(

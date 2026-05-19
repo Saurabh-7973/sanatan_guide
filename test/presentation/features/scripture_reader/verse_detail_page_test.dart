@@ -100,6 +100,26 @@ void main() {
     expect(find.text('dharma-kṣetre'), findsOneWidget);
   });
 
+  testWidgets(
+      'word with no gloss + no API key shows calm copy, not false "yet"',
+      (tester) async {
+    await tester.pumpWidget(_harness());
+    await tester.pumpAndSettle(const Duration(seconds: 1));
+
+    // कुरुक्षेत्रे has no WordMeaning; tests run without GEMINI_API_KEY,
+    // so this exercises the no-key fallback branch of _WordCallout.
+    await tester.tap(find.text('कुरुक्षेत्रे'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Enable the AI guide'), findsOneWidget);
+    expect(
+      find.textContaining('not available for this verse yet'),
+      findsNothing,
+      reason: 'the old false-promise copy must be gone',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('no commentary card when there is no cached explanation',
       (tester) async {
     await tester.pumpWidget(_harness(explanation: null));
