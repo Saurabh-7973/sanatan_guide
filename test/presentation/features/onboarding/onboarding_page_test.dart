@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/pages/onboarding_page.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 
 Widget _harness({TextScaler textScaler = TextScaler.noScaling}) => ProviderScope(
       child: MaterialApp(
@@ -36,6 +37,24 @@ void main() {
     expect(find.text('Beginner'), findsOneWidget);
     expect(find.text('Regular'), findsOneWidget);
     expect(find.text('Scholar'), findsOneWidget);
+  });
+
+  testWidgets('start mark shows only on the selected level card',
+      (tester) async {
+    await pumpPhone(tester, _harness());
+
+    // Nothing selected → no card carries the start mark.
+    expect(find.byType(LeafThread), findsNothing);
+
+    await tester.tap(find.text('Beginner'));
+    await tester.pump(const Duration(milliseconds: 220));
+    expect(find.byType(LeafThread), findsOneWidget);
+
+    // Switching selection keeps it to exactly the selected card.
+    await tester.tap(find.text('Scholar'));
+    await tester.pump(const Duration(milliseconds: 220));
+    expect(find.byType(LeafThread), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('no layout overflow at a large accessibility text scale',
