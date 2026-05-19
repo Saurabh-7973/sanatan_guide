@@ -6,6 +6,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/constants/bhagavad_gita_chapters.dart';
+import 'package:sanatan_guide/core/services/gemini_service.dart';
+import 'package:sanatan_guide/core/services/section_theme_service.dart';
 import 'package:sanatan_guide/core/utils/devanagari.dart';
 import 'package:sanatan_guide/core/utils/nav_logger.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
@@ -216,6 +218,9 @@ class _LoadedBody extends ConsumerWidget {
 
     final size = _groupSize;
     final lastVerseNum = verses.last.verseNum;
+    final scriptureLabel = verses.isNotEmpty
+        ? verses.first.scripture.displayName
+        : scriptureId;
     final entries = <_ListItem>[];
     var currentGroup = -1;
     for (var i = 0; i < verses.length; i++) {
@@ -226,7 +231,14 @@ class _LoadedBody extends ConsumerWidget {
         // Clamp the decade's end to the actual last verse, so Karma Yoga
         // (43 verses) shows "VERSES 41 — 43" instead of "41 — 50".
         final end = ((group + 1) * size).clamp(start, lastVerseNum);
-        entries.add(_HeaderItem(start, end));
+        final raw = (v.english?.trim().isNotEmpty ?? false)
+            ? v.english!.trim()
+            : v.sanskrit.trim();
+        entries.add(_HeaderItem(
+          start,
+          end,
+          raw.length > 90 ? raw.substring(0, 90) : raw,
+        ));
         currentGroup = group;
       }
       entries.add(_VerseItem(v, i));
@@ -240,10 +252,14 @@ class _LoadedBody extends ConsumerWidget {
           itemBuilder: (context, i) {
             final e = entries[i];
             return switch (e) {
-              _HeaderItem(:final start, :final end) => _VerseSectionHeader(
+              _HeaderItem(:final start, :final end, :final contextText) =>
+                _VerseSectionHeader(
                   start: start,
                   end: end,
                   isDark: isDark,
+                  scriptureLabel: scriptureLabel,
+                  chapterNum: chapterNum,
+                  contextText: contextText,
                 ),
               _VerseItem(:final verse, :final index) =>
                 _verseTile(verse, index),
@@ -653,9 +669,12 @@ sealed class _ListItem {
 }
 
 class _HeaderItem extends _ListItem {
-  const _HeaderItem(this.start, this.end);
+  const _HeaderItem(this.start, this.end, this.contextText);
   final int start;
   final int end;
+
+  /// First-verse incipit of the range — context for the AI theme label.
+  final String contextText;
 }
 
 class _VerseItem extends _ListItem {
@@ -664,24 +683,62 @@ class _VerseItem extends _ListItem {
   final int index;
 }
 
-class _VerseSectionHeader extends StatelessWidget {
+/// AI section theme, lazily resolved + cached. autoDispose keeps memory
+/// tight; the prefs cache makes re-scroll instant. No key / loading /
+/// error → null → the plain "VERSES N — M" with no suffix (unchanged).
+final _sectionThemeProvider = FutureProvider.autoDispose.family<String?,
+    ({String label, int chapter, int start, int end, String context})>(
+  (ref, k) => SectionThemeService.themeFor(
+    scriptureLabel: k.label,
+    chapterNum: k.chapter,
+    start: k.start,
+    end: k.end,
+    contextText: k.context,
+  ),
+);
+
+class _VerseSectionHeader extends ConsumerWidget {
   const _VerseSectionHeader({
     required this.start,
     required this.end,
     required this.isDark,
+    required this.scriptureLabel,
+    required this.chapterNum,
+    required this.contextText,
   });
 
   final int start;
   final int end;
   final bool isDark;
+  final String scriptureLabel;
+  final int chapterNum;
+  final String contextText;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
     final divider = isDark ? DColors.divider : LColors.divider;
     final devaRange =
         '‖${arabicToDevanagari(start)}–${arabicToDevanagari(end)}‖';
+
+    var label = 'VERSES $start — $end';
+    // Key present → append a cached AI theme. No key / pending / error →
+    // leave the plain range (zero regression on no-key builds).
+    if (GeminiService.isEnabled) {
+      final theme = ref
+          .watch(_sectionThemeProvider((
+            label: scriptureLabel,
+            chapter: chapterNum,
+            start: start,
+            end: end,
+            context: contextText,
+          )))
+          .asData
+          ?.value;
+      if (theme != null && theme.isNotEmpty) label = '$label · $theme';
+    }
+
     return Container(
       margin: const EdgeInsets.only(top: 18),
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 10),
@@ -693,7 +750,7 @@ class _VerseSectionHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              'VERSES $start — $end',
+              label,
               style: TextStyle(
                 fontFamily: Fonts.sans,
                 fontSize: 9,
