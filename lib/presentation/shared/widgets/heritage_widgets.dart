@@ -59,19 +59,22 @@ class BindingLine extends StatelessWidget {
   }
 
   Widget _buildFaded() {
+    // Verse-detail leaf-binding rule (screen-02 mockup):
+    //   .theme-dark  → linear-gradient(transparent, --d-saffron-deep, transparent), opacity .45
+    //   .theme-light → linear-gradient(transparent, rgba(139,72,6,.4), transparent)
     final ruleColor = isDark
-        ? DColors.saffronDeep
+        ? DColors.saffronDeep.withValues(alpha: 0.45)
         : LColors.saffronDeep.withValues(alpha: 0.4);
     final dotColor = isDark ? DColors.saffron : LColors.saffronDeep;
 
-    Widget rule({required bool fadeLeft}) => Expanded(
+    // Each half is a symmetric transparent→colour→transparent fade, so the
+    // rule is faint at both the screen edge and the centre diamond.
+    Widget rule() => Expanded(
           child: Container(
             height: 1,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: fadeLeft
-                    ? [Colors.transparent, ruleColor]
-                    : [ruleColor, Colors.transparent],
+                colors: [Colors.transparent, ruleColor, Colors.transparent],
               ),
             ),
           ),
@@ -81,7 +84,7 @@ class BindingLine extends StatelessWidget {
       height: 14,
       child: Row(
         children: [
-          rule(fadeLeft: true),
+          rule(),
           SizedBox(width: sideGap),
           Transform.rotate(
             angle: 0.785398,
@@ -102,7 +105,7 @@ class BindingLine extends StatelessWidget {
             ),
           ),
           SizedBox(width: sideGap),
-          rule(fadeLeft: false),
+          rule(),
         ],
       ),
     );
