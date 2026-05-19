@@ -100,22 +100,37 @@ class GeminiRateLimit {
   static const int maxPerDay = 10;
   static const String _prefix = 'gemini_daily_';
 
-  static String _todayKey() {
+  /// Per-feature daily budgets. Chat keeps the original 10/day. Word-gloss
+  /// and section-theme lookups get their own pools so first-use bursts can't
+  /// starve "Ask the Pandit". Results are cached forever, so each unique
+  /// item costs one lifetime call — the caps are first-touch ceilings.
+  static const int chatCap = maxPerDay;
+  static const int glossCap = 50;
+  static const int themeCap = 40;
+
+  static String _todayKey(String bucket) {
     final now = DateTime.now();
-    return '$_prefix${now.year}_${now.month}_${now.day}';
+    final b = bucket == 'chat' ? '' : '${bucket}_';
+    return '$_prefix$b${now.year}_${now.month}_${now.day}';
   }
 
-  static Future<int> remaining() async {
+  static Future<int> remaining({
+    String bucket = 'chat',
+    int cap = maxPerDay,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    final used = prefs.getInt(_todayKey()) ?? 0;
-    return (maxPerDay - used).clamp(0, maxPerDay);
+    final used = prefs.getInt(_todayKey(bucket)) ?? 0;
+    return (cap - used).clamp(0, cap);
   }
 
-  static Future<bool> consume() async {
+  static Future<bool> consume({
+    String bucket = 'chat',
+    int cap = maxPerDay,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    final key = _todayKey();
+    final key = _todayKey(bucket);
     final used = prefs.getInt(key) ?? 0;
-    if (used >= maxPerDay) return false;
+    if (used >= cap) return false;
     await prefs.setInt(key, used + 1);
     return true;
   }
