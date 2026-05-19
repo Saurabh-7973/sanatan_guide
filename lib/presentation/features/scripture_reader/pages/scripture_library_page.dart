@@ -313,11 +313,13 @@ class _SearchBar extends StatelessWidget {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
-    final isFocused = focus.hasFocus || query.isNotEmpty;
-
     return AnimatedBuilder(
       animation: focus,
       builder: (context, _) {
+        // Read focus INSIDE the builder so it reflects the live state on
+        // every notification — and track focus only, so a lingering query
+        // can't keep the pill "active" after the user taps away (#6).
+        final isFocused = focus.hasFocus;
         final borderColor = isFocused ? saffron : dividerSoft;
         final iconColor = isFocused ? saffron : text3;
 
@@ -339,6 +341,9 @@ class _SearchBar extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     focusNode: focus,
+                    // Mobile keeps focus on outside-tap by default; force
+                    // unfocus so the focus-driven border resets (#6).
+                    onTapOutside: (_) => focus.unfocus(),
                     onChanged: onChanged,
                     cursorColor: saffron,
                     style: TextStyle(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/pages/scripture_library_page.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 Widget _harness({TextScaler textScaler = TextScaler.noScaling}) => ProviderScope(
       child: MaterialApp(
@@ -77,5 +78,43 @@ void main() {
     expect(find.text('श्रुति'), findsNothing); // family list replaced
     expect(find.textContaining('RESULT'), findsOneWidget); // count line
     expect(find.text('Bhagavad Gītā'), findsOneWidget); // the match
+  });
+
+  testWidgets('search border drops to unfocused after tapping outside, '
+      'even with a non-empty query', (tester) async {
+    await tester.pumpWidget(_harness());
+    await tester.pumpAndSettle();
+
+    Color searchBorderColor() {
+      final containers = tester.widgetList<Container>(
+        find.ancestor(
+          of: find.byType(TextField),
+          matching: find.byType(Container),
+        ),
+      );
+      for (final c in containers) {
+        final d = c.decoration;
+        if (d is BoxDecoration &&
+            d.borderRadius == BorderRadius.circular(28) &&
+            d.border is Border) {
+          return (d.border! as Border).top.color;
+        }
+      }
+      fail('search-bar pill container not found');
+    }
+
+    await tester.enterText(find.byType(TextField), 'rig');
+    await tester.pumpAndSettle();
+    // Focused while typing → saffron active border.
+    expect(searchBorderColor(), LColors.saffron);
+
+    // Simulate tapping outside (global unfocus / onTapOutside).
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
+    // Focus gone → border must return to the idle divider even though the
+    // query text ("rig") is still present.
+    expect(searchBorderColor(), LColors.dividerSoft,
+        reason: 'border must track focus, not query presence');
   });
 }
