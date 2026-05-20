@@ -19,11 +19,13 @@ class BookmarksDao extends DatabaseAccessor<AppDatabase>
         ]))
       .watch();
 
-  /// Bookmarks enriched with Sanskrit, English, and verse coordinates.
+  /// Bookmarks enriched with Sanskrit, English, verse coordinates, and the
+  /// user's personal note (`verses.note_text` — the same store the verse
+  /// detail screen writes, so a note saved there shows here).
   Stream<List<EnrichedBookmark>> watchAllEnriched() {
     final q = customSelect(
       'SELECT b.verse_id, b.saved_at, v.sanskrit, v.english, '
-      'v.scripture, v.chapter_num, v.verse_num, v.book_num '
+      'v.scripture, v.chapter_num, v.verse_num, v.book_num, v.note_text '
       'FROM bookmarks b LEFT JOIN verses v ON b.verse_id = v.id '
       'ORDER BY b.saved_at DESC',
       readsFrom: {bookmarksTable, db.versesTable},
@@ -38,6 +40,7 @@ class BookmarksDao extends DatabaseAccessor<AppDatabase>
             chapterNum: r.readNullable<int>('chapter_num'),
             verseNum: r.readNullable<int>('verse_num'),
             bookNum: r.readNullable<int>('book_num'),
+            noteText: r.readNullable<String>('note_text'),
           );
         }).toList());
   }
@@ -90,6 +93,7 @@ class EnrichedBookmark {
     this.chapterNum,
     this.verseNum,
     this.bookNum,
+    this.noteText,
   });
 
   final String verseId;
@@ -100,4 +104,7 @@ class EnrichedBookmark {
   final int? chapterNum;
   final int? verseNum;
   final int? bookNum;
+
+  /// The user's personal note for this verse (`verses.note_text`), or null.
+  final String? noteText;
 }
