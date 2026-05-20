@@ -144,4 +144,24 @@ void main() {
     await tester.pump();
     expect(find.text('COLLAPSE'), findsOneWidget);
   });
+
+  testWidgets('tapping outside the search field drops focus (border resets)',
+      (tester) async {
+    await tester.pumpWidget(_harness());
+    await tester.pumpAndSettle();
+
+    // The border is driven by this exact node's hasFocus.
+    FocusNode fieldNode() =>
+        tester.widget<TextField>(find.byType(TextField)).focusNode!;
+
+    // The page autofocuses the field in initState.
+    expect(fieldNode().hasFocus, isTrue);
+
+    // Tap a non-interactive area outside the field's TapRegion.
+    await tester.tap(find.text('SEARCH ANY WAY'));
+    await tester.pumpAndSettle();
+
+    expect(fieldNode().hasFocus, isFalse,
+        reason: 'onTapOutside must unfocus so the border returns to divider');
+  });
 }

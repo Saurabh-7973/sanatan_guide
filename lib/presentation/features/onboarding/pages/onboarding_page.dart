@@ -530,19 +530,21 @@ class _LevelCard extends StatelessWidget {
           ),
         ),
         // Stack OUTSIDE inner padding so `left: 0` lands on the card's real
-        // left edge (not clipped by Stack.hardEdge). Start mark on every
-        // card, like the continue card; pulse only the selected one.
+        // left edge (not clipped by Stack.hardEdge). Start mark ONLY on the
+        // selected card — mockup screen-11: .level-card::before opacity 0,
+        // .level-card.selected::before opacity 1.
         child: Stack(
           children: [
-            Positioned(
-              left: 0,
-              top: 12,
-              bottom: 12,
-              child: LeafThread(
-                isDark: isDark,
-                pulseOnce: selected,
+            if (selected)
+              Positioned(
+                left: 0,
+                top: 12,
+                bottom: 12,
+                child: LeafThread(
+                  isDark: isDark,
+                  pulseOnce: true,
+                ),
               ),
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 16, 18, 16),
               child: Row(

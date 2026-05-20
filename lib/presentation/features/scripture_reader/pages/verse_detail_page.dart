@@ -12,6 +12,7 @@ import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
+import 'package:sanatan_guide/core/services/word_gloss_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/core/utils/explain_question.dart';
 import 'package:sanatan_guide/core/utils/verse_text.dart';
@@ -1216,7 +1217,8 @@ class _Leaf extends StatelessWidget {
               right: 0,
               bottom: 4,
               child: Center(
-                child: _WordCallout(word: selectedWord!, isDark: isDark),
+                child: _WordCallout(
+                    word: selectedWord!, isDark: isDark, verse: verse),
               ),
             ),
         ],
@@ -1315,14 +1317,31 @@ class _SanskritWords extends StatelessWidget {
   }
 }
 
-class _WordCallout extends StatelessWidget {
-  const _WordCallout({required this.word, required this.isDark});
+/// Lazily resolves a per-word gloss when the bundled DB has none.
+/// autoDispose keeps memory tight; the prefs cache makes re-taps instant.
+final _wordGlossProvider = FutureProvider.autoDispose.family<WordMeaning,
+    ({String verseId, String word, String sanskrit, String label})>(
+  (ref, k) => WordGlossService.glossFor(
+    verseId: k.verseId,
+    word: k.word,
+    verseSanskrit: k.sanskrit,
+    scriptureLabel: k.label,
+  ),
+);
+
+class _WordCallout extends ConsumerWidget {
+  const _WordCallout({
+    required this.word,
+    required this.isDark,
+    required this.verse,
+  });
 
   final WordMeaning word;
   final bool isDark;
+  final Verse verse;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final surface2 = isDark ? DColors.surface2 : LColors.surface2;
     final divider = isDark ? DColors.divider : LColors.divider;
     final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
@@ -1330,48 +1349,109 @@ class _WordCallout extends StatelessWidget {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text2 = isDark ? DColors.text2 : LColors.text2;
 
-    return Container(
-      width: 240,
-      padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
-      decoration: BoxDecoration(
-        color: surface2,
-        borderRadius: BorderRadius.circular(Radii.card),
-        border: Border.all(color: divider),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.18),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(word.word,
-              style: AppText.sanskritBody(color: cream, size: 18)
-                  .copyWith(height: 1.3)),
-          if (word.transliteration?.trim().isNotEmpty ?? false) ...[
-            const SizedBox(height: 4),
-            Text(word.transliteration!.trim(),
-                style: AppText.commentary(color: saffron, size: 12)),
-          ],
-          const SizedBox(height: 8),
-          Text(
-            word.meaning.trim().isNotEmpty
-                ? word.meaning
-                : 'Word-by-word gloss not available for this verse yet.',
-            style: AppText.translation(color: text2, size: 13).copyWith(
-              height: 1.5,
-              fontStyle: word.meaning.trim().isEmpty
-                  ? FontStyle.italic
-                  : FontStyle.normal,
+    final bodyStyle =
+        AppText.translation(color: text2, size: 13).copyWith(height: 1.5);
+    final italic = bodyStyle.copyWith(fontStyle: FontStyle.italic);
+
+    Widget shell({required String? translit, required Widget body}) {
+      return Container(
+        width: 240,
+        padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+        decoration: BoxDecoration(
+          color: surface2,
+          borderRadius: BorderRadius.circular(Radii.card),
+          border: Border.all(color: divider),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.18),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(word.word,
+                style: AppText.sanskritBody(color: cream, size: 18)
+                    .copyWith(height: 1.3)),
+            if (translit?.trim().isNotEmpty ?? false) ...[
+              const SizedBox(height: 4),
+              Text(translit!.trim(),
+                  style: AppText.commentary(color: saffron, size: 12)),
+            ],
+            const SizedBox(height: 8),
+            body,
+            const SizedBox(height: 10),
+            Container(height: 1, color: dividerSoft),
+          ],
+        ),
+      );
+    }
+
+    // 1. DB already had a gloss (DB ships none today, but honour it).
+    if (word.meaning.trim().isNotEmpty) {
+      return shell(
+        translit: word.transliteration,
+        body: Text(word.meaning, style: bodyStyle),
+      );
+    }
+
+    // 2. No API key → calm, honest copy (no false "yet": data isn't coming).
+    if (!GeminiService.isEnabled) {
+      return shell(
+        translit: word.transliteration,
+        body: Text(
+          'Per-word meaning isn’t bundled. Enable the AI guide '
+          '(GEMINI_API_KEY) for live word lookups.',
+          style: italic,
+        ),
+      );
+    }
+
+    // 3. Key present → fetch once, cache forever, label as AI-suggested.
+    final gloss = ref.watch(_wordGlossProvider((
+      verseId: verse.id,
+      word: word.word,
+      sanskrit: verse.sanskrit,
+      label: verse.scripture.displayNameSafe,
+    )));
+    return gloss.when(
+      loading: () => shell(
+        translit: word.transliteration,
+        body: Row(mainAxisSize: MainAxisSize.min, children: [
+          SizedBox(
+            width: 12,
+            height: 12,
+            child:
+                CircularProgressIndicator(strokeWidth: 1.5, color: saffron),
           ),
-          const SizedBox(height: 10),
-          Container(height: 1, color: dividerSoft),
-        ],
+          const SizedBox(width: 8),
+          Text('Looking up…', style: italic),
+        ]),
+      ),
+      error: (e, _) => shell(
+        translit: word.transliteration,
+        body: Text(
+          e is GeminiException
+              ? e.message
+              : 'Couldn’t look up this word. Try again.',
+          style: italic,
+        ),
+      ),
+      data: (wm) => shell(
+        translit: wm.transliteration ?? word.transliteration,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(wm.meaning, style: bodyStyle),
+            const SizedBox(height: 6),
+            Text('AI-suggested gloss · verify before relying on it',
+                style: AppText.meta(color: text2, size: 10)),
+          ],
+        ),
       ),
     );
   }

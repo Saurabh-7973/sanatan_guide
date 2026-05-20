@@ -196,6 +196,10 @@ class _SearchTopBar extends StatelessWidget {
                           controller: controller,
                           focusNode: focusNode,
                           textInputAction: TextInputAction.search,
+                          // Mobile's default onTapOutside keeps focus; force
+                          // unfocus so the focus-driven border resets when
+                          // the user taps a result or empty space.
+                          onTapOutside: (_) => focusNode.unfocus(),
                           onChanged: onChanged,
                           onSubmitted: onSubmitted,
                           style: TextStyle(
