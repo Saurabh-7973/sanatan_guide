@@ -257,7 +257,7 @@ class _StreakStrip extends ConsumerWidget {
                         TextSpan(
                           text: streak == 1
                               ? 'day streak · this week'
-                              : 'day streak · this week',
+                              : 'days streak · this week',
                           style: TextStyle(
                             fontFamily: Fonts.sans,
                             fontSize: 12,
@@ -896,7 +896,6 @@ class _Horizon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final divider = isDark ? DColors.divider : LColors.divider;
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -924,7 +923,7 @@ class _Horizon extends StatelessWidget {
               fontSize: 15,
               fontWeight: FontWeight.w500,
               height: 1.3,
-              color: saffron == text1 ? text1 : text1,
+              color: text1,
             ),
           ),
           const SizedBox(height: 4),
