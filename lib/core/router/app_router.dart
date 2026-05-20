@@ -20,7 +20,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/pages/verse
 import 'package:sanatan_guide/presentation/features/settings/pages/credits_page.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/feedback_page.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/settings_page.dart';
-import 'package:sanatan_guide/presentation/shared/pages/coming_soon_page.dart';
+import 'package:sanatan_guide/presentation/features/chat/pages/pandit_chat_page.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/scaffold_with_nav_bar.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -162,7 +162,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.chatGeneral,
         pageBuilder: (_, state) => _fadeSlideUpTransition(
           state,
-          const ComingSoonPage(title: 'Ask the Pandit'),
+          const PanditChatPage(),
         ),
       ),
       ShellRoute(
