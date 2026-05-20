@@ -1,16 +1,31 @@
+// lib/presentation/features/learning_path/pages/learning_path_page.dart
+//
+// Your Path — the practice / learning-path screen (S8). Heritage restyle to
+// New Design/screen-12-practice.html: in-content header, compressed 7-day
+// streak strip (full history in a calendar sheet), sūtra-numbered section
+// headers, a "Continue your path" anchor, knot-threaded module rows, and a
+// dashed Mastery horizon. All providers and progression logic are preserved.
+
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
+
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+
+/// Level 1 completions required to unlock Level 2 (Deepening). Preserved
+/// verbatim from the pre-restyle screen.
+const int _kDeepeningUnlockThreshold = 4;
+
+String _ymd(DateTime d) => '${d.year}-'
+    '${d.month.toString().padLeft(2, '0')}-'
+    '${d.day.toString().padLeft(2, '0')}';
 
 class LearningPathPage extends ConsumerWidget {
   const LearningPathPage({super.key});
@@ -20,40 +35,20 @@ class LearningPathPage extends ConsumerWidget {
     final state = ref.watch(modulesProvider);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text('Your Path', style: context.ts.displayMedium),
-        centerTitle: false,
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
           SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
+            child: state.when(
+              loading: () => const LearningPathShimmer(),
+              error: (_, __) => ErrorStateWidget(
+                onRetry: () => ref.invalidate(modulesProvider),
               ),
-              child: state.when(
-                loading: () => const LearningPathShimmer(),
-                error: (e, _) => ErrorStateWidget(
-                  onRetry: () => ref.invalidate(modulesProvider),
-                ),
-                data: (either) => either.fold(
-                  (failure) => ErrorStateWidget(message: failure.message),
-                  (modules) {
-                    final level1 = modules.where((m) => m.level == 1).toList()
-                      ..sort((a, b) => a.sequence.compareTo(b.sequence));
-                    final level2 = modules.where((m) => m.level == 2).toList()
-                      ..sort((a, b) => a.sequence.compareTo(b.sequence));
-                    return _ModuleList(level1: level1, level2: level2);
-                  },
-                ),
+              data: (either) => either.fold(
+                (failure) => ErrorStateWidget(message: failure.message),
+                (modules) => _PathBody(modules: modules),
               ),
             ),
           ),
@@ -63,662 +58,1069 @@ class LearningPathPage extends ConsumerWidget {
   }
 }
 
-class _ModuleList extends StatelessWidget {
-  const _ModuleList({required this.level1, required this.level2});
+class _PathBody extends StatelessWidget {
+  const _PathBody({required this.modules});
 
-  final List<LearningModule> level1;
-  final List<LearningModule> level2;
+  final List<LearningModule> modules;
 
   @override
   Widget build(BuildContext context) {
-    // Unlock Level 2 when at least 4 of 8 Level 1 modules are completed
-    final level1Completed = level1.where((m) => m.isCompleted).length;
-    final level2Unlocked = level1Completed >= 4;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Build item list:
-    // index 0 → Level 1 header
-    // index 1 → streak calendar
-    // index 2..1+level1.length → Level 1 module cards
-    // next → Level 2 header
-    // next.. → Level 2 module cards
-    final itemCount = 2 + level1.length + 1 + level2.length;
+    final foundations = modules.where((m) => m.level == 1).toList()
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+    final deepening = modules.where((m) => m.level == 2).toList()
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.pagePadding,
-        AppSpacing.lg,
-        AppSpacing.pagePadding,
-        AppSpacing.xxxl,
-      ),
-      physics: const ScrollPhysics(),
-      itemCount: itemCount,
-      separatorBuilder: (_, i) {
-        if (i == 0 || i == 1) return const SizedBox(height: AppSpacing.lg);
-        if (i == 1 + level1.length) {
-          return const SizedBox(height: AppSpacing.xxl);
+    final foundationsDone = foundations.where((m) => m.isCompleted).length;
+    final deepeningUnlocked = foundationsDone >= _kDeepeningUnlockThreshold;
+
+    // The single "next up" module: first incomplete one in an unlocked
+    // section. Drives both the active-row styling and the Continue anchor.
+    LearningModule? active;
+    for (final m in foundations) {
+      if (!m.isCompleted) {
+        active = m;
+        break;
+      }
+    }
+    if (active == null && deepeningUnlocked) {
+      for (final m in deepening) {
+        if (!m.isCompleted) {
+          active = m;
+          break;
         }
-        return const SizedBox(height: AppSpacing.listItemSpacing);
-      },
-      itemBuilder: (context, index) {
-        // ── index 0: Level 1 header ────────────────────────────────────
-        if (index == 0) {
-          return _LevelHeader(
-            title: 'I — Foundations',
-            subtitle: 'Eight modules on the essentials of Sanatan Dharma.',
-            completedCount: level1Completed,
-            totalCount: level1.length,
-          );
-        }
+      }
+    }
 
-        // ── index 1: streak calendar ───────────────────────────────────
-        if (index == 1) return const _StreakCalendar();
-
-        // ── index 2..1+level1.length: Level 1 cards ───────────────────
-        if (index <= 1 + level1.length) {
-          final moduleIndex = index - 2;
-          return _TimelineModuleCard(
-            module: level1[moduleIndex],
-            showConnector: moduleIndex < level1.length - 1,
-          )
-              .animate(delay: Duration(milliseconds: moduleIndex * 40))
-              .fadeIn(duration: 200.ms)
-              .slideY(
-                begin: 0.05,
-                end: 0,
-                duration: 200.ms,
-                curve: Curves.easeOutCubic,
-              );
-        }
-
-        // ── Level 2 header ─────────────────────────────────────────────
-        if (index == 2 + level1.length) {
-          return _Level2Header(
-            completedCount: level2.where((m) => m.isCompleted).length,
-            totalCount: level2.length,
-            unlocked: level2Unlocked,
-            level1Completed: level1Completed,
-          );
-        }
-
-        // ── Level 2 cards ──────────────────────────────────────────────
-        final l2Index = index - (3 + level1.length);
-        return _TimelineModuleCard(
-          module: level2[l2Index],
-          locked: !level2Unlocked,
-          showConnector: l2Index < level2.length - 1,
-        )
-            .animate(delay: Duration(milliseconds: l2Index * 40))
-            .fadeIn(duration: 200.ms)
-            .slideY(
-              begin: 0.05,
-              end: 0,
-              duration: 200.ms,
-              curve: Curves.easeOutCubic,
-            );
-      },
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 28),
+      children: [
+        const _PathHeader(),
+        const _StreakStrip(),
+        _SectionHeader(
+          isDark: isDark,
+          marker: 'I.',
+          name: 'Foundations',
+          description:
+              'Eight modules on the essentials of Sanātana Dharma.',
+          completed: foundationsDone,
+          total: foundations.length,
+          locked: false,
+        ),
+        if (active != null && active.level == 1)
+          _ContinueAnchor(
+            isDark: isDark,
+            module: active,
+            ordinal: active.sequence,
+            total: foundations.length,
+          ),
+        _ModuleList(
+          isDark: isDark,
+          modules: foundations,
+          locked: false,
+          activeId: active?.id,
+        ),
+        _SectionHeader(
+          isDark: isDark,
+          marker: 'II.',
+          name: 'Deepening',
+          description:
+              'The primary scriptures, in their structure — Vedas, '
+              'Upaniṣads, the Gītā in full.',
+          completed: deepening.where((m) => m.isCompleted).length,
+          total: deepening.length,
+          locked: !deepeningUnlocked,
+          lockedMeta: deepeningUnlocked
+              ? null
+              : 'Complete ${_kDeepeningUnlockThreshold - foundationsDone} '
+                  'more',
+        ),
+        if (active != null && active.level == 2)
+          _ContinueAnchor(
+            isDark: isDark,
+            module: active,
+            ordinal: active.sequence,
+            total: deepening.length,
+          ),
+        _ModuleList(
+          isDark: isDark,
+          modules: deepening,
+          locked: !deepeningUnlocked,
+          activeId: active?.id,
+        ),
+        _Horizon(isDark: isDark),
+      ],
     );
   }
 }
 
-// ── Timeline module card wrapper ──────────────────────────────────────────
-// Draws a 1px connector line from the icon centre downward into the separator
-// gap, creating a continuous vertical thread between cards in each level.
+// ── Header ─────────────────────────────────────────────────────────────────
 
-class _TimelineModuleCard extends StatelessWidget {
-  const _TimelineModuleCard({
-    required this.module,
-    this.locked = false,
-    required this.showConnector,
-  });
-
-  final LearningModule module;
-  final bool locked;
-  final bool showConnector;
-
-  // icon occupies y=[cardPadding .. cardPadding+44]; line starts at icon bottom.
-  static const double _lineStartY = AppSpacing.cardPadding + 44; // = 60
-  // extend below card bottom to reach next icon centre:
-  //   separator(12) + cardPadding(16) + half-icon(22) = 50
-  static const double _extendBelow =
-      AppSpacing.listItemSpacing + AppSpacing.cardPadding + 22;
+class _PathHeader extends StatelessWidget {
+  const _PathHeader();
 
   @override
   Widget build(BuildContext context) {
-    final card = _ModuleCard(module: module, locked: locked);
-    if (!showConnector) return card;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        card,
-        const Positioned(
-          left: AppSpacing.cardPadding + 20,
-          top: _lineStartY,
-          bottom: -_extendBelow,
-          child: SizedBox(
-            width: 2,
-            child: CustomPaint(painter: _DashedLinePainter()),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Your Path', style: AppText.screenTitle(color: text1)),
+          const SizedBox(height: 4),
+          Text(
+            'A guided journey through the foundations of Sanātana Dharma.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 13.5,
+              height: 1.4,
+              color: text2,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Streak strip ───────────────────────────────────────────────────────────
+
+class _StreakStrip extends ConsumerWidget {
+  const _StreakStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    final history = ref.watch(readHistoryProvider).value ?? const <String>{};
+    final streak = ref.watch(currentStreakProvider).value ?? 0;
+
+    final today = DateTime.now();
+    final monday = DateTime(today.year, today.month, today.day)
+        .subtract(Duration(days: today.weekday - 1));
+    const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 18),
+      child: InkWell(
+        onTap: () => _openCalendar(context),
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: divider),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(color: glow, shape: BoxShape.circle),
+                alignment: Alignment.center,
+                child: Text(
+                  '🔥',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: streak > 0 ? null : text3,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(children: [
+                        TextSpan(
+                          text: '$streak ',
+                          style: TextStyle(
+                            fontFamily: Fonts.serif,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 13,
+                            color: text1,
+                          ),
+                        ),
+                        TextSpan(
+                          text: streak == 1
+                              ? 'day streak · this week'
+                              : 'days streak · this week',
+                          style: TextStyle(
+                            fontFamily: Fonts.sans,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: text1,
+                          ),
+                        ),
+                      ]),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        for (var i = 0; i < 7; i++)
+                          Expanded(
+                            child: _WeekDot(
+                              isDark: isDark,
+                              label: labels[i],
+                              date: monday.add(Duration(days: i)),
+                              today: today,
+                              history: history,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Icon(Icons.chevron_right_rounded, size: 18, color: text3),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openCalendar(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _CalendarSheet(),
+    );
+  }
+}
+
+class _WeekDot extends StatelessWidget {
+  const _WeekDot({
+    required this.isDark,
+    required this.label,
+    required this.date,
+    required this.today,
+    required this.history,
+  });
+
+  final bool isDark;
+  final String label;
+  final DateTime date;
+  final DateTime today;
+  final Set<String> history;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    final t = DateTime(today.year, today.month, today.day);
+    final isToday = date == t;
+    final isFuture = date.isAfter(t);
+    final wasRead = history.contains(_ymd(date));
+
+    final Color dotColor;
+    final Border? border;
+    if (wasRead) {
+      dotColor = saffron;
+      border = null;
+    } else if (isToday) {
+      dotColor = Colors.transparent;
+      border = Border.all(color: saffron, width: 1.5);
+    } else if (isFuture) {
+      dotColor = divider.withValues(alpha: 0.4);
+      border = null;
+    } else {
+      dotColor = divider;
+      border = null;
+    }
+
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontSize: 8,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.48,
+            color: text3,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Container(
+          width: 8,
+          height: 8,
+          decoration:
+              BoxDecoration(color: dotColor, shape: BoxShape.circle, border: border),
         ),
       ],
     );
   }
 }
 
-class _DashedLinePainter extends CustomPainter {
-  const _DashedLinePainter();
+// ── Section header ─────────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.isDark,
+    required this.marker,
+    required this.name,
+    required this.description,
+    required this.completed,
+    required this.total,
+    required this.locked,
+    this.lockedMeta,
+  });
+
+  final bool isDark;
+  final String marker;
+  final String name;
+  final String description;
+  final int completed;
+  final int total;
+  final bool locked;
+  final String? lockedMeta;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    const dashH = 3.0;
-    const gapH = 4.0;
-    final paint = Paint()
-      ..color = AppColors.warmGrey10
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-    var y = 0.0;
-    while (y < size.height) {
-      canvas.drawLine(
-        Offset(size.width / 2, y),
-        Offset(size.width / 2, (y + dashH).clamp(0.0, size.height)),
-        paint,
-      );
-      y += dashH + gapH;
-    }
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final threadLocked = isDark ? DColors.threadLocked : LColors.threadLocked;
+
+    final progress = total > 0 ? completed / total : 0.0;
+    final allDone = total > 0 && completed == total;
+    final status = locked
+        ? null
+        : allDone
+            ? 'Complete'
+            : completed > 0
+                ? 'In progress'
+                : 'Not started';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                marker,
+                style: TextStyle(
+                  fontFamily: Fonts.serif,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: saffron,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                name,
+                style: TextStyle(
+                  fontFamily: Fonts.serif,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.18,
+                  color: text1,
+                ),
+              ),
+              const Spacer(),
+              if (locked)
+                _LockPill(isDark: isDark)
+              else
+                Text(status!, style: AppText.sectionLabel(color: text3)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            description,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 13,
+              height: 1.45,
+              color: text2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(1),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 1.5,
+                    backgroundColor: divider,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      locked ? threadLocked : saffron,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                lockedMeta ?? '$completed / $total',
+                style: AppText.sectionLabel(color: text3),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(_DashedLinePainter _) => false;
 }
 
-// ── Streak Calendar ───────────────────────────────────────────────────────
+class _LockPill extends StatelessWidget {
+  const _LockPill({required this.isDark});
 
-class _StreakCalendar extends ConsumerWidget {
-  const _StreakCalendar();
+  final bool isDark;
 
-  static const double _kCellSize = 32;
+  @override
+  Widget build(BuildContext context) {
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final surface2 = isDark ? DColors.surface2 : LColors.surface2;
 
-  static String _dateString(DateTime date) => '${date.year}-'
-      '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: surface2,
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.lock_outline_rounded, size: 10, color: text3),
+          const SizedBox(width: 4),
+          Text('LOCKED', style: AppText.sectionLabel(color: text3)),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Continue anchor ────────────────────────────────────────────────────────
+
+class _ContinueAnchor extends StatelessWidget {
+  const _ContinueAnchor({
+    required this.isDark,
+    required this.module,
+    required this.ordinal,
+    required this.total,
+  });
+
+  final bool isDark;
+  final LearningModule module;
+  final int ordinal;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
+      child: InkWell(
+        onTap: () => context.push('/learn/${module.id}'),
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: divider),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 3,
+                height: 56,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: saffron,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 19),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'CONTINUE YOUR PATH',
+                        style: AppText.sectionLabel(color: saffron),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        module.title,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                          color: text1,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Module $ordinal of $total · '
+                        '${module.estimatedMinutes} min',
+                        style: TextStyle(
+                          fontFamily: Fonts.sans,
+                          fontSize: 11,
+                          height: 1.3,
+                          color: text2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Padding(
+                padding: const EdgeInsets.only(right: 18),
+                child: Icon(Icons.arrow_forward_rounded,
+                    size: 16, color: saffron),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Module list ────────────────────────────────────────────────────────────
+
+class _ModuleList extends StatelessWidget {
+  const _ModuleList({
+    required this.isDark,
+    required this.modules,
+    required this.locked,
+    required this.activeId,
+  });
+
+  final bool isDark;
+  final List<LearningModule> modules;
+  final bool locked;
+  final String? activeId;
+
+  @override
+  Widget build(BuildContext context) {
+    if (modules.isEmpty) return const SizedBox.shrink();
+
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final threadLocked = isDark ? DColors.threadLocked : LColors.threadLocked;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Stack(
+        children: [
+          // The binding thread — a hairline behind the knots.
+          Positioned(
+            left: 6,
+            top: 8,
+            bottom: 8,
+            child: Container(width: 1, color: locked ? threadLocked : divider),
+          ),
+          Column(
+            children: [
+              for (var i = 0; i < modules.length; i++)
+                _ModuleRow(
+                  isDark: isDark,
+                  module: modules[i],
+                  locked: locked,
+                  isActive: modules[i].id == activeId,
+                  showDivider: i != modules.length - 1,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ModuleRow extends StatelessWidget {
+  const _ModuleRow({
+    required this.isDark,
+    required this.module,
+    required this.locked,
+    required this.isActive,
+    required this.showDivider,
+  });
+
+  final bool isDark;
+  final LearningModule module;
+  final bool locked;
+  final bool isActive;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final threadLocked = isDark ? DColors.threadLocked : LColors.threadLocked;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+
+    final done = module.isCompleted;
+
+    // Knot fill follows the row state.
+    final Color knotColor;
+    if (locked) {
+      knotColor = threadLocked;
+    } else if (done || isActive) {
+      knotColor = saffron;
+    } else {
+      knotColor = text3;
+    }
+
+    final titleColor = locked
+        ? text1.withValues(alpha: 0.62)
+        : done
+            ? text2
+            : text1;
+    final metaText = done
+        ? '${module.estimatedMinutes} min · completed'
+        : isActive
+            ? '${module.estimatedMinutes} min · next up'
+            : '${module.estimatedMinutes} min';
+
+    return Opacity(
+      opacity: locked ? 0.85 : 1,
+      child: InkWell(
+        onTap: locked
+            ? () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Complete more Foundations modules to unlock Deepening.',
+                    ),
+                    duration: Duration(seconds: 2),
+                  ),
+                )
+            : () => context.push('/learn/${module.id}'),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            border: showDivider
+                ? Border(bottom: BorderSide(color: dividerSoft))
+                : null,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Knot — a 12px diamond riding the thread.
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: SizedBox(
+                  width: 13,
+                  child: Center(
+                    child: Transform.rotate(
+                      angle: 0.7853981633974483, // 45°
+                      child: Container(
+                        width: 11,
+                        height: 11,
+                        decoration: BoxDecoration(
+                          color: knotColor,
+                          boxShadow: isActive && !locked
+                              ? [
+                                  BoxShadow(
+                                    color: saffron.withValues(alpha: 0.55),
+                                    blurRadius: 8,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              SizedBox(
+                width: 22,
+                child: Text(
+                  '${module.sequence}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    color: locked
+                        ? text3.withValues(alpha: 0.6)
+                        : done
+                            ? text3
+                            : text2,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      module.title,
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontSize: 15.5,
+                        fontWeight:
+                            isActive ? FontWeight.w600 : FontWeight.w500,
+                        height: 1.3,
+                        letterSpacing: -0.08,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      module.hook,
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12.5,
+                        height: 1.45,
+                        color: locked ? text3 : text2,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      metaText,
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.06,
+                        color: text3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              SizedBox(
+                width: 16,
+                child: _ModuleStateIcon(
+                  done: done,
+                  active: isActive,
+                  locked: locked,
+                  saffron: saffron,
+                  text2: text2,
+                  text3: text3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ModuleStateIcon extends StatelessWidget {
+  const _ModuleStateIcon({
+    required this.done,
+    required this.active,
+    required this.locked,
+    required this.saffron,
+    required this.text2,
+    required this.text3,
+  });
+
+  final bool done;
+  final bool active;
+  final bool locked;
+  final Color saffron;
+  final Color text2;
+  final Color text3;
+
+  @override
+  Widget build(BuildContext context) {
+    if (locked) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Icon(Icons.lock_outline_rounded, size: 12, color: text3),
+      );
+    }
+    if (done) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Icon(Icons.check_circle_outline_rounded,
+            size: 15, color: text2),
+      );
+    }
+    if (active) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Icon(Icons.chevron_right_rounded, size: 16, color: saffron),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+// ── Mastery horizon ────────────────────────────────────────────────────────
+
+class _Horizon extends StatelessWidget {
+  const _Horizon({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+      padding: const EdgeInsets.fromLTRB(22, 18, 20, 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: divider,
+          style: BorderStyle.solid,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('THEN', style: AppText.sectionLabel(color: text3)),
+          const SizedBox(height: 6),
+          Text(
+            'III. Mastery',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+              color: text1,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'The Itihāsa-Purāṇa corpus, the six Darśanas, and the '
+            'philosophical schools — when you are ready.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 12.5,
+              height: 1.5,
+              color: text2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Calendar bottom sheet (full read history) ──────────────────────────────
+
+class _CalendarSheet extends ConsumerWidget {
+  const _CalendarSheet();
+
+  static const double _cell = 34;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final historyAsync = ref.watch(readHistoryProvider);
-    final streakAsync = ref.watch(currentStreakProvider);
+    final bg = isDark ? DColors.bg : LColors.bg;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
 
-    final history = historyAsync.value ?? {};
-    final streak = streakAsync.value ?? 0;
+    final history = ref.watch(readHistoryProvider).value ?? const <String>{};
+    final streak = ref.watch(currentStreakProvider).value ?? 0;
 
-    final today = DateTime.now();
+    final today = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
     final rangeStart = today.subtract(const Duration(days: 29));
-
-    // Align grid to Monday of the week containing rangeStart.
-    // weekday: Mon=1 … Sun=7
     final firstMonday =
         rangeStart.subtract(Duration(days: rangeStart.weekday - 1));
 
-    // Build a flat list of nullable days: null = padding cell before rangeStart.
     final gridDays = <DateTime?>[];
     var d = firstMonday;
     while (!d.isAfter(today)) {
       gridDays.add(d.isBefore(rangeStart) ? null : d);
       d = d.add(const Duration(days: 1));
     }
-    // Pad tail to a full row of 7.
     while (gridDays.length % 7 != 0) {
       gridDays.add(null);
     }
+    const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-    const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-    return RepaintBoundary(
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      padding: const EdgeInsets.fromLTRB(22, 8, 22, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: dividerSoft,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Row(
               children: [
-                Icon(
-                  streak > 0
-                      ? Icons.local_fire_department_rounded
-                      : Icons.local_fire_department_outlined,
-                  color:
-                      streak >= 7 ? AppColors.saffron : AppColors.textSecondary,
-                  size: 18,
-                ),
-                const SizedBox(width: AppSpacing.xs),
+                Text('Your reading days',
+                    style: AppText.sectionName(color: text1)),
+                const Spacer(),
                 Text(
-                  streak > 0 ? '$streak day streak' : 'Start your streak today',
-                  style: context.ts.labelMedium.copyWith(
-                    color: streak >= 7 ? AppColors.saffron : null,
-                  ),
+                  streak > 0 ? '$streak day streak' : 'No streak yet',
+                  style: AppText.sectionLabel(
+                      color: streak >= 7 ? saffron : text3),
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: dayLabels
-                  .map(
-                    (label) => SizedBox(
-                      width: _kCellSize,
-                      child: Text(
-                        label,
-                        style: context.ts.caption.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            ...List.generate(gridDays.length ~/ 7, (rowIndex) {
-              final rowDays = gridDays.skip(rowIndex * 7).take(7).toList();
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: rowDays.map((day) {
-                    if (day == null) {
-                      return const SizedBox(width: _kCellSize, height: _kCellSize);
-                    }
-                    final dateStr = _dateString(day);
-                    final isToday = dateStr == _dateString(today);
-                    final wasRead = history.contains(dateStr);
-                    return Container(
-                      width: _kCellSize,
-                      height: _kCellSize,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: wasRead
-                            ? (isDark ? AppColors.saffronOnDark : AppColors.saffron)
-                            : Colors.transparent,
-                        border: isToday && !wasRead
-                            ? Border.all(color: AppColors.saffron)
-                            : null,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${day.day}',
-                        style: context.ts.caption.copyWith(
-                          color: wasRead
-                              ? (isDark ? AppColors.bgDark : AppColors.cream)
-                              : isToday
-                                  ? AppColors.saffron
-                                  : AppColors.textHint,
-                          fontWeight: wasRead || isToday
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+          ),
+          Row(
+            children: [
+              for (final l in labels)
+                SizedBox(
+                  width: _cell,
+                  child: Text(
+                    l,
+                    textAlign: TextAlign.center,
+                    style: AppText.sectionLabel(color: text3),
+                  ),
                 ),
-              );
-            }),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'Read any verse or complete a module card to fill a day',
-              style: context.ts.caption.copyWith(
-                color: AppColors.textSecondary,
+            ],
+          ),
+          const SizedBox(height: 6),
+          for (var row = 0; row < gridDays.length ~/ 7; row++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  for (final day in gridDays.skip(row * 7).take(7))
+                    SizedBox(
+                      width: _cell,
+                      height: _cell,
+                      child: day == null
+                          ? const SizedBox.shrink()
+                          : _CalendarCell(
+                              day: day,
+                              today: today,
+                              read: history.contains(_ymd(day)),
+                              saffron: saffron,
+                              divider: divider,
+                              text1: text1,
+                              text3: text3,
+                            ),
+                    ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Level 1 header ────────────────────────────────────────────────────────
-
-class _LevelHeader extends StatelessWidget {
-  const _LevelHeader({
-    required this.title,
-    required this.subtitle,
-    required this.completedCount,
-    required this.totalCount,
-  });
-
-  final String title;
-  final String subtitle;
-  final int completedCount;
-  final int totalCount;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final progress = totalCount > 0 ? completedCount / totalCount : 0.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: context.ts.sectionLabel,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(subtitle, style: context.ts.caption),
-        const SizedBox(height: AppSpacing.md),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: isDark ? AppColors.borderDark : AppColors.border,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.saffron),
-            minHeight: 4,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          '$completedCount of $totalCount completed',
-          style: context.ts.caption,
-        ),
-      ],
-    );
-  }
-}
-
-// ── Level 2 header ────────────────────────────────────────────────────────
-
-class _Level2Header extends StatelessWidget {
-  const _Level2Header({
-    required this.completedCount,
-    required this.totalCount,
-    required this.unlocked,
-    required this.level1Completed,
-  });
-
-  final int completedCount;
-  final int totalCount;
-  final bool unlocked;
-  final int level1Completed;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final progress = totalCount > 0 ? completedCount / totalCount : 0.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Divider(color: isDark ? AppColors.dividerDark : AppColors.divider),
-        const SizedBox(height: AppSpacing.lg),
-        Row(
-          children: [
-            Text(
-              'II — Deepening',
-              style: context.ts.sectionLabel,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            if (!unlocked)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.borderDark : AppColors.border,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.lock_outline_rounded,
-                      size: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text('Locked', style: context.ts.caption),
-                  ],
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          unlocked
-              ? 'Dive deeper into the primary texts.'
-              : 'Complete 4 Foundations modules to begin. ($level1Completed/4 done)',
-          style: context.ts.caption,
-        ),
-        if (unlocked) ...[
-          const SizedBox(height: AppSpacing.md),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: isDark ? AppColors.borderDark : AppColors.border,
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.saffron),
-              minHeight: 4,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 8),
           Text(
-            '$completedCount of $totalCount completed',
-            style: context.ts.caption,
+            'Read any verse or complete a module card to fill a day.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontStyle: FontStyle.italic,
+              fontSize: 12,
+              height: 1.4,
+              color: text2,
+            ),
           ),
         ],
-      ],
+      ),
     );
   }
 }
 
-// ── Module icon with progress ring ────────────────────────────────────────
-
-class _ModuleIcon extends StatelessWidget {
-  const _ModuleIcon({
-    required this.locked,
-    required this.isCompleted,
-    required this.isStarted,
-    required this.progress,
-    required this.sequence,
+class _CalendarCell extends StatelessWidget {
+  const _CalendarCell({
+    required this.day,
+    required this.today,
+    required this.read,
+    required this.saffron,
+    required this.divider,
+    required this.text1,
+    required this.text3,
   });
 
-  final bool locked;
-  final bool isCompleted;
-  final bool isStarted;
-  final double progress;
-  final int sequence;
+  final DateTime day;
+  final DateTime today;
+  final bool read;
+  final Color saffron;
+  final Color divider;
+  final Color text1;
+  final Color text3;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (locked) {
-      return Container(
-        width: 44,
-        height: 44,
+    final isToday = day == today;
+    return Center(
+      child: Container(
+        width: 30,
+        height: 30,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.borderDark : AppColors.border,
-          borderRadius: BorderRadius.circular(10),
+          shape: BoxShape.circle,
+          color: read ? saffron : Colors.transparent,
+          border: isToday && !read ? Border.all(color: saffron) : null,
         ),
         alignment: Alignment.center,
-        child: const Icon(
-          Icons.lock_outline_rounded,
-          color: AppColors.textSecondary,
-          size: 18,
-        ),
-      );
-    }
-
-    if (isCompleted) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: AppColors.successLight,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.check_rounded,
-          color: AppColors.success,
-          size: 22,
-        ),
-      );
-    }
-
-    if (isStarted) {
-      return SizedBox(
-        width: 44,
-        height: 44,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: CircularProgressIndicator(
-                value: progress,
-                strokeWidth: 3,
-                backgroundColor: isDark ? AppColors.borderDark : AppColors.border,
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppColors.saffron),
-              ),
-            ),
-            Text(
-              '$sequence',
-              style: context.ts.labelMedium.copyWith(
-                color: AppColors.saffron,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: AppColors.warmGrey10,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        '$sequence',
-        style: context.ts.labelLarge.copyWith(
-          color: AppColors.warmGrey80,
-        ),
-      ),
-    );
-  }
-}
-
-// ── Module card ───────────────────────────────────────────────────────────
-
-class _ModuleCard extends StatelessWidget {
-  const _ModuleCard({required this.module, this.locked = false});
-
-  final LearningModule module;
-  final bool locked;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isCompleted = module.isCompleted;
-    final isStarted = module.cardsRead > 0 && !isCompleted;
-    final progress =
-        module.cardCount > 0 ? module.cardsRead / module.cardCount : 0.0;
-
-    return InkWell(
-      onTap: locked
-          ? () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Complete 4 Foundations modules to unlock Deepening.',
-                  ),
-                  duration: Duration(seconds: 2),
-                ),
-              )
-          : () => context.push('/learn/${module.id}'),
-      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-      child: AnimatedOpacity(
-        opacity: locked ? 0.5 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-            border: Border.all(
-              color: isCompleted
-                  ? AppColors.successMuted
-                  : isStarted
-                      ? AppColors.saffronBorder
-                      : isDark
-                          ? AppColors.borderDark
-                          : AppColors.border,
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _ModuleIcon(
-                locked: locked,
-                isCompleted: isCompleted,
-                isStarted: isStarted,
-                progress: progress,
-                sequence: module.sequence,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(module.title, style: context.ts.labelLarge),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      module.hook,
-                      style: context.ts.caption,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.schedule_outlined,
-                          size: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${module.estimatedMinutes} min',
-                          style: context.ts.caption,
-                        ),
-                        if (isStarted) ...[
-                          const SizedBox(width: AppSpacing.md),
-                          Text(
-                            '${module.cardsRead}/${module.cardCount} cards',
-                            style: context.ts.captionHighlight,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Icon(
-                locked
-                    ? Icons.lock_outline_rounded
-                    : Icons.chevron_right_rounded,
-                color: AppColors.textSecondary,
-                size: 20,
-              ),
-            ],
+        child: Text(
+          '${day.day}',
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontSize: 11,
+            fontWeight: read || isToday ? FontWeight.w600 : FontWeight.w400,
+            color: read
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? DColors.bg
+                    : LColors.bg)
+                : isToday
+                    ? saffron
+                    : text3,
           ),
         ),
       ),
