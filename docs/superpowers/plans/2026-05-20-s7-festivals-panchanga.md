@@ -1,9 +1,21 @@
 # S7 — Festivals & Panchāṅga Almanac
 
-> **Status:** spec + plan (build pending). The roadmap's
-> `2026-05-17-festivals-rewrite.md` was never written; this replaces it.
-> **Source of truth:** `New Design/screen-08-festivals.html`. No
-> `.claude/screen_specs/10_*` file exists — this doc is the spec.
+> **Status:** ENGINE DONE + verified (2026-05-20). Almanac UI pending.
+> The roadmap's `2026-05-17-festivals-rewrite.md` was never written; this
+> replaces it. **Source of truth:** `New Design/screen-08-festivals.html`.
+> No `.claude/screen_specs/10_*` file exists — this doc is the spec.
+>
+> **⚠ screen-08's printed pañcāṅga values are illustrative placeholders.**
+> The verified engine disagrees with the mockup's May-2026 tithi/nakṣatra
+> by ~5 tithis. The engine is correct (see below); the almanac UI must
+> render the engine's output, not the mockup's numbers.
+>
+> **Engine — DONE.** `lib/core/panchanga/` (`panchanga.dart` +
+> `panchanga_names.dart`), no external dependency — the Meeus solar (ch. 25)
+> and abridged 35-term lunar (ch. 47) series are implemented directly.
+> `astronomia` was not needed. Verified against Meeus worked example 47.a
+> (<0.05°) and the 2026 equinox; 7 tests in `test/core/panchanga_test.dart`.
+> API: `computePanchanga(DateTime) → Panchanga`.
 
 ## What screen-08 actually is
 
@@ -87,14 +99,17 @@ and a `category` field; backfill the 12 entries in `festival_data_2026.dart`.
 
 ## Build order
 
-1. Add `astronomia`; build `core/panchanga/` engine + name tables.
-2. Engine unit tests — verify against external reference dates (human check).
-3. `Festival` category enum + field + backfill data.
-4. Rewrite `festival_calendar_page.dart` to the almanac (banner, filter,
-   day rows) — heritage tokens, both themes.
+1. ~~Build `core/panchanga/` engine + name tables.~~ **DONE + verified.**
+2. ~~Engine unit tests.~~ **DONE — 7 tests, textbook-verified.**
+3. `Festival` category enum + field + backfill `festival_data_2026.dart`.
+4. Rewrite `festival_calendar_page.dart` to the almanac (panchāṅga banner
+   from `computePanchanga`, filter strip, day rows with per-day
+   `computePanchanga`) — heritage tokens, both themes.
 5. Festival detail heritage restyle.
 6. Widget tests; `flutter analyze`; full suite green.
 7. On-device visual smoke (both themes) — owed to the user.
+
+Steps 3–7 remain. The hard, risk-bearing part (the verified engine) is done.
 
 ## Risks
 
