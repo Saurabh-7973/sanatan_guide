@@ -797,6 +797,7 @@ class _ResetRow extends ConsumerWidget {
     );
     if (confirmed != true || !context.mounted) return;
     // Each notifier setter persists to SharedPreferences; reset is durable.
+    // No analytics event here — reset is a bulk restore, not a user toggle.
     await ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.system);
     await ref.read(fontSizeProvider.notifier).setFontSize(kDefaultFontSize);
     await ref.read(localeProvider.notifier).setLocale(null);

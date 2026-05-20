@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/settings/pages/settings_page.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
 
 Widget _harness({Brightness brightness = Brightness.light}) {
   final router = GoRouter(
@@ -85,5 +87,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('at /credits'), findsOneWidget);
+  });
+
+  testWidgets('Reset confirm dialog restores defaults and snackbars',
+      (tester) async {
+    await _pumpSettings(tester);
+
+    // Move providers off their defaults so the reset is observable.
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsPage)),
+    );
+    await container
+        .read(themeModeProvider.notifier)
+        .setThemeMode(ThemeMode.dark);
+    await container.read(fontSizeProvider.notifier).setFontSize(22);
+    await tester.pump();
+
+    await tester.tap(find.text('Reset all settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Reset'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(themeModeProvider), ThemeMode.system);
+    expect(container.read(fontSizeProvider), 16.0); // kDefaultFontSize
+    expect(find.text('Settings reset'), findsOneWidget);
   });
 }
