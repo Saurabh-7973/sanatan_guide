@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/pages/bookmarks_page.dart';
-import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmark_notes_provider.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 
 EnrichedBookmark _b({
@@ -13,6 +12,7 @@ EnrichedBookmark _b({
   required int verseNum,
   String sanskrit = 'धर्मक्षेत्रे कुरुक्षेत्रे',
   String? english = 'On the field of dharma',
+  String? noteText,
   Duration ago = const Duration(days: 2),
 }) =>
     EnrichedBookmark(
@@ -23,18 +23,13 @@ EnrichedBookmark _b({
       scriptureCode: scriptureCode,
       chapterNum: chapterNum,
       verseNum: verseNum,
+      noteText: noteText,
     );
 
-Widget _harness({
-  required List<EnrichedBookmark> bookmarks,
-  Map<String, String?> notes = const {},
-}) {
+Widget _harness({required List<EnrichedBookmark> bookmarks}) {
   return ProviderScope(
     overrides: [
       enrichedBookmarksProvider.overrideWith((_) => Stream.value(bookmarks)),
-      for (final entry in notes.entries)
-        bookmarkNoteProvider(entry.key)
-            .overrideWith((_) async => entry.value),
     ],
     child: const MaterialApp(home: BookmarksPage()),
   );
@@ -110,11 +105,9 @@ void main() {
           scriptureCode: 'bhagavad_gita',
           chapterNum: 2,
           verseNum: 47,
+          noteText: 'The line my father read aloud at his retirement.',
         ),
       ],
-      notes: const {
-        'BG.2.47': 'The line my father read aloud at his retirement.',
-      },
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
@@ -134,7 +127,6 @@ void main() {
           verseNum: 47,
         ),
       ],
-      notes: const {'BG.2.47': null},
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 500));
 

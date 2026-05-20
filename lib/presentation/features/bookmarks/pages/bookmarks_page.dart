@@ -7,7 +7,6 @@ import 'package:sanatan_guide/core/utils/devanagari.dart';
 import 'package:sanatan_guide/core/utils/nav_logger.dart';
 import 'package:sanatan_guide/data/datasources/local/daos/bookmarks_dao.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
-import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmark_notes_provider.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmark_sort_provider.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
@@ -536,7 +535,7 @@ class _GroupHeader extends StatelessWidget {
 // Leaf card
 // ─────────────────────────────────────────────────────────────────────────
 
-class _LeafCard extends ConsumerWidget {
+class _LeafCard extends StatelessWidget {
   const _LeafCard({
     required this.bookmark,
     required this.entry,
@@ -550,7 +549,7 @@ class _LeafCard extends ConsumerWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
@@ -559,8 +558,9 @@ class _LeafCard extends ConsumerWidget {
     final divider = isDark ? DColors.divider : LColors.divider;
     final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
-    final noteAsync = ref.watch(bookmarkNoteProvider(bookmark.verseId));
-    final note = noteAsync.value;
+    // Personal note — the same `verses.note_text` the verse detail screen
+    // writes; a note saved while reading now shows on its bookmark.
+    final note = bookmark.noteText;
 
     final coordText = _formatCoord(entry, showShortCode);
 
