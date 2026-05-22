@@ -171,4 +171,33 @@ void main() {
       );
     });
   });
+
+  group('compareVerseIds', () {
+    test('Bhagavad Gita verses keep ascending order', () {
+      expect(compareVerseIds('BG.1.1', 'BG.1.2'), lessThan(0));
+      expect(compareVerseIds('BG.1.2', 'BG.1.1'), greaterThan(0));
+    });
+
+    test('numeric, not lexical — BG.2.47 sorts after BG.2.9', () {
+      expect(compareVerseIds('BG.2.47', 'BG.2.9'), greaterThan(0));
+    });
+
+    test('Rigveda sukta boundary — RV.1.1.9 before RV.1.2.1', () {
+      expect(compareVerseIds('RV.1.1.9', 'RV.1.2.1'), lessThan(0));
+    });
+
+    test('Rigveda numeric — RV.1.1.10 after RV.1.1.9', () {
+      expect(compareVerseIds('RV.1.1.10', 'RV.1.1.9'), greaterThan(0));
+    });
+
+    test('identical ids compare equal', () {
+      expect(compareVerseIds('RV.1.1.1', 'RV.1.1.1'), 0);
+    });
+
+    test('sorting a scrambled Rigveda chapter yields reading order', () {
+      final ids = ['RV.1.2.1', 'RV.1.1.10', 'RV.1.1.2', 'RV.1.1.1']
+        ..sort(compareVerseIds);
+      expect(ids, ['RV.1.1.1', 'RV.1.1.2', 'RV.1.1.10', 'RV.1.2.1']);
+    });
+  });
 }

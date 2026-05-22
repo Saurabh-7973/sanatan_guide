@@ -10,6 +10,7 @@ import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/services/section_theme_service.dart';
 import 'package:sanatan_guide/core/utils/devanagari.dart';
 import 'package:sanatan_guide/core/utils/nav_logger.dart';
+import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
@@ -141,11 +142,21 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
                     ),
                   ),
                   (verses) {
-                    final sorted = [...verses]
-                      ..sort((a, b) => a.verseNum.compareTo(b.verseNum));
+                    // Nested texts (Ṛgveda Sukta, etc.) reset verseNum each
+                    // sub-unit, so it repeats across the chapter. Detect that
+                    // and order by natural id; flat texts keep verseNum order.
+                    final flatNumbering =
+                        verses.map((v) => v.verseNum).toSet().length ==
+                            verses.length;
+                    final sorted = [...verses]..sort(
+                        flatNumbering
+                            ? (a, b) => a.verseNum.compareTo(b.verseNum)
+                            : (a, b) => compareVerseIds(a.id, b.id),
+                      );
                     _verseCount = sorted.length;
                     return _LoadedBody(
                       verses: sorted,
+                      flatNumbering: flatNumbering,
                       scriptureId: widget.scriptureId,
                       chapterNum: widget.chapterNum,
                       bookNum: widget.bookNum,
@@ -171,6 +182,7 @@ class _VerseListPageState extends ConsumerState<VerseListPage>
 class _LoadedBody extends ConsumerWidget {
   const _LoadedBody({
     required this.verses,
+    required this.flatNumbering,
     required this.scriptureId,
     required this.chapterNum,
     required this.bookNum,
@@ -180,6 +192,11 @@ class _LoadedBody extends ConsumerWidget {
   });
 
   final List<Verse> verses;
+
+  /// True when `verseNum` is unique across the chapter (flat texts like the
+  /// Gītā). False for nested texts where `verseNum` repeats per sub-unit —
+  /// then list position drives row numbers and section headers.
+  final bool flatNumbering;
   final String scriptureId;
   final int chapterNum;
   final int? bookNum;
@@ -217,20 +234,22 @@ class _LoadedBody extends ConsumerWidget {
     }
 
     final size = _groupSize;
-    final lastVerseNum = verses.last.verseNum;
-    final scriptureLabel = verses.isNotEmpty
-        ? verses.first.scripture.displayName
-        : scriptureId;
+    // Flat texts group by verseNum; nested texts (verseNum repeats) group by
+    // 1-based list position so decade headers stay sequential.
+    int positionOf(Verse v, int i) => flatNumbering ? v.verseNum : i + 1;
+    final lastPosition = positionOf(verses.last, verses.length - 1);
+    final scriptureLabel =
+        verses.isNotEmpty ? verses.first.scripture.displayName : scriptureId;
     final entries = <_ListItem>[];
     var currentGroup = -1;
     for (var i = 0; i < verses.length; i++) {
       final v = verses[i];
-      final group = (v.verseNum - 1) ~/ size;
+      final group = (positionOf(v, i) - 1) ~/ size;
       if (group != currentGroup) {
         final start = group * size + 1;
         // Clamp the decade's end to the actual last verse, so Karma Yoga
         // (43 verses) shows "VERSES 41 — 43" instead of "41 — 50".
-        final end = ((group + 1) * size).clamp(start, lastVerseNum);
+        final end = ((group + 1) * size).clamp(start, lastPosition);
         final raw = (v.english?.trim().isNotEmpty ?? false)
             ? v.english!.trim()
             : v.sanskrit.trim();
@@ -272,9 +291,11 @@ class _LoadedBody extends ConsumerWidget {
 
   Widget _verseTile(Verse v, int orderIndex) {
     final row = KeyedSubtree(
-      key: ValueKey<int>(v.verseNum),
+      // verseNum repeats in nested texts — key on the unique id.
+      key: ValueKey<String>(v.id),
       child: _VerseRow(
         verse: v,
+        displayNumber: flatNumbering ? v.verseNum : orderIndex + 1,
         scriptureId: scriptureId,
         isDark: isDark,
       ),
@@ -782,11 +803,16 @@ class _VerseSectionHeader extends ConsumerWidget {
 class _VerseRow extends ConsumerWidget {
   const _VerseRow({
     required this.verse,
+    required this.displayNumber,
     required this.scriptureId,
     required this.isDark,
   });
 
   final Verse verse;
+
+  /// Row badge number — `verseNum` for flat texts, 1-based list position
+  /// for nested texts where `verseNum` repeats.
+  final int displayNumber;
   final String scriptureId;
   final bool isDark;
 
@@ -833,7 +859,7 @@ class _VerseRow extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 1),
                   child: DandaCoord.multipart(
-                    parts: [verse.verseNum],
+                    parts: [displayNumber],
                     isDark: isDark,
                     fontSize: 13,
                     colorOverride: dandaColor,

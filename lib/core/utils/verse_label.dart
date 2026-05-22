@@ -123,3 +123,26 @@ String getVerseLabel(Verse verse) {
   }
   return 'Verse ${verse.verseNum}';
 }
+
+/// Natural-order comparison of two composite verse ids (e.g. `RV.1.1.10`).
+///
+/// Compares segment by segment, numerically where both segments parse as
+/// integers. This keeps reading order intact for nested texts: `RV.1.1.9`
+/// sorts before `RV.1.2.1`, and `RV.1.1.10` after `RV.1.1.9` — plain
+/// [String.compareTo] would place `"10"` before `"2"`. The leading
+/// scripture code compares as text, so ids from different texts stay
+/// grouped. Use this instead of `verseNum` ordering when a chapter nests
+/// sub-units (Ṛgveda Sukta, Mahābhārata Adhyāya) and `verseNum` repeats.
+int compareVerseIds(String a, String b) {
+  final pa = a.split('.');
+  final pb = b.split('.');
+  for (var i = 0; i < pa.length && i < pb.length; i++) {
+    final na = int.tryParse(pa[i]);
+    final nb = int.tryParse(pb[i]);
+    final cmp = (na != null && nb != null)
+        ? na.compareTo(nb)
+        : pa[i].compareTo(pb[i]);
+    if (cmp != 0) return cmp;
+  }
+  return pa.length.compareTo(pb.length);
+}
