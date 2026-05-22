@@ -89,8 +89,8 @@ double julianDay(DateTime instant) {
   final utc = instant.toUtc();
   var year = utc.year;
   var month = utc.month;
-  final dayFraction = utc.day +
-      (utc.hour + utc.minute / 60.0 + utc.second / 3600.0) / 24.0;
+  final dayFraction =
+      utc.day + (utc.hour + utc.minute / 60.0 + utc.second / 3600.0) / 24.0;
   if (month <= 2) {
     year -= 1;
     month += 12;
@@ -171,10 +171,7 @@ double moonLongitude(double t) {
       0.0018819 * t2 +
       t3 / 545868.0 -
       t4 / 113065000.0;
-  final m = 357.5291092 +
-      35999.0502909 * t -
-      0.0001536 * t2 +
-      t3 / 24490000.0;
+  final m = 357.5291092 + 35999.0502909 * t - 0.0001536 * t2 + t3 / 24490000.0;
   final mp = 134.9633964 +
       477198.8675055 * t +
       0.0087414 * t2 +
@@ -188,8 +185,8 @@ double moonLongitude(double t) {
 
   var sum = 0.0;
   for (final term in _moonTerms) {
-    final arg = (term[0] * d + term[1] * m + term[2] * mp + term[3] * f) *
-        _deg2rad;
+    final arg =
+        (term[0] * d + term[1] * m + term[2] * mp + term[3] * f) * _deg2rad;
     sum += term[4] * math.sin(arg);
   }
   return _norm360(lp + sum / 1000000.0);
@@ -253,4 +250,70 @@ Panchanga computePanchanga(DateTime instant) {
     karana: karana,
     vara: varaNames[instant.weekday - 1],
   );
+}
+
+// ── Lunar month (amānta, adhika-aware) ──────────────────────────────────────
+
+/// The sidereal solar rāśi for [instant]: 0 = Meṣa … 11 = Mīna.
+int solarRashi(DateTime instant) {
+  final t = (julianDay(instant) - 2451545.0) / 36525.0;
+  return (_norm360(sunLongitude(t) - lahiriAyanamsa(t)) / 30.0).floor() % 12;
+}
+
+/// An amānta lunar month — its name index and whether it is an adhika māsa.
+class LunarMonth {
+  const LunarMonth(this.index, this.isAdhika);
+
+  /// Caitra = 0 … Phālguna = 11.
+  final int index;
+
+  /// True for an adhika (Puruṣottama / leap) māsa — a lunar month that
+  /// spans no saṅkrānti. It carries the following nija month's name.
+  final bool isAdhika;
+}
+
+const double _synodicMonth = 29.530588861;
+
+/// Moon−Sun elongation at [instant], signed to (−180°, 180°] — zero at the
+/// new moon, rising ~12°/day.
+double _signedElongation(DateTime instant) {
+  final t = (julianDay(instant) - 2451545.0) / 36525.0;
+  final e = _norm360(moonLongitude(t) - sunLongitude(t));
+  return e > 180.0 ? e - 360.0 : e;
+}
+
+/// The instant of the new moon at or before [date].
+///
+/// Adhika-māsa detection turns on whether a saṅkrānti falls inside a
+/// lunar month — a knife-edge that day-granular sampling cannot resolve,
+/// so the new moon is pinned to the second by bisection.
+DateTime _newMoonOnOrBefore(DateTime date) {
+  final e = _signedElongation(date);
+  final daysSince = (e >= 0 ? e : e + 360.0) / 360.0 * _synodicMonth;
+  final guess = date.subtract(Duration(minutes: (daysSince * 1440.0).round()));
+  var lo = guess.subtract(const Duration(days: 2));
+  var hi = guess.add(const Duration(days: 2));
+  for (var i = 0; i < 42; i++) {
+    final mid = lo.add(Duration(seconds: hi.difference(lo).inSeconds ~/ 2));
+    if (_signedElongation(mid) < 0) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+}
+
+/// The amānta lunar month containing [date].
+///
+/// A nija month is named after the rāśi the Sun occupies at its starting
+/// new moon (Sun in Meṣa → Vaiśākha). A month spanning no saṅkrānti — the
+/// Sun in one rāśi from new moon to new moon — is an adhika māsa and
+/// carries the following nija month's name.
+LunarMonth lunarMonthOf(DateTime date) {
+  final start = _newMoonOnOrBefore(date);
+  final nextStart = _newMoonOnOrBefore(start.add(const Duration(days: 31)));
+  final startRashi = solarRashi(start);
+  final nextRashi = solarRashi(nextStart);
+  return LunarMonth((startRashi + 1) % 12, startRashi == nextRashi);
 }

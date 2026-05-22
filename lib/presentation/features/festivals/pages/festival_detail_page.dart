@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:sanatan_guide/core/panchanga/panchanga.dart';
-import 'package:sanatan_guide/core/utils/panchang_utils.dart';
+import 'package:sanatan_guide/core/panchanga/panchanga_names.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -51,7 +51,10 @@ class FestivalDetailPage extends StatelessWidget {
     final panchanga = computePanchanga(
       DateTime(date.year, date.month, date.day, 6),
     );
-    final hindu = PanchangUtils.getHinduDate(date);
+    final lunarMonth = lunarMonthOf(date);
+    final monthName = lunarMonthNames[lunarMonth.index];
+    final monthLabel =
+        lunarMonth.isAdhika ? 'Adhika ${monthName.iast}' : monthName.iast;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -79,7 +82,7 @@ class FestivalDetailPage extends StatelessWidget {
                 _Hero(
                   festival: festival,
                   panchanga: panchanga,
-                  hindu: hindu,
+                  monthLabel: monthLabel,
                   isDark: isDark,
                 ),
                 _DataGrid(
@@ -131,13 +134,13 @@ class _Hero extends StatelessWidget {
   const _Hero({
     required this.festival,
     required this.panchanga,
-    required this.hindu,
+    required this.monthLabel,
     required this.isDark,
   });
 
   final Festival festival;
   final Panchanga panchanga;
-  final HinduDateInfo hindu;
+  final String monthLabel;
   final bool isDark;
 
   @override
@@ -154,8 +157,7 @@ class _Hero extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '${PanchangUtils.monthIast(hindu.monthName)} · '
-            '${panchanga.tithiLabelIast}',
+            '$monthLabel · ${panchanga.tithiLabelIast}',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.deva,

@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sanatan_guide/core/panchanga/panchanga.dart';
+import 'package:sanatan_guide/core/panchanga/panchanga_names.dart';
 import 'package:sanatan_guide/core/utils/panchang_utils.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
@@ -163,23 +164,26 @@ class _AlmanacViewState extends State<_AlmanacView> {
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    // Build the day cells and group them into lunar-month segments.
+    // Build the day cells and group them into amānta-month segments — a
+    // tithi index that drops below the previous day's has crossed a new
+    // moon into the next lunar month. Each segment is named (adhika-aware)
+    // by the verified engine.
     _segments = [];
     for (var d = _windowStart;
         !d.isAfter(windowEnd);
         d = d.add(const Duration(days: 1))) {
       final cell =
           _DayCell(d, computePanchanga(DateTime(d.year, d.month, d.day, 6)));
-      final hindu = PanchangUtils.getHinduDate(d);
-      final deva = PanchangUtils.monthDeva(hindu.monthName);
       if (_segments.isEmpty ||
-          _segments.last.monthDeva != deva ||
-          _segments.last.vsYear != hindu.vikramSamvatYear) {
+          cell.panchanga.tithiIndex <
+              _segments.last.days.last.panchanga.tithiIndex) {
+        final lm = lunarMonthOf(d);
+        final name = lunarMonthNames[lm.index];
         _segments.add(
           _LunarSegment(
-            deva,
-            PanchangUtils.monthIast(hindu.monthName),
-            hindu.vikramSamvatYear,
+            lm.isAdhika ? 'अधिक ${name.deva}' : name.deva,
+            lm.isAdhika ? 'Adhika ${name.iast}' : name.iast,
+            PanchangUtils.getHinduDate(d).vikramSamvatYear,
           ),
         );
       }

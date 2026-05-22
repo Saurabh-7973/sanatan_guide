@@ -107,10 +107,10 @@ const List<PanchangaName> movableKaranas = [
 ];
 
 /// The 4 fixed (sthira) karaṇas.
-const PanchangaName karanaKimstughna = PanchangaName('किंस्तुघ्न', 'Kiṃstughna');
+const PanchangaName karanaKimstughna =
+    PanchangaName('किंस्तुघ्न', 'Kiṃstughna');
 const PanchangaName karanaShakuni = PanchangaName('शकुनि', 'Śakuni');
-const PanchangaName karanaChatushpada =
-    PanchangaName('चतुष्पाद', 'Catuṣpāda');
+const PanchangaName karanaChatushpada = PanchangaName('चतुष्पाद', 'Catuṣpāda');
 const PanchangaName karanaNaga = PanchangaName('नाग', 'Nāga');
 
 /// The 7 vāras, indexed by `DateTime.weekday` (Mon = 1 … Sun = 7).
@@ -122,4 +122,20 @@ const List<PanchangaName> varaNames = [
   PanchangaName('शुक्रवार', 'Śukravāra'),
   PanchangaName('शनिवार', 'Śanivāra'),
   PanchangaName('रविवार', 'Ravivāra'), // Sun — weekday 7
+];
+
+/// The 12 amānta lunar months, Caitra (index 0) … Phālguna (11).
+const List<PanchangaName> lunarMonthNames = [
+  PanchangaName('चैत्र', 'Caitra'),
+  PanchangaName('वैशाख', 'Vaiśākha'),
+  PanchangaName('ज्येष्ठ', 'Jyeṣṭha'),
+  PanchangaName('आषाढ', 'Āṣāḍha'),
+  PanchangaName('श्रावण', 'Śrāvaṇa'),
+  PanchangaName('भाद्रपद', 'Bhādrapada'),
+  PanchangaName('आश्विन', 'Āśvina'),
+  PanchangaName('कार्तिक', 'Kārttika'),
+  PanchangaName('मार्गशीर्ष', 'Mārgaśīrṣa'),
+  PanchangaName('पौष', 'Pauṣa'),
+  PanchangaName('माघ', 'Māgha'),
+  PanchangaName('फाल्गुन', 'Phālguna'),
 ];

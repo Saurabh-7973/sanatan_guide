@@ -14,15 +14,14 @@ void main() {
     test('Moon longitude matches Meeus worked example 47.a', () {
       // Meeus, "Astronomical Algorithms", example 47.a: 1992 April 12, 0h TD.
       // Geocentric ecliptic longitude λ ≈ 133.162659° (mean equinox of date).
-      final t =
-          (julianDay(DateTime.utc(1992, 4, 12)) - 2451545.0) / 36525.0;
+      final t = (julianDay(DateTime.utc(1992, 4, 12)) - 2451545.0) / 36525.0;
       expect(moonLongitude(t), closeTo(133.1627, 0.05));
     });
 
     test('Sun longitude is ~0° at the March 2026 equinox', () {
       // Vernal equinox 2026: ~20 March 14:46 UTC — Sun apparent longitude 0°.
-      final t = (julianDay(DateTime.utc(2026, 3, 20, 14, 46)) - 2451545.0) /
-          36525.0;
+      final t =
+          (julianDay(DateTime.utc(2026, 3, 20, 14, 46)) - 2451545.0) / 36525.0;
       final lon = sunLongitude(t);
       final delta = lon > 180 ? 360 - lon : lon;
       expect(delta, lessThan(0.1));
@@ -78,6 +77,41 @@ void main() {
     test('vāra tracks the weekday', () {
       final p = computePanchanga(DateTime.utc(2026, 5, 4)); // a Monday
       expect(p.vara.iast, 'Somavāra');
+    });
+  });
+
+  group('amānta lunar month — adhika-aware', () {
+    // Cross-checked against Drik Panchang for 2026: the year carries an
+    // Adhika Jyeṣṭha māsa (17 May – 15 Jun 2026).
+
+    test('Buddha Pūrṇimā falls in Vaiśākha', () {
+      final m = lunarMonthOf(DateTime(2026, 5, 5));
+      expect(m.index, 1); // Vaiśākha
+      expect(m.isAdhika, isFalse);
+    });
+
+    test('mid-May is the Adhika Jyeṣṭha leap month', () {
+      final m = lunarMonthOf(DateTime(2026, 5, 25));
+      expect(m.index, 2); // Jyeṣṭha
+      expect(m.isAdhika, isTrue);
+    });
+
+    test('late June is the nija (regular) Jyeṣṭha', () {
+      final m = lunarMonthOf(DateTime(2026, 6, 25));
+      expect(m.index, 2); // Jyeṣṭha
+      expect(m.isAdhika, isFalse);
+    });
+
+    test('Guru Pūrṇimā (29 Jul) falls in Āṣāḍha', () {
+      final m = lunarMonthOf(DateTime(2026, 7, 29));
+      expect(m.index, 3); // Āṣāḍha
+      expect(m.isAdhika, isFalse);
+    });
+
+    test('Gaṇeśa Caturthī (14 Sep) falls in Bhādrapada', () {
+      final m = lunarMonthOf(DateTime(2026, 9, 14));
+      expect(m.index, 5); // Bhādrapada
+      expect(m.isAdhika, isFalse);
     });
   });
 }
