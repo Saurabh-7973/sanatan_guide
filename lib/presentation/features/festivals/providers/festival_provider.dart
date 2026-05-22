@@ -79,6 +79,7 @@ Future<List<Festival>> festivals(Ref ref) async {
           explainer: festival.explainer,
           deity: festival.deity,
           emoji: festival.emoji,
+          category: festival.category,
           howToObserve: festival.howToObserve,
         );
       } catch (e) {

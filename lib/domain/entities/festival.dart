@@ -1,5 +1,23 @@
 import 'package:flutter/foundation.dart';
 
+/// Tradition-awareness grouping for the Festivals almanac filter strip.
+///
+/// A festival is filed by its *defining* observance: a celebratory parva, a
+/// fasting vrat, or a tradition-specific regional day.
+enum FestivalCategory {
+  majorParva('Major parva', 'Major parvas'),
+  vrat('Vrat', 'Vrats'),
+  regional('Regional', 'Regional');
+
+  const FestivalCategory(this.label, this.pluralLabel);
+
+  /// Singular label for the per-festival almanac meta line.
+  final String label;
+
+  /// Plural label for the filter-strip pill.
+  final String pluralLabel;
+}
+
 @immutable
 class Festival {
   const Festival({
@@ -11,6 +29,7 @@ class Festival {
     required this.explainer,
     required this.deity,
     required this.emoji,
+    required this.category,
     required this.howToObserve,
   });
 
@@ -22,6 +41,7 @@ class Festival {
   final String explainer;
   final String deity;
   final String emoji;
+  final FestivalCategory category;
 
   /// Ordered list of practical observance steps shown on the detail page.
   final List<String> howToObserve;
