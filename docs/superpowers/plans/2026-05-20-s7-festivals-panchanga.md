@@ -120,14 +120,25 @@ and a `category` field; backfill the 12 entries in `festival_data_2026.dart`.
 
 Steps 3–6 done. Step 7 (device smoke) cannot be done by an agent.
 
-### Month-header note
+### Post-build on-device verification (2026-05-22)
 
-The day-row tithi/nakṣatra come from the verified engine. The sticky
-month-header *label* (lunar month + VS year) is taken from `PanchangUtils`
-— the approximate synodic model already shipped on Home — since the label
-is not religiously load-bearing. At a lunar-month boundary the two can
-disagree by ~1 day; a day may briefly sit under the adjacent month chip
-while still showing the correct tithi.
+Verifying the almanac on the emulator surfaced three defects, all fixed:
+
+1. **IAST tofu.** Dot-diacritics (ṣ ṭ ṇ ṛ ṅ) rendered as replacement
+   glyphs — Outfit and Lora lack them; only TiroDevanagari covers them.
+   IAST text now renders in TiroDevanagari; caps aṅga labels are ASCII.
+2. **Missing back button.** `/festivals` is a pushed route; the rewrite
+   dropped the AppBar. A back button was added to the in-content header.
+3. **Wrong lunar-month labels.** The header label first used
+   `PanchangUtils` (approximate, no leap-month logic). 2026 carries an
+   **Adhika Jyeṣṭha māsa** (17 May–15 Jun); the detail hero contradicted
+   its own explainer (showed "Śrāvaṇa" for Guru Pūrṇimā, which is
+   Āṣāḍha). Replaced with an **adhika-aware** computation in the verified
+   engine: `lunarMonthOf()` names the amānta month by the Sun's sidereal
+   rāśi at its starting new moon (new-moon instants pinned by bisection,
+   since adhika detection is a saṅkrānti-vs-new-moon knife-edge). Five
+   engine tests cross-check 2026 against Drik Panchang. Festival dates
+   themselves were confirmed correct.
 
 ## Risks
 
