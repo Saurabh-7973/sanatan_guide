@@ -158,10 +158,9 @@ class _Hero extends StatelessWidget {
             '${panchanga.tithiLabelIast}',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: Fonts.sans,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 3.0,
+              fontFamily: Fonts.deva,
+              fontSize: 11,
+              letterSpacing: 1.5,
               color: saffron,
             ),
           ),
@@ -306,7 +305,7 @@ class _DataGrid extends StatelessWidget {
             children: [
               Expanded(
                 child: _DataCell(
-                  label: 'Nakṣatra',
+                  label: 'Nakshatra',
                   value: panchanga.nakshatra.deva,
                   en: panchanga.nakshatra.iast,
                   isDark: isDark,
@@ -386,7 +385,7 @@ class _DataCell extends StatelessWidget {
           Text(
             en!,
             style: TextStyle(
-              fontFamily: Fonts.sans,
+              fontFamily: Fonts.deva,
               fontSize: 10,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.4,
@@ -478,7 +477,7 @@ class _Disclaimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'Pañcāṅga values are computed for your device timezone. Consult your '
+      'Panchanga values are computed for your device timezone. Consult your '
       'local pandit for regional variations.',
       style: TextStyle(
         fontFamily: Fonts.sans,

@@ -326,30 +326,42 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
-      child: Text.rich(
-        TextSpan(
-          children: [
+      padding: const EdgeInsets.fromLTRB(8, 4, 24, 6),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back, size: 22, color: text1),
+            tooltip: 'Back',
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          const SizedBox(width: 4),
+          Text.rich(
             TextSpan(
-              text: 'पञ्चाङ्ग',
-              style: TextStyle(
-                fontFamily: Fonts.deva,
-                fontSize: 16,
-                color: isDark ? DColors.saffron : LColors.saffron,
-              ),
+              children: [
+                TextSpan(
+                  text: 'पञ्चाङ्ग',
+                  style: TextStyle(
+                    fontFamily: Fonts.deva,
+                    fontSize: 16,
+                    color: isDark ? DColors.saffron : LColors.saffron,
+                  ),
+                ),
+                TextSpan(
+                  text: '  ·  Almanac',
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 15,
+                    color: text1,
+                  ),
+                ),
+              ],
             ),
-            TextSpan(
-              text: '  ·  Almanac',
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontStyle: FontStyle.italic,
-                fontSize: 15,
-                color: isDark ? DColors.text1 : LColors.text1,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -392,7 +404,7 @@ class _PanchangaBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "TODAY'S PANCHĀṄGA",
+            "TODAY'S PANCHANGA",
             style: TextStyle(
               fontFamily: Fonts.sans,
               fontSize: 9.5,
@@ -440,7 +452,7 @@ class _PanchangaBanner extends StatelessWidget {
               children: [
                 Expanded(
                   child: _BannerCell(
-                    label: 'Vāra',
+                    label: 'Vara',
                     value: panchanga.vara.deva,
                     en: _weekdaysFull[date.weekday - 1],
                     isDark: isDark,
@@ -448,7 +460,7 @@ class _PanchangaBanner extends StatelessWidget {
                 ),
                 Expanded(
                   child: _BannerCell(
-                    label: 'Nakṣatra',
+                    label: 'Nakshatra',
                     value: panchanga.nakshatra.deva,
                     en: panchanga.nakshatra.iast,
                     isDark: isDark,
@@ -464,7 +476,7 @@ class _PanchangaBanner extends StatelessWidget {
                 ),
                 Expanded(
                   child: _BannerCell(
-                    label: 'Karaṇa',
+                    label: 'Karana',
                     value: panchanga.karana.deva,
                     en: panchanga.karana.iast,
                     isDark: isDark,
@@ -526,7 +538,7 @@ class _BannerCell extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontFamily: Fonts.sans,
+            fontFamily: Fonts.deva,
             fontSize: 9,
             fontWeight: FontWeight.w500,
             color: text3,
@@ -671,8 +683,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
           Text(
             segment.monthIast,
             style: TextStyle(
-              fontFamily: Fonts.serif,
-              fontStyle: FontStyle.italic,
+              fontFamily: Fonts.deva,
               fontSize: 12.5,
               color: text2,
             ),
@@ -851,7 +862,7 @@ class _DayBody extends StatelessWidget {
               TextSpan(
                 text: '${panchanga.paksha.iast.toUpperCase()}  ',
                 style: TextStyle(
-                  fontFamily: Fonts.sans,
+                  fontFamily: Fonts.deva,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.5,
@@ -884,7 +895,7 @@ class _DayBody extends StatelessWidget {
               TextSpan(
                 text: panchanga.nakshatra.iast,
                 style: TextStyle(
-                  fontFamily: Fonts.sans,
+                  fontFamily: Fonts.deva,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: text3,
@@ -1123,7 +1134,7 @@ class _Disclaimer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       child: Text(
-        'Pañcāṅga is computed for your device timezone. Consult your local '
+        'Panchanga is computed for your device timezone. Consult your local '
         'pandit for regional variations.',
         style: TextStyle(
           fontFamily: Fonts.sans,

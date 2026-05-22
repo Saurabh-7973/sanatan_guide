@@ -35,17 +35,18 @@ void main() {
       (tester) async {
     await _pump(tester);
 
-    expect(find.text("TODAY'S PANCHĀṄGA"), findsOneWidget);
+    expect(find.text("TODAY'S PANCHANGA"), findsOneWidget);
     expect(find.textContaining('Almanac'), findsWidgets);
     expect(find.text('All'), findsOneWidget);
     expect(find.text('Major parvas'), findsOneWidget);
     expect(find.text('Vrats'), findsOneWidget);
     expect(find.text('Regional'), findsOneWidget);
-    // The four aṅga cells of the banner.
-    expect(find.text('VĀRA'), findsOneWidget);
-    expect(find.text('NAKṢATRA'), findsOneWidget);
+    // The four aṅga cells of the banner (ASCII labels — the bundled sans
+    // font lacks the IAST dot-diacritics; see the Tiro-font note).
+    expect(find.text('VARA'), findsOneWidget);
+    expect(find.text('NAKSHATRA'), findsOneWidget);
     expect(find.text('YOGA'), findsOneWidget);
-    expect(find.text('KARAṆA'), findsOneWidget);
+    expect(find.text('KARANA'), findsOneWidget);
   });
 
   testWidgets('the Regional filter shows only regional-category festivals',
