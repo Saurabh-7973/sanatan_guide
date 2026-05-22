@@ -211,7 +211,16 @@ class _SearchTopBar extends StatelessWidget {
                           ),
                           decoration: InputDecoration(
                             isCollapsed: true,
+                            // The app's inputDecorationTheme supplies a
+                            // filled OutlineInputBorder; every border state
+                            // must be overridden or the focused/enabled
+                            // border leaks a second box inside the pill.
                             border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
                             hintText:
                                 'Search verse, phrase, or coordinate…',
                             hintStyle: TextStyle(
