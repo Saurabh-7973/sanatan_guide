@@ -43,129 +43,136 @@ class SettingsPage extends ConsumerWidget {
     final text1 = isDark ? DColors.text1 : LColors.text1;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text(
-          l10n.settingsTitle,
-          style: AppText.settingsTitle(color: text1),
-        ),
-        centerTitle: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: text1),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
           SafeArea(
-            top: false,
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(
-                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
-                bottom: 32,
-              ),
+            child: Column(
               children: [
-                // ── Appearance ──────────────────────────────────────────
-                _SectionHeader(
-                  title: l10n.settingsSectionAppearance,
-                  isDark: isDark,
-                ),
-                const _ThemeRow(),
-
-                // ── Reading ─────────────────────────────────────────────
-                _SectionHeader(
-                  title: l10n.settingsSectionReading,
-                  isDark: isDark,
-                ),
-                const _FontSizeRow(),
-                const _LanguageRow(),
-                const _ExperienceRow(),
-
-                // ── Notifications ───────────────────────────────────────
-                _SectionHeader(
-                  title: l10n.settingsSectionNotifications,
-                  isDark: isDark,
-                ),
-                const _NotificationTimeRow(),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.celebration_outlined,
-                  title: 'Festival alerts',
-                  subtitle: 'Day before each major parva',
-                  trailing: const _SoonTag(),
-                ),
-
-                // ── Data ────────────────────────────────────────────────
-                _SectionHeader(
-                  title: l10n.settingsSectionData,
-                  isDark: isDark,
-                ),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.folder_outlined,
-                  title: 'Storage',
-                  subtitle: 'Scripture library bundled with the app',
-                ),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.ios_share_outlined,
-                  title: 'Export bookmarks',
-                  subtitle: 'Save your saved verses to a file',
-                  trailing: const _SoonTag(),
-                ),
-                const _ClearHistoryRow(),
-
-                // ── About ───────────────────────────────────────────────
-                _SectionHeader(
-                  title: l10n.settingsSectionAbout,
-                  isDark: isDark,
-                ),
-                const _AppVersionRow(),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.auto_stories_outlined,
-                  title: 'Credits & attributions',
-                  trailing: _Chevron(isDark: isDark),
-                  onTap: () => context.push('/credits'),
-                ),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.privacy_tip_outlined,
-                  title: l10n.settingsPrivacyPolicy,
-                  trailing: _ExternalIcon(isDark: isDark),
-                  onTap: () => launchUrl(
-                    Uri.parse(_kPrivacyUrl),
-                    mode: LaunchMode.externalApplication,
+                // Fixed topbar — content scrolls below it, no overlay
+                // collision (the Credits-screen idiom). A transparent pinned
+                // AppBar previously let scrolled rows bleed through the title.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 6, 20, 8),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back, color: text1),
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.settingsTitle,
+                        style: AppText.settingsTitle(color: text1),
+                      ),
+                    ],
                   ),
                 ),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.description_outlined,
-                  title: l10n.settingsTermsOfService,
-                  trailing: _ExternalIcon(isDark: isDark),
-                  onTap: () => launchUrl(
-                    Uri.parse(_kTermsUrl),
-                    mode: LaunchMode.externalApplication,
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 32),
+                    children: [
+                      // ── Appearance ──────────────────────────────────────────
+                      _SectionHeader(
+                        title: l10n.settingsSectionAppearance,
+                        isDark: isDark,
+                      ),
+                      const _ThemeRow(),
+
+                      // ── Reading ─────────────────────────────────────────────
+                      _SectionHeader(
+                        title: l10n.settingsSectionReading,
+                        isDark: isDark,
+                      ),
+                      const _FontSizeRow(),
+                      const _LanguageRow(),
+                      const _ExperienceRow(),
+
+                      // ── Notifications ───────────────────────────────────────
+                      _SectionHeader(
+                        title: l10n.settingsSectionNotifications,
+                        isDark: isDark,
+                      ),
+                      const _NotificationTimeRow(),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.celebration_outlined,
+                        title: 'Festival alerts',
+                        subtitle: 'Day before each major parva',
+                        trailing: const _SoonTag(),
+                      ),
+
+                      // ── Data ────────────────────────────────────────────────
+                      _SectionHeader(
+                        title: l10n.settingsSectionData,
+                        isDark: isDark,
+                      ),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.folder_outlined,
+                        title: 'Storage',
+                        subtitle: 'Scripture library bundled with the app',
+                      ),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.ios_share_outlined,
+                        title: 'Export bookmarks',
+                        subtitle: 'Save your saved verses to a file',
+                        trailing: const _SoonTag(),
+                      ),
+                      const _ClearHistoryRow(),
+
+                      // ── About ───────────────────────────────────────────────
+                      _SectionHeader(
+                        title: l10n.settingsSectionAbout,
+                        isDark: isDark,
+                      ),
+                      const _AppVersionRow(),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.auto_stories_outlined,
+                        title: 'Credits & attributions',
+                        trailing: _Chevron(isDark: isDark),
+                        onTap: () => context.push('/credits'),
+                      ),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.privacy_tip_outlined,
+                        title: l10n.settingsPrivacyPolicy,
+                        trailing: _ExternalIcon(isDark: isDark),
+                        onTap: () => launchUrl(
+                          Uri.parse(_kPrivacyUrl),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                      ),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.description_outlined,
+                        title: l10n.settingsTermsOfService,
+                        trailing: _ExternalIcon(isDark: isDark),
+                        onTap: () => launchUrl(
+                          Uri.parse(_kTermsUrl),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                      ),
+                      _Row(
+                        isDark: isDark,
+                        icon: Icons.feedback_outlined,
+                        title: 'Send feedback',
+                        trailing: _Chevron(isDark: isDark),
+                        onTap: () => context.push('/feedback'),
+                      ),
+
+                      // ── Reset ───────────────────────────────────────────────
+                      _SectionHeader(
+                          title: 'Reset', isDark: isDark, danger: true),
+                      const _ResetRow(),
+                    ],
                   ),
                 ),
-                _Row(
-                  isDark: isDark,
-                  icon: Icons.feedback_outlined,
-                  title: 'Send feedback',
-                  trailing: _Chevron(isDark: isDark),
-                  onTap: () => context.push('/feedback'),
-                ),
-
-                // ── Reset ───────────────────────────────────────────────
-                _SectionHeader(title: 'Reset', isDark: isDark, danger: true),
-                const _ResetRow(),
               ],
             ),
           ),
@@ -502,8 +509,7 @@ class _LanguageChoice extends StatelessWidget {
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     return SimpleDialogOption(
-      onPressed: () =>
-          Navigator.pop(context, value ?? const Locale('_none_')),
+      onPressed: () => Navigator.pop(context, value ?? const Locale('_none_')),
       child: Row(
         children: [
           Icon(
@@ -646,9 +652,8 @@ class _NotificationTimeRow extends ConsumerWidget {
             initialTime: time,
             builder: (context, child) => Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: Theme.of(context)
-                    .colorScheme
-                    .copyWith(primary: saffron),
+                colorScheme:
+                    Theme.of(context).colorScheme.copyWith(primary: saffron),
               ),
               child: child!,
             ),
