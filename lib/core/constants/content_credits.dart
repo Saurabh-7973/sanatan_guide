@@ -6,10 +6,13 @@
 enum ContentLicense { publicDomain, creativeCommons, custom }
 
 /// Library grouping for the credits screen (matches scripture taxonomy).
+///
+/// Ordered śruti-first (Veda → Upaniṣad) then smṛti, mirroring the Library
+/// screen and canonical sequence. CreditsPage renders sections in this order.
 enum CreditCatalogSection {
-  itihasaPurana,
   veda,
   upanishad,
+  itihasaPurana,
   darshanaYoga,
   stotra,
   dharmashastraNiti,
