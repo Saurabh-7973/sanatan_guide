@@ -639,7 +639,16 @@ class _InputArea extends StatelessWidget {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    // Field sits in a custom pill — strip the global
+                    // inputDecorationTheme (filled:true + bordered) or it
+                    // paints its own box inside the pill.
+                    filled: false,
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     hintText: 'Ask anything about the texts…',
                     hintStyle: TextStyle(
                       fontFamily: Fonts.sans,

@@ -636,7 +636,15 @@ class _InputBar extends StatelessWidget {
                   hintStyle: context.ts.bodyMedium.copyWith(
                     color: AppColors.textHint,
                   ),
+                  // Field sits in a custom pill — strip the global
+                  // inputDecorationTheme (filled:true + bordered).
+                  filled: false,
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.sm,
