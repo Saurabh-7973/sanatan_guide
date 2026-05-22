@@ -272,6 +272,21 @@ abstract final class PanchangUtils {
     'Phalguna': 'फाल्गुन',
   };
 
+  static const Map<String, String> _hinduMonthIast = {
+    'Chaitra': 'Caitra',
+    'Vaishakha': 'Vaiśākha',
+    'Jyeshtha': 'Jyeṣṭha',
+    'Ashadha': 'Āṣāḍha',
+    'Shravana': 'Śrāvaṇa',
+    'Bhadrapada': 'Bhādrapada',
+    'Ashwin': 'Āśvina',
+    'Kartik': 'Kārttika',
+    'Margashirsha': 'Mārgaśīrṣa',
+    'Pausha': 'Pauṣa',
+    'Magha': 'Māgha',
+    'Phalguna': 'Phālguna',
+  };
+
   static const Map<String, String> _tithiDeva = {
     'Pratipada': 'प्रतिपदा',
     'Dwitiya': 'द्वितीया',
@@ -308,6 +323,10 @@ abstract final class PanchangUtils {
 
   static String monthDeva(String monthName) =>
       _hinduMonthDeva[monthName] ?? monthName;
+
+  /// IAST transliteration of a Hindu lunar month name (e.g. `Vaiśākha`).
+  static String monthIast(String monthName) =>
+      _hinduMonthIast[monthName] ?? monthName;
 
   static String tithiDeva(String tithiName) =>
       _tithiDeva[tithiName] ?? tithiName;

@@ -1,6 +1,8 @@
 # S7 — Festivals & Panchāṅga Almanac
 
-> **Status:** ENGINE DONE + verified (2026-05-20). Almanac UI pending.
+> **Status:** DONE (2026-05-22). Engine verified 2026-05-20; almanac UI,
+> filter, detail + widget tests built 2026-05-22. Owed: on-device visual
+> smoke in both themes (an agent cannot drive a device).
 > The roadmap's `2026-05-17-festivals-rewrite.md` was never written; this
 > replaces it. **Source of truth:** `New Design/screen-08-festivals.html`.
 > No `.claude/screen_specs/10_*` file exists — this doc is the spec.
@@ -101,15 +103,31 @@ and a `category` field; backfill the 12 entries in `festival_data_2026.dart`.
 
 1. ~~Build `core/panchanga/` engine + name tables.~~ **DONE + verified.**
 2. ~~Engine unit tests.~~ **DONE — 7 tests, textbook-verified.**
-3. `Festival` category enum + field + backfill `festival_data_2026.dart`.
-4. Rewrite `festival_calendar_page.dart` to the almanac (panchāṅga banner
-   from `computePanchanga`, filter strip, day rows with per-day
-   `computePanchanga`) — heritage tokens, both themes.
-5. Festival detail heritage restyle.
-6. Widget tests; `flutter analyze`; full suite green.
-7. On-device visual smoke (both themes) — owed to the user.
+3. ~~`Festival` category enum + field + backfill.~~ **DONE** —
+   `FestivalCategory {majorParva, vrat, regional}`, 12 entries filed by
+   defining observance (8 parva / 3 vrat / 1 regional).
+4. ~~Rewrite `festival_calendar_page.dart` to the almanac.~~ **DONE** —
+   pañcāṅga banner, filter strip, sticky lunar-month headers, day rows
+   (engine per day), moon-phase glyph, iron-red festival names, both themes.
+   Window = current month → Dec 31; an "Earlier this year" list keeps the
+   already-passed festivals reachable (no festival is dropped).
+5. ~~Festival detail heritage restyle.~~ **DONE** — own file
+   `festival_detail_page.dart`: tithi-anchored hero, 2×2 pañcāṅga data grid
+   (verified engine), explainer, observance steps.
+6. ~~Widget tests; analyzer; full suite.~~ **DONE** — 4 widget tests;
+   `flutter analyze` clean; 250 tests green.
+7. On-device visual smoke (both themes) — **still owed to the user.**
 
-Steps 3–7 remain. The hard, risk-bearing part (the verified engine) is done.
+Steps 3–6 done. Step 7 (device smoke) cannot be done by an agent.
+
+### Month-header note
+
+The day-row tithi/nakṣatra come from the verified engine. The sticky
+month-header *label* (lunar month + VS year) is taken from `PanchangUtils`
+— the approximate synodic model already shipped on Home — since the label
+is not religiously load-bearing. At a lunar-month boundary the two can
+disagree by ~1 day; a day may briefly sit under the adjacent month chip
+while still showing the correct tithi.
 
 ## Risks
 

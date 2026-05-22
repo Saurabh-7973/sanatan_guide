@@ -16,6 +16,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'The sun enters Capricorn — a day of gratitude and giving',
     deity: 'Surya',
     emoji: '☀️',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Wake before sunrise and take a bath — ideally in a river or with sesame (til) mixed in the water.',
       'Offer water to the rising sun (Surya Arghya) while reciting the Gayatri Mantra or Om Suryaya Namah.',
@@ -45,6 +46,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'The great night of Shiva — fasting, vigil, and transformation',
     deity: 'Shiva',
     emoji: '🔱',
+    category: FestivalCategory.vrat,
     howToObserve: const [
       'Fast through the day — water, fruits, and milk are permitted. Full fast is traditional but partial is accepted.',
       'Perform abhisheka (ritual bathing) of the Shivalinga with milk, honey, water, and bel leaves.',
@@ -75,6 +77,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'The festival of colours — victory of devotion over arrogance',
     deity: 'Vishnu',
     emoji: '🎨',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'The night before Holi, attend or witness Holika Dahan — the bonfire that commemorates Prahlada\'s devotion.',
       'Walk around the bonfire (parikrama) and offer prayer, remembering what you wish to burn away this year.',
@@ -104,6 +107,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'The birth of Rama — the ideal of dharmic kingship',
     deity: 'Rama',
     emoji: '🏹',
+    category: FestivalCategory.vrat,
     howToObserve: const [
       'Fast through the day or take a single meal — fruits and milk are traditionally permitted.',
       'Read or listen to the Sundara Kanda of the Valmiki Ramayana, or the Ram Charit Manas.',
@@ -133,6 +137,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'Birth of Hanuman — the embodiment of seva and strength',
     deity: 'Hanuman',
     emoji: '🙏',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Recite the Hanuman Chalisa — ideally at sunrise. If possible, complete 7 or 11 recitations.',
       'Offer red flowers, sindoor (vermillion), and sesame oil at a Hanuman temple or home altar.',
@@ -163,6 +168,7 @@ final List<Festival> festivals2026 = [
         'Full moon of the Guru — gratitude for the one who removes darkness',
     deity: 'Vyasa',
     emoji: '🌕',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Rise early and begin the day with study — read a passage from a text given or recommended by your Guru.',
       'If you have a living Guru, offer pranam and express gratitude in person, by letter, or in prayer.',
@@ -192,6 +198,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'Birth of Krishna — the complete avatar',
     deity: 'Krishna',
     emoji: '🦚',
+    category: FestivalCategory.vrat,
     howToObserve: const [
       'Fast through the day — breaking only after midnight when Krishna is born.',
       'Decorate a small cradle (jhula) with flowers and place a baby Krishna murti in it.',
@@ -223,6 +230,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'Birthday of Ganesha — remover of obstacles, lord of beginnings',
     deity: 'Ganesha',
     emoji: '🐘',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Install a clay Ganesha murti at home or join the community installation — eco-friendly clay is traditional.',
       'Offer durva grass (21 blades), red flowers, modak (sweet dumplings), and coconut to Ganesha.',
@@ -254,6 +262,7 @@ final List<Festival> festivals2026 = [
         'Nine nights of the Goddess — the battle of consciousness over inertia',
     deity: 'Durga',
     emoji: '🪔',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Fast for all nine days or on alternate days — fruits, milk, and sendha namak (rock salt) are permitted.',
       'Set up a Devi altar with an image of Durga, Lakshmi, or Saraswati. Light a lamp (akhand jyot) if possible.',
@@ -261,8 +270,7 @@ final List<Festival> festivals2026 = [
       'On the eighth or ninth day (Ashtami or Navami), perform Kanya Puja — worship young girls as forms of the Devi.',
       'Break the fast on Vijayadashami (Dussehra) after morning puja, with prasad shared with family.',
     ],
-    explainer:
-        'Navratri — nine nights — is the great festival of Shakti, the '
+    explainer: 'Navratri — nine nights — is the great festival of Shakti, the '
         'divine feminine principle. The Sharada Navratri in Ashwin is the '
         'most celebrated. Each of the nine nights is dedicated to a different '
         'form of the Goddess: from Shailaputri on the first night to Siddhidatri '
@@ -283,6 +291,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'Victory of Rama over Ravana — the triumph of dharma',
     deity: 'Rama',
     emoji: '🏹',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Begin the day with Ram naam japa — recite "Shri Ram Jai Ram Jai Jai Ram" 108 times.',
       'Read or listen to the Yuddha Kanda of the Ramayana — the battle and victory of Rama.',
@@ -310,9 +319,11 @@ final List<Festival> festivals2026 = [
     name: 'Diwali',
     sanskritName: 'दीपावली',
     date: DateTime(2026, 11, 8),
-    shortDesc: 'Festival of lights — the return of light after the darkest night',
+    shortDesc:
+        'Festival of lights — the return of light after the darkest night',
     deity: 'Lakshmi',
     emoji: '🪔',
+    category: FestivalCategory.majorParva,
     howToObserve: const [
       'Clean and declutter your home in the days before Diwali — Lakshmi does not enter homes of disorder.',
       'On Diwali evening, light diyas (clay lamps) with ghee or sesame oil — at least 13 around the home.',
@@ -343,6 +354,7 @@ final List<Festival> festivals2026 = [
     shortDesc: 'Diwali of the gods — when the devas descend to the Ganga',
     deity: 'Shiva',
     emoji: '🌊',
+    category: FestivalCategory.regional,
     howToObserve: const [
       'If in Varanasi, go to the ghats at dusk — the sight of hundreds of thousands of diyas on the Ganga is transformative.',
       'If not in Varanasi, light diyas on the bank of any river, lake, or body of water near you.',
@@ -350,8 +362,7 @@ final List<Festival> festivals2026 = [
       'Float a diya on a leaf in the water as an offering to the devas said to be present on this night.',
       'Recite the Shiva Tandava Stotram or Om Namah Shivaya 108 times in the evening.',
     ],
-    explainer:
-        'Dev Deepawali — Diwali of the Gods — falls on the full moon of '
+    explainer: 'Dev Deepawali — Diwali of the Gods — falls on the full moon of '
         'Kartika, fifteen days after Diwali. It is most magnificently '
         'celebrated in Varanasi, where the ghats of the Ganga are lit with '
         'hundreds of thousands of diyas.\n\n'
