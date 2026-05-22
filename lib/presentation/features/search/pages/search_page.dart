@@ -151,8 +151,14 @@ class _SearchTopBar extends StatelessWidget {
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final divider = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final surface = isDark ? DColors.surface : LColors.surface;
     final activeBorder = saffron.withValues(alpha: 0.45);
-    final activeFill = saffron.withValues(alpha: isDark ? 0.06 : 0.04);
+    // Opaque fills. A translucent tint let the WarmBackdrop glow bleed
+    // through unevenly in dark mode — a visible patch behind the icon.
+    final activeFill = Color.alphaBlend(
+      saffron.withValues(alpha: isDark ? 0.06 : 0.04),
+      surface,
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
@@ -177,7 +183,7 @@ class _SearchTopBar extends StatelessWidget {
                   height: 44,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: hasFocus ? activeFill : Colors.transparent,
+                    color: hasFocus ? activeFill : surface,
                     borderRadius: BorderRadius.circular(26),
                     border: Border.all(
                       color: hasFocus ? activeBorder : divider,
@@ -211,10 +217,12 @@ class _SearchTopBar extends StatelessWidget {
                           ),
                           decoration: InputDecoration(
                             isCollapsed: true,
-                            // The app's inputDecorationTheme supplies a
-                            // filled OutlineInputBorder; every border state
-                            // must be overridden or the focused/enabled
-                            // border leaks a second box inside the pill.
+                            // The app's inputDecorationTheme sets filled:true
+                            // + a filled OutlineInputBorder. Without these
+                            // overrides the field paints its own surface
+                            // rectangle and border inside the custom pill —
+                            // a visible patch and a second box.
+                            filled: false,
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
