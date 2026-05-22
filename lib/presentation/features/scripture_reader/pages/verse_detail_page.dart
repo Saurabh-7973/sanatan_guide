@@ -964,10 +964,16 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                       child: Text(
                         verse.transliteration!.trim(),
                         textAlign: TextAlign.center,
+                        // IAST dot-diacritics (ṛ ṣ ṭ ṇ) tofu in Lora — only
+                        // TiroDevanagari covers them (see commit f6647d6).
                         style: AppText.commentary(
                           color: isDark ? DColors.text2 : LColors.text2,
                           size: 14 * sanskritScale,
-                        ).copyWith(height: 1.75),
+                        ).copyWith(
+                          fontFamily: Fonts.deva,
+                          fontStyle: FontStyle.normal,
+                          height: 1.75,
+                        ),
                       ),
                     ),
                   ],
@@ -1379,7 +1385,11 @@ class _WordCallout extends ConsumerWidget {
             if (translit?.trim().isNotEmpty ?? false) ...[
               const SizedBox(height: 4),
               Text(translit!.trim(),
-                  style: AppText.commentary(color: saffron, size: 12)),
+                  // IAST glyphs render only in TiroDevanagari (commit f6647d6).
+                  style: AppText.commentary(color: saffron, size: 12).copyWith(
+                    fontFamily: Fonts.deva,
+                    fontStyle: FontStyle.normal,
+                  )),
             ],
             const SizedBox(height: 8),
             body,
