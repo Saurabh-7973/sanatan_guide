@@ -27,6 +27,7 @@ import 'package:sanatan_guide/presentation/features/settings/providers/theme_mod
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 
 const _kPrivacyUrl =
     'https://gist.github.com/Saurabh-7973/96cf400ffbbbece5ece2d5d4c3f0a16c';
@@ -294,7 +295,7 @@ class _Chevron extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text3 = isDark ? DColors.text3 : LColors.text3;
-    return Icon(Icons.chevron_right_rounded, size: 18, color: text3);
+    return MockupRowChevron(color: text3);
   }
 }
 

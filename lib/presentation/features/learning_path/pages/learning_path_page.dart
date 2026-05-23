@@ -18,6 +18,7 @@ import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 
 /// Level 1 completions required to unlock Level 2 (Deepening). Preserved
 /// verbatim from the pre-restyle screen.
@@ -253,7 +254,10 @@ class _StreakStrip extends ConsumerWidget {
                             fontFamilyFallback: AppFontFallback.latin,
                             fontStyle: FontStyle.italic,
                             fontSize: 13,
-                            color: text1,
+                            // Mockup `.streak-count .num` is saffron, not
+                            // text1 — the number is the saffron-coloured
+                            // anchor that makes the row read as a streak.
+                            color: isDark ? DColors.saffron : LColors.saffron,
                           ),
                         ),
                         TextSpan(
@@ -289,7 +293,7 @@ class _StreakStrip extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 14),
-              Icon(Icons.chevron_right_rounded, size: 18, color: text3),
+              MockupRowChevron(color: text3),
             ],
           ),
         ),
@@ -892,7 +896,7 @@ class _ModuleStateIcon extends StatelessWidget {
     if (active) {
       return Padding(
         padding: const EdgeInsets.only(top: 4),
-        child: Icon(Icons.chevron_right_rounded, size: 16, color: saffron),
+        child: MockupRowChevron(color: saffron),
       );
     }
     return const SizedBox.shrink();
@@ -964,8 +968,6 @@ class _Horizon extends StatelessWidget {
 class _CalendarSheet extends ConsumerWidget {
   const _CalendarSheet();
 
-  static const double _cell = 34;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -1036,11 +1038,15 @@ class _CalendarSheet extends ConsumerWidget {
               ],
             ),
           ),
+          // The calendar grid stretches edge-to-edge inside the sheet so
+          // the cells get the full sheet width. The old fixed-cell layout
+          // (34 px columns) left the grid cramped on the left half of the
+          // sheet — user-reported "calendar is not expanding to the whole
+          // bottom sheet in width".
           Row(
             children: [
               for (final l in labels)
-                SizedBox(
-                  width: _cell,
+                Expanded(
                   child: Text(
                     l,
                     textAlign: TextAlign.center,
@@ -1056,20 +1062,21 @@ class _CalendarSheet extends ConsumerWidget {
               child: Row(
                 children: [
                   for (final day in gridDays.skip(row * 7).take(7))
-                    SizedBox(
-                      width: _cell,
-                      height: _cell,
-                      child: day == null
-                          ? const SizedBox.shrink()
-                          : _CalendarCell(
-                              day: day,
-                              today: today,
-                              read: history.contains(_ymd(day)),
-                              saffron: saffron,
-                              divider: divider,
-                              text1: text1,
-                              text3: text3,
-                            ),
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: day == null
+                            ? const SizedBox.shrink()
+                            : _CalendarCell(
+                                day: day,
+                                today: today,
+                                read: history.contains(_ymd(day)),
+                                saffron: saffron,
+                                divider: divider,
+                                text1: text1,
+                                text3: text3,
+                              ),
+                      ),
                     ),
                 ],
               ),

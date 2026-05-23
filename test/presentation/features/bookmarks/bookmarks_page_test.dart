@@ -69,7 +69,9 @@ void main() {
       find.textContaining('२·४७'),
       findsWidgets,
     );
-    expect(find.textContaining('Bhagavad Gita'), findsOneWidget);
+    // Footer renders the scripture name uppercase (mockup `.leaf-footer`
+    // text-transform: uppercase). The chip text is "BHAGAVAD GITA".
+    expect(find.textContaining('BHAGAVAD GITA'), findsOneWidget);
   });
 
   testWidgets('sort tabs swap when user taps By scripture', (tester) async {

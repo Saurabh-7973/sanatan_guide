@@ -27,6 +27,7 @@ import 'package:sanatan_guide/presentation/features/festivals/providers/festival
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 
 const List<String> _varaAbbr = [
   'MON',
@@ -1165,7 +1166,7 @@ class _EarlierRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: text3),
+            MockupRowChevron(color: text3),
           ],
         ),
       ),

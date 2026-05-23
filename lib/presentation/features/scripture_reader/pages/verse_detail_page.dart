@@ -32,6 +32,7 @@ import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart'
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 
 /// Cleans `verse.sanskrit` for the reading pass while keeping the manuscript's
 /// metrical line breaks: drops Vedic svara marks (via [stripVedicAccents]),
@@ -1596,7 +1597,7 @@ class _ExplainTrigger extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(Icons.chevron_right_rounded, size: 18, color: text3),
+                  MockupRowChevron(color: text3),
                 ],
               ),
             ),
@@ -2011,7 +2012,7 @@ class _FallbackRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: text3),
+            MockupRowChevron(color: text3),
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -558,10 +559,7 @@ class _SuggestRow extends StatelessWidget {
           if (showArrow)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Icon(
-                Icons.chevron_right_rounded,
-                size: 14,
-                color: text3.withValues(alpha: 0.6),
+              child: MockupRowChevron(color: text3.withValues(alpha: 0.6),
               ),
             ),
         ],
@@ -1437,10 +1435,7 @@ class _ResultRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 14,
-                color: text3.withValues(alpha: 0.5),
+              MockupRowChevron(color: text3.withValues(alpha: 0.5),
               ),
             ],
           ),
