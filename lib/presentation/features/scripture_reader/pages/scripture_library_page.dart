@@ -644,16 +644,18 @@ class _ScriptureRow extends StatelessWidget {
   final _Family family;
 
   Color _glyphColor() {
+    // Brief §5.1.2: iron-red is reserved for Festivals + destructive only.
+    // Smṛti families (itihāsa, purāṇa, dharmaśāstra, darśana, tamil) render
+    // in text2 — secondary to the śruti families' saffron. Avoids the
+    // invented Darśana/Tamil amber tones that weren't design tokens.
     return switch (family.kind) {
       _FamilyKind.shruti => isDark ? DColors.saffron : LColors.saffron,
       _FamilyKind.itihasa ||
       _FamilyKind.purana ||
-      _FamilyKind.dharmasastra =>
-        isDark ? DColors.ironRed : LColors.ironRed,
-      _FamilyKind.darshana =>
-        isDark ? const Color(0xFFC9A467) : const Color(0xFFA47B30),
+      _FamilyKind.dharmasastra ||
+      _FamilyKind.darshana ||
       _FamilyKind.tamil =>
-        isDark ? const Color(0xFFB07642) : const Color(0xFF8B5226),
+        isDark ? DColors.text2 : LColors.text2,
     };
   }
 
@@ -1204,10 +1206,10 @@ class _SearchMatch {
 
 const _kVedas = <_Scripture>[
   _Scripture(
-    id: 'rigveda',
+    id: 'rigveda', // verseCount per DB (was 10552, drifted)
     devaName: 'ऋग्वेद',
     englishName: 'Ṛg Veda',
-    verseCount: 10552,
+    verseCount: 9508,
     unitLabel: 'mantras',
     aliases: ['rig', 'rigveda'],
   ),
@@ -1215,7 +1217,7 @@ const _kVedas = <_Scripture>[
     id: 'samaveda',
     devaName: 'सामवेद',
     englishName: 'Sāma Veda',
-    verseCount: 1875,
+    verseCount: 1719,
     unitLabel: 'mantras',
     aliases: ['sama', 'samaveda'],
   ),
@@ -1223,7 +1225,7 @@ const _kVedas = <_Scripture>[
     id: 'yajurveda',
     devaName: 'यजुर्वेद',
     englishName: 'Yajur Veda',
-    verseCount: 1975,
+    verseCount: 1978,
     unitLabel: 'mantras',
     aliases: ['yajur', 'yajurveda'],
   ),
@@ -1231,7 +1233,7 @@ const _kVedas = <_Scripture>[
     id: 'atharvaveda',
     devaName: 'अथर्ववेद',
     englishName: 'Atharva Veda',
-    verseCount: 5977,
+    verseCount: 5627,
     unitLabel: 'mantras',
     aliases: ['atharva', 'atharvaveda'],
   ),
@@ -1243,7 +1245,7 @@ const _kMukhyaUpanishads = _Scripture(
   id: 'isha_upanishad',
   devaName: 'मुख्य उपनिषद् ११',
   englishName: 'The Mukhya Upaniṣads',
-  verseCount: 1876,
+  verseCount: 1199,
   unitLabel: 'verses',
   subdivision: '11 principal texts',
   aliases: ['upanishad', 'upanishads', 'mukhya'],
@@ -1319,7 +1321,7 @@ const _kFamilies = <_Family>[
         id: 'vishnu_purana',
         devaName: 'विष्णुपुराण',
         englishName: 'Viṣṇu Purāṇa',
-        verseCount: 6000,
+        verseCount: 28,
         unitLabel: 'verses',
         subdivision: '6 aṁśas',
         aliases: ['vishnu'],
@@ -1348,7 +1350,7 @@ const _kFamilies = <_Family>[
         id: 'brahma_sutras',
         devaName: 'ब्रह्मसूत्र',
         englishName: 'Brahma Sūtras',
-        verseCount: 555,
+        verseCount: 30,
         unitLabel: 'sūtras',
         subdivision: '4 adhyāyas',
         aliases: ['brahma'],
@@ -1368,7 +1370,7 @@ const _kFamilies = <_Family>[
         id: 'manusmriti',
         devaName: 'मनुस्मृति',
         englishName: 'Manusmṛti',
-        verseCount: 2684,
+        verseCount: 54,
         unitLabel: 'verses',
         subdivision: '12 chapters',
         aliases: ['manu'],
@@ -1377,7 +1379,7 @@ const _kFamilies = <_Family>[
         id: 'arthashastra',
         devaName: 'अर्थशास्त्र',
         englishName: 'Arthaśāstra',
-        verseCount: 5348,
+        verseCount: 5371,
         unitLabel: 'verses',
         subdivision: '15 books',
         aliases: ['artha', 'kautilya'],
@@ -1396,7 +1398,7 @@ const _kFamilies = <_Family>[
         id: 'tirukkural',
         devaName: 'திருக்குறள்',
         englishName: 'Tirukkuṟaḷ',
-        verseCount: 1330,
+        verseCount: 1326,
         unitLabel: 'couplets',
         subdivision: 'Tiruvaḷḷuvar',
         aliases: ['kural', 'tirukkural'],
