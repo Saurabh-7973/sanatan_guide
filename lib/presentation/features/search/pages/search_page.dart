@@ -562,6 +562,7 @@ class _PanditCta extends StatelessWidget {
     if (!GeminiService.isEnabled) return const SizedBox.shrink();
 
     final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final saffronGlow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final divider = isDark ? DColors.divider : LColors.divider;
 
@@ -578,6 +579,13 @@ class _PanditCta extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             border: Border.all(color: divider, width: 1),
+            // Match the verse-detail "Explain this verse" card — a soft
+            // saffron glow fades from top to transparent at the bottom.
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [saffronGlow, Colors.transparent],
+            ),
           ),
           child: Row(
         children: [
@@ -1286,11 +1294,18 @@ class _ResultRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 44,
+                width: 64,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 1),
                   child: Text(
                     coordText,
+                    // Compound coords like ‖१·१४‖ or ‖१·१·७‖ (Ṛgveda) wrap
+                    // when the box is too tight — start/end ॥ slid onto a
+                    // second line. Force one line and let it fade if a very
+                    // wide 3-part coord still spills.
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
                     style: TextStyle(
                       fontFamily: Fonts.deva,
                       fontSize: 12,
