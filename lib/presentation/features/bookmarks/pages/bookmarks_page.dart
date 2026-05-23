@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -148,6 +149,7 @@ class _PothiHeader extends StatelessWidget {
                 'पोथी',
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 26,
                   height: 1,
                   letterSpacing: 0.005 * 26,
@@ -160,6 +162,7 @@ class _PothiHeader extends StatelessWidget {
                   'Your collection',
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
                     letterSpacing: -0.015 * 22,
@@ -189,6 +192,7 @@ class _PothiHeader extends StatelessWidget {
               DefaultTextStyle(
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.16 * 11,
@@ -216,6 +220,7 @@ class _PothiHeader extends StatelessWidget {
         text,
         style: TextStyle(
           fontFamily: Fonts.serif,
+          fontFamilyFallback: AppFontFallback.latin,
           fontStyle: FontStyle.italic,
           fontSize: 13,
           fontWeight: FontWeight.w500,
@@ -279,6 +284,7 @@ class _SortBar extends ConsumerWidget {
             label,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.16 * 11,
@@ -321,6 +327,7 @@ class _SortBar extends ConsumerWidget {
                   'Filter',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.06 * 10.5,
@@ -495,6 +502,7 @@ class _GroupHeader extends StatelessWidget {
                       text: scripture.devaName,
                       style: TextStyle(
                         fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
                         fontSize: 14,
                         height: 1,
                         color: cream,
@@ -505,6 +513,7 @@ class _GroupHeader extends StatelessWidget {
                       text: scripture.displayName,
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontStyle: FontStyle.italic,
                         fontSize: 11.5,
                         color: text2,
@@ -517,6 +526,7 @@ class _GroupHeader extends StatelessWidget {
                 '$count VERSES',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.18 * 9,
@@ -602,6 +612,7 @@ class _LeafCard extends StatelessWidget {
                       coordText,
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 9.5,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.24 * 9.5,
@@ -613,6 +624,7 @@ class _LeafCard extends StatelessWidget {
                       entry.sanskritPreview,
                       style: TextStyle(
                         fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
                         fontSize: 16,
                         height: 1.55,
                         letterSpacing: 0.005 * 16,
@@ -628,6 +640,7 @@ class _LeafCard extends StatelessWidget {
                         '"${entry.englishPreview}"',
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontStyle: FontStyle.italic,
                           fontSize: 13,
                           height: 1.45,
@@ -667,6 +680,7 @@ class _LeafCard extends StatelessWidget {
                                 note,
                                 style: TextStyle(
                                   fontFamily: Fonts.serif,
+                                  fontFamilyFallback: AppFontFallback.latin,
                                   fontStyle: FontStyle.italic,
                                   fontSize: 12,
                                   height: 1.45,
@@ -701,6 +715,7 @@ class _LeafCard extends StatelessWidget {
                               entry.scriptureName,
                               style: TextStyle(
                                 fontFamily: Fonts.serif,
+                                fontFamilyFallback: AppFontFallback.latin,
                                 fontStyle: FontStyle.italic,
                                 fontSize: 11.5,
                                 color: text2,
@@ -713,6 +728,7 @@ class _LeafCard extends StatelessWidget {
                             _relativeDate(bookmark.savedAt),
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 10.5,
                               letterSpacing: 0.04 * 10.5,
                               color: text3,
@@ -723,6 +739,7 @@ class _LeafCard extends StatelessWidget {
                             'Saved ${_relativeDate(bookmark.savedAt).toLowerCase()}',
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 10.5,
                               letterSpacing: 0.04 * 10.5,
                               color: text3,
@@ -832,6 +849,7 @@ class _EmptyBody extends StatelessWidget {
           'Your pothī awaits',
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 18,
             fontWeight: FontWeight.w500,
             height: 1.3,
@@ -846,6 +864,7 @@ class _EmptyBody extends StatelessWidget {
             'Save a verse, and it joins your collection — like a leaf bound in your own bundle. Add a note about why it spoke to you.',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 13,
               height: 1.55,
               color: text2,
@@ -866,6 +885,7 @@ class _EmptyBody extends StatelessWidget {
                   'BEGIN READING',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.18 * 11,
@@ -971,6 +991,7 @@ class _LoadingBody extends StatelessWidget {
                 'RECENT',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.16 * 11,
@@ -982,6 +1003,7 @@ class _LoadingBody extends StatelessWidget {
                 'BY SCRIPTURE',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.16 * 11,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:sanatan_guide/core/utils/panchang_utils.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -50,6 +51,7 @@ class PanchangBlock extends StatelessWidget {
             greetingLine,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 17,
               letterSpacing: 0.17,
@@ -71,6 +73,7 @@ class PanchangBlock extends StatelessWidget {
             vsLine,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 11,
               fontWeight: FontWeight.w500,
               letterSpacing: 1.76,
@@ -110,6 +113,7 @@ class _PanchangLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = TextStyle(
       fontFamily: Fonts.deva,
+      fontFamilyFallback: AppFontFallback.deva,
       fontSize: 14,
       letterSpacing: 0.84,
       height: 1.0,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/overflow_menu.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/topbar_icons.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
 class _IconBtn extends StatelessWidget {
   const _IconBtn({
@@ -66,6 +67,7 @@ class HomeTopBar extends ConsumerWidget {
             'सनातन',
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 22,
               color: saffron,
             ),

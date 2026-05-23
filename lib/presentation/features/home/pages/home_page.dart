@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
@@ -140,6 +141,7 @@ class _FirstDayCta extends StatelessWidget {
             '॥ श्री गणेशाय नमः ॥',
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 14,
               letterSpacing: 0.56,
               color: saffron,
@@ -151,6 +153,7 @@ class _FirstDayCta extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 22,
               fontWeight: FontWeight.w500,
               height: 1.35,
@@ -164,6 +167,7 @@ class _FirstDayCta extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 14,
               height: 1.55,
@@ -184,6 +188,7 @@ class _FirstDayCta extends StatelessWidget {
                   'OPEN FOUNDATIONS',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.04,
@@ -219,6 +224,7 @@ class _BrowseLibraryLink extends StatelessWidget {
           'OR BROWSE THE LIBRARY  →',
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 11,
             letterSpacing: 1.76,
             color: text3,

@@ -365,6 +365,7 @@ class _TopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
@@ -971,6 +972,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                           size: 14 * sanskritScale,
                         ).copyWith(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontStyle: FontStyle.normal,
                           height: 1.75,
                         ),
@@ -1388,6 +1390,7 @@ class _WordCallout extends ConsumerWidget {
                   // IAST glyphs render only in TiroDevanagari (commit f6647d6).
                   style: AppText.commentary(color: saffron, size: 12).copyWith(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontStyle: FontStyle.normal,
                   )),
             ],

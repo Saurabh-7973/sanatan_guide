@@ -205,6 +205,7 @@ class _Hero extends StatelessWidget {
           title,
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 24,
             fontWeight: FontWeight.w500,
             height: 1.2,
@@ -216,6 +217,7 @@ class _Hero extends StatelessWidget {
           prose,
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontStyle: FontStyle.italic,
             fontSize: 13.5,
             height: 1.55,
@@ -323,6 +325,7 @@ class _KindRow extends StatelessWidget {
                     kind.title,
                     style: TextStyle(
                       fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: text1,
@@ -333,6 +336,7 @@ class _KindRow extends StatelessWidget {
                     kind.rowDesc,
                     style: TextStyle(
                       fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontStyle: FontStyle.italic,
                       fontSize: 12.5,
                       height: 1.4,
@@ -430,6 +434,7 @@ class _Compose extends StatelessWidget {
                             kind.mailTag,
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.66,
@@ -458,6 +463,7 @@ class _Compose extends StatelessWidget {
                 cursorColor: saffron,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 14.5,
                   height: 1.65,
                   color: text1,
@@ -478,6 +484,7 @@ class _Compose extends StatelessWidget {
                   hintText: kind.placeholder,
                   hintStyle: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 14.5,
                     height: 1.65,
                     color: text3,
@@ -520,6 +527,7 @@ class _Compose extends StatelessWidget {
                         'SEND',
                         style: TextStyle(
                           fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.82,
@@ -595,6 +603,7 @@ class _Check extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11.5,
                   fontWeight: FontWeight.w500,
                   color: text2,

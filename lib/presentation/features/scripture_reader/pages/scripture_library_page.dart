@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -225,6 +226,7 @@ class _Header extends StatelessWidget {
             'Library',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 32,
               fontWeight: FontWeight.w500,
               letterSpacing: -0.64,
@@ -237,6 +239,7 @@ class _Header extends StatelessWidget {
             TextSpan(
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 1.76,
@@ -247,6 +250,7 @@ class _Header extends StatelessWidget {
                   text: verses,
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 13,
                     letterSpacing: 0,
@@ -273,6 +277,7 @@ class _Header extends StatelessWidget {
                   text: '$scriptures',
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 13,
                     letterSpacing: 0,
@@ -352,6 +357,7 @@ class _SearchBar extends StatelessWidget {
                     cursorColor: saffron,
                     style: TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 14,
                       letterSpacing: 0.14,
                       color: text1,
@@ -373,6 +379,7 @@ class _SearchBar extends StatelessWidget {
                       hintText: 'Find a scripture...',
                       hintStyle: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 14,
                         letterSpacing: 0.14,
                         color: text3,
@@ -478,6 +485,7 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
                               family.englishLabel,
                               style: TextStyle(
                                 fontFamily: Fonts.serif,
+                                fontFamilyFallback: AppFontFallback.latin,
                                 fontStyle: FontStyle.italic,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -491,6 +499,7 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
                             family.metaLabel,
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 9,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 1.98,
@@ -508,6 +517,7 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontStyle: FontStyle.italic,
                             fontSize: 12.5,
                             height: 1.5,
@@ -597,6 +607,7 @@ class _VedaCell extends StatelessWidget {
                   scripture.devaName,
                   style: TextStyle(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontSize: 16,
                     height: 1.2,
                     color: cream,
@@ -607,6 +618,7 @@ class _VedaCell extends StatelessWidget {
                   scripture.englishName,
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: text1,
@@ -618,6 +630,7 @@ class _VedaCell extends StatelessWidget {
               '${_indianFmtStatic(scripture.verseCount)}  ${scripture.unitLabel}',
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 1.4,
@@ -725,6 +738,7 @@ class _ScriptureRow extends StatelessWidget {
                         scripture.englishName,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           letterSpacing: -0.075,
@@ -739,8 +753,13 @@ class _ScriptureRow extends StatelessWidget {
                             fontFamily: Fonts.sans,
                             // Outfit lacks the dot-below Tamil-romanisation
                             // letters (ḷ, ṟ) used in names like "Tiruvaḷḷuvar";
-                            // fall back to Lora for the full IAST set.
-                            fontFamilyFallback: const [Fonts.serif],
+                            // fall back to Lora then NotoSansDevanagari then
+                            // system serif for the full IAST set.
+                            fontFamilyFallback: const <String>[
+                              Fonts.serif,
+                              'NotoSansDevanagari',
+                              'serif',
+                            ],
                             fontSize: 11,
                             height: 1.4,
                             color: text3,
@@ -751,6 +770,7 @@ class _ScriptureRow extends StatelessWidget {
                                   '${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel}',
                               style: TextStyle(
                                 fontFamily: Fonts.serif,
+                                fontFamilyFallback: AppFontFallback.latin,
                                 fontStyle: FontStyle.italic,
                                 fontSize: 12,
                                 color: text2,
@@ -950,6 +970,7 @@ class _SearchResultsSliver extends StatelessWidget {
               '${matches.length} ${matches.length == 1 ? 'RESULT' : 'RESULTS'}',
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 2.2,
@@ -1042,6 +1063,7 @@ class _SearchResultRow extends StatelessWidget {
                     '${family.shortLabel}  ·  ${_indianFmtStatic(scripture.verseCount)} ${scripture.unitLabel.toUpperCase()}',
                     style: TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 10,
                       letterSpacing: 1.6,
                       color: text3,
@@ -1061,6 +1083,7 @@ class _SearchResultRow extends StatelessWidget {
   static Widget _highlighted(String text, String query, Color hl, Color base) {
     final baseStyle = TextStyle(
       fontFamily: Fonts.serif,
+      fontFamilyFallback: AppFontFallback.latin,
       fontSize: 14,
       color: base,
     );
@@ -1119,6 +1142,7 @@ class _EmptyResults extends StatelessWidget {
                 '॥',
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 28,
                   color: saffron,
                 ),
@@ -1129,6 +1153,7 @@ class _EmptyResults extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 16,
                   color: text1,
@@ -1140,6 +1165,7 @@ class _EmptyResults extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 13,
                   height: 1.5,
                   color: text2,

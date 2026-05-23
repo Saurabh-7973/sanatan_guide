@@ -258,6 +258,7 @@ class _Row extends StatelessWidget {
                     title,
                     style: TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 14,
                       color: fg,
                     ),
@@ -268,6 +269,7 @@ class _Row extends StatelessWidget {
                       subtitle!,
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontStyle: FontStyle.italic,
                         fontSize: 12,
                         color: text2,
@@ -394,6 +396,7 @@ class _FontSizeRow extends ConsumerWidget {
                 'A',
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 13,
                   color: text3,
                 ),
@@ -413,6 +416,7 @@ class _FontSizeRow extends ConsumerWidget {
                 'A',
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 22,
                   color: text3,
                 ),
@@ -502,6 +506,7 @@ class _ExperienceRow extends ConsumerWidget {
                         l.displayTitle,
                         style: TextStyle(
                           fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 14,
                           color: text1,
                         ),
@@ -510,6 +515,7 @@ class _ExperienceRow extends ConsumerWidget {
                         l.displaySubtitle,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontStyle: FontStyle.italic,
                           fontSize: 12,
                           color: text2,
@@ -580,6 +586,7 @@ class _NotificationTimeRow extends ConsumerWidget {
           time.format(context),
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: saffron,

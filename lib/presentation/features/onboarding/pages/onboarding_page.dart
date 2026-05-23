@@ -185,6 +185,7 @@ class _WelcomeStep extends StatelessWidget {
                 'ॐ',
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 68,
                   color: saffron,
                   height: 1,
@@ -385,6 +386,7 @@ class _ReminderStepState extends State<_ReminderStep> {
                       '$_displayHour : ${_time.minute.toString().padLeft(2, '0')}',
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 38,
                         fontWeight: FontWeight.w500,
                         height: 1,

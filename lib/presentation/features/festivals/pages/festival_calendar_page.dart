@@ -304,6 +304,7 @@ class _AlmanacViewState extends State<_AlmanacView> {
                 'No festivals in this category.',
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 14,
                   color: isDark ? DColors.text2 : LColors.text2,
@@ -349,6 +350,7 @@ class _Header extends StatelessWidget {
                   text: 'पञ्चाङ्ग',
                   style: TextStyle(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontSize: 16,
                     color: isDark ? DColors.saffron : LColors.saffron,
                   ),
@@ -357,6 +359,7 @@ class _Header extends StatelessWidget {
                   text: '  ·  Almanac',
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 15,
                     color: text1,
@@ -411,6 +414,7 @@ class _PanchangaBanner extends StatelessWidget {
             "TODAY'S PANCHANGA",
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 9.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 2.66,
@@ -427,6 +431,7 @@ class _PanchangaBanner extends StatelessWidget {
                   panchanga.tithiLabelDeva,
                   style: TextStyle(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontSize: 22,
                     height: 1.0,
                     color: cream,
@@ -438,6 +443,7 @@ class _PanchangaBanner extends StatelessWidget {
                 greg,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 13,
                   color: text2,
@@ -520,6 +526,7 @@ class _BannerCell extends StatelessWidget {
           label.toUpperCase(),
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 8.5,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.5,
@@ -531,6 +538,7 @@ class _BannerCell extends StatelessWidget {
           value,
           style: TextStyle(
             fontFamily: Fonts.deva,
+            fontFamilyFallback: AppFontFallback.deva,
             fontSize: 13,
             height: 1.1,
             color: cream,
@@ -543,6 +551,7 @@ class _BannerCell extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontFamily: Fonts.deva,
+            fontFamilyFallback: AppFontFallback.deva,
             fontSize: 9,
             fontWeight: FontWeight.w500,
             color: text3,
@@ -629,6 +638,7 @@ class _FilterPill extends StatelessWidget {
             label,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 11,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.4,
@@ -678,6 +688,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
             segment.monthDeva,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 19,
               height: 1.0,
               color: saffron,
@@ -688,6 +699,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
             segment.monthIast,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 12.5,
               color: text2,
             ),
@@ -697,6 +709,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
             'VS ${segment.vsYear}',
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 9,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.8,
@@ -818,6 +831,7 @@ class _DateColumn extends StatelessWidget {
           '${cell.date.day}',
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 19,
             height: 1.0,
             fontWeight: isToday ? FontWeight.w600 : FontWeight.w500,
@@ -829,6 +843,7 @@ class _DateColumn extends StatelessWidget {
           _varaAbbr[cell.date.weekday - 1],
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 8,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.4,
@@ -867,6 +882,7 @@ class _DayBody extends StatelessWidget {
                 text: '${panchanga.paksha.iast.toUpperCase()}  ',
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.5,
@@ -877,6 +893,7 @@ class _DayBody extends StatelessWidget {
                 text: panchanga.tithi.deva,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 13,
                   color: text1,
                 ),
@@ -892,6 +909,7 @@ class _DayBody extends StatelessWidget {
                 text: '${panchanga.nakshatra.deva}  ',
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 11,
                   color: text2,
                 ),
@@ -900,6 +918,7 @@ class _DayBody extends StatelessWidget {
                 text: panchanga.nakshatra.iast,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: text3,
@@ -944,6 +963,7 @@ class _DayFestival extends StatelessWidget {
                 festival.sanskritName,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 14,
                   height: 1.2,
                   fontWeight: FontWeight.w500,
@@ -954,6 +974,7 @@ class _DayFestival extends StatelessWidget {
                 festival.name,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 12,
                   height: 1.25,
@@ -967,6 +988,7 @@ class _DayFestival extends StatelessWidget {
             '${festival.category.label} · ${festival.deity}'.toUpperCase(),
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 8.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.7,
@@ -1086,6 +1108,7 @@ class _EarlierRow extends StatelessWidget {
                 '${_monthsShort[festival.date.month - 1]}',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.6,
@@ -1102,6 +1125,7 @@ class _EarlierRow extends StatelessWidget {
                     festival.name,
                     style: TextStyle(
                       fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 14.5,
                       color: text1,
                     ),
@@ -1111,6 +1135,7 @@ class _EarlierRow extends StatelessWidget {
                     festival.sanskritName,
                     style: TextStyle(
                       fontFamily: Fonts.deva,
+                      fontFamilyFallback: AppFontFallback.deva,
                       fontSize: 12,
                       color: ironRed,
                     ),
@@ -1142,6 +1167,7 @@ class _Disclaimer extends StatelessWidget {
         'pandit for regional variations.',
         style: TextStyle(
           fontFamily: Fonts.sans,
+          fontFamilyFallback: AppFontFallback.latin,
           fontSize: 10.5,
           height: 1.5,
           color: isDark ? DColors.text3 : LColors.text3,

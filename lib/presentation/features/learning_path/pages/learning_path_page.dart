@@ -177,6 +177,7 @@ class _PathHeader extends StatelessWidget {
             'A guided journey through the foundations of Sanātana Dharma.',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 13.5,
               height: 1.4,
@@ -249,6 +250,7 @@ class _StreakStrip extends ConsumerWidget {
                           text: '$streak ',
                           style: TextStyle(
                             fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontStyle: FontStyle.italic,
                             fontSize: 13,
                             color: text1,
@@ -260,6 +262,7 @@ class _StreakStrip extends ConsumerWidget {
                               : 'days streak · this week',
                           style: TextStyle(
                             fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: text1,
@@ -352,6 +355,7 @@ class _WeekDot extends StatelessWidget {
           label,
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 8,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.48,
@@ -425,6 +429,7 @@ class _SectionHeader extends StatelessWidget {
                 marker,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -436,6 +441,7 @@ class _SectionHeader extends StatelessWidget {
                 name,
                 style: TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   letterSpacing: -0.18,
@@ -454,6 +460,7 @@ class _SectionHeader extends StatelessWidget {
             description,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 13,
               height: 1.45,
@@ -578,6 +585,7 @@ class _ContinueAnchor extends StatelessWidget {
                         module.title,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           height: 1.25,
@@ -590,6 +598,7 @@ class _ContinueAnchor extends StatelessWidget {
                         '${module.estimatedMinutes} min',
                         style: TextStyle(
                           fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 11,
                           height: 1.3,
                           color: text2,
@@ -769,6 +778,7 @@ class _ModuleRow extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.2,
@@ -789,6 +799,7 @@ class _ModuleRow extends StatelessWidget {
                       module.title,
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 15.5,
                         fontWeight:
                             isActive ? FontWeight.w600 : FontWeight.w500,
@@ -802,6 +813,7 @@ class _ModuleRow extends StatelessWidget {
                       module.hook,
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontStyle: FontStyle.italic,
                         fontSize: 12.5,
                         height: 1.45,
@@ -815,6 +827,7 @@ class _ModuleRow extends StatelessWidget {
                       metaText,
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.06,
@@ -919,6 +932,7 @@ class _Horizon extends StatelessWidget {
             'III. Mastery',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 15,
               fontWeight: FontWeight.w500,
@@ -932,6 +946,7 @@ class _Horizon extends StatelessWidget {
             'philosophical schools — when you are ready.',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 12.5,
               height: 1.5,
@@ -1064,6 +1079,7 @@ class _CalendarSheet extends ConsumerWidget {
             'Read any verse or complete a module card to fill a day.',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 12,
               height: 1.4,
@@ -1112,6 +1128,7 @@ class _CalendarCell extends StatelessWidget {
           '${day.day}',
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 11,
             fontWeight: read || isToday ? FontWeight.w600 : FontWeight.w400,
             color: read

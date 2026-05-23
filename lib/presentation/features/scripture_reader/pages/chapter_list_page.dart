@@ -412,6 +412,7 @@ class _ChapterListHeader extends StatelessWidget {
             scripture.devaName,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 22,
               height: 1.1,
               letterSpacing: 0.01 * 22,
@@ -423,6 +424,7 @@ class _ChapterListHeader extends StatelessWidget {
             scripture.scholarlySubtitle,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 14,
               color: text2,
@@ -435,7 +437,11 @@ class _ChapterListHeader extends StatelessWidget {
               // Outfit lacks uppercase IAST glyphs (Ṇ, Ḍ, Ṣ, Ṭ, …);
               // fall back to Lora so "KĀṆḌAS", "MAṆḌALAS" etc. don't
               // render with tofu boxes in the toUpperCase() output.
-              fontFamilyFallback: const [Fonts.serif],
+              fontFamilyFallback: const <String>[
+                Fonts.serif,
+                'NotoSansDevanagari',
+                'serif',
+              ],
               fontSize: 10,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.22 * 10,
@@ -482,6 +488,7 @@ class _MetaLine extends StatelessWidget {
           num,
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontStyle: FontStyle.italic,
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -601,6 +608,7 @@ class _ResumeRow extends StatelessWidget {
                             'CONTINUE READING',
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 9.5,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.24 * 9.5,
@@ -767,6 +775,7 @@ class _ChapterRow extends StatelessWidget {
                       arabicToDevanagari(entry.chapterNum),
                       style: TextStyle(
                         fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
                         fontSize: 22,
                         height: 1,
                         color: numColor,
@@ -777,6 +786,7 @@ class _ChapterRow extends StatelessWidget {
                       '${scripture.unitCode} ${entry.chapterNum}',
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.16 * 9,
@@ -797,6 +807,7 @@ class _ChapterRow extends StatelessWidget {
                         entry.devaTitle!,
                         style: TextStyle(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontSize: 16,
                           height: 1.25,
                           letterSpacing: 0.005 * 16,
@@ -811,6 +822,7 @@ class _ChapterRow extends StatelessWidget {
                       entry.enTitle,
                       style: TextStyle(
                         fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontStyle: FontStyle.italic,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -884,6 +896,7 @@ class _MetaText extends StatelessWidget {
     final hasSubtitle = entry.subtitle != null && entry.subtitle!.isNotEmpty;
     final base = TextStyle(
       fontFamily: Fonts.sans,
+      fontFamilyFallback: AppFontFallback.latin,
       fontSize: 11,
       height: 1.4,
       color: text3,
@@ -895,6 +908,7 @@ class _MetaText extends StatelessWidget {
           text: '${_fmt(entry.verseCount!)} verses',
           style: base.copyWith(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontStyle: FontStyle.italic,
             fontSize: 11.5,
             color: text2,

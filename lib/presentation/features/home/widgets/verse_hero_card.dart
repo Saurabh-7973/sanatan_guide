@@ -124,6 +124,7 @@ class _VerseCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
                 fontSize: 22,
                 height: 1.85,
                 letterSpacing: 0.11,
@@ -228,12 +229,14 @@ class _VerseMeta extends StatelessWidget {
   Widget build(BuildContext context) {
     final pushpika = TextStyle(
       fontFamily: Fonts.serif,
+      fontFamilyFallback: AppFontFallback.latin,
       fontSize: 12,
       height: 1.0,
       color: pushpikaColor,
     );
     final label = TextStyle(
       fontFamily: Fonts.sans,
+      fontFamilyFallback: AppFontFallback.latin,
       fontSize: 10,
       fontWeight: FontWeight.w600,
       letterSpacing: 2.2,
@@ -291,6 +294,7 @@ class _DividerLabel extends StatelessWidget {
           style: isSourceLine
               ? TextStyle(
                   fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontStyle: FontStyle.italic,
                   fontSize: 11,
                   letterSpacing: 0.5,
@@ -298,6 +302,7 @@ class _DividerLabel extends StatelessWidget {
                 )
               : TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2.52,
@@ -329,6 +334,7 @@ class _Cta extends StatelessWidget {
           label,
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 12,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.92,
@@ -467,6 +473,7 @@ class _ErrorBanner extends StatelessWidget {
               '!',
               style: TextStyle(
                 fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
                 fontSize: 18,
                 color: ironRed,
               ),
@@ -478,6 +485,7 @@ class _ErrorBanner extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 15,
               color: text1,
@@ -489,6 +497,7 @@ class _ErrorBanner extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 12,
               height: 1.5,
               color: text2,
@@ -507,6 +516,7 @@ class _ErrorBanner extends StatelessWidget {
                 '↻   TRY AGAIN',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2.2,

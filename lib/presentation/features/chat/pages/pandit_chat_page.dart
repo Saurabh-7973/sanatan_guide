@@ -243,6 +243,7 @@ class _TopBar extends StatelessWidget {
                   'ॐ',
                   style: TextStyle(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontSize: 18,
                     height: 1,
                     color: saffron,
@@ -315,6 +316,7 @@ class _EmptyState extends StatelessWidget {
               'ॐ',
               style: TextStyle(
                 fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
                 fontSize: 60,
                 height: 1,
                 color: saffron,
@@ -326,6 +328,7 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
                 height: 1.3,
@@ -344,6 +347,7 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontStyle: FontStyle.italic,
                 fontSize: 13.5,
                 height: 1.55,
@@ -400,6 +404,7 @@ class _SuggestionChip extends StatelessWidget {
           text,
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontStyle: FontStyle.italic,
             fontSize: 13.5,
             height: 1.3,
@@ -466,6 +471,7 @@ class _Conversation extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 12,
                 height: 1.4,
                 color: iron,
@@ -511,6 +517,7 @@ class _UserBubble extends StatelessWidget {
             text,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 13.5,
               height: 1.45,
               color: text1,
@@ -535,6 +542,7 @@ class _AiProse extends StatelessWidget {
     // chat uses non-italic reply prose — this divergence is deliberate.
     final style = TextStyle(
       fontFamily: Fonts.serif,
+      fontFamilyFallback: AppFontFallback.latin,
       fontStyle: FontStyle.italic,
       fontSize: 14.5,
       height: 1.75,
@@ -633,6 +641,7 @@ class _InputArea extends StatelessWidget {
                   onSubmitted: (_) => onSend(),
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 13.5,
                     height: 1.4,
                     color: text1,
@@ -653,6 +662,7 @@ class _InputArea extends StatelessWidget {
                     hintText: 'Ask anything about the texts…',
                     hintStyle: TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 13.5,
                       color: text3,
                     ),
@@ -770,6 +780,7 @@ class _RestingStrip extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: Fonts.sans,
+          fontFamilyFallback: AppFontFallback.latin,
           fontSize: 12,
           height: 1.4,
           color: text3,

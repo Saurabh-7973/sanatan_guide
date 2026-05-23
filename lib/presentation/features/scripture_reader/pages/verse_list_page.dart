@@ -437,6 +437,7 @@ class _ChapterHeader extends StatelessWidget {
                   deva ?? scripture.displayName,
                   style: TextStyle(
                     fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
                     fontSize: 18,
                     // 1.1 clipped the Devanāgarī top mātrā on the chapter
                     // title; Devanāgarī needs a taller line box.
@@ -453,6 +454,7 @@ class _ChapterHeader extends StatelessWidget {
                 'CH $chapterNum · ${scripture.shortCode}',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.22 * 9.5,
@@ -467,6 +469,7 @@ class _ChapterHeader extends StatelessWidget {
               en,
               style: TextStyle(
                 fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontStyle: FontStyle.italic,
                 fontSize: 13,
                 color: text2,
@@ -512,6 +515,7 @@ class _ChapterHeader extends StatelessWidget {
                     ],
                     style: const TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.18 * 9,
@@ -522,6 +526,7 @@ class _ChapterHeader extends StatelessWidget {
                   '$percent%',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.18 * 9,
@@ -607,6 +612,7 @@ class _ResumeAnchor extends StatelessWidget {
                             'CONTINUE',
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 9,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.24 * 9,
@@ -618,6 +624,7 @@ class _ResumeAnchor extends StatelessWidget {
                             incipit,
                             style: TextStyle(
                               fontFamily: Fonts.deva,
+                              fontFamilyFallback: AppFontFallback.deva,
                               fontSize: 14,
                               height: 1.3,
                               color: cream,
@@ -630,6 +637,7 @@ class _ResumeAnchor extends StatelessWidget {
                             'Verse ${verse.verseNum} — next unread',
                             style: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 10.5,
                               color: text2,
                             ),
@@ -671,6 +679,7 @@ class _VersesLabel extends StatelessWidget {
         'ALL VERSES',
         style: TextStyle(
           fontFamily: Fonts.sans,
+          fontFamilyFallback: AppFontFallback.latin,
           fontSize: 9.5,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.28 * 9.5,
@@ -774,6 +783,7 @@ class _VerseSectionHeader extends ConsumerWidget {
               label,
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.32 * 9,
@@ -785,6 +795,7 @@ class _VerseSectionHeader extends ConsumerWidget {
             devaRange,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 13,
               height: 1.0,
               color: cream,
@@ -873,6 +884,7 @@ class _VerseRow extends ConsumerWidget {
                         enLine,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontStyle: FontStyle.italic,
                           fontSize: 13.5,
                           height: 1.45,
@@ -889,6 +901,7 @@ class _VerseRow extends ConsumerWidget {
                             skLine,
                             style: TextStyle(
                               fontFamily: Fonts.deva,
+                              fontFamilyFallback: AppFontFallback.deva,
                               fontSize: 14.5,
                               height: 1.4,
                               letterSpacing: 0.005 * 14.5,
@@ -903,6 +916,7 @@ class _VerseRow extends ConsumerWidget {
                               enLine,
                               style: TextStyle(
                                 fontFamily: Fonts.serif,
+                                fontFamilyFallback: AppFontFallback.latin,
                                 fontStyle: FontStyle.italic,
                                 fontSize: 12,
                                 height: 1.4,
@@ -1182,6 +1196,7 @@ class _JumperTooltip extends StatelessWidget {
             '‖${arabicToDevanagari(verseNum)}‖',
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: inkText,
@@ -1242,6 +1257,7 @@ class _JumperLabel extends StatelessWidget {
           text,
           style: TextStyle(
             fontFamily: Fonts.deva,
+            fontFamilyFallback: AppFontFallback.deva,
             fontSize: 11,
             height: 1,
             fontWeight: active ? FontWeight.w500 : FontWeight.w400,

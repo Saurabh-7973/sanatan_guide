@@ -145,6 +145,7 @@ class _Row extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: AppText.rowLabel(color: text1).copyWith(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 13.5,
                   fontWeight: FontWeight.w500,
                 ),
@@ -240,6 +241,7 @@ void _drawOm(Canvas c, Size s, Color col) {
       text: 'ॐ',
       style: TextStyle(
         fontFamily: Fonts.deva,
+        fontFamilyFallback: AppFontFallback.deva,
         fontSize: s.width * 1.05,
         height: 1.0,
         color: col,

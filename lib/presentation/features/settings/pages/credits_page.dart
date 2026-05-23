@@ -159,6 +159,7 @@ class _Hero extends StatelessWidget {
             'Credits & Attributions',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 26,
               fontWeight: FontWeight.w500,
               height: 1.15,
@@ -174,6 +175,7 @@ class _Hero extends StatelessWidget {
             'acknowledge it here.',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 14,
               height: 1.6,
@@ -245,6 +247,7 @@ class _CreditRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 14,
                   height: 1.2,
                   color: saffron,
@@ -264,6 +267,7 @@ class _CreditRow extends StatelessWidget {
                         text: '${row.term} ',
                         style: TextStyle(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontWeight: FontWeight.w500,
                           color: saffron,
                         ),
@@ -272,6 +276,7 @@ class _CreditRow extends StatelessWidget {
                   ]),
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
@@ -284,6 +289,7 @@ class _CreditRow extends StatelessWidget {
                   row.description,
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 12.5,
                     height: 1.5,
@@ -295,6 +301,7 @@ class _CreditRow extends StatelessWidget {
                   row.meta.toUpperCase(),
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.71, // 0.18em at 9.5px
@@ -375,6 +382,7 @@ class _LineageFooter extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 18,
               height: 1.4,
               color: saffron,
@@ -387,6 +395,7 @@ class _LineageFooter extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 12.5,
               height: 1.5,

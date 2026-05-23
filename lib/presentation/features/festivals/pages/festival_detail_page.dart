@@ -101,6 +101,7 @@ class FestivalDetailPage extends StatelessWidget {
                         festival.explainer,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 14.5,
                           height: 1.7,
                           color: isDark ? DColors.text1 : LColors.text1,
@@ -161,6 +162,7 @@ class _Hero extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 11,
               letterSpacing: 1.5,
               color: saffron,
@@ -172,6 +174,7 @@ class _Hero extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 32,
               height: 1.15,
               color: cream,
@@ -183,6 +186,7 @@ class _Hero extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 17,
               fontWeight: FontWeight.w500,
@@ -210,6 +214,7 @@ class _Hero extends StatelessWidget {
                     date.day.toString().padLeft(2, '0'),
                     style: TextStyle(
                       fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 24,
                       height: 1.0,
                       fontWeight: FontWeight.w500,
@@ -225,6 +230,7 @@ class _Hero extends StatelessWidget {
                         '${_monthsShort[date.month - 1]} ${date.year}',
                         style: TextStyle(
                           fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.9,
@@ -237,6 +243,7 @@ class _Hero extends StatelessWidget {
                         '${_weekdaysShort[date.weekday - 1]}',
                         style: TextStyle(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontSize: 13,
                           color: cream,
                         ),
@@ -358,6 +365,7 @@ class _DataCell extends StatelessWidget {
           label.toUpperCase(),
           style: TextStyle(
             fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 8.5,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.9,
@@ -370,6 +378,7 @@ class _DataCell extends StatelessWidget {
           style: valueIsSans
               ? TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   height: 1.2,
@@ -377,6 +386,7 @@ class _DataCell extends StatelessWidget {
                 )
               : TextStyle(
                   fontFamily: Fonts.deva,
+                  fontFamilyFallback: AppFontFallback.deva,
                   fontSize: 14,
                   height: 1.2,
                   color: cream,
@@ -388,6 +398,7 @@ class _DataCell extends StatelessWidget {
             en!,
             style: TextStyle(
               fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
               fontSize: 10,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.4,
@@ -447,6 +458,7 @@ class _ObserveStep extends StatelessWidget {
               index.toString(),
               style: TextStyle(
                 fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: saffron,
@@ -459,6 +471,7 @@ class _ObserveStep extends StatelessWidget {
               text,
               style: TextStyle(
                 fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 13.5,
                 height: 1.55,
                 color: isDark ? DColors.text2 : LColors.text2,
@@ -483,6 +496,7 @@ class _Disclaimer extends StatelessWidget {
       'local pandit for regional variations.',
       style: TextStyle(
         fontFamily: Fonts.sans,
+        fontFamilyFallback: AppFontFallback.latin,
         fontSize: 10.5,
         height: 1.5,
         color: isDark ? DColors.text3 : LColors.text3,

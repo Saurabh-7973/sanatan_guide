@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
@@ -160,6 +161,7 @@ class FestivalPill extends ConsumerWidget {
                         text: '${upcoming.sanskritName}  ',
                         style: TextStyle(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontSize: 13,
                           color: saffron,
                         ),
@@ -168,6 +170,7 @@ class FestivalPill extends ConsumerWidget {
                         text: upcoming.name,
                         style: TextStyle(
                           fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontStyle: FontStyle.italic,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -189,6 +192,7 @@ class FestivalPill extends ConsumerWidget {
                         : '$daysUntil DAYS',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.98,
@@ -287,6 +291,7 @@ class _StripShell extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 9.5,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 2.09,
@@ -298,6 +303,7 @@ class _StripShell extends StatelessWidget {
                     title,
                     style: TextStyle(
                       fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.075,
@@ -313,6 +319,7 @@ class _StripShell extends StatelessWidget {
                       meta!,
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 12,
                         color: text2,
                       ),
@@ -332,6 +339,7 @@ class _StripShell extends StatelessWidget {
                       '$completedCount complete',
                       style: TextStyle(
                         fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
                         fontSize: 11,
                         color: text3,
                       ),

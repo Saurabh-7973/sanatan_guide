@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -211,6 +212,7 @@ class _SearchTopBar extends StatelessWidget {
                           onSubmitted: onSubmitted,
                           style: TextStyle(
                             fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontSize: 14,
                             letterSpacing: 0.005 * 14,
                             color: text1,
@@ -233,6 +235,7 @@ class _SearchTopBar extends StatelessWidget {
                                 'Search verse, phrase, or coordinate…',
                             hintStyle: TextStyle(
                               fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontSize: 14,
                               color: text3,
                             ),
@@ -431,6 +434,7 @@ class _SectionLabel extends StatelessWidget {
             text,
             style: TextStyle(
               fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 9.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.28 * 9.5,
@@ -513,6 +517,7 @@ class _SuggestRow extends StatelessWidget {
                   meta,
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.04 * 10.5,
@@ -601,6 +606,7 @@ class _PanditCta extends StatelessWidget {
               'ॐ',
               style: TextStyle(
                 fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
                 fontSize: 16,
                 color: saffron,
               ),
@@ -616,6 +622,7 @@ class _PanditCta extends StatelessWidget {
                   'ASK THE PANDIT',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.24 * 9,
@@ -627,6 +634,7 @@ class _PanditCta extends StatelessWidget {
                   'Pose a question. Receive guidance with verse citations.',
                   style: TextStyle(
                     fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontStyle: FontStyle.italic,
                     fontSize: 13.5,
                     height: 1.4,
@@ -681,6 +689,7 @@ class _SearchingBody extends StatelessWidget {
               'OR RELATED VERSES',
               style: TextStyle(
                 fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
                 fontSize: 9.5,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.24 * 9.5,
@@ -697,6 +706,7 @@ class _SearchingBody extends StatelessWidget {
                   'SEARCHING ACROSS 31 SCRIPTURES',
                   style: TextStyle(
                     fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.24 * 9.5,
@@ -880,6 +890,7 @@ class _ResultsBody extends StatelessWidget {
                 'OR RELATED VERSES',
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.24 * 9.5,
@@ -894,6 +905,7 @@ class _ResultsBody extends StatelessWidget {
               TextSpan(
                 style: TextStyle(
                   fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
                   fontSize: 9.5,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.24 * 9.5,
@@ -927,6 +939,7 @@ class _ResultsBody extends StatelessWidget {
         text: text,
         style: TextStyle(
           fontFamily: Fonts.serif,
+          fontFamilyFallback: AppFontFallback.latin,
           fontStyle: FontStyle.italic,
           fontSize: 12,
           fontWeight: FontWeight.w500,
@@ -961,6 +974,7 @@ class _NoMatches extends StatelessWidget {
             'No matches for "$query"',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: text2,
@@ -972,6 +986,7 @@ class _NoMatches extends StatelessWidget {
             'Try a Sanskrit word, a phrase, or a coordinate like "BG 2.47".',
             style: TextStyle(
               fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
               fontSize: 12.5,
               height: 1.5,
@@ -1000,6 +1015,7 @@ class _ErrorMessage extends StatelessWidget {
           message,
           style: TextStyle(
             fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
             fontSize: 13,
             color: text2,
           ),
@@ -1079,6 +1095,7 @@ class _CoordResolvedCard extends StatelessWidget {
                     coordGlyph,
                     style: TextStyle(
                       fontFamily: Fonts.deva,
+                      fontFamilyFallback: AppFontFallback.deva,
                       fontSize: 18,
                       height: 1,
                       color: cream,
@@ -1094,6 +1111,7 @@ class _CoordResolvedCard extends StatelessWidget {
                           'DIRECT MATCH',
                           style: TextStyle(
                             fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.24 * 9,
@@ -1105,6 +1123,7 @@ class _CoordResolvedCard extends StatelessWidget {
                           '${coord.scripture.displayName} · $unit ${coord.chapterNum} · Verse ${coord.verseNum}',
                           style: TextStyle(
                             fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             height: 1.3,
@@ -1186,6 +1205,7 @@ class _ResultGroup extends StatelessWidget {
                             text: scripture.devaName,
                             style: TextStyle(
                               fontFamily: Fonts.deva,
+                              fontFamilyFallback: AppFontFallback.deva,
                               fontSize: 14,
                               height: 1,
                               color: cream,
@@ -1196,6 +1216,7 @@ class _ResultGroup extends StatelessWidget {
                             text: scripture.displayName,
                             style: TextStyle(
                               fontFamily: Fonts.serif,
+                              fontFamilyFallback: AppFontFallback.latin,
                               fontStyle: FontStyle.italic,
                               fontSize: 11.5,
                               color: text2,
@@ -1214,6 +1235,7 @@ class _ResultGroup extends StatelessWidget {
                               : '${verses.length} · VIEW ALL',
                           style: TextStyle(
                             fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.18 * 9,
@@ -1226,6 +1248,7 @@ class _ResultGroup extends StatelessWidget {
                         '${verses.length}',
                         style: TextStyle(
                           fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.18 * 9,
@@ -1308,6 +1331,7 @@ class _ResultRow extends StatelessWidget {
                     overflow: TextOverflow.fade,
                     style: TextStyle(
                       fontFamily: Fonts.deva,
+                      fontFamilyFallback: AppFontFallback.deva,
                       fontSize: 12,
                       height: 1.4,
                       color: saffron,
@@ -1327,6 +1351,7 @@ class _ResultRow extends StatelessWidget {
                         query,
                         TextStyle(
                           fontFamily: Fonts.deva,
+                          fontFamilyFallback: AppFontFallback.deva,
                           fontSize: 14,
                           height: 1.5,
                           color: cream,
@@ -1344,6 +1369,7 @@ class _ResultRow extends StatelessWidget {
                           query,
                           TextStyle(
                             fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
                             fontStyle: FontStyle.italic,
                             fontSize: 12,
                             height: 1.45,
