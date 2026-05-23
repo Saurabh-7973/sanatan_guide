@@ -46,12 +46,14 @@ void main() {
   // Every settings provider lazily loads from SharedPreferences.
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('renders six heritage section headers in spec order',
+  testWidgets('renders five heritage section headers in spec order',
       (tester) async {
     await _pumpSettings(tester);
 
+    // Per screen-09 mockup the APPEARANCE section is collapsed into
+    // READING (Theme is the first reading row), so the spec is five
+    // headers, not six.
     for (final header in const [
-      'APPEARANCE',
       'READING',
       'NOTIFICATIONS',
       'DATA',
