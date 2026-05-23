@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Missing Flows (Screen 14)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%), #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p { margin-top: 8px; color: rgba(242, 229, 206, 0.5); font-size: 14px; letter-spacing: 0.02em; }
+
+  .group-header { max-width: 1280px; margin: 0 auto 18px; padding-top: 16px; }
+  .group-header h2 {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 500;
+    color: #E8820C;
+  }
+  .group-header p { font-size: 13px; color: rgba(242, 229, 206, 0.55); margin-top: 4px; }
+
+  .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== AI CHAT — GENERAL MODE ==================== */
+  .chat-topbar {
+    flex-shrink: 0;
+    padding: 6px 16px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .chat-title {
+    flex: 1;
+    text-align: center;
+  }
+  .chat-title-glyph {
+    font-family: var(--f-deva);
+    font-size: 18px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .chat-title-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* empty state */
+  .chat-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 36px 80px;
+    text-align: center;
+  }
+  .chat-empty-glyph {
+    font-family: var(--f-deva);
+    font-size: 60px;
+    line-height: 1;
+    margin-bottom: 18px;
+  }
+  .chat-empty-title {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .chat-empty-sub {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+
+  .chat-suggest-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .chat-suggest {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  .chat-suggest-chip {
+    padding: 11px 16px;
+    border: 1px solid;
+    border-radius: 22px;
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.3;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* messages */
+  .chat-messages {
+    padding: 12px 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .msg-user {
+    align-self: flex-end;
+    max-width: 78%;
+    padding: 10px 14px;
+    border-radius: 18px 18px 4px 18px;
+    font-family: var(--f-sans);
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+
+  .msg-ai {
+    padding: 0 4px;
+  }
+  .msg-ai-prose {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+  .msg-ai-prose p + p { margin-top: 12px; }
+  .msg-ai-prose em.term {
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* citation card inline in AI prose */
+  .ai-citation {
+    margin: 14px 0;
+    padding: 14px 16px 12px;
+    border: 1px solid;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ai-citation-binding {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 6px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .ai-citation-binding::before, .ai-citation-binding::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+  .ai-citation-binding .hole {
+    width: 4px; height: 4px;
+    margin: 0 8px;
+    transform: rotate(45deg);
+  }
+
+  .ai-citation-coord {
+    margin-top: 10px;
+    font-family: var(--f-deva);
+    font-size: 12px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .ai-citation-sanskrit {
+    font-family: var(--f-deva);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-bottom: 4px;
+  }
+  .ai-citation-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .ai-citation-arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 10px;
+    opacity: 0.4;
+  }
+
+  /* input bar */
+  .chat-input {
+    flex-shrink: 0;
+    padding: 8px 16px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chat-input-field {
+    flex: 1;
+    min-height: 44px;
+    border-radius: 26px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    border: 1px solid;
+  }
+  .chat-input-field input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--f-sans);
+    font-size: 13.5px;
+  }
+  .chat-input-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ==================== BOTTOM SHEET ==================== */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+  }
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px 16px 0 0;
+    z-index: 11;
+    padding: 8px 0 22px;
+    max-height: 80%;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+  .sheet-header {
+    padding: 0 22px 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    border-bottom: 1px solid;
+  }
+  .sheet-title {
+    font-family: var(--f-serif);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sheet-coord {
+    margin-left: auto;
+    font-family: var(--f-deva);
+    font-size: 13px;
+    line-height: 1;
+  }
+  .sheet-body {
+    padding: 16px 22px 6px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .sheet-actions {
+    padding: 12px 22px 0;
+    border-top: 1px solid;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sheet-action-tertiary {
+    font-family: var(--f-sans);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .sheet-action-spacer { flex: 1; }
+  .sheet-btn {
+    height: 40px;
+    padding: 0 22px;
+    border-radius: 22px;
+    border: none;
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .sheet-btn.secondary { background: transparent; }
+
+  /* notes specific */
+  .notes-textarea {
+    width: 100%;
+    min-height: 130px;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .notes-counter {
+    margin-top: 8px;
+    text-align: right;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+
+  /* share specific */
+  .share-preview {
+    padding: 18px 20px;
+    border: 1px solid;
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .share-binding {
+    position: absolute;
+    left: 20px; right: 20px;
+    top: 8px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .share-binding::before, .share-binding::after {
+    content: ""; flex: 1; height: 1px;
+  }
+  .share-binding .hole {
+    width: 5px; height: 5px;
+    margin: 0 10px;
+    transform: rotate(45deg);
+  }
+  .share-coord {
+    margin-top: 14px;
+    font-family: var(--f-deva);
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .share-sanskrit {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .share-trans {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  .share-link {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-align: center;
+  }
+
+  .share-format-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .share-formats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .share-format {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1px solid;
+    border-radius: 8px;
+    text-align: center;
+    font-family: var(--f-sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-btn { color: var(--d-text-1); }
+  .theme-dark .chat-title-glyph { color: var(--d-saffron); }
+  .theme-dark .chat-title-label { color: var(--d-text-3); }
+
+  .theme-dark .chat-empty-glyph { color: var(--d-saffron); text-shadow: 0 0 16px rgba(232, 130, 12, 0.3); }
+  .theme-dark .chat-empty-title { color: var(--d-cream); }
+  .theme-dark .chat-empty-sub { color: var(--d-text-2); }
+  .theme-dark .chat-suggest-label { color: var(--d-text-3); }
+  .theme-dark .chat-suggest-chip {
+    border-color: var(--d-divider-soft);
+    color: var(--d-text-2);
+    background: rgba(232, 130, 12, 0.02);
+  }
+
+  .theme-dark .msg-user {
+    background: var(--d-saffron-glow);
+    color: var(--d-cream);
+  }
+  .theme-dark .msg-ai-prose { color: var(--d-text-1); }
+  .theme-dark .msg-ai-prose em.term { color: var(--d-saffron); }
+  .theme-dark .ai-citation {
+    background: var(--d-surface);
+    border-color: var(--d-divider);
+  }
+  .theme-dark .ai-citation-binding::before, .theme-dark .ai-citation-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.4;
+  }
+  .theme-dark .ai-citation-binding .hole { background: var(--d-saffron); }
+  .theme-dark .ai-citation-coord { color: var(--d-saffron); }
+  .theme-dark .ai-citation-sanskrit { color: var(--d-cream); }
+  .theme-dark .ai-citation-en { color: var(--d-text-2); }
+  .theme-dark .ai-citation-arrow { color: var(--d-text-3); }
+
+  .theme-dark .chat-input-field {
+    background: var(--d-surface);
+    border-color: var(--d-divider-soft);
+  }
+  .theme-dark .chat-input-field input { color: var(--d-text-1); }
+  .theme-dark .chat-input-field input::placeholder { color: var(--d-text-3); }
+  .theme-dark .chat-input-send {
+    background: var(--d-saffron);
+    color: #1a1208;
+  }
+
+  /* sheets dark */
+  .theme-dark .sheet {
+    background: var(--d-surface-2);
+  }
+  .theme-dark .sheet-handle { background: var(--d-text-3); }
+  .theme-dark .sheet-header { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .sheet-title { color: var(--d-cream); }
+  .theme-dark .sheet-coord { color: var(--d-saffron); }
+  .theme-dark .sheet-actions { border-top-color: var(--d-divider-soft); }
+  .theme-dark .sheet-action-tertiary { color: var(--d-text-3); }
+  .theme-dark .sheet-btn { background: var(--d-saffron); color: #1a1208; }
+  .theme-dark .sheet-btn.secondary { color: var(--d-text-2); background: transparent; }
+
+  .theme-dark .notes-textarea { color: var(--d-text-1); }
+  .theme-dark .notes-textarea::placeholder { color: var(--d-text-3); }
+  .theme-dark .notes-counter { color: var(--d-text-3); }
+
+  .theme-dark .share-preview { border-color: var(--d-divider); background: var(--d-surface); }
+  .theme-dark .share-binding::before, .theme-dark .share-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.4;
+  }
+  .theme-dark .share-binding .hole { background: var(--d-saffron); }
+  .theme-dark .share-coord { color: var(--d-saffron); }
+  .theme-dark .share-sanskrit { color: var(--d-cream); }
+  .theme-dark .share-trans { color: var(--d-text-2); }
+  .theme-dark .share-link { color: var(--d-text-3); }
+  .theme-dark .share-format-label { color: var(--d-text-3); }
+  .theme-dark .share-format { border-color: var(--d-divider-soft); color: var(--d-text-2); }
+  .theme-dark .share-format.active {
+    border-color: var(--d-saffron);
+    background: var(--d-saffron-glow);
+    color: var(--d-saffron);
+  }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background: radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%), var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-btn { color: var(--l-text-1); }
+  .theme-light .chat-title-glyph { color: var(--l-saffron); }
+  .theme-light .chat-title-label { color: var(--l-text-3); }
+  .theme-light .chat-empty-glyph { color: var(--l-saffron); }
+  .theme-light .chat-empty-title { color: var(--l-text-1); }
+  .theme-light .chat-empty-sub { color: var(--l-text-2); }
+  .theme-light .chat-suggest-label { color: var(--l-text-3); }
+  .theme-light .chat-suggest-chip {
+    border-color: var(--l-divider-soft);
+    color: var(--l-text-2);
+  }
+  .theme-light .msg-user { background: var(--l-saffron-glow); color: var(--l-text-1); }
+  .theme-light .msg-ai-prose { color: var(--l-text-1); }
+  .theme-light .msg-ai-prose em.term { color: var(--l-saffron); }
+  .theme-light .chat-input-field { background: var(--l-surface); border-color: var(--l-divider-soft); }
+  .theme-light .chat-input-field input { color: var(--l-text-1); }
+  .theme-light .chat-input-field input::placeholder { color: var(--l-text-3); }
+  .theme-light .chat-input-send { background: var(--l-saffron); color: #fff; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .chat-empty-glyph, .chat-empty-title, .chat-empty-sub, .chat-suggest-chip {
+    animation: inkSettle 500ms ease-out backwards;
+  }
+  .chat-empty-glyph { animation-delay: 100ms; }
+  .chat-empty-title { animation-delay: 250ms; }
+  .chat-empty-sub { animation-delay: 380ms; }
+  .chat-suggest-chip:nth-child(1) { animation-delay: 550ms; }
+  .chat-suggest-chip:nth-child(2) { animation-delay: 620ms; }
+  .chat-suggest-chip:nth-child(3) { animation-delay: 690ms; }
+  .chat-suggest-chip:nth-child(4) { animation-delay: 760ms; }
+
+  @keyframes sheetIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .sheet { animation: sheetIn 280ms cubic-bezier(0.32, 0.72, 0, 1); }
+
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes h3 {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: #E8820C;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 22px 0 10px;
+  }
+  .design-notes ul { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 32px; }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0; top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 14 · Missing Flows</span></h1>
+  <p>AI Chat general mode · Notes bottom sheet · Share bottom sheet</p>
+</div>
+
+<!-- ==================== GROUP 1: AI CHAT GENERAL MODE ==================== -->
+<div class="group-header">
+  <h2>1 · AI Chat — general mode (no verse anchor)</h2>
+  <p>Reached from Search "Ask the Pandit" CTA. Different from verse-anchored chat (no anchor strip at top).</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · GENERAL EMPTY -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · empty (just opened)</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:52</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="chat-topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="chat-title">
+            <div class="chat-title-glyph">ॐ</div>
+            <div class="chat-title-label">Ask the Pandit</div>
+          </div>
+          <div class="topbar-btn"></div>
+        </div>
+
+        <div class="chat-empty">
+          <div class="chat-empty-glyph">ॐ</div>
+          <div class="chat-empty-title">What would you like to ask?</div>
+          <div class="chat-empty-sub">
+            Pose a question about the texts — life, dharma, a specific concept, or a passage you remember. Every answer cites real verses.
+          </div>
+
+          <div class="chat-suggest-label">Try asking</div>
+          <div class="chat-suggest">
+            <div class="chat-suggest-chip">"What does the Gītā say about anger?"</div>
+            <div class="chat-suggest-chip">"How should I think about death?"</div>
+            <div class="chat-suggest-chip">"What is the difference between dharma and karma?"</div>
+            <div class="chat-suggest-chip">"Which Upaniṣad should I read first?"</div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="chat-input-field">
+            <input type="text" placeholder="Ask anything about the texts..." />
+          </div>
+          <div class="chat-input-send" style="opacity: 0.4;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9l13-6-4 13-3-6-6-1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · GENERAL WITH MESSAGES -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · conversation</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:53</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="chat-topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="chat-title">
+            <div class="chat-title-glyph">ॐ</div>
+            <div class="chat-title-label">Ask the Pandit</div>
+          </div>
+          <div class="topbar-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="chat-messages screen-content" style="padding: 12px 16px 8px;">
+          <div class="msg-user">What does the Gītā say about anger?</div>
+
+          <div class="msg-ai">
+            <div class="msg-ai-prose">
+              <p>Anger is treated in the Gītā not as a sin but as a <em class="term">corruption of judgment</em>. Krishna traces a chain: attachment to objects breeds desire; obstructed desire becomes anger; anger destroys clarity; loss of clarity destroys memory; loss of memory ruins the intellect; and a ruined intellect destroys the self.</p>
+
+              <div class="ai-citation">
+                <div class="ai-citation-binding"><div class="hole"></div></div>
+                <div class="ai-citation-coord">‖२·६२‖ ‖२·६३‖</div>
+                <div class="ai-citation-sanskrit">क्रोधाद्भवति सम्मोहः सम्मोहात्स्मृतिविभ्रमः ।</div>
+                <div class="ai-citation-en">"From anger arises delusion; from delusion, the bewilderment of memory..."</div>
+                <div class="ai-citation-arrow">
+                  <svg width="9" height="13" viewBox="0 0 9 13" fill="none">
+                    <path d="M1 1l6 5.5-6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <p>The Gītā's remedy is not suppression but <em class="term">tracing the chain backward</em> — to act without attachment to results. The Bhāgavata adds that anger can be transmuted, that what burns the worldly self can illumine the spiritual one when its energy is redirected toward truth.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="chat-input-field">
+            <input type="text" placeholder="Ask anything about the texts..." />
+          </div>
+          <div class="chat-input-send">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9l13-6-4 13-3-6-6-1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · EMPTY -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · empty</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:52</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="chat-topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="chat-title">
+            <div class="chat-title-glyph">ॐ</div>
+            <div class="chat-title-label">Ask the Pandit</div>
+          </div>
+          <div class="topbar-btn"></div>
+        </div>
+
+        <div class="chat-empty">
+          <div class="chat-empty-glyph">ॐ</div>
+          <div class="chat-empty-title">What would you like to ask?</div>
+          <div class="chat-empty-sub">
+            Pose a question about the texts — life, dharma, a specific concept, or a passage you remember. Every answer cites real verses.
+          </div>
+
+          <div class="chat-suggest-label">Try asking</div>
+          <div class="chat-suggest">
+            <div class="chat-suggest-chip">"What does the Gītā say about anger?"</div>
+            <div class="chat-suggest-chip">"How should I think about death?"</div>
+            <div class="chat-suggest-chip">"What is the difference between dharma and karma?"</div>
+            <div class="chat-suggest-chip">"Which Upaniṣad should I read first?"</div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="chat-input-field">
+            <input type="text" placeholder="Ask anything about the texts..." />
+          </div>
+          <div class="chat-input-send" style="opacity: 0.4;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9l13-6-4 13-3-6-6-1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 2: NOTES BOTTOM SHEET ==================== -->
+<div class="group-header">
+  <h2>2 · Notes bottom sheet</h2>
+  <p>Reached from Verse Detail action bar "Notes" icon. Modal bottom sheet, 1–200 chars per note.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · NOTES NEW -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · writing new note</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:55</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <!-- dimmed verse detail behind -->
+        <div style="padding: 20px 24px; opacity: 0.3;">
+          <div style="font-family: var(--f-serif); font-style: italic; color: var(--d-text-2);">[Verse Detail behind]</div>
+          <div style="margin-top: 40px; font-family: var(--f-deva); color: var(--d-cream); font-size: 22px; text-align: center; line-height: 1.85;">
+            कर्मण्येवाधिकारस्ते<br/>मा फलेषु कदाचन ।
+          </div>
+        </div>
+
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">Your note</div>
+            <div class="sheet-coord">‖२·४७‖</div>
+          </div>
+          <div class="sheet-body">
+            <textarea class="notes-textarea" placeholder="What does this verse mean to you? A reflection, a memory, a question to revisit..."></textarea>
+            <div class="notes-counter">0 / 200</div>
+          </div>
+          <div class="sheet-actions">
+            <div class="sheet-action-spacer"></div>
+            <button class="sheet-btn secondary">Cancel</button>
+            <button class="sheet-btn" style="opacity: 0.5;">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · NOTES EDIT EXISTING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · editing existing</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:56</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div style="padding: 20px 24px; opacity: 0.3;">
+          <div style="font-family: var(--f-serif); font-style: italic; color: var(--d-text-2);">[Verse Detail behind]</div>
+          <div style="margin-top: 40px; font-family: var(--f-deva); color: var(--d-cream); font-size: 22px; text-align: center; line-height: 1.85;">
+            कर्मण्येवाधिकारस्ते<br/>मा फलेषु कदाचन ।
+          </div>
+        </div>
+
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">Your note</div>
+            <div class="sheet-coord">‖२·४७‖</div>
+          </div>
+          <div class="sheet-body">
+            <textarea class="notes-textarea">Read this on the morning before the interview. The detachment Krishna asks for isn't indifference — it's choosing the act over the outcome. I keep coming back to this one.</textarea>
+            <div class="notes-counter">169 / 200</div>
+          </div>
+          <div class="sheet-actions">
+            <span class="sheet-action-tertiary" style="color: var(--d-text-3);">Delete</span>
+            <div class="sheet-action-spacer"></div>
+            <button class="sheet-btn secondary">Cancel</button>
+            <button class="sheet-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 3: SHARE BOTTOM SHEET ==================== -->
+<div class="group-header">
+  <h2>3 · Share bottom sheet</h2>
+  <p>Reached from Verse Detail action bar "Share" icon. v1 is text-only; image card is v2.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · SHARE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · share preview</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:57</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div style="padding: 20px 24px; opacity: 0.3;">
+          <div style="font-family: var(--f-serif); font-style: italic; color: var(--d-text-2);">[Verse Detail behind]</div>
+        </div>
+
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">Share this verse</div>
+            <div class="sheet-coord">‖२·४७‖</div>
+          </div>
+          <div class="sheet-body">
+
+            <div class="share-format-label">What to include</div>
+            <div class="share-formats">
+              <div class="share-format">Sanskrit only</div>
+              <div class="share-format active">+ Translation</div>
+              <div class="share-format">Full citation</div>
+            </div>
+
+            <div class="share-preview">
+              <div class="share-binding"><div class="hole"></div></div>
+              <div class="share-coord">‖ Bhagavad Gītā · २·४७ ‖</div>
+              <div class="share-sanskrit">
+                कर्मण्येवाधिकारस्ते<br/>
+                मा फलेषु कदाचन ।
+              </div>
+              <div class="share-trans">
+                "Your right is to action alone, never to its fruits."
+              </div>
+              <div class="share-link">sanatanguide.app/BG/2/47</div>
+            </div>
+
+          </div>
+          <div class="sheet-actions">
+            <div class="sheet-action-spacer"></div>
+            <button class="sheet-btn secondary">Copy text</button>
+            <button class="sheet-btn">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · SHARE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · share preview</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:57</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div style="padding: 20px 24px; opacity: 0.3;">
+          <div style="font-family: var(--f-serif); font-style: italic; color: var(--l-text-2);">[Verse Detail behind]</div>
+        </div>
+
+        <div class="scrim"></div>
+
+        <div class="sheet" style="background: #fff;">
+          <div class="sheet-handle" style="background: var(--l-text-3);"></div>
+          <div class="sheet-header" style="border-bottom-color: var(--l-divider-soft);">
+            <div class="sheet-title" style="color: var(--l-text-1);">Share this verse</div>
+            <div class="sheet-coord" style="color: var(--l-saffron);">‖२·४७‖</div>
+          </div>
+          <div class="sheet-body">
+
+            <div class="share-format-label" style="color: var(--l-text-3);">What to include</div>
+            <div class="share-formats">
+              <div class="share-format" style="border-color: var(--l-divider-soft); color: var(--l-text-2);">Sanskrit only</div>
+              <div class="share-format" style="border-color: var(--l-saffron); background: var(--l-saffron-glow); color: var(--l-saffron);">+ Translation</div>
+              <div class="share-format" style="border-color: var(--l-divider-soft); color: var(--l-text-2);">Full citation</div>
+            </div>
+
+            <div class="share-preview" style="border-color: var(--l-divider); background: var(--l-surface);">
+              <div class="share-binding">
+                <div style="background: linear-gradient(90deg, transparent, rgba(139,72,6,0.4), transparent); flex:1; height:1px;"></div>
+                <div class="hole" style="background: var(--l-saffron-deep); width:5px; height:5px; margin:0 10px; transform:rotate(45deg);"></div>
+                <div style="background: linear-gradient(90deg, transparent, rgba(139,72,6,0.4), transparent); flex:1; height:1px;"></div>
+              </div>
+              <div class="share-coord" style="color: var(--l-saffron);">‖ Bhagavad Gītā · २·४७ ‖</div>
+              <div class="share-sanskrit" style="color: var(--l-text-1);">
+                कर्मण्येवाधिकारस्ते<br/>
+                मा फलेषु कदाचन ।
+              </div>
+              <div class="share-trans" style="color: var(--l-text-2);">
+                "Your right is to action alone, never to its fruits."
+              </div>
+              <div class="share-link" style="color: var(--l-text-3);">sanatanguide.app/BG/2/47</div>
+            </div>
+
+          </div>
+          <div class="sheet-actions" style="border-top-color: var(--l-divider-soft);">
+            <div class="sheet-action-spacer"></div>
+            <button class="sheet-btn secondary" style="color: var(--l-text-2);">Copy text</button>
+            <button class="sheet-btn" style="background: var(--l-saffron); color: #fff;">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What's covered here</h2>
+
+  <h3>AI Chat — general mode</h3>
+  <ul>
+    <li><b>No verse anchor at the top.</b> Replaced with a compact title block: small ॐ glyph + "ASK THE PANDIT" small-caps. This is what distinguishes general mode from verse-anchored mode (which has the full Sanskrit incipit + leaf-thread at top).</li>
+    <li><b>Empty state hero: large ॐ + question + sub-prose + 4 example questions.</b> The 4 examples teach the user what general mode is for: concepts ("anger"), life questions ("death"), comparisons ("dharma vs karma"), reading guidance ("which Upaniṣad first").</li>
+    <li><b>Suggest chips are full italic-serif questions, not single words.</b> Shows the user that questions are conversational, not keyword-based.</li>
+    <li><b>Same message styling as verse-anchored mode.</b> User = saffron-tinted rounded bubble right-aligned. AI = flowing Lora italic prose, no bubble. Citation cards inline use the binding-line motif from the rest of the app.</li>
+    <li><b>"New conversation" + icon top-right</b> (visible in conversation state). Clears history, returns to empty state. Not present on empty state (nothing to clear).</li>
+    <li><b>Input placeholder: "Ask anything about the texts..."</b> — distinct from verse-anchored placeholder ("Ask about this verse...").</li>
+  </ul>
+
+  <h3>Notes bottom sheet</h3>
+  <ul>
+    <li><b>Modal slide-up from bottom.</b> Drag handle at top, 16px radius on top corners. 55% black scrim dims the verse behind.</li>
+    <li><b>Header: "Your note" + verse coordinate</b> (‖२·४७‖) on the right in saffron. The coord ties the note to its verse explicitly.</li>
+    <li><b>Lora italic textarea.</b> 14.5px, line-height 1.65. The italic-serif aesthetic matches commentary and AI replies — notes are personal reflections, the literary register of the app.</li>
+    <li><b>200 character limit.</b> Counter at bottom-right. Forces brevity; encourages reflection over essays. Notes are journal-style, not long-form.</li>
+    <li><b>Action row: Delete (tertiary, left) · Cancel (secondary, right) · Save (primary, right).</b> Delete only shows when editing an existing note. Save disabled until content exists.</li>
+    <li><b>One note per verse.</b> Simpler model than threaded notes. If user wants multiple thoughts, they edit existing.</li>
+    <li><b>Notes appear on Bookmarks screen</b> under each saved verse in italic-serif (already designed in Screen 07).</li>
+  </ul>
+
+  <h3>Share bottom sheet</h3>
+  <ul>
+    <li><b>Three-segment format chooser at the top.</b> "Sanskrit only / + Translation / Full citation" — gives the user control without overwhelming. Middle option is default (Sanskrit + Translation).</li>
+    <li><b>Live preview card with palm-leaf binding line.</b> Shows exactly what will be shared, formatted with the same heritage vocabulary as Verse Detail. This is the share artifact's identity.</li>
+    <li><b>Deep link included: <code>sanatanguide.app/BG/2/47</code></b>. Recipients who don't have the app see a web preview; recipients with the app deep-link directly to the verse.</li>
+    <li><b>Two CTAs: "Copy text" (secondary) · "Share" (primary).</b> Copy puts the formatted text on clipboard. Share invokes the system share sheet with the same text payload.</li>
+    <li><b>v1 ships text-only.</b> The image-card share (with full design, deity colors, etc. — like Instagram-friendly cards) is documented as v2 in <code>V2_BACKLOG.md</code>. Don't build it for launch.</li>
+    <li><b>Format strings (canonical, do not change):</b><br/>
+      Sanskrit only: <code>{deva}\n\n— {scripture} {coord}\n{deep_link}</code><br/>
+      + Translation: <code>{deva}\n\n"{translation}"\n\n— {scripture} {coord}\n{deep_link}</code><br/>
+      Full: <code>{deva}\n\n{transliteration}\n\n"{translation}"\n\n— {scripture} {coord} ({attribution})\n{deep_link}</code>
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>

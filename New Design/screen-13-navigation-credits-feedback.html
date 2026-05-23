@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Navigation & Sub-Screens (Screen 13)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .group-header {
+    max-width: 1280px;
+    margin: 0 auto 18px;
+    padding-top: 16px;
+  }
+  .group-header h2 {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 500;
+    color: #E8820C;
+  }
+  .group-header p {
+    font-size: 13px;
+    color: rgba(242, 229, 206, 0.55);
+    margin-top: 4px;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== HOME TOPBAR (with new icons) ==================== */
+  .home-topbar {
+    flex-shrink: 0;
+    padding: 6px 16px 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .home-topbar-brand {
+    flex: 1;
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .topbar-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  /* small dot indicator for unread bookmarks */
+  .topbar-icon-btn .dot-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* ==================== HOME MINI PREVIEW ==================== */
+  .home-greeting {
+    padding: 8px 24px 22px;
+  }
+
+  .home-greeting-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .home-greeting-en {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* ==================== OVERFLOW MENU ==================== */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+  }
+
+  .overflow-menu {
+    position: absolute;
+    top: 80px;
+    right: 16px;
+    width: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 11;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .overflow-item {
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+    font-family: var(--f-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+  .overflow-item:last-child { border-bottom: none; }
+
+  .overflow-item-icon {
+    width: 18px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* ==================== CREDITS SCREEN ==================== */
+  .credits-topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .topbar-spacer { flex: 1; }
+
+  .credits-hero {
+    padding: 8px 24px 14px;
+  }
+
+  .credits-hero-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .credits-hero-title {
+    font-family: var(--f-serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .credits-hero-prose {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* sutra-style enumeration */
+  .credits-section {
+    margin-top: 26px;
+    padding: 0 24px;
+  }
+
+  .credits-section-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 1px solid;
+    margin-bottom: 4px;
+  }
+
+  .credit-row {
+    padding: 14px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    border-bottom: 1px solid;
+    cursor: pointer;
+  }
+  .credit-row:last-child { border-bottom: none; }
+
+  /* Sanskrit numeral marker */
+  .credit-marker {
+    flex-shrink: 0;
+    font-family: var(--f-deva);
+    font-size: 14px;
+    line-height: 1.2;
+    margin-top: 1px;
+    width: 16px;
+    text-align: center;
+  }
+
+  .credit-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .credit-title {
+    font-family: var(--f-serif);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    margin-bottom: 3px;
+  }
+
+  .credit-title em {
+    font-family: var(--f-deva);
+    font-style: normal;
+    font-weight: 500;
+    margin-right: 3px;
+  }
+
+  .credit-desc {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .credit-meta {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .credit-link-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+    margin-top: 4px;
+  }
+
+  /* lineage footer */
+  .lineage-footer {
+    margin: 28px 24px 32px;
+    padding: 22px 22px 20px;
+    border-radius: 4px;
+    border: 1px solid;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lineage-binding {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    top: 8px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .lineage-binding::before, .lineage-binding::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+  .lineage-binding .hole {
+    width: 5px;
+    height: 5px;
+    margin: 0 10px;
+    transform: rotate(45deg);
+  }
+
+  .lineage-deva {
+    margin-top: 18px;
+    font-family: var(--f-deva);
+    font-size: 18px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .lineage-attribution {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  /* ==================== SEND FEEDBACK SCREEN ==================== */
+  .feedback-hero {
+    padding: 8px 24px 22px;
+  }
+
+  .feedback-hero-title {
+    font-family: var(--f-serif);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .feedback-hero-prose {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .feedback-section {
+    padding: 0 24px;
+    margin-top: 8px;
+  }
+
+  .feedback-section-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid;
+  }
+
+  .feedback-kind {
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+  }
+  .feedback-kind:last-child { border-bottom: none; }
+
+  .feedback-kind-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid;
+  }
+
+  .feedback-kind-body { flex: 1; min-width: 0; }
+
+  .feedback-kind-title {
+    font-family: var(--f-serif);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .feedback-kind-desc {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .feedback-kind-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  /* compose state */
+  .compose-meta {
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid;
+  }
+
+  .compose-meta-pill {
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .compose-textarea {
+    width: 100%;
+    min-height: 220px;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: var(--f-serif);
+    font-size: 14.5px;
+    line-height: 1.65;
+    padding: 18px 0;
+  }
+
+  .compose-attach {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--f-sans);
+    font-size: 11.5px;
+    font-weight: 500;
+    border-top: 1px solid;
+  }
+
+  .compose-attach-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* bottom action */
+  .bottom-actions {
+    flex-shrink: 0;
+    padding: 12px 24px 28px;
+  }
+
+  .primary-btn {
+    width: 100%;
+    height: 50px;
+    border-radius: 28px;
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+  }
+
+  .primary-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+
+  .theme-dark .home-topbar-brand { color: var(--d-saffron); }
+  .theme-dark .topbar-icon-btn { color: var(--d-text-1); }
+  .theme-dark .topbar-icon-btn .dot-indicator { background: var(--d-saffron); }
+  .theme-dark .topbar-back { color: var(--d-text-1); }
+
+  .theme-dark .home-greeting-deva { color: var(--d-cream); }
+  .theme-dark .home-greeting-en { color: var(--d-text-2); }
+
+  /* overflow menu dark */
+  .theme-dark .overflow-menu {
+    background: var(--d-surface-2);
+    border: 1px solid var(--d-divider);
+  }
+  .theme-dark .overflow-item {
+    color: var(--d-text-1);
+    border-bottom-color: var(--d-divider-soft);
+  }
+  .theme-dark .overflow-item:hover { background: rgba(232, 130, 12, 0.05); }
+  .theme-dark .overflow-item-icon { color: var(--d-saffron); }
+
+  /* credits dark */
+  .theme-dark .credits-hero-label { color: var(--d-saffron); }
+  .theme-dark .credits-hero-title { color: var(--d-cream); }
+  .theme-dark .credits-hero-prose { color: var(--d-text-2); }
+
+  .theme-dark .credits-section-label {
+    color: var(--d-text-3);
+    border-bottom-color: var(--d-divider);
+  }
+
+  .theme-dark .credit-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .credit-marker { color: var(--d-saffron); }
+  .theme-dark .credit-title { color: var(--d-text-1); }
+  .theme-dark .credit-title em { color: var(--d-saffron); }
+  .theme-dark .credit-desc { color: var(--d-text-2); }
+  .theme-dark .credit-meta { color: var(--d-text-3); }
+  .theme-dark .credit-link-arrow { color: var(--d-text-3); }
+
+  .theme-dark .lineage-footer {
+    background: var(--d-surface);
+    border-color: var(--d-divider);
+  }
+  .theme-dark .lineage-binding::before, .theme-dark .lineage-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.4;
+  }
+  .theme-dark .lineage-binding .hole { background: var(--d-saffron); }
+  .theme-dark .lineage-deva { color: var(--d-cream); }
+  .theme-dark .lineage-attribution { color: var(--d-text-2); }
+
+  /* feedback dark */
+  .theme-dark .feedback-hero-title { color: var(--d-text-1); }
+  .theme-dark .feedback-hero-prose { color: var(--d-text-2); }
+  .theme-dark .feedback-section-label {
+    color: var(--d-text-3);
+    border-bottom-color: var(--d-divider);
+  }
+  .theme-dark .feedback-kind { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .feedback-kind-icon {
+    border-color: var(--d-divider);
+    color: var(--d-saffron);
+  }
+  .theme-dark .feedback-kind-title { color: var(--d-text-1); }
+  .theme-dark .feedback-kind-desc { color: var(--d-text-2); }
+  .theme-dark .feedback-kind-arrow { color: var(--d-text-3); }
+
+  .theme-dark .compose-meta { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .compose-meta-pill {
+    background: var(--d-saffron-glow);
+    color: var(--d-saffron);
+  }
+  .theme-dark .compose-textarea { color: var(--d-text-1); }
+  .theme-dark .compose-textarea::placeholder { color: var(--d-text-3); }
+  .theme-dark .compose-attach {
+    border-top-color: var(--d-divider-soft);
+    color: var(--d-text-2);
+  }
+  .theme-dark .compose-attach-check { border-color: var(--d-text-3); }
+  .theme-dark .compose-attach-check.checked {
+    background: var(--d-saffron);
+    border-color: var(--d-saffron);
+    color: #1a1208;
+  }
+
+  .theme-dark .primary-btn { background: var(--d-saffron); color: #1a1208; }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+
+  .theme-light .home-topbar-brand { color: var(--l-saffron); }
+  .theme-light .topbar-icon-btn { color: var(--l-text-1); }
+  .theme-light .topbar-icon-btn .dot-indicator { background: var(--l-saffron); }
+  .theme-light .topbar-back { color: var(--l-text-1); }
+
+  .theme-light .home-greeting-deva { color: var(--l-text-1); }
+  .theme-light .home-greeting-en { color: var(--l-text-2); }
+
+  .theme-light .overflow-menu {
+    background: #fff;
+    border: 1px solid var(--l-divider);
+  }
+  .theme-light .overflow-item {
+    color: var(--l-text-1);
+    border-bottom-color: var(--l-divider-soft);
+  }
+  .theme-light .overflow-item-icon { color: var(--l-saffron); }
+
+  .theme-light .credits-hero-label { color: var(--l-saffron); }
+  .theme-light .credits-hero-title { color: var(--l-text-1); }
+  .theme-light .credits-hero-prose { color: var(--l-text-2); }
+
+  .theme-light .credits-section-label {
+    color: var(--l-text-3);
+    border-bottom-color: var(--l-divider);
+  }
+
+  .theme-light .credit-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .credit-marker { color: var(--l-saffron); }
+  .theme-light .credit-title { color: var(--l-text-1); }
+  .theme-light .credit-title em { color: var(--l-saffron); }
+  .theme-light .credit-desc { color: var(--l-text-2); }
+  .theme-light .credit-meta { color: var(--l-text-3); }
+  .theme-light .credit-link-arrow { color: var(--l-text-3); }
+
+  .theme-light .lineage-footer {
+    background: var(--l-surface);
+    border-color: var(--l-divider);
+  }
+  .theme-light .lineage-binding::before, .theme-light .lineage-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .lineage-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .lineage-deva { color: var(--l-text-1); }
+  .theme-light .lineage-attribution { color: var(--l-text-2); }
+
+  .theme-light .feedback-hero-title { color: var(--l-text-1); }
+  .theme-light .feedback-hero-prose { color: var(--l-text-2); }
+  .theme-light .feedback-section-label {
+    color: var(--l-text-3);
+    border-bottom-color: var(--l-divider);
+  }
+  .theme-light .feedback-kind { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .feedback-kind-icon {
+    border-color: var(--l-divider);
+    color: var(--l-saffron);
+  }
+  .theme-light .feedback-kind-title { color: var(--l-text-1); }
+  .theme-light .feedback-kind-desc { color: var(--l-text-2); }
+  .theme-light .feedback-kind-arrow { color: var(--l-text-3); }
+
+  .theme-light .compose-meta { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .compose-meta-pill {
+    background: var(--l-saffron-glow);
+    color: var(--l-saffron);
+  }
+  .theme-light .compose-textarea { color: var(--l-text-1); }
+  .theme-light .compose-textarea::placeholder { color: var(--l-text-3); }
+  .theme-light .compose-attach {
+    border-top-color: var(--l-divider-soft);
+    color: var(--l-text-2);
+  }
+  .theme-light .compose-attach-check { border-color: var(--l-text-3); }
+  .theme-light .compose-attach-check.checked {
+    background: var(--l-saffron);
+    border-color: var(--l-saffron);
+    color: #fff;
+  }
+
+  .theme-light .primary-btn { background: var(--l-saffron); color: #fff; }
+
+  /* ==================== ENTRANCE ==================== */
+  @keyframes menuIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .overflow-menu { animation: menuIn 180ms ease-out backwards; transform-origin: top right; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .credit-row { animation: inkSettle 350ms ease-out backwards; }
+  .credit-row:nth-child(1) { animation-delay: 40ms; }
+  .credit-row:nth-child(2) { animation-delay: 80ms; }
+  .credit-row:nth-child(3) { animation-delay: 120ms; }
+  .credit-row:nth-child(4) { animation-delay: 160ms; }
+  .credit-row:nth-child(5) { animation-delay: 200ms; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes h3 {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: #E8820C;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 22px 0 10px;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 13 · Navigation & Sub-screens</span></h1>
+  <p>The missing entry points · Credits · Send Feedback · six frames</p>
+</div>
+
+<!-- ==================== GROUP 1: NAVIGATION ==================== -->
+<div class="group-header">
+  <h2>1 · How Bookmarks, Search, Settings are reached</h2>
+  <p>Home topbar gets three trailing icons: Search, Bookmarks, ⋯ (overflow). Settings lives in the overflow menu.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · HOME TOPBAR -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Home topbar</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <!-- THE NEW TOPBAR -->
+        <div class="home-topbar">
+          <div class="home-topbar-brand">सनातन</div>
+          <!-- Search icon -->
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <!-- Bookmarks icon (knot diamond) -->
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 3h10v15l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <span class="dot-indicator"></span>
+          </div>
+          <!-- Overflow ⋯ -->
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="4" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="10" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="16" cy="10" r="1.7" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="home-greeting">
+          <div class="home-greeting-deva">शुभ प्रभात</div>
+          <div class="home-greeting-en">Tuesday, 5 May 2026</div>
+        </div>
+
+        <!-- Mock home content -->
+        <div style="padding: 0 24px; color: rgba(242, 229, 206, 0.4); font-family: var(--f-serif); font-style: italic; font-size: 13px; line-height: 1.6;">
+          [Home content continues here — verse of the day card, Your Path strip, Upcoming Parva, etc. See screen-01-home.html for the full layout.]
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · OVERFLOW MENU OPEN -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · overflow open</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="home-topbar">
+          <div class="home-topbar-brand">सनातन</div>
+          <div class="topbar-icon-btn" style="opacity: 0.5;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="topbar-icon-btn" style="opacity: 0.5;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 3h10v15l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-icon-btn" style="background: rgba(232, 130, 12, 0.12); color: var(--d-saffron);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="4" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="10" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="16" cy="10" r="1.7" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- dim the home content -->
+        <div class="home-greeting" style="opacity: 0.3;">
+          <div class="home-greeting-deva">शुभ प्रभात</div>
+          <div class="home-greeting-en">Tuesday, 5 May 2026</div>
+        </div>
+        <div style="padding: 0 24px; opacity: 0.2;">[Home content]</div>
+
+        <!-- scrim -->
+        <div class="scrim"></div>
+
+        <!-- the menu itself -->
+        <div class="overflow-menu">
+          <div class="overflow-item">
+            <div class="overflow-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M8 1.5v1.5M8 13v1.5M1.5 8h1.5M13 8h1.5M3.2 3.2l1 1M11.8 11.8l1 1M3.2 12.8l1-1M11.8 4.2l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Settings</span>
+          </div>
+          <div class="overflow-item">
+            <div class="overflow-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 3.5h10.5L11 6 12.5 8.5H2V3.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M2 8.5V14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Send feedback</span>
+          </div>
+          <div class="overflow-item">
+            <div class="overflow-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M8 5v3.5M8 10.5v0.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>About this app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · HOME TOPBAR -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · Home topbar</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="home-topbar">
+          <div class="home-topbar-brand">सनातन</div>
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 3h10v15l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <span class="dot-indicator"></span>
+          </div>
+          <div class="topbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="4" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="10" cy="10" r="1.7" fill="currentColor"/>
+              <circle cx="16" cy="10" r="1.7" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="home-greeting">
+          <div class="home-greeting-deva">शुभ प्रभात</div>
+          <div class="home-greeting-en">Tuesday, 5 May 2026</div>
+        </div>
+
+        <div style="padding: 0 24px; color: rgba(42, 30, 20, 0.4); font-family: var(--f-serif); font-style: italic; font-size: 13px; line-height: 1.6;">
+          [Home content continues here.]
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 2: CREDITS & ATTRIBUTIONS ==================== -->
+<div class="group-header">
+  <h2>2 · Credits & Attributions</h2>
+  <p>Reached from Settings → "Credits & attributions". Acknowledges every source. Sutra-style enumeration with Devanāgarī numerals.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · CREDITS TOP -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Credits (top)</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="credits-topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="credits-hero">
+            <div class="credits-hero-label">श्रद्धा · With gratitude</div>
+            <div class="credits-hero-title">Credits & Attributions</div>
+            <div class="credits-hero-prose">
+              Every verse in this app comes from a real academic source. Nothing is invented. The texts are public domain; the digitisation work that made them readable is not. We acknowledge it here.
+            </div>
+          </div>
+
+          <!-- Section: Vedas & Upanishads -->
+          <div class="credits-section">
+            <div class="credits-section-label">Vedas & Upaniṣads</div>
+
+            <div class="credit-row">
+              <div class="credit-marker">१</div>
+              <div class="credit-body">
+                <div class="credit-title"><em>GRETIL</em>Göttingen Register of Electronic Texts in Indian Languages</div>
+                <div class="credit-desc">The four Vedas, Chāndogya and Bṛhadāraṇyaka Upaniṣads, Bhāgavata Purāṇa, and Yoga Sūtras — all sourced from GRETIL's TEI-encoded archive.</div>
+                <div class="credit-meta">Universität Göttingen · Public domain</div>
+              </div>
+              <div class="credit-link-arrow">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="credit-row">
+              <div class="credit-marker">२</div>
+              <div class="credit-body">
+                <div class="credit-title">Ralph T. H. Griffith's Vedic translations</div>
+                <div class="credit-desc">English renderings of the Rigveda, Yajurveda, Sāmaveda, and Atharvaveda — completed between 1889 and 1899, now public domain.</div>
+                <div class="credit-meta">sacred-texts.com · Public domain</div>
+              </div>
+              <div class="credit-link-arrow">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · CREDITS SCROLLED -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Credits (mid)</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="credits-topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="credits-section" style="margin-top: 8px;">
+            <div class="credits-section-label">Tamil traditions</div>
+
+            <div class="credit-row">
+              <div class="credit-marker">१</div>
+              <div class="credit-body">
+                <div class="credit-title">Project Madurai</div>
+                <div class="credit-desc">திருக்குறள் (Tirukkuṛaḷ) — Tamil verses and English translation, faithfully digitised by volunteers preserving classical Tamil literature.</div>
+                <div class="credit-meta">projectmadurai.org · Public domain</div>
+              </div>
+              <div class="credit-link-arrow">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="credits-section">
+            <div class="credits-section-label">Tools used in preparing this app</div>
+
+            <div class="credit-row">
+              <div class="credit-marker">१</div>
+              <div class="credit-body">
+                <div class="credit-title">indic-transliteration (Python)</div>
+                <div class="credit-desc">IAST ↔ Devanāgarī transliteration. Used in every parser that brought Sanskrit text into the app.</div>
+                <div class="credit-meta">MIT License</div>
+              </div>
+            </div>
+
+            <div class="credit-row">
+              <div class="credit-marker">२</div>
+              <div class="credit-body">
+                <div class="credit-title">Tiro Devanagari Sanskrit · Lora · Outfit · Noto Sans Devanagari</div>
+                <div class="credit-desc">The four typefaces of this app. Tiro is Google's Sanskrit display face, designed specifically for shastra (scripture) reading.</div>
+                <div class="credit-meta">SIL Open Font License</div>
+              </div>
+            </div>
+
+            <div class="credit-row">
+              <div class="credit-marker">३</div>
+              <div class="credit-body">
+                <div class="credit-title">Flutter · Riverpod · Drift</div>
+                <div class="credit-desc">The Dart and Flutter ecosystem that this app is built on. The corpus lives in a local SQLite database via Drift.</div>
+                <div class="credit-meta">BSD · MIT · Apache 2.0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lineage footer -->
+          <div class="lineage-footer">
+            <div class="lineage-binding"><div class="hole"></div></div>
+            <div class="lineage-deva">सर्वे भवन्तु सुखिनः ।<br/>सर्वे सन्तु निरामयाः ॥</div>
+            <div class="lineage-attribution">
+              "May all be happy. May all be free of suffering."<br/>
+              — Bṛhadāraṇyaka Upaniṣad 1.4.14
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · CREDITS -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · Credits</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="credits-topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="credits-hero">
+            <div class="credits-hero-label">श्रद्धा · With gratitude</div>
+            <div class="credits-hero-title">Credits & Attributions</div>
+            <div class="credits-hero-prose">
+              Every verse in this app comes from a real academic source. Nothing is invented. The texts are public domain; the digitisation work that made them readable is not. We acknowledge it here.
+            </div>
+          </div>
+
+          <div class="credits-section">
+            <div class="credits-section-label">Vedas & Upaniṣads</div>
+
+            <div class="credit-row">
+              <div class="credit-marker">१</div>
+              <div class="credit-body">
+                <div class="credit-title"><em>GRETIL</em>Göttingen Register of Electronic Texts in Indian Languages</div>
+                <div class="credit-desc">The four Vedas, Chāndogya and Bṛhadāraṇyaka Upaniṣads, Bhāgavata Purāṇa, and Yoga Sūtras — all sourced from GRETIL's TEI-encoded archive.</div>
+                <div class="credit-meta">Universität Göttingen · Public domain</div>
+              </div>
+              <div class="credit-link-arrow">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="credit-row">
+              <div class="credit-marker">२</div>
+              <div class="credit-body">
+                <div class="credit-title">Ralph T. H. Griffith's Vedic translations</div>
+                <div class="credit-desc">English renderings of the Rigveda, Yajurveda, Sāmaveda, and Atharvaveda — completed between 1889 and 1899, now public domain.</div>
+                <div class="credit-meta">sacred-texts.com · Public domain</div>
+              </div>
+              <div class="credit-link-arrow">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 3: SEND FEEDBACK ==================== -->
+<div class="group-header">
+  <h2>3 · Send Feedback</h2>
+  <p>Reached from Settings → "Send feedback" and from the overflow menu. Two states: kind selection, then compose.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · FEEDBACK KIND -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · pick kind</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:50</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="credits-topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="feedback-hero">
+            <div class="feedback-hero-title">Send feedback</div>
+            <div class="feedback-hero-prose">
+              We read every message. The app is built and maintained by one person — your reports and ideas shape what comes next.
+            </div>
+          </div>
+
+          <div class="feedback-section">
+            <div class="feedback-section-label">What kind of feedback?</div>
+
+            <div class="feedback-kind">
+              <div class="feedback-kind-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M7 4.5v3M7 9.5v0.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="feedback-kind-body">
+                <div class="feedback-kind-title">Bug report</div>
+                <div class="feedback-kind-desc">Something is broken or behaves unexpectedly.</div>
+              </div>
+              <div class="feedback-kind-arrow">
+                <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+                  <path d="M2 1l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="feedback-kind">
+              <div class="feedback-kind-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1.5l1.7 3.5 3.8 0.5-2.8 2.7 0.7 3.8L7 10.2 3.6 12l0.7-3.8L1.5 5.5 5.3 5 7 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="feedback-kind-body">
+                <div class="feedback-kind-title">Idea or suggestion</div>
+                <div class="feedback-kind-desc">A feature you'd love to see.</div>
+              </div>
+              <div class="feedback-kind-arrow">
+                <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+                  <path d="M2 1l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="feedback-kind">
+              <div class="feedback-kind-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 3.5h10v7H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M4.5 6h5M4.5 8h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="feedback-kind-body">
+                <div class="feedback-kind-title">Text or translation error</div>
+                <div class="feedback-kind-desc">A typo, misattribution, or scholarly correction.</div>
+              </div>
+              <div class="feedback-kind-arrow">
+                <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+                  <path d="M2 1l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="feedback-kind">
+              <div class="feedback-kind-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 7c0 2 2 4 4 4s4-2 4-4-2-4-4-4-4 2-4 4z" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M5.5 7h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="feedback-kind-body">
+                <div class="feedback-kind-title">Something else</div>
+                <div class="feedback-kind-desc">A general thought or thanks.</div>
+              </div>
+              <div class="feedback-kind-arrow">
+                <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+                  <path d="M2 1l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="height: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · FEEDBACK COMPOSE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · compose</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:51</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="credits-topbar">
+          <div class="topbar-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-spacer"></div>
+        </div>
+
+        <div class="screen-content">
+
+          <div class="feedback-hero">
+            <div class="feedback-hero-title">Text or translation error</div>
+            <div class="feedback-hero-prose">
+              Be specific where you can — verse coordinate, scripture name, what looks wrong. The more context, the faster the fix.
+            </div>
+          </div>
+
+          <div class="feedback-section">
+            <!-- selected kind pill + textarea -->
+            <div class="compose-meta">
+              <div class="compose-meta-pill">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 2.5h6v5H2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                  <path d="M3.5 4.5h3M3.5 6h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                Text error
+              </div>
+              <div style="flex: 1; font-family: var(--f-sans); font-size: 10.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--d-text-3); text-align: right;">v1.0.0 · build 1</div>
+            </div>
+
+            <textarea class="compose-textarea" placeholder="Describe what you noticed. Include verse coordinate (e.g., BG 2.47) where relevant."></textarea>
+
+            <div class="compose-attach">
+              <div class="compose-attach-check checked">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5l2 2 4-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span style="flex: 1;">Attach device info (OS, app version, locale)</span>
+            </div>
+            <div class="compose-attach">
+              <div class="compose-attach-check"></div>
+              <span style="flex: 1;">Allow me to reply via email</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bottom-actions">
+          <button class="primary-btn disabled">
+            <span>Send</span>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2 6.5l9-4.5-2.5 11-3-5-3.5-1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What this screen resolves</h2>
+
+  <h3>Navigation entry points</h3>
+  <ul>
+    <li><b>Home topbar trailing icons:</b> Search · Bookmarks · ⋯ (overflow). Three icons, in that order, on the right side of the topbar.</li>
+    <li><b>Bookmarks gets a subtle dot indicator</b> when there are unread/new bookmarks (e.g., user saved something on another device — moot for v1, but the affordance is there for v2).</li>
+    <li><b>Overflow menu</b> opens as a 220 px popover anchored top-right, with three items: Settings · Send feedback · About this app. Backdrop scrim at 55% black. Tap scrim to dismiss.</li>
+    <li><b>Library screen keeps its inline search field</b> at top of list. Tapping it routes to the full Search screen with field auto-focused. Same Search screen, two entry points (Home icon + Library inline field).</li>
+    <li><b>Chapter List, Verse List, Verse Detail</b> do NOT get search/bookmarks icons. The user is in a reading flow; don't distract. Back-button only.</li>
+    <li><b>3-tab bottom nav preserved.</b> Today / Practice / Texts. Adding more tabs would signal shallow structure.</li>
+  </ul>
+
+  <h3>Credits & Attributions screen</h3>
+  <ul>
+    <li><b>Sūtra-style enumeration with Devanāgarī numerals.</b> Each entry is numbered १, २, ३... in saffron. Mirrors how a classical Sanskrit śāstra enumerates its sources at the beginning of a commentary.</li>
+    <li><b>Section header "श्रद्धा · With gratitude"</b> sets the tone. श्रद्धा (śraddhā) is the Sanskrit word for the kind of trust-with-respect that scholarly tradition is built on — not just "credits" as engineering attribution.</li>
+    <li><b>Lineage footer</b> uses the palm-leaf binding-line motif and ends with the Bṛhadāraṇyaka Upaniṣad blessing "सर्वे भवन्तु सुखिनः" — every scriptural work historically ends with such a śānti mantra. This is one place where the heritage flourish is exactly right.</li>
+    <li><b>External-link arrows</b> on rows that link out (GRETIL, sacred-texts.com, Project Madurai). Tools (libraries, fonts) don't link out — just metadata.</li>
+    <li><b>Sections grouped meaningfully:</b> Vedas & Upaniṣads / Itihāsa-Purāṇa / Darśana texts / Tamil traditions / Tools used. Not alphabetical — by domain.</li>
+    <li><b>Voice:</b> "Every verse in this app comes from a real academic source. Nothing is invented." This is contrarian copy that distinguishes the app from competitors. Keep this language.</li>
+  </ul>
+
+  <h3>Send Feedback screen</h3>
+  <ul>
+    <li><b>Two-step flow:</b> pick kind → compose. Kind selection lets the message reach the right place in the backend (or filter inbox) without making the user type "this is a bug" themselves.</li>
+    <li><b>Four kinds:</b> Bug report · Idea or suggestion · Text or translation error · Something else. The "Text error" kind is critical for a scripture app — scholars will report typos, and the app needs to make that easy.</li>
+    <li><b>Compose state:</b> Selected kind appears as a saffron pill at the top, with version metadata on the right. Textarea takes most of the space. Two checkboxes at the bottom for device info attachment and reply consent.</li>
+    <li><b>"Attach device info" defaulted ON.</b> Engineers need it. "Allow reply via email" defaulted OFF — user opts in. Privacy-respecting defaults.</li>
+    <li><b>Voice in the prose:</b> "The app is built and maintained by one person — your reports and ideas shape what comes next." Honest, sets expectations, builds rapport. This is your competitive advantage as an indie developer; lean into it.</li>
+    <li><b>Send button disabled until message has content.</b> Standard.</li>
+  </ul>
+
+  <h3>Settings rows now resolved</h3>
+  <ul>
+    <li><b>"Credits & attributions" row</b> → routes to /settings/credits (Group 2 above)</li>
+    <li><b>"Privacy Policy" row</b> → opens external URL via browser. No internal screen. (External-link arrow icon already shown in Settings spec.)</li>
+    <li><b>"Terms of Service" row</b> → opens external URL via browser. Same pattern.</li>
+    <li><b>"Send feedback" row</b> → routes to /settings/feedback (Group 3 above)</li>
+    <li><b>About this app</b> (from overflow menu) → routes to the same Credits screen, or optionally a smaller About screen. Recommendation: same destination for v1.</li>
+  </ul>
+</div>
+
+</body>
+</html>
