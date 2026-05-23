@@ -121,7 +121,8 @@ class _PanditChatPageState extends State<PanditChatPage> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _error = 'Something went wrong. Please try again.';
+          _error =
+              "Couldn't reach the Pandit. Check your connection and try again.";
           _loading = false;
         });
       }

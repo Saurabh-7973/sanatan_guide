@@ -125,7 +125,8 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Something went wrong. Please try again.';
+          _error =
+              "Couldn't reach the Pandit. Check your connection and try again.";
           _loading = false;
         });
       }
