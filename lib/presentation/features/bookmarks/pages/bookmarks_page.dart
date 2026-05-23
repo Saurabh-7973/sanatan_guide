@@ -131,7 +131,6 @@ class _PothiHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cream = isDark ? DColors.cream : LColors.text1;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -153,7 +152,10 @@ class _PothiHeader extends StatelessWidget {
                   fontSize: 26,
                   height: 1,
                   letterSpacing: 0.005 * 26,
-                  color: cream,
+                  // Mockup `.pothi-deva` uses saffron, not cream — the
+                  // Devanāgarī word is the saffron-highlighted anchor that
+                  // sets the page's read tone.
+                  color: saffron,
                 ),
               ),
               const SizedBox(width: 14),
@@ -302,41 +304,10 @@ class _SortBar extends ConsumerWidget {
         border: Border(bottom: BorderSide(color: divider, width: 1)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              tab('RECENT', BookmarkSort.recent),
-              const SizedBox(width: 18),
-              tab('BY SCRIPTURE', BookmarkSort.byScripture),
-            ],
-          ),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Filters coming soon'),
-                duration: Duration(seconds: 2),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.filter_list_rounded, size: 14, color: text3),
-                const SizedBox(width: 6),
-                Text(
-                  'Filter',
-                  style: TextStyle(
-                    fontFamily: Fonts.sans,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.06 * 10.5,
-                    color: text3,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          tab('RECENT', BookmarkSort.recent),
+          const SizedBox(width: 18),
+          tab('BY SCRIPTURE', BookmarkSort.byScripture),
         ],
       ),
     );
@@ -478,64 +449,59 @@ class _GroupHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cream = isDark ? DColors.cream : LColors.text1;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
-    final divider = isDark ? DColors.divider : LColors.divider;
 
+    // Mockup `.group-header`: padding 26 24 8, no border-bottom, deva size
+    // 16 in saffron, en in serif italic text-2 12, count sans 9.5 0.24em
+    // uppercase text-3. The old version added a divider line which the
+    // mockup explicitly omits — user flagged the extra rule.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 22, 24, 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: divider, width: 1)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Expanded(
-                child: Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                      text: scripture.devaName,
-                      style: TextStyle(
-                        fontFamily: Fonts.deva,
-                        fontFamilyFallback: AppFontFallback.deva,
-                        fontSize: 14,
-                        height: 1,
-                        color: cream,
-                      ),
-                    ),
-                    const TextSpan(text: '   '),
-                    TextSpan(
-                      text: scripture.displayName,
-                      style: TextStyle(
-                        fontFamily: Fonts.serif,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 11.5,
-                        color: text2,
-                      ),
-                    ),
-                  ]),
+      padding: const EdgeInsets.fromLTRB(24, 26, 24, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Expanded(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                  text: scripture.devaName,
+                  style: TextStyle(
+                    fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
+                    fontSize: 16,
+                    height: 1,
+                    color: saffron,
+                  ),
                 ),
-              ),
-              Text(
-                '$count VERSES',
-                style: TextStyle(
-                  fontFamily: Fonts.sans,
-                  fontFamilyFallback: AppFontFallback.latin,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.18 * 9,
-                  color: text3,
+                const TextSpan(text: '   '),
+                TextSpan(
+                  text: scripture.displayName,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                    color: text2,
+                  ),
                 ),
-              ),
-            ],
+              ]),
+            ),
           ),
-        ),
+          Text(
+            '$count VERSES',
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 9.5,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.24 * 9.5,
+              color: text3,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -562,6 +528,7 @@ class _LeafCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final surface = isDark ? DColors.surface : LColors.surface;
@@ -571,8 +538,6 @@ class _LeafCard extends StatelessWidget {
     // Personal note — the same `verses.note_text` the verse detail screen
     // writes; a note saved while reading now shows on its bookmark.
     final note = bookmark.noteText;
-
-    final coordText = _formatCoord(entry, showShortCode);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
@@ -597,27 +562,32 @@ class _LeafCard extends StatelessWidget {
                   left: 0,
                   right: 0,
                   top: -10,
-                  child: _LeafBinding(divider: divider),
+                  child: _LeafBinding(divider: divider, saffron: saffron),
                 ),
+                // Inset the knot 4 px from the right so the rotated diamond
+                // doesn't clip against the card's 4-px borderRadius corner —
+                // the user reported the right diamond reading "half-cut".
                 Positioned(
-                  top: -4,
-                  right: 0,
+                  top: -2,
+                  right: 4,
                   child: _KnotMark(saffron: saffron),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 8),
-                    Text(
-                      coordText,
-                      style: TextStyle(
-                        fontFamily: Fonts.sans,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.24 * 9.5,
-                        color: text3,
-                      ),
+                    // Per screen-07 mockup `.leaf-coord`: Devanāgarī coord in
+                    // cream + the rest of the meta line (BG · CHAPTER 2) in
+                    // saffron, sans, uppercase, 0.24em tracking. Was a flat
+                    // text3 line before — read as muted noise.
+                    _LeafCoordLine(
+                      coordDeva: entry.coordPartsDeva.isEmpty
+                          ? '—'
+                          : entry.coordPartsDeva.join('·'),
+                      shortCode: showShortCode ? entry.shortCode : '',
+                      unitLabel: entry.unitLabel,
+                      saffron: saffron,
+                      cream: cream,
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -651,47 +621,46 @@ class _LeafCard extends StatelessWidget {
                       ),
                     ],
                     if (note != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.only(top: 12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: dividerSoft,
-                              width: 1,
-                              style: BorderStyle.solid,
+                      const SizedBox(height: 14),
+                      // Mockup `.leaf-note`: 1px dashed top border (not
+                      // solid), saffron pencil glyph @ 60% opacity, text-1
+                      // italic body — was a solid divider + Material edit
+                      // icon before.
+                      _DashedTopRule(color: dividerSoft),
+                      const SizedBox(height: 14),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Opacity(
+                              opacity: 0.6,
+                              child: SizedBox(
+                                width: 11,
+                                height: 11,
+                                child: CustomPaint(
+                                  painter: _LeafNotePencilPainter(color: saffron),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Icon(
-                                Icons.edit_note_rounded,
-                                size: 13,
-                                color: text3,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              note,
+                              style: TextStyle(
+                                fontFamily: Fonts.serif,
+                                fontFamilyFallback: AppFontFallback.latin,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 13,
+                                height: 1.5,
+                                color: text1,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                note,
-                                style: TextStyle(
-                                  fontFamily: Fonts.serif,
-                                  fontFamilyFallback: AppFontFallback.latin,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 12,
-                                  height: 1.45,
-                                  color: text2,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                     const SizedBox(height: 12),
@@ -701,24 +670,28 @@ class _LeafCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // Per mockup `.scripture-glyph`: 5×5 saffron
+                            // circle (border-radius:50%), not a rotated
+                            // square. Keeps the footer typographically
+                            // distinct from the leaf-binding diamond.
                             Container(
                               width: 5,
                               height: 5,
                               decoration: BoxDecoration(
                                 color: saffron,
-                                borderRadius: BorderRadius.circular(1),
+                                shape: BoxShape.circle,
                               ),
-                              transform: Matrix4.rotationZ(0.6),
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              entry.scriptureName,
+                              entry.scriptureName.toUpperCase(),
                               style: TextStyle(
-                                fontFamily: Fonts.serif,
+                                fontFamily: Fonts.sans,
                                 fontFamilyFallback: AppFontFallback.latin,
-                                fontStyle: FontStyle.italic,
-                                fontSize: 11.5,
-                                color: text2,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.14 * 9.5,
+                                color: text3,
                               ),
                             ),
                           ],
@@ -758,9 +731,128 @@ class _LeafCard extends StatelessWidget {
   }
 }
 
+/// 1-px dashed top rule for the leaf-note section.
+class _DashedTopRule extends StatelessWidget {
+  const _DashedTopRule({required this.color});
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 1,
+      child: CustomPaint(painter: _BookmarkDashedPainter(color: color)),
+    );
+  }
+}
+
+class _BookmarkDashedPainter extends CustomPainter {
+  const _BookmarkDashedPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    const dash = 3.0;
+    const gap = 3.0;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(Offset(x, 0), Offset(x + dash, 0), paint);
+      x += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BookmarkDashedPainter old) => old.color != color;
+}
+
+/// Mockup `.leaf-note-icon` glyph: 11×11 viewBox, pencil/quill path,
+/// 1.2-px stroke, rounded joins. SVG path: M2 9l1.5-1.5L8 3 9.5 1.5l-1-1L7 2 2.5 6.5 1 8l1 1z.
+class _LeafNotePencilPainter extends CustomPainter {
+  const _LeafNotePencilPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 11.0;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2 * u
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(2 * u, 9 * u)
+      ..lineTo(3.5 * u, 7.5 * u)
+      ..lineTo(8 * u, 3 * u)
+      ..lineTo(9.5 * u, 1.5 * u)
+      ..lineTo(8.5 * u, 0.5 * u)
+      ..lineTo(7 * u, 2 * u)
+      ..lineTo(2.5 * u, 6.5 * u)
+      ..lineTo(1 * u, 8 * u)
+      ..lineTo(2 * u, 9 * u)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_LeafNotePencilPainter old) => old.color != color;
+}
+
+/// Saffron `.leaf-coord` meta line. Devanāgarī coord (`२·४७`) sits in cream;
+/// `· BG · CHAPTER 2` follows in saffron, sans, 0.24em tracking, 9.5 px.
+class _LeafCoordLine extends StatelessWidget {
+  const _LeafCoordLine({
+    required this.coordDeva,
+    required this.shortCode,
+    required this.unitLabel,
+    required this.saffron,
+    required this.cream,
+  });
+
+  final String coordDeva;
+  final String shortCode;
+  final String unitLabel;
+  final Color saffron;
+  final Color cream;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffronStyle = TextStyle(
+      fontFamily: Fonts.sans,
+      fontFamilyFallback: AppFontFallback.latin,
+      fontSize: 9.5,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.24 * 9.5,
+      color: saffron,
+    );
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: coordDeva,
+            style: TextStyle(
+              fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
+              fontSize: 11,
+              height: 1.0,
+              color: cream,
+              letterSpacing: 0,
+            ),
+          ),
+          if (shortCode.isNotEmpty)
+            TextSpan(text: '  ·  $shortCode', style: saffronStyle),
+          TextSpan(text: '  ·  $unitLabel', style: saffronStyle),
+        ],
+      ),
+    );
+  }
+}
+
 class _LeafBinding extends StatelessWidget {
-  const _LeafBinding({required this.divider});
+  const _LeafBinding({required this.divider, required this.saffron});
   final Color divider;
+  final Color saffron;
 
   @override
   Widget build(BuildContext context) {
@@ -776,7 +868,10 @@ class _LeafBinding extends StatelessWidget {
             child: Container(
               width: 5,
               height: 5,
-              color: divider,
+              // Mockup `.leaf-binding .hole` colours the diamond saffron, not
+              // divider — the saffron mark is what makes the row read as a
+              // binding-hole rather than a hairline crack in the divider.
+              color: saffron,
             ),
           ),
           const SizedBox(width: 10),
@@ -1031,7 +1126,7 @@ class _LoadingBody extends StatelessWidget {
                       left: 0,
                       right: 0,
                       top: -10,
-                      child: _LeafBinding(divider: divider),
+                      child: _LeafBinding(divider: divider, saffron: saffron),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1149,16 +1244,6 @@ String _unitNameFor(Scripture? s) {
     'parvas' => 'Parva',
     _ => 'Chapter',
   };
-}
-
-String _formatCoord(_LeafEntry entry, bool showShortCode) {
-  final coord = entry.coordPartsDeva.isEmpty
-      ? '—'
-      : entry.coordPartsDeva.join('·');
-  if (showShortCode && entry.shortCode.isNotEmpty) {
-    return '$coord · ${entry.shortCode} · ${entry.unitLabel}';
-  }
-  return '$coord · ${entry.unitLabel}';
 }
 
 Scripture? _scriptureFromCode(String? code) {
