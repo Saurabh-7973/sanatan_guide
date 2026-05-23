@@ -49,10 +49,13 @@ class _OverflowMenu extends StatelessWidget {
     final sep = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final text1 = isDark ? DColors.text1 : LColors.text1;
 
-    // Exactly three items, per screen-13 mockup. (Festivals reached from the
-    // Home "Upcoming Parva" card; general AI chat from Search.)
+    // Five items per brief §3.6. Adds Festivals & Ask-the-Pandit so both
+    // have a stable secondary entry (Festivals also reached from the Home
+    // "Upcoming Parva" card; general AI chat also from Search).
     const items = <_Item>[
       _Item('Settings', '/settings', _drawGear),
+      _Item('Festivals & Calendar', '/festivals', _drawCalendar),
+      _Item('Ask the Pandit', '/chat', _drawOm),
       _Item('Send feedback', '/feedback', _drawPlane),
       _Item('About this app', '/credits', _drawInfo),
     ];
@@ -211,4 +214,41 @@ void _drawInfo(Canvas c, Size s, Color col) {
   c.drawCircle(p(8, 8), 6.5 * u, _s(col, u));
   c.drawLine(p(8, 5), p(8, 8.5), _s(col, u));
   c.drawLine(p(8, 10.5), p(8, 11), _s(col, u));
+}
+
+void _drawCalendar(Canvas c, Size s, Color col) {
+  final u = s.width / 16;
+  final paint = _s(col, u);
+  // Body — rounded rectangle from y=4 to y=14, full width.
+  final body = RRect.fromRectAndRadius(
+    Rect.fromLTRB(2 * u, 4 * u, 14 * u, 14 * u),
+    Radius.circular(u),
+  );
+  c.drawRRect(body, paint);
+  // Header divider.
+  c.drawLine(Offset(2 * u, 7 * u), Offset(14 * u, 7 * u), paint);
+  // Two binding clips that overshoot the top edge.
+  c.drawLine(Offset(5 * u, 2 * u), Offset(5 * u, 5.5 * u), paint);
+  c.drawLine(Offset(11 * u, 2 * u), Offset(11 * u, 5.5 * u), paint);
+}
+
+void _drawOm(Canvas c, Size s, Color col) {
+  // Devanāgarī ॐ rendered via TextPainter so it stays the canonical glyph
+  // — drawing it with strokes wouldn't read as ॐ at 16 px.
+  final tp = TextPainter(
+    text: TextSpan(
+      text: 'ॐ',
+      style: TextStyle(
+        fontFamily: Fonts.deva,
+        fontSize: s.width * 1.05,
+        height: 1.0,
+        color: col,
+      ),
+    ),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  tp.paint(
+    c,
+    Offset((s.width - tp.width) / 2, (s.height - tp.height) / 2),
+  );
 }
