@@ -103,12 +103,20 @@ class AppText {
   // SANSKRIT
   // ============================================================
 
+  // Brief §5.2.9 / §2.3: Devanāgarī styles fall back to Noto Sans Devanagari
+  // if Tiro fails to load. Generic `serif` is the final guard.
+  static const List<String> _devaFallback = <String>[
+    'NotoSansDevanagari',
+    'serif',
+  ];
+
   static TextStyle sanskritBody({
     required Color color,
     double size = 18,
   }) =>
       TextStyle(
         fontFamily: Fonts.deva,
+        fontFamilyFallback: _devaFallback,
         fontSize: size,
         height: 1.7,
         letterSpacing: 0.09,
@@ -117,6 +125,7 @@ class AppText {
 
   static TextStyle sanskritIncipit({required Color color}) => TextStyle(
         fontFamily: Fonts.deva,
+        fontFamilyFallback: _devaFallback,
         fontSize: 14,
         height: 1.55,
         color: color,
@@ -157,6 +166,7 @@ class AppText {
 
   static TextStyle dandaCoord({required Color saffronColor}) => TextStyle(
         fontFamily: Fonts.deva,
+        fontFamilyFallback: _devaFallback,
         fontSize: 13,
         height: 1.0,
         color: saffronColor,
@@ -205,6 +215,7 @@ class AppText {
 
   static TextStyle invocation({required Color saffronColor}) => TextStyle(
         fontFamily: Fonts.deva,
+        fontFamilyFallback: _devaFallback,
         fontSize: 11,
         letterSpacing: 1.76,
         color: saffronColor,
