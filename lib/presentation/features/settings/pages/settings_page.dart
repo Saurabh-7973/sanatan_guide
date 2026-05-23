@@ -427,107 +427,21 @@ class _FontSizeRow extends ConsumerWidget {
 
 // ── Reading: translation language ──────────────────────────────────────────
 
-/// Language picker. `null` → follow device; `en`/`hi` → forced locale.
+/// Brief §2.4 / §6: v1 ships English only. Row is static — no chevron,
+/// no tap, no picker. localeProvider stays wired for v2 (Hindi UI alongside
+/// Hindi content); the picker UI returns when Hindi content ships.
 class _LanguageRow extends ConsumerWidget {
   const _LanguageRow();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final current = ref.watch(localeProvider);
     final l10n = AppLocalizations.of(context);
-    final currentLabel = switch (current?.languageCode) {
-      null => l10n.settingsLanguageSystem,
-      'en' => l10n.settingsLanguageEnglish,
-      'hi' => l10n.settingsLanguageHindi,
-      final code => code,
-    };
     return _Row(
       isDark: isDark,
       icon: Icons.translate_rounded,
       title: l10n.settingsLanguage,
-      subtitle: currentLabel,
-      trailing: _Chevron(isDark: isDark),
-      onTap: () => _showLanguageDialog(context, ref, current, l10n),
-    );
-  }
-
-  Future<void> _showLanguageDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Locale? current,
-    AppLocalizations l10n,
-  ) async {
-    final chosen = await showDialog<Locale?>(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        title: Text(l10n.settingsLanguage),
-        children: [
-          _LanguageChoice(
-            label: l10n.settingsLanguageSystem,
-            value: null,
-            selected: current == null,
-          ),
-          _LanguageChoice(
-            label: l10n.settingsLanguageEnglish,
-            value: const Locale('en'),
-            selected: current?.languageCode == 'en',
-          ),
-          _LanguageChoice(
-            label: l10n.settingsLanguageHindi,
-            value: const Locale('hi'),
-            selected: current?.languageCode == 'hi',
-          ),
-        ],
-      ),
-    );
-    if (!context.mounted) return;
-    // Dialog returns the wrapped sentinel; treat Locale('_none_') as null.
-    if (chosen?.languageCode == '_none_') {
-      await ref.read(localeProvider.notifier).setLocale(null);
-    } else if (chosen != null) {
-      await ref.read(localeProvider.notifier).setLocale(chosen);
-    }
-  }
-}
-
-class _LanguageChoice extends StatelessWidget {
-  const _LanguageChoice({
-    required this.label,
-    required this.value,
-    required this.selected,
-  });
-
-  final String label;
-  final Locale? value;
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
-    final text3 = isDark ? DColors.text3 : LColors.text3;
-    return SimpleDialogOption(
-      onPressed: () => Navigator.pop(context, value ?? const Locale('_none_')),
-      child: Row(
-        children: [
-          Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_off,
-            size: 20,
-            color: selected ? saffron : text3,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: Fonts.sans,
-              fontSize: 14,
-              color: text1,
-            ),
-          ),
-        ],
-      ),
+      subtitle: l10n.settingsLanguageEnglish,
     );
   }
 }
