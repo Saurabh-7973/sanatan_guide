@@ -90,8 +90,12 @@ class PathStrip extends ConsumerWidget {
           (m) => !m.isCompleted,
           orElse: () => list.first,
         );
-        final completedCount = list.where((m) => m.isCompleted).length;
-        final position = list.indexOf(next) + 1;
+        // Scope position + total to the next module's section (level), so
+        // the strip shows "module 1 of 8" (Foundations) — not "of 17"
+        // across all sections, which contradicts Practice and the label.
+        final section = list.where((m) => m.level == next.level).toList();
+        final position = section.indexOf(next) + 1;
+        final completedCount = section.where((m) => m.isCompleted).length;
 
         return Padding(
           padding: const EdgeInsets.only(top: 12),
@@ -101,7 +105,7 @@ class PathStrip extends ConsumerWidget {
             label: 'YOUR PATH  ·  FOUNDATIONS',
             title: next.title,
             meta:
-                '${next.estimatedMinutes} min  ·  module $position of ${list.length}',
+                '${next.estimatedMinutes} min  ·  module $position of ${section.length}',
             completedCount: completedCount,
             onTap: () => context.push('/learn/${next.id}'),
           ),
