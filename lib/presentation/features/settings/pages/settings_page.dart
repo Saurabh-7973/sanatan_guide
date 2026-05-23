@@ -76,18 +76,15 @@ class SettingsPage extends ConsumerWidget {
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.only(bottom: 32),
                     children: [
-                      // ── Appearance ──────────────────────────────────────────
-                      _SectionHeader(
-                        title: l10n.settingsSectionAppearance,
-                        isDark: isDark,
-                      ),
-                      const _ThemeRow(),
-
                       // ── Reading ─────────────────────────────────────────────
+                      // Mockup screen-09 puts Theme under READING, not its
+                      // own APPEARANCE section. Collapse Appearance into the
+                      // first row of Reading per ditto.
                       _SectionHeader(
                         title: l10n.settingsSectionReading,
                         isDark: isDark,
                       ),
+                      const _ThemeRow(),
                       const _FontSizeRow(),
                       const _LanguageRow(),
                       const _ExperienceRow(),
