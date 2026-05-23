@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sanatan_guide/core/constants/bhagavad_gita_chapters.dart';
 import 'package:sanatan_guide/core/errors/failures.dart';
+import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/data/datasources/local/app_database_provider.dart';
 import 'package:sanatan_guide/domain/entities/commentary.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
@@ -152,7 +153,14 @@ Future<({int index, int total})?> verseChapterPosition(
     bookNum: row.bookNum,
   );
   if (verses.isEmpty) return null;
-  final sorted = [...verses]..sort((a, b) => a.verseNum.compareTo(b.verseNum));
+  // Nested texts (Ṛgveda Sukta etc.) repeat verseNum across the chapter,
+  // so verseNum-sort scrambles. Match the verse-list page's logic.
+  final flat = verses.map((v) => v.verseNum).toSet().length == verses.length;
+  final sorted = [...verses]..sort(
+      flat
+          ? (a, b) => a.verseNum.compareTo(b.verseNum)
+          : (a, b) => compareVerseIds(a.id, b.id),
+    );
   final idx = sorted.indexWhere((e) => e.id == verseId);
   if (idx < 0) return null;
   return (index: idx + 1, total: sorted.length);
@@ -174,6 +182,31 @@ Future<({String? prevId, String? nextId})> adjacentVerseIds(
     return _adjacentBhagavadGitaIds(verseId) ?? (prevId: null, nextId: null);
   }
 
+  // Nested-id texts (RV.M.S.V, MBH.P.C.V, etc.) repeat verseNum across the
+  // chapter, so the DAO's SQL ORDER BY (book_num, chapter_num, verse_num, id)
+  // mis-orders them — all sukta-verse-1s cluster, then verse-2s, etc.
+  // Fetch the chapter and sort by natural id order in Dart. Within-chapter
+  // only; cross-Maṇḍala swipe is out of scope for v1.
+  final isNested = verseId.split('.').length >= 4;
+  if (isNested) {
+    final verses = await dao.getChapter(
+      scriptureCode: current.scripture,
+      chapterNum: current.chapterNum,
+      bookNum: current.bookNum,
+    );
+    if (verses.isEmpty) return (prevId: null, nextId: null);
+    final sorted = [...verses]
+      ..sort((a, b) => compareVerseIds(a.id, b.id));
+    final idx = sorted.indexWhere((e) => e.id == verseId);
+    if (idx < 0) return (prevId: null, nextId: null);
+    return (
+      prevId: idx > 0 ? sorted[idx - 1].id : null,
+      nextId: idx < sorted.length - 1 ? sorted[idx + 1].id : null,
+    );
+  }
+
+  // Flat texts (Gītā, Upaniṣads, etc.) — DAO ORDER BY is correct and gives
+  // cross-chapter siblings for free.
   final prevRow =
       await dao.getPrevVerse(current.scripture, verseId, current: current);
   final nextRow =
