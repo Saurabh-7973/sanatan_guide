@@ -5,7 +5,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart'; // ignore: unnecessary_import
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanatan_guide/core/router/app_router.dart';
 import 'package:sanatan_guide/core/services/ad_service.dart';
