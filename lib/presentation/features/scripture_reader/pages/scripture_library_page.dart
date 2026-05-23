@@ -67,7 +67,11 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
   static int _totalScriptures() {
     final fromFamilies =
         _kFamilies.fold(0, (sum, f) => sum + f.scriptures.length);
-    return fromFamilies + _kVedas.length + 1;
+    // Mukhya card represents 13 individual Upaniṣads (11 principal + 2
+    // ancillary). Count individuals here so the hero reads "32 SCRIPTURES"
+    // — matches brief §1 + DB.
+    const mukhyaIndividualCount = 13;
+    return fromFamilies + _kVedas.length + mukhyaIndividualCount;
   }
 
   @override
@@ -654,6 +658,7 @@ class _ScriptureRow extends StatelessWidget {
       _FamilyKind.purana ||
       _FamilyKind.dharmasastra ||
       _FamilyKind.darshana ||
+      _FamilyKind.stotraTantra ||
       _FamilyKind.tamil =>
         isDark ? DColors.text2 : LColors.text2,
     };
@@ -1154,7 +1159,15 @@ class _EmptyResults extends StatelessWidget {
 
 String _indianFmtStatic(int n) => _ScriptureLibraryPageState._indianFormat(n);
 
-enum _FamilyKind { shruti, itihasa, purana, darshana, dharmasastra, tamil }
+enum _FamilyKind {
+  shruti,
+  itihasa,
+  purana,
+  darshana,
+  dharmasastra,
+  stotraTantra,
+  tamil,
+}
 
 class _Family {
   const _Family({
@@ -1241,13 +1254,14 @@ const _kVedas = <_Scripture>[
 
 const _kMukhyaUpanishads = _Scripture(
   // Routes to Isha Upanishad as the canonical entry-point until a dedicated
-  // /library/upanishads collection page exists.
+  // /library/upanishads collection page exists. Count includes the 11 mukhya
+  // + Maitrāyaṇī (24) + Kauṣītaki (18) ancillary upaniṣads present in the DB.
   id: 'isha_upanishad',
-  devaName: 'मुख्य उपनिषद् ११',
+  devaName: 'मुख्य उपनिषद्',
   englishName: 'The Mukhya Upaniṣads',
-  verseCount: 1199,
+  verseCount: 1241,
   unitLabel: 'verses',
-  subdivision: '11 principal texts',
+  subdivision: '11 principal + 2 ancillary',
   aliases: ['upanishad', 'upanishads', 'mukhya'],
 );
 
@@ -1304,7 +1318,7 @@ const _kFamilies = <_Family>[
     kind: _FamilyKind.purana,
     devaName: 'पुराण',
     englishLabel: 'Purāṇa — old tales of gods and worlds',
-    metaLabel: '2 TEXTS',
+    metaLabel: '4 TEXTS',
     shortLabel: 'PURĀṆA',
     description: 'Cosmology, devotion, and the līlās of the divine.',
     scriptures: [
@@ -1326,13 +1340,31 @@ const _kFamilies = <_Family>[
         subdivision: '6 aṁśas',
         aliases: ['vishnu'],
       ),
+      _Scripture(
+        id: 'devi_bhagavata_purana',
+        devaName: 'देवीभागवतम्',
+        englishName: 'Devī Bhāgavata Purāṇa',
+        verseCount: 20,
+        unitLabel: 'verses',
+        subdivision: '12 skandhas',
+        aliases: ['devi', 'devibhagavata'],
+      ),
+      _Scripture(
+        id: 'markandeya_purana',
+        devaName: 'मार्कण्डेयपुराण',
+        englishName: 'Mārkaṇḍeya Purāṇa',
+        verseCount: 16,
+        unitLabel: 'verses',
+        subdivision: '137 chapters',
+        aliases: ['markandeya'],
+      ),
     ],
   ),
   _Family(
     kind: _FamilyKind.darshana,
     devaName: 'दर्शन',
     englishLabel: 'Darśana — philosophy in sūtra form',
-    metaLabel: '2 TEXTS',
+    metaLabel: '3 TEXTS',
     shortLabel: 'DARŚANA',
     description:
         'The condensed teachings — yoga, vedānta, and the schools of thought.',
@@ -1354,6 +1386,15 @@ const _kFamilies = <_Family>[
         unitLabel: 'sūtras',
         subdivision: '4 adhyāyas',
         aliases: ['brahma'],
+      ),
+      _Scripture(
+        id: 'hatha_yoga_pradipika',
+        devaName: 'हठयोगप्रदीपिका',
+        englishName: 'Haṭha Yoga Pradīpikā',
+        verseCount: 60,
+        unitLabel: 'verses',
+        subdivision: '4 upadeśas',
+        aliases: ['hatha', 'pradipika', 'hyp'],
       ),
     ],
   ),
@@ -1383,6 +1424,34 @@ const _kFamilies = <_Family>[
         unitLabel: 'verses',
         subdivision: '15 books',
         aliases: ['artha', 'kautilya'],
+      ),
+    ],
+  ),
+  _Family(
+    kind: _FamilyKind.stotraTantra,
+    devaName: 'स्तोत्र · तन्त्र',
+    englishLabel: 'Stotra & Tantra — hymns and ritual',
+    metaLabel: '2 TEXTS',
+    shortLabel: 'STOTRA · TANTRA',
+    description: 'Devotional litanies and esoteric ritual literature.',
+    scriptures: [
+      _Scripture(
+        id: 'vishnu_sahasranama',
+        devaName: 'विष्णुसहस्रनाम',
+        englishName: 'Viṣṇu Sahasranāma',
+        verseCount: 118,
+        unitLabel: 'verses',
+        subdivision: 'from the Mahābhārata',
+        aliases: ['sahasranama', 'thousand names'],
+      ),
+      _Scripture(
+        id: 'mahanirvana_tantra',
+        devaName: 'महानिर्वाणतन्त्र',
+        englishName: 'Mahānirvāṇa Tantra',
+        verseCount: 60,
+        unitLabel: 'verses',
+        subdivision: '14 ullāsas',
+        aliases: ['mahanirvana', 'tantra'],
       ),
     ],
   ),
