@@ -49,20 +49,27 @@ class ContinueStrip extends ConsumerWidget {
     );
   }
 
-  /// Convert "BG.1.2" or "1.2" to "1.2" display.
+  /// Compact display fragment for nested + flat verse ids.
+  /// `BG.2.47` → `2.47`. `RV.1.1.1` → `1.1.1`. `TK.42` → `42`.
   static String _formatVerseId(String id, Scripture scripture) {
     final parts = id.split('.');
+    if (parts.length >= 4) {
+      return '${parts[1]}.${parts[2]}.${parts[3]}';
+    }
     if (parts.length >= 3) return '${parts[1]}.${parts[2]}';
     if (parts.length >= 2) return parts.sublist(1).join('.');
     return id;
   }
 
-  /// 8 beads — proportional fill within current chapter (heuristic).
-  /// Without total-verses-in-chapter data here, show 2 filled by default
-  /// when there's history; the spec is "8 beads showing chapter progress",
-  /// the exact ratio improves once chapter-progress provider is wired.
+  /// 8 beads — proportional fill within current chapter (heuristic). For
+  /// nested texts (`RV.M.S.V`) the verse number is the last segment, not
+  /// the third; otherwise we'd always read mandala 1 → 2 → 3 etc.
   static int _beadFillFor(String verseId) {
     final parts = verseId.split('.');
+    if (parts.length >= 4) {
+      final v = int.tryParse(parts[3]) ?? 1;
+      return (v / 4).clamp(1, 8).round();
+    }
     if (parts.length >= 3) {
       final v = int.tryParse(parts[2]) ?? 1;
       return (v / 4).clamp(1, 8).round();
