@@ -322,10 +322,29 @@ class _SearchBody extends ConsumerWidget {
           isDark: isDark,
           expandedGroups: expandedGroups,
           onToggleGroup: onToggleGroup,
+          onPandit: onPandit,
         ),
       ),
     );
   }
+}
+
+/// True when the trimmed query reads like a question — even without a
+/// trailing `?`. Used to surface the Pandit CTA at the top of results.
+bool looksLikeQuestion(String q) {
+  final s = q.trim().toLowerCase();
+  if (s.isEmpty) return false;
+  if (s.endsWith('?')) return true;
+  // Common English question openers.
+  const openers = <String>[
+    'what', 'why', 'how', 'when', 'where', 'who', 'which', 'whose',
+    'should', 'can', 'could', 'would', 'is', 'are', 'do', 'does', 'did',
+    'will', 'tell me', 'explain', 'meaning of', 'difference between',
+  ];
+  for (final o in openers) {
+    if (s == o || s.startsWith('$o ')) return true;
+  }
+  return false;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -370,7 +389,8 @@ class _EmptyBody extends ConsumerWidget {
           title: 'By phrase',
           meta: '"you have a right to action…"',
           isDark: isDark,
-          onTap: null,
+          onTap: () => onPickRecent('right to action'),
+          showArrow: true,
         ),
         _SuggestRow(
           icon: Icons.translate_rounded,
@@ -378,21 +398,24 @@ class _EmptyBody extends ConsumerWidget {
           titleIsDeva: true,
           meta: 'By Sanskrit word — Devanāgarī or IAST',
           isDark: isDark,
-          onTap: null,
+          onTap: () => onPickRecent('कर्म'),
+          showArrow: true,
         ),
         _SuggestRow(
           icon: Icons.bookmark_outline_rounded,
           title: 'By coordinate',
           meta: '"BG 2.47" · "Gita 11.37" · "Katha 1.2.18"',
           isDark: isDark,
-          onTap: null,
+          onTap: () => onPickRecent('BG 2.47'),
+          showArrow: true,
         ),
         _SuggestRow(
           icon: Icons.help_outline_rounded,
           title: 'By question',
           meta: '"What is dharma?" · "How to find peace?"',
           isDark: isDark,
-          onTap: null,
+          onTap: onPandit,
+          showArrow: true,
           isLast: true,
         ),
         Padding(
@@ -505,11 +528,14 @@ class _SuggestRow extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontFamily: titleIsDeva ? Fonts.deva : Fonts.serif,
+                    fontFamilyFallback: titleIsDeva
+                        ? AppFontFallback.deva
+                        : AppFontFallback.latin,
                     fontSize: titleIsDeva ? 15 : 14.5,
                     height: 1.35,
                     color: text1,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
@@ -523,7 +549,7 @@ class _SuggestRow extends StatelessWidget {
                     letterSpacing: 0.04 * 10.5,
                     color: text3,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -854,6 +880,7 @@ class _ResultsBody extends StatelessWidget {
     required this.isDark,
     required this.expandedGroups,
     required this.onToggleGroup,
+    required this.onPandit,
   });
 
   final ScriptureCoordinate? coord;
@@ -862,6 +889,7 @@ class _ResultsBody extends StatelessWidget {
   final bool isDark;
   final Set<String> expandedGroups;
   final void Function(String) onToggleGroup;
+  final VoidCallback onPandit;
 
   @override
   Widget build(BuildContext context) {
@@ -869,8 +897,14 @@ class _ResultsBody extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
 
     if (coord == null && verses.isEmpty) {
-      return _NoMatches(query: query, isDark: isDark);
+      return _NoMatches(
+        query: query,
+        isDark: isDark,
+        onPandit: onPandit,
+      );
     }
+
+    final isQuestion = looksLikeQuestion(query);
 
     final groups = _groupByScripture(verses);
     final scriptureCount = groups.length;
@@ -878,6 +912,15 @@ class _ResultsBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
       children: [
+        // Question-shaped queries get the Pandit CTA at the top — even when
+        // the FTS index turned up some incidental matches — so the user can
+        // route to the AI guide without re-typing or going back.
+        if (isQuestion) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
+            child: _PanditCta(isDark: isDark, onTap: onPandit),
+          ),
+        ],
         if (coord != null) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
@@ -958,17 +1001,23 @@ class _ResultsBody extends StatelessWidget {
 }
 
 class _NoMatches extends StatelessWidget {
-  const _NoMatches({required this.query, required this.isDark});
+  const _NoMatches({
+    required this.query,
+    required this.isDark,
+    required this.onPandit,
+  });
   final String query;
   final bool isDark;
+  final VoidCallback onPandit;
 
   @override
   Widget build(BuildContext context) {
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 80, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 64, 24, 24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'No matches for "$query"',
@@ -994,6 +1043,8 @@ class _NoMatches extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 22),
+          _PanditCta(isDark: isDark, onTap: onPandit),
         ],
       ),
     );

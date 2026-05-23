@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:sanatan_guide/core/panchanga/panchanga.dart';
 import 'package:sanatan_guide/core/panchanga/panchanga_names.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -57,69 +58,88 @@ class FestivalDetailPage extends StatelessWidget {
         lunarMonth.isAdhika ? 'Adhika ${monthName.iast}' : monthName.iast;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: isDark ? DColors.text1 : LColors.text1,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
-          SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              0,
-              kToolbarHeight + MediaQuery.paddingOf(context).top,
-              0,
-              32,
-            ),
+          SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _Hero(
-                  festival: festival,
-                  panchanga: panchanga,
-                  monthLabel: monthLabel,
-                  isDark: isDark,
-                ),
-                _DataGrid(
-                  festival: festival,
-                  panchanga: panchanga,
-                  isDark: isDark,
-                ),
+                // Fixed back bar (same pattern as Credits + Settings) — the
+                // earlier extendBodyBehindAppBar variant collided with the
+                // hero on scroll. Bar is fixed, body scrolls beneath.
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 8),
+                  child: Row(
                     children: [
-                      _SectionLabel('About the day', isDark: isDark),
-                      const SizedBox(height: 10),
-                      Text(
-                        festival.explainer,
-                        style: TextStyle(
-                          fontFamily: Fonts.serif,
-                          fontFamilyFallback: AppFontFallback.latin,
-                          fontSize: 14.5,
-                          height: 1.7,
-                          color: isDark ? DColors.text1 : LColors.text1,
+                      InkResponse(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        radius: 22,
+                        child: const SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Center(child: MockupBackChevron()),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      _SectionLabel('How to observe', isDark: isDark),
-                      const SizedBox(height: 6),
-                      ...festival.howToObserve.asMap().entries.map(
-                            (e) => _ObserveStep(
-                              index: e.key + 1,
-                              text: e.value,
-                              isDark: isDark,
-                            ),
-                          ),
-                      const SizedBox(height: 20),
-                      _Disclaimer(isDark: isDark),
+                      const Spacer(),
                     ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _Hero(
+                          festival: festival,
+                          panchanga: panchanga,
+                          monthLabel: monthLabel,
+                          isDark: isDark,
+                        ),
+                        _DataGrid(
+                          festival: festival,
+                          panchanga: panchanga,
+                          isDark: isDark,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _SectionLabel('About the day', isDark: isDark),
+                              const SizedBox(height: 10),
+                              Text(
+                                festival.explainer,
+                                style: TextStyle(
+                                  fontFamily: Fonts.serif,
+                                  fontFamilyFallback: AppFontFallback.latin,
+                                  fontSize: 14.5,
+                                  height: 1.7,
+                                  color: isDark ? DColors.text1 : LColors.text1,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              // Per screen-08 mockup the section is titled
+                              // "Practices" (upavāsa / dāna / pāṭha), not the
+                              // older "How to observe". Each step shows the
+                              // ॐ glyph instead of a numeral.
+                              _SectionLabel('Practices', isDark: isDark),
+                              const SizedBox(height: 6),
+                              ...festival.howToObserve.map(
+                                (text) => _ObserveStep(
+                                  text: text,
+                                  isDark: isDark,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              _Disclaimer(isDark: isDark),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -430,12 +450,10 @@ class _SectionLabel extends StatelessWidget {
 
 class _ObserveStep extends StatelessWidget {
   const _ObserveStep({
-    required this.index,
     required this.text,
     required this.isDark,
   });
 
-  final int index;
   final String text;
   final bool isDark;
 
@@ -452,13 +470,16 @@ class _ObserveStep extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Per screen-08 mockup the leading glyph is the ॐ symbol, not a
+          // numeral. Practices are an unordered observance set, not a
+          // sequence of steps.
           SizedBox(
             width: 22,
             child: Text(
-              index.toString(),
+              'ॐ',
               style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
+                fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: saffron,

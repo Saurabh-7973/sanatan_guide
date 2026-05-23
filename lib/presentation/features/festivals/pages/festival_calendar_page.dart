@@ -397,14 +397,27 @@ class _PanchangaBanner extends StatelessWidget {
     final greg = '${_weekdaysShort[date.weekday - 1]}, ${date.day} '
         '${_monthsShort[date.month - 1]} ${date.year}';
 
+    // Mockup `.panchanga-banner` layers a top-down saffron tint (5% dark /
+    // 4% light, fading to transparent at 70%) over the surface fill. Flutter
+    // can't stack a gradient on top of a solid background fill, so bake the
+    // surface colour into both gradient stops — only the alpha-tinted overlay
+    // differs at the top.
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final saffronOverlayTop =
+        Color.alphaBlend(saffron.withValues(alpha: isDark ? 0.05 : 0.04), surface);
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 14),
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: BoxDecoration(
-        color: isDark ? DColors.surface : LColors.surface,
         borderRadius: BorderRadius.circular(Radii.card),
         border: Border.all(
           color: isDark ? DColors.divider : LColors.divider,
+        ),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [saffronOverlayTop, surface],
+          stops: const [0.0, 0.7],
         ),
       ),
       child: Column(
@@ -1044,7 +1057,16 @@ class _MoonPhase extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: outline),
+              // Mockup uses 1px text-3 inset shadow. text-3 reads very light
+              // in the warm light theme on a small 16-px circle — bump the
+              // stroke to 1.25 px and the colour to text-2 for legibility
+              // without losing the moon-phase contrast.
+              border: Border.all(
+                color: outline == (isDark ? DColors.text3 : LColors.text3)
+                    ? (isDark ? DColors.text2 : LColors.text2)
+                    : outline,
+                width: 1.25,
+              ),
             ),
           ),
         ],

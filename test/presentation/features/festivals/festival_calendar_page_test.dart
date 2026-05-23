@@ -71,7 +71,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(FestivalDetailPage), findsOneWidget);
-    expect(find.text('HOW TO OBSERVE'), findsOneWidget);
+    expect(find.text('PRACTICES'), findsOneWidget);
     expect(find.text('देव दीपावली'), findsWidgets);
   });
 
