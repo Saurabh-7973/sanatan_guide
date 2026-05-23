@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/overflow_menu.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/topbar_icons.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -59,12 +58,6 @@ class HomeTopBar extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final ink = isDark ? DColors.text2 : LColors.text2;
-    final hasBookmarks = ref
-            .watch(bookmarkedVersesProvider)
-            .asData
-            ?.value
-            .isNotEmpty ??
-        false;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 6, 16, 14),
       child: Row(
@@ -86,7 +79,9 @@ class HomeTopBar extends ConsumerWidget {
           _IconBtn(
             glyph: TopBarGlyph.bookmark,
             color: ink,
-            showDot: hasBookmarks,
+            // Brief §3.2: dot is a v2 feature ("new/unread bookmarks").
+            // In v1 the indicator never lights up.
+            showDot: false,
             dotColor: saffron,
             onTap: () => context.push('/bookmarks'),
           ),
@@ -110,19 +105,14 @@ class LibraryTopBarActions extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final ink = isDark ? DColors.text2 : LColors.text2;
-    final hasBookmarks = ref
-            .watch(bookmarkedVersesProvider)
-            .asData
-            ?.value
-            .isNotEmpty ??
-        false;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _IconBtn(
           glyph: TopBarGlyph.bookmark,
           color: ink,
-          showDot: hasBookmarks,
+          // Brief §3.2: dot is a v2 feature; never lights up in v1.
+          showDot: false,
           dotColor: saffron,
           onTap: () => context.push('/bookmarks'),
         ),
