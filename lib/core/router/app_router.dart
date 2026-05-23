@@ -78,9 +78,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/browse/:scriptureId/verse/:verseId/chat',
         pageBuilder: (ctx, state) {
           final verseId = state.pathParameters['verseId']!;
+          final extra = state.extra;
+          final seed = extra is Map && extra['seed'] is String
+              ? extra['seed'] as String
+              : null;
           return _slideTransition(
             state,
-            VerseChatPage(verseId: verseId),
+            VerseChatPage(verseId: verseId, seed: seed),
           );
         },
       ),

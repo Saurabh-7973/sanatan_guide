@@ -12,8 +12,13 @@ import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 
 class VerseChatPage extends ConsumerStatefulWidget {
-  const VerseChatPage({super.key, required this.verseId});
+  const VerseChatPage({super.key, required this.verseId, this.seed});
   final String verseId;
+
+  /// Optional pre-filled first question. When non-null the chat fires it
+  /// automatically as soon as the verse loads — used by Commentary →
+  /// "Ask further" chips so the user lands on a populated conversation.
+  final String? seed;
 
   @override
   ConsumerState<VerseChatPage> createState() => _VerseChatPageState();
@@ -28,6 +33,7 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
   bool _loading = false;
   int _remaining = GeminiRateLimit.maxPerDay;
   String? _error;
+  bool _seedFired = false;
 
   static const String _systemPrompt =
       'You are a helpful and reverent guide to Hindu scriptures. '
@@ -145,9 +151,19 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     });
   }
 
+  void _maybeFireSeed(Verse verse) {
+    if (_seedFired) return;
+    final seed = widget.seed?.trim();
+    if (seed == null || seed.isEmpty) return;
+    _seedFired = true;
+    _controller.text = seed;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _send(verse));
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(verseDetailProvider(widget.verseId));
+    state.whenData((either) => either.fold((_) {}, _maybeFireSeed));
 
     return Scaffold(
       extendBodyBehindAppBar: true,

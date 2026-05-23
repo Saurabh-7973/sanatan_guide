@@ -465,7 +465,7 @@ final class VerseChapterPositionProvider extends $FunctionalProvider<
 }
 
 String _$verseChapterPositionHash() =>
-    r'59ffd1f61d51e2ca0e2dee31a4464964d0db8aff';
+    r'a225de1fc1ecc29de834d172c1ff89b3ee02a78c';
 
 final class VerseChapterPositionFamily extends $Family
     with
@@ -578,7 +578,7 @@ final class AdjacentVerseIdsProvider extends $FunctionalProvider<
   }
 }
 
-String _$adjacentVerseIdsHash() => r'1c61543ec243de156bccdb0a35693f8891a1a857';
+String _$adjacentVerseIdsHash() => r'a16c0b999bbd0abda174422c3432d7690cee76fb';
 
 final class AdjacentVerseIdsFamily extends $Family
     with

@@ -1361,7 +1361,11 @@ class _WordCallout extends ConsumerWidget {
         AppText.translation(color: text2, size: 13).copyWith(height: 1.5);
     final italic = bodyStyle.copyWith(fontStyle: FontStyle.italic);
 
-    Widget shell({required String? translit, required Widget body}) {
+    Widget shell({
+      required String? translit,
+      required Widget body,
+      String? grammar,
+    }) {
       return Container(
         width: 240,
         padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
@@ -1381,9 +1385,11 @@ class _WordCallout extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 1. Devanāgarī word (cream, 18)
             Text(word.word,
                 style: AppText.sanskritBody(color: cream, size: 18)
                     .copyWith(height: 1.3)),
+            // 2. IAST transliteration (italic saffron 12)
             if (translit?.trim().isNotEmpty ?? false) ...[
               const SizedBox(height: 4),
               Text(translit!.trim(),
@@ -1395,9 +1401,24 @@ class _WordCallout extends ConsumerWidget {
                   )),
             ],
             const SizedBox(height: 8),
+            // 3. Meaning prose
             body,
-            const SizedBox(height: 10),
-            Container(height: 1, color: dividerSoft),
+            // 4. Grammar tag (NOUN · LOCATIVE · NEUTER) above a dashed divider.
+            if (grammar != null && grammar.trim().isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _DashedRule(color: dividerSoft),
+              const SizedBox(height: 10),
+              Text(
+                grammar.trim().toUpperCase(),
+                style: AppText.meta(color: text2, size: 9).copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.8,
+                ),
+              ),
+            ] else ...[
+              const SizedBox(height: 10),
+              Container(height: 1, color: dividerSoft),
+            ],
           ],
         ),
       );
@@ -1407,6 +1428,7 @@ class _WordCallout extends ConsumerWidget {
     if (word.meaning.trim().isNotEmpty) {
       return shell(
         translit: word.transliteration,
+        grammar: word.grammar,
         body: Text(word.meaning, style: bodyStyle),
       );
     }
@@ -1455,6 +1477,7 @@ class _WordCallout extends ConsumerWidget {
       ),
       data: (wm) => shell(
         translit: wm.transliteration ?? word.transliteration,
+        grammar: wm.grammar,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -2162,4 +2185,40 @@ class _BookmarkAction extends ConsumerWidget {
           ),
     );
   }
+}
+
+/// 1-px dashed horizontal rule. Matches mockup `.word-pos` top border:
+/// `border-top: 1px dashed var(--d-divider-soft);`.
+class _DashedRule extends StatelessWidget {
+  const _DashedRule({required this.color});
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 1,
+      child: CustomPaint(painter: _DashedLinePainter(color: color)),
+    );
+  }
+}
+
+class _DashedLinePainter extends CustomPainter {
+  const _DashedLinePainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    const dash = 3.0;
+    const gap = 3.0;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(Offset(x, 0), Offset(x + dash, 0), paint);
+      x += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedLinePainter old) => old.color != color;
 }

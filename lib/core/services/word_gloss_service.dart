@@ -20,7 +20,9 @@ typedef GeminiAsk = Future<String> Function({
 class WordGlossService {
   WordGlossService._();
 
-  static const String _prefix = 'wordgloss_v1_';
+  // v2 cache: 3 fields (IAST, gloss, grammar). v1 entries are ignored —
+  // old cache stays in prefs (no migration cost) but new taps re-fetch.
+  static const String _prefix = 'wordgloss_v2_';
 
   static const String _fieldSep = '\u0001';
 
@@ -64,34 +66,43 @@ class WordGlossService {
       history: const [],
       userMessage:
           'For the single Sanskrit word "$word" exactly as it appears in '
-          'the verse above, give its IAST transliteration and a concise '
-          'English gloss in this verse\'s context. Reply on ONE line, '
-          'exactly as:\nIAST :: gloss\nNo other text.',
+          'the verse above, give its IAST transliteration, a concise '
+          "English gloss in this verse's context, and its grammar tag "
+          '(part of speech, case, number, gender — separated by " · "). '
+          'Reply on ONE line, exactly as:\n'
+          'IAST :: gloss :: grammar\n'
+          'Examples of the grammar field: "noun · locative · neuter", '
+          '"verb · 3rd person · singular · present", "adjective · '
+          'nominative · masculine · plural". No other text.',
     );
 
     final line = raw.trim().split('\n').first.trim();
-    final sep = line.indexOf('::');
-    final translit = sep >= 0 ? line.substring(0, sep).trim() : '';
-    final meaning = (sep >= 0 ? line.substring(sep + 2) : line).trim();
+    final parts = line.split('::').map((s) => s.trim()).toList();
+    final translit = parts.isNotEmpty ? parts[0] : '';
+    final meaning = parts.length > 1 ? parts[1] : line;
+    final grammar = parts.length > 2 ? parts[2] : '';
 
     await prefs.setString(
       _cacheKey(verseId, word),
-      '$translit$_fieldSep$meaning',
+      '$translit$_fieldSep$meaning$_fieldSep$grammar',
     );
     return WordMeaning(
       word: word,
       transliteration: translit.isEmpty ? null : translit,
       meaning: meaning,
+      grammar: grammar.isEmpty ? null : grammar,
     );
   }
 
   static WordMeaning _decode(String word, String cached) {
     final parts = cached.split(_fieldSep);
     final translit = parts.isNotEmpty ? parts[0] : '';
+    final grammar = parts.length > 2 ? parts[2] : '';
     return WordMeaning(
       word: word,
       transliteration: translit.isEmpty ? null : translit,
       meaning: parts.length > 1 ? parts[1] : '',
+      grammar: grammar.isEmpty ? null : grammar,
     );
   }
 }

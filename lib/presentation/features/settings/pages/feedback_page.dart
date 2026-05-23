@@ -14,7 +14,7 @@ import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const String _feedbackEmail = 'feedback@sanatanguide.app';
+const String _feedbackEmail = 'saurabhupadhyay7973@gmail.com';
 
 enum FeedbackKind { bug, idea, textError, other }
 
@@ -121,7 +121,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   void _back() {
     if (_kind != null) {
-      setState(() => _kind = null);
+      // Switching categories must not carry over the previous category's
+      // body text — drop it as the user steps back to the picker.
+      _controller.clear();
+      setState(() {
+        _kind = null;
+        _attachDeviceInfo = true;
+        _allowReply = false;
+      });
     } else {
       Navigator.of(context).maybePop();
     }

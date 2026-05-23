@@ -98,24 +98,13 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
           slivers: [
             SliverToBoxAdapter(child: _Header(isDark: isDark)),
             SliverToBoxAdapter(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _SearchBar(
-                      isDark: isDark,
-                      controller: _ctrl,
-                      focus: _focus,
-                      query: _query,
-                      onChanged: _onQueryChanged,
-                      onClear: _clearQuery,
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 14, right: 8),
-                    child: LibraryTopBarActions(),
-                  ),
-                ],
+              child: _SearchBar(
+                isDark: isDark,
+                controller: _ctrl,
+                focus: _focus,
+                query: _query,
+                onChanged: _onQueryChanged,
+                onClear: _clearQuery,
               ),
             ),
             if (_query.isEmpty) ...[
@@ -218,21 +207,36 @@ class _Header extends StatelessWidget {
     final scriptures = _ScriptureLibraryPageState._totalScriptures();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 18),
+      padding: const EdgeInsets.fromLTRB(24, 8, 8, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Library',
-            style: TextStyle(
-              fontFamily: Fonts.serif,
-              fontFamilyFallback: AppFontFallback.latin,
-              fontSize: 32,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.64,
-              height: 1,
-              color: text1,
-            ),
+          // Title row + trailing actions (Bookmark + ⋯). The actions used to
+          // sit next to the search field below; that broke the screen-03
+          // header layout. Pin them top-right where every other Heritage
+          // topbar puts them.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Text(
+                    'Library',
+                    style: TextStyle(
+                      fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.64,
+                      height: 1,
+                      color: text1,
+                    ),
+                  ),
+                ),
+              ),
+              const LibraryTopBarActions(),
+            ],
           ),
           const SizedBox(height: 10),
           Text.rich(
@@ -665,6 +669,13 @@ class _ScriptureRow extends StatelessWidget {
     // Smṛti families (itihāsa, purāṇa, dharmaśāstra, darśana, tamil) render
     // in text2 — secondary to the śruti families' saffron. Avoids the
     // invented Darśana/Tamil amber tones that weren't design tokens.
+    //
+    // The Mukhya Upaniṣads row sits inside the shruti section but is a
+    // text row (not a Veda grid card), so its diamond drops to text2 too
+    // — keeps row-level diamonds visually uniform across the library.
+    if (identical(scripture, _kMukhyaUpanishads)) {
+      return isDark ? DColors.text2 : LColors.text2;
+    }
     return switch (family.kind) {
       _FamilyKind.shruti => isDark ? DColors.saffron : LColors.saffron,
       _FamilyKind.itihasa ||

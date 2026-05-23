@@ -18,6 +18,10 @@ mixin _$WordMeaning {
   String get meaning;
   String? get transliteration;
 
+  /// Optional grammar tag — case, number, gender, part of speech.
+  /// Free-text, e.g. "noun · locative · neuter".
+  String? get grammar;
+
   /// Create a copy of WordMeaning
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -33,15 +37,17 @@ mixin _$WordMeaning {
             (identical(other.word, word) || other.word == word) &&
             (identical(other.meaning, meaning) || other.meaning == meaning) &&
             (identical(other.transliteration, transliteration) ||
-                other.transliteration == transliteration));
+                other.transliteration == transliteration) &&
+            (identical(other.grammar, grammar) || other.grammar == grammar));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, word, meaning, transliteration);
+  int get hashCode =>
+      Object.hash(runtimeType, word, meaning, transliteration, grammar);
 
   @override
   String toString() {
-    return 'WordMeaning(word: $word, meaning: $meaning, transliteration: $transliteration)';
+    return 'WordMeaning(word: $word, meaning: $meaning, transliteration: $transliteration, grammar: $grammar)';
   }
 }
 
@@ -51,7 +57,8 @@ abstract mixin class $WordMeaningCopyWith<$Res> {
           WordMeaning value, $Res Function(WordMeaning) _then) =
       _$WordMeaningCopyWithImpl;
   @useResult
-  $Res call({String word, String meaning, String? transliteration});
+  $Res call(
+      {String word, String meaning, String? transliteration, String? grammar});
 }
 
 /// @nodoc
@@ -69,6 +76,7 @@ class _$WordMeaningCopyWithImpl<$Res> implements $WordMeaningCopyWith<$Res> {
     Object? word = null,
     Object? meaning = null,
     Object? transliteration = freezed,
+    Object? grammar = freezed,
   }) {
     return _then(_self.copyWith(
       word: null == word
@@ -82,6 +90,10 @@ class _$WordMeaningCopyWithImpl<$Res> implements $WordMeaningCopyWith<$Res> {
       transliteration: freezed == transliteration
           ? _self.transliteration
           : transliteration // ignore: cast_nullable_to_non_nullable
+              as String?,
+      grammar: freezed == grammar
+          ? _self.grammar
+          : grammar // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -178,14 +190,16 @@ extension WordMeaningPatterns on WordMeaning {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String word, String meaning, String? transliteration)?
+    TResult Function(String word, String meaning, String? transliteration,
+            String? grammar)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _WordMeaning() when $default != null:
-        return $default(_that.word, _that.meaning, _that.transliteration);
+        return $default(
+            _that.word, _that.meaning, _that.transliteration, _that.grammar);
       case _:
         return orElse();
     }
@@ -206,13 +220,15 @@ extension WordMeaningPatterns on WordMeaning {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String word, String meaning, String? transliteration)
+    TResult Function(String word, String meaning, String? transliteration,
+            String? grammar)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WordMeaning():
-        return $default(_that.word, _that.meaning, _that.transliteration);
+        return $default(
+            _that.word, _that.meaning, _that.transliteration, _that.grammar);
     }
   }
 
@@ -230,13 +246,15 @@ extension WordMeaningPatterns on WordMeaning {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String word, String meaning, String? transliteration)?
+    TResult? Function(String word, String meaning, String? transliteration,
+            String? grammar)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WordMeaning() when $default != null:
-        return $default(_that.word, _that.meaning, _that.transliteration);
+        return $default(
+            _that.word, _that.meaning, _that.transliteration, _that.grammar);
       case _:
         return null;
     }
@@ -247,7 +265,10 @@ extension WordMeaningPatterns on WordMeaning {
 
 class _WordMeaning implements WordMeaning {
   const _WordMeaning(
-      {required this.word, required this.meaning, this.transliteration});
+      {required this.word,
+      required this.meaning,
+      this.transliteration,
+      this.grammar});
 
   @override
   final String word;
@@ -255,6 +276,11 @@ class _WordMeaning implements WordMeaning {
   final String meaning;
   @override
   final String? transliteration;
+
+  /// Optional grammar tag — case, number, gender, part of speech.
+  /// Free-text, e.g. "noun · locative · neuter".
+  @override
+  final String? grammar;
 
   /// Create a copy of WordMeaning
   /// with the given fields replaced by the non-null parameter values.
@@ -272,15 +298,17 @@ class _WordMeaning implements WordMeaning {
             (identical(other.word, word) || other.word == word) &&
             (identical(other.meaning, meaning) || other.meaning == meaning) &&
             (identical(other.transliteration, transliteration) ||
-                other.transliteration == transliteration));
+                other.transliteration == transliteration) &&
+            (identical(other.grammar, grammar) || other.grammar == grammar));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, word, meaning, transliteration);
+  int get hashCode =>
+      Object.hash(runtimeType, word, meaning, transliteration, grammar);
 
   @override
   String toString() {
-    return 'WordMeaning(word: $word, meaning: $meaning, transliteration: $transliteration)';
+    return 'WordMeaning(word: $word, meaning: $meaning, transliteration: $transliteration, grammar: $grammar)';
   }
 }
 
@@ -292,7 +320,8 @@ abstract mixin class _$WordMeaningCopyWith<$Res>
       __$WordMeaningCopyWithImpl;
   @override
   @useResult
-  $Res call({String word, String meaning, String? transliteration});
+  $Res call(
+      {String word, String meaning, String? transliteration, String? grammar});
 }
 
 /// @nodoc
@@ -310,6 +339,7 @@ class __$WordMeaningCopyWithImpl<$Res> implements _$WordMeaningCopyWith<$Res> {
     Object? word = null,
     Object? meaning = null,
     Object? transliteration = freezed,
+    Object? grammar = freezed,
   }) {
     return _then(_WordMeaning(
       word: null == word
@@ -323,6 +353,10 @@ class __$WordMeaningCopyWithImpl<$Res> implements _$WordMeaningCopyWith<$Res> {
       transliteration: freezed == transliteration
           ? _self.transliteration
           : transliteration // ignore: cast_nullable_to_non_nullable
+              as String?,
+      grammar: freezed == grammar
+          ? _self.grammar
+          : grammar // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }

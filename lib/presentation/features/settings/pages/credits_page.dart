@@ -11,6 +11,7 @@ import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// One render row, source-agnostic (scripture or tool).
 class _Row {
@@ -20,12 +21,28 @@ class _Row {
     required this.meta,
     required this.linksOut,
     this.term,
+    this.url,
   });
   final String? term;
   final String title;
   final String description;
   final String meta;
   final bool linksOut;
+  final Uri? url;
+}
+
+/// Lift the first plausible https domain out of a free-text meta/source line.
+/// Returns null when no domain is present (rows that don't link out).
+Uri? _deriveUrl(String text) {
+  final m = RegExp(r'[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?'
+          r'(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+')
+      .firstMatch(text);
+  if (m == null) return null;
+  final host = m.group(0)!;
+  if (!host.contains('.')) return null;
+  // Skip noise like "1.4.14" or file extensions
+  if (RegExp(r'^\d').hasMatch(host)) return null;
+  return Uri.parse('https://$host');
 }
 
 class _Section {
@@ -46,6 +63,7 @@ List<_Section> _buildSections() {
                   : '${c.translators.join(' · ')}. ${c.licenseNote}',
               meta: '${c.source} · ${c.licenseLabel}',
               linksOut: c.source.contains('.'),
+              url: _deriveUrl(c.source),
             ))
         .toList();
     if (rows.isNotEmpty) sections.add(_Section(s.catalogTitle, rows));
@@ -59,6 +77,7 @@ List<_Section> _buildSections() {
               description: t.description,
               meta: t.meta,
               linksOut: t.linksOut,
+              url: t.linksOut ? _deriveUrl(t.meta) : null,
             ))
         .toList(),
   ));
@@ -228,12 +247,8 @@ class _CreditRow extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final sep = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        border:
-            showDivider ? Border(bottom: BorderSide(color: sep)) : null,
-      ),
+    final hasUrl = row.url != null;
+    final body = Padding(
       padding: const EdgeInsets.symmetric(vertical: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,6 +342,30 @@ class _CreditRow extends StatelessWidget {
             ),
         ],
       ),
+    );
+
+    final container = Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        border:
+            showDivider ? Border(bottom: BorderSide(color: sep)) : null,
+      ),
+      child: hasUrl
+          ? InkWell(
+              onTap: () => _openUrl(context, row.url!),
+              child: body,
+            )
+          : body,
+    );
+    return container;
+  }
+}
+
+Future<void> _openUrl(BuildContext context, Uri url) async {
+  final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
+  if (!ok && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not open ${url.host}')),
     );
   }
 }

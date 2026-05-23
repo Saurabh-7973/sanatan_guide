@@ -10,6 +10,9 @@ sealed class WordMeaning with _$WordMeaning {
     required String word,
     required String meaning,
     String? transliteration,
+    /// Optional grammar tag — case, number, gender, part of speech.
+    /// Free-text, e.g. "noun · locative · neuter".
+    String? grammar,
   }) = _WordMeaning;
 }
 
