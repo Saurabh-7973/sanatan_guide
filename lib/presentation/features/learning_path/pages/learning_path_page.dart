@@ -724,9 +724,11 @@ class _ModuleRow extends StatelessWidget {
             ? '${module.estimatedMinutes} min · next up'
             : '${module.estimatedMinutes} min';
 
-    return Opacity(
-      opacity: locked ? 0.85 : 1,
-      child: InkWell(
+    // Mockup `.module-row.locked` uses per-element opacity (title 0.62,
+    // desc 0.5, meta 0.5, num 0.4) rather than a single wrapping Opacity.
+    // Applying alpha at each Text gives more granular contrast: title
+    // stays legible while desc/meta/num recede.
+    return InkWell(
         onTap: locked
             ? () => ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -787,7 +789,7 @@ class _ModuleRow extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     height: 1.2,
                     color: locked
-                        ? text3.withValues(alpha: 0.6)
+                        ? text3.withValues(alpha: 0.4)
                         : done
                             ? text3
                             : text2,
@@ -821,7 +823,9 @@ class _ModuleRow extends StatelessWidget {
                         fontStyle: FontStyle.italic,
                         fontSize: 12.5,
                         height: 1.45,
-                        color: locked ? text3 : text2,
+                        color: locked
+                            ? text2.withValues(alpha: 0.5)
+                            : text2,
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -835,7 +839,9 @@ class _ModuleRow extends StatelessWidget {
                         fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.06,
-                        color: text3,
+                        color: locked
+                            ? text3.withValues(alpha: 0.5)
+                            : text3,
                       ),
                     ),
                   ],
@@ -856,8 +862,7 @@ class _ModuleRow extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
