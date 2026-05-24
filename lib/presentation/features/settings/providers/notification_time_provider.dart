@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 
 part 'notification_time_provider.g.dart';
 
@@ -31,6 +35,11 @@ class NotificationTimeNotifier extends _$NotificationTimeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kNotifHourKey, time.hour);
     await prefs.setInt(_kNotifMinuteKey, time.minute);
+    // Force verseOfDay to recompute so scheduleDailyVerseNotification
+    // re-fires with the new time. Without this, the keepAlive cache
+    // delivers the old schedule until the app restarts.
+    ref.invalidate(verseOfDayProvider);
+    unawaited(ref.read(verseOfDayProvider.future));
   }
 }
 
@@ -54,5 +63,9 @@ class NotificationEnabled extends _$NotificationEnabled {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kNotifEnabledKey, enabled);
+    // Same fix as setTime — force verseOfDay rebuild so the schedule path
+    // re-runs and either cancels or re-fires immediately.
+    ref.invalidate(verseOfDayProvider);
+    unawaited(ref.read(verseOfDayProvider.future));
   }
 }
