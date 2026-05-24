@@ -37,6 +37,7 @@ final List<Festival> festivals2026 = [
         'where kite-flying fills the skies. Common across all forms: sesame '
         'seeds (til) and jaggery (gur) are shared as prasad, symbolising the '
         'sweetness of togetherness and the warmth needed in winter.',
+    readingVerseId: 'BG.2.14',
   ),
   Festival(
     id: 'maha_shivratri',
@@ -68,6 +69,7 @@ final List<Festival> festivals2026 = [
         'planetary positions naturally help spiritual seekers transcend their '
         'ordinary consciousness — which is why sadhana done on this night is '
         'said to yield results far beyond any ordinary night.',
+    readingVerseId: 'BG.10.23',
   ),
   Festival(
     id: 'holi',
@@ -98,6 +100,7 @@ final List<Festival> festivals2026 = [
         'with medicinal properties to ease the body into spring. The '
         'celebration dissolves social barriers — caste, class, age — in a '
         'shared expression of joy and renewal.',
+    readingVerseId: 'BG.4.7',
   ),
   Festival(
     id: 'ram_navami',
@@ -128,6 +131,7 @@ final List<Festival> festivals2026 = [
         'is the ego, and Hanuman is the devoted breath that bridges them. The '
         'day is observed with fasting, reading of the Ramayana, and recitation '
         'of Ram naam.',
+    readingVerseId: 'BG.4.7',
   ),
   Festival(
     id: 'hanuman_jayanti',
@@ -158,6 +162,7 @@ final List<Festival> festivals2026 = [
         'on this day across Bharat. It is one of the most powerful stotras '
         'in the tradition, condensing the entire Hanuman principle into 40 '
         'precisely composed dohas and chaupais.',
+    readingVerseId: 'BG.18.66',
   ),
   Festival(
     id: 'guru_purnima',
@@ -189,6 +194,7 @@ final List<Festival> festivals2026 = [
         'Sarnath, making it sacred across dharmic traditions. It is a day to '
         'honour all teachers — living or not — whose transmission has changed '
         'your direction.',
+    readingVerseId: 'BG.4.34',
   ),
   Festival(
     id: 'janmashtami',
@@ -221,6 +227,7 @@ final List<Festival> festivals2026 = [
         'bathed and rocked in a cradle. Dahi Handi — human pyramids breaking '
         'a pot of yogurt — celebrates the legend of Krishna stealing butter '
         'from the village women.',
+    readingVerseId: 'BG.4.7',
   ),
   Festival(
     id: 'ganesh_chaturthi',
@@ -252,6 +259,7 @@ final List<Festival> festivals2026 = [
         'Tilak in 1893 as a way to unite Indians across caste during the '
         'freedom movement — making Ganesha Chaturthi as much a story of '
         'dharma meeting politics as of devotion.',
+    readingVerseId: 'BG.4.34',
   ),
   Festival(
     id: 'navratri',
@@ -282,6 +290,7 @@ final List<Festival> festivals2026 = [
         'The nine forms correspond to nine aspects of consciousness moving from '
         'raw creative power through to perfected wisdom. It culminates in '
         'Vijayadashami — Dussehra — the day of victory.',
+    readingVerseId: 'BG.9.22',
   ),
   Festival(
     id: 'dussehra',
@@ -313,6 +322,7 @@ final List<Festival> festivals2026 = [
         'chitta (will), and ahamkara (ego).\n\n'
         'Burning Ravana is not about destroying an enemy. It is a ritual '
         'reminder to burn the Ravana within.',
+    readingVerseId: 'BG.4.8',
   ),
   Festival(
     id: 'diwali',
@@ -345,6 +355,7 @@ final List<Festival> festivals2026 = [
         'Naraka Chaturdashi (cleansing), Diwali night (Lakshmi puja), '
         'Govardhan Puja (gratitude), and Bhai Dooj (sibling bonds). The '
         'entire arc moves from acquiring abundance to sharing it.',
+    readingVerseId: 'BG.15.6',
   ),
   Festival(
     id: 'dev_deepawali',
@@ -375,5 +386,6 @@ final List<Festival> festivals2026 = [
         'believed to wash away accumulated karma. The sight of Varanasi\'s '
         'ghats on this night — entirely ringed with fire — is considered one '
         'of the most beautiful sights in Bharat.',
+    readingVerseId: 'BG.10.23',
   ),
 ];

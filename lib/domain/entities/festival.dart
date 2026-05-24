@@ -31,6 +31,7 @@ class Festival {
     required this.emoji,
     required this.category,
     required this.howToObserve,
+    this.readingVerseId,
   });
 
   final String id;
@@ -45,6 +46,11 @@ class Festival {
 
   /// Ordered list of practical observance steps shown on the detail page.
   final List<String> howToObserve;
+
+  /// Verse to surface in "Read on this day" on the festival detail page.
+  /// Format: composite verse id (e.g. `BG.4.7`). Null when no recommended
+  /// reading has been curated for this festival.
+  final String? readingVerseId;
 
   bool get isPast => date.isBefore(
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
