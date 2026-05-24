@@ -332,6 +332,13 @@ class _ThemeRow extends ConsumerWidget {
         : themeMode == ThemeMode.light
             ? Icons.light_mode_rounded
             : Icons.brightness_auto_rounded;
+    // Mockup `.seg-item.active` is neutral text-1 background with the bg
+    // colour as the icon fg — not iron-red. Override the Material-default
+    // primary colours so the active pill reads calm.
+    final activeBg = isDark ? DColors.text1 : LColors.text1;
+    final activeFg = isDark ? DColors.bg : LColors.bg;
+    final inactiveFg = isDark ? DColors.text2 : LColors.text2;
+    final divider = isDark ? DColors.divider : LColors.divider;
     return _Row(
       isDark: isDark,
       icon: icon,
@@ -358,9 +365,25 @@ class _ThemeRow extends ConsumerWidget {
           AnalyticsService.darkModeToggled(enabled: mode == ThemeMode.dark);
         },
         showSelectedIcon: false,
-        style: const ButtonStyle(
+        style: ButtonStyle(
           visualDensity: VisualDensity.compact,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? activeBg
+                : Colors.transparent,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? activeFg
+                : inactiveFg,
+          ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? activeFg
+                : inactiveFg,
+          ),
+          side: WidgetStateProperty.all(BorderSide(color: divider)),
         ),
       ),
     );

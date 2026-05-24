@@ -2717,7 +2717,14 @@ class _ShareSheetState extends State<_ShareSheet> {
                               saffron: saffron,
                             ),
                           ),
-                          Column(
+                          // SizedBox forces the column to fill the card
+                          // width — without it the Column takes the intrinsic
+                          // width of its widest child (so the Sanskrit-only
+                          // format reads left-aligned when the single-line
+                          // Sanskrit is narrower than the card).
+                          SizedBox(
+                            width: double.infinity,
+                            child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
@@ -2777,6 +2784,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                                 ),
                               ],
                             ],
+                          ),
                           ),
                         ],
                       ),
