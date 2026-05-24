@@ -13,10 +13,16 @@ class MockupBackChevron extends StatelessWidget {
     final color = Theme.of(context).brightness == Brightness.dark
         ? DColors.text1
         : LColors.text1;
-    return SizedBox(
-      width: 20,
-      height: 20,
-      child: CustomPaint(painter: _BackChevronPainter(color: color)),
+    return Semantics(
+      label: 'Back',
+      button: true,
+      child: SizedBox(
+        width: 20,
+        height: 20,
+        child: ExcludeSemantics(
+          child: CustomPaint(painter: _BackChevronPainter(color: color)),
+        ),
+      ),
     );
   }
 }
@@ -50,10 +56,14 @@ class MockupRowChevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 8,
-      height: 14,
-      child: CustomPaint(painter: _RowChevronPainter(color: color)),
+    // Decorative — the surrounding row's text is the semantic anchor for
+    // TalkBack. Don't double-announce "Forward" on every list row.
+    return ExcludeSemantics(
+      child: SizedBox(
+        width: 8,
+        height: 14,
+        child: CustomPaint(painter: _RowChevronPainter(color: color)),
+      ),
     );
   }
 }

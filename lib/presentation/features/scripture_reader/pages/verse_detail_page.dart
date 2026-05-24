@@ -396,10 +396,16 @@ class _TopBar extends StatelessWidget {
           ),
           if (actionsEnabled) ...[
             _BookmarkAction(verseId: bookmarkId, isDark: isDark),
-            _CircleButton(
-              isDark: isDark,
-              onTap: onShare ?? () {},
-              child: ShareNetworkGlyph(color: text1, size: 18),
+            Semantics(
+              button: true,
+              label: 'Share verse',
+              child: _CircleButton(
+                isDark: isDark,
+                onTap: onShare ?? () {},
+                child: ExcludeSemantics(
+                  child: ShareNetworkGlyph(color: text1, size: 18),
+                ),
+              ),
             ),
           ] else
             const SizedBox(width: 72),
@@ -2427,28 +2433,35 @@ class _BookmarkAction extends ConsumerWidget {
     final isBookmarked =
         ref.watch(isBookmarkedProvider(verseId)).asData?.value ?? false;
 
-    return _CircleButton(
-      isDark: isDark,
-      onTap: () async {
-        try {
-          await Haptics.vibrate(HapticsType.light);
-        } catch (_) {}
-        final BookmarksDao dao = await ref.read(bookmarksDaoProvider.future);
-        await dao.toggleBookmark(verseId);
-        if (!isBookmarked) AnalyticsService.verseBookmarked(verseId);
-      },
-      child: RibbonBookmarkGlyph(
-        color: isBookmarked ? saffron : text1,
-        filled: isBookmarked,
-        size: 18,
-      )
-          .animate(key: ValueKey(isBookmarked))
-          .scale(
-            begin: const Offset(0.8, 0.8),
-            end: const Offset(1, 1),
-            duration: 300.ms,
-            curve: Curves.easeOutBack,
-          ),
+    return Semantics(
+      button: true,
+      toggled: isBookmarked,
+      label: isBookmarked ? 'Remove bookmark' : 'Bookmark this verse',
+      child: _CircleButton(
+        isDark: isDark,
+        onTap: () async {
+          try {
+            await Haptics.vibrate(HapticsType.light);
+          } catch (_) {}
+          final BookmarksDao dao = await ref.read(bookmarksDaoProvider.future);
+          await dao.toggleBookmark(verseId);
+          if (!isBookmarked) AnalyticsService.verseBookmarked(verseId);
+        },
+        child: ExcludeSemantics(
+          child: RibbonBookmarkGlyph(
+            color: isBookmarked ? saffron : text1,
+            filled: isBookmarked,
+            size: 18,
+          )
+              .animate(key: ValueKey(isBookmarked))
+              .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1, 1),
+                duration: 300.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ),
     );
   }
 }

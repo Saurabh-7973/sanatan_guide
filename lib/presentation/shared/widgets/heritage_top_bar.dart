@@ -20,31 +20,47 @@ class _IconBtn extends StatelessWidget {
   final bool showDot;
   final Color? dotColor;
 
+  String get _semanticLabel => switch (glyph) {
+        TopBarGlyph.search => 'Search verses',
+        TopBarGlyph.bookmark => 'Open bookmarks',
+        TopBarGlyph.overflow => 'More options',
+      };
+
   @override
-  Widget build(BuildContext context) => InkResponse(
-        onTap: onTap,
-        radius: 24,
-        child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Stack(
-            children: [
-              Center(child: TopBarIcon(glyph: glyph, color: color)),
-              if (showDot)
-                Positioned(
-                  // mockup .dot-indicator: 6×6 saffron, top-right.
-                  right: 10,
-                  top: 10,
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: dotColor,
-                      shape: BoxShape.circle,
-                    ),
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: _semanticLabel,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 24,
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Stack(
+              children: [
+                Center(
+                  child: ExcludeSemantics(
+                    child: TopBarIcon(glyph: glyph, color: color),
                   ),
                 ),
-            ],
+                if (showDot)
+                  Positioned(
+                    // mockup .dot-indicator: 6×6 saffron, top-right.
+                    right: 10,
+                    top: 10,
+                    child: ExcludeSemantics(
+                      child: Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: dotColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       );
