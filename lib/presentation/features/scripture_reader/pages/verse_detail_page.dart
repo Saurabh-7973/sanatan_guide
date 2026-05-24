@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -805,18 +806,36 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
   }
 
   void _openNotes() {
+    // Snapshot the saved value when the sheet opens so Cancel can roll back
+    // any unsaved edits the user made inside the sheet.
+    final original = _noteController.text;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (sheetCtx) => _NotesSheet(
+        verse: verse,
         controller: _noteController,
         focusNode: _noteFocusNode,
         isDark: widget.isDark,
         onChanged: _onNoteChanged,
-        onDone: () {
+        onSave: () {
           _saveTimer?.cancel();
           unawaited(_persistNoteFor(verse, _noteController.text));
+          _noteFocusNode.unfocus();
+          Navigator.of(sheetCtx).pop();
+        },
+        onCancel: () {
+          // Revert the controller to what we snapshotted; don't persist.
+          _saveTimer?.cancel();
+          _noteController.text = original;
+          _noteFocusNode.unfocus();
+          Navigator.of(sheetCtx).pop();
+        },
+        onDelete: () {
+          _saveTimer?.cancel();
+          _noteController.clear();
+          unawaited(_persistNoteFor(verse, ''));
           _noteFocusNode.unfocus();
           Navigator.of(sheetCtx).pop();
         },
@@ -834,20 +853,30 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
   // ── Share ───────────────────────────────────────────────────────────────
 
   void _share() {
-    AnalyticsService.verseShared(verse.id);
-    final coord = '${verse.scripture.displayNameSafe} '
-        '${verse.chapterNum}.${verse.verseNum}';
-    final body = StringBuffer()
-      ..writeln(coord)
-      ..writeln()
-      ..writeln(verse.sanskrit.trim());
-    final translation = verse.english;
-    if (translation != null && translation.trim().isNotEmpty) {
-      body
-        ..writeln()
-        ..writeln(translation.trim());
-    }
-    Share.share(body.toString());
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => _ShareSheet(
+        verse: verse,
+        isDark: widget.isDark,
+        onCopy: (text) {
+          Clipboard.setData(ClipboardData(text: text));
+          Navigator.of(sheetCtx).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Copied'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        },
+        onShare: (text) {
+          AnalyticsService.verseShared(verse.id);
+          Navigator.of(sheetCtx).pop();
+          Share.share(text);
+        },
+      ),
+    );
   }
 
   // ── AI explanation ──────────────────────────────────────────────────────
@@ -2056,93 +2085,333 @@ class _SwipeHints extends StatelessWidget {
   }
 }
 
-class _NotesSheet extends StatelessWidget {
+/// Notes bottom sheet — matches `New Design/screen-14-missing-flows.html`
+/// §2 ("Your note"). Two states share one widget: NEW (textarea empty,
+/// Save disabled, no Delete) and EDITING (Save enabled, Delete in the
+/// lower-left). 1–200 char cap enforced by the textarea.
+class _NotesSheet extends StatefulWidget {
   const _NotesSheet({
+    required this.verse,
     required this.controller,
     required this.focusNode,
     required this.isDark,
     required this.onChanged,
-    required this.onDone,
+    required this.onSave,
+    required this.onCancel,
+    required this.onDelete,
   });
 
+  final Verse verse;
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool isDark;
   final ValueChanged<String> onChanged;
-  final VoidCallback onDone;
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
+  final VoidCallback onDelete;
+
+  @override
+  State<_NotesSheet> createState() => _NotesSheetState();
+}
+
+class _NotesSheetState extends State<_NotesSheet> {
+  static const int _maxLen = 200;
+  late String _initial;
+
+  @override
+  void initState() {
+    super.initState();
+    _initial = widget.controller.text;
+    widget.controller.addListener(_rebuild);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    final bg = isDark ? DColors.bg : LColors.bg;
-    final surface = isDark ? DColors.surface : LColors.surface;
-    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
-    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final bg = widget.isDark ? DColors.bg : LColors.bg;
+    final dividerSoft =
+        widget.isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final saffron = widget.isDark ? DColors.saffron : LColors.saffron;
+    final text1 = widget.isDark ? DColors.text1 : LColors.text1;
+    final text2 = widget.isDark ? DColors.text2 : LColors.text2;
+    final text3 = widget.isDark ? DColors.text3 : LColors.text3;
+    final onSaffron = widget.isDark ? const Color(0xFF1A1208) : Colors.white;
 
-    return Container(
+    final hasText = widget.controller.text.trim().isNotEmpty;
+    final isEditing = _initial.trim().isNotEmpty;
+    final length = widget.controller.text.characters.length;
+    final coordDeva = DandaCoord.toDevanagari(widget.verse.verseNum);
+    final chapterDeva = DandaCoord.toDevanagari(widget.verse.chapterNum);
+
+    return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: dividerSoft,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Text('Your reflection',
-                    style: AppText.sectionName(color: text1)),
-                const Spacer(),
-                TextButton(
-                  onPressed: onDone,
-                  style: TextButton.styleFrom(foregroundColor: saffron),
-                  child: const Text('Done'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 120, maxHeight: 240),
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                autofocus: true,
-                onChanged: onChanged,
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                style: AppText.translation(color: text1, size: 14.5),
-                decoration: InputDecoration(
-                  hintText: 'What does this verse mean to you?',
-                  hintStyle: AppText.translation(color: text3, size: 14.5),
-                  filled: true,
-                  fillColor: surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(Radii.card),
-                    borderSide: BorderSide.none,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: dividerSoft,
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  contentPadding: const EdgeInsets.all(16),
                 ),
               ),
+              // Header with bottom border. Title left, saffron Devanāgarī
+              // coord (₹chapter·verse₹) right.
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 14),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: dividerSoft)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      'Your note',
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.17,
+                        color: text1,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '‖$chapterDeva·$coordDeva‖',
+                      style: TextStyle(
+                        fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
+                        fontSize: 13,
+                        height: 1.0,
+                        color: saffron,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Body — transparent textarea, italic serif. Counter right.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 22, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(minHeight: 130, maxHeight: 220),
+                      child: TextField(
+                        controller: widget.controller,
+                        focusNode: widget.focusNode,
+                        autofocus: true,
+                        onChanged: widget.onChanged,
+                        maxLines: null,
+                        maxLength: _maxLen,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
+                        cursorColor: saffron,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14.5,
+                          height: 1.65,
+                          color: text1,
+                        ),
+                        decoration: InputDecoration(
+                          isCollapsed: true,
+                          filled: false,
+                          fillColor: Colors.transparent,
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          counterText: '',
+                          hintText:
+                              'What does this verse mean to you? A reflection, a memory, a question to revisit...',
+                          hintStyle: TextStyle(
+                            fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14.5,
+                            height: 1.65,
+                            color: text3,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$length / $_maxLen',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.12 * 10,
+                        color: text3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Actions footer with top border. Delete (only when editing)
+              // lives in the lower-left; Cancel + Save on the right.
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: dividerSoft)),
+                ),
+                child: Row(
+                  children: [
+                    if (isEditing)
+                      InkWell(
+                        onTap: widget.onDelete,
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 8),
+                          child: Text(
+                            'DELETE',
+                            style: TextStyle(
+                              fontFamily: Fonts.sans,
+                              fontFamilyFallback: AppFontFallback.latin,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.12 * 11.5,
+                              color: text3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    const Spacer(),
+                    _SheetGhostBtn(
+                      label: 'CANCEL',
+                      color: text2,
+                      onTap: widget.onCancel,
+                    ),
+                    const SizedBox(width: 8),
+                    _SheetFilledBtn(
+                      label: 'SAVE',
+                      bg: saffron,
+                      fg: onSaffron,
+                      enabled: hasText,
+                      onTap: widget.onSave,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetGhostBtn extends StatelessWidget {
+  const _SheetGhostBtn({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.14 * 12,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetFilledBtn extends StatelessWidget {
+  const _SheetFilledBtn({
+    required this.label,
+    required this.bg,
+    required this.fg,
+    required this.enabled,
+    required this.onTap,
+  });
+  final String label;
+  final Color bg;
+  final Color fg;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: enabled ? 1 : 0.45,
+      child: Material(
+        color: bg,
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: enabled ? onTap : null,
+          child: Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.14 * 12,
+                color: fg,
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -2222,4 +2491,401 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DashedLinePainter old) => old.color != color;
+}
+
+/// Share bottom sheet — matches `New Design/screen-14-missing-flows.html`
+/// §3. Three "What to include" formats (Sanskrit / +Translation / Full
+/// citation), a leaf-style preview card, and Copy/Share footer actions.
+enum _ShareFormat { sanskritOnly, withTranslation, fullCitation }
+
+class _ShareSheet extends StatefulWidget {
+  const _ShareSheet({
+    required this.verse,
+    required this.isDark,
+    required this.onCopy,
+    required this.onShare,
+  });
+
+  final Verse verse;
+  final bool isDark;
+  final ValueChanged<String> onCopy;
+  final ValueChanged<String> onShare;
+
+  @override
+  State<_ShareSheet> createState() => _ShareSheetState();
+}
+
+class _ShareSheetState extends State<_ShareSheet> {
+  _ShareFormat _format = _ShareFormat.withTranslation;
+
+  String _buildShareText() {
+    final v = widget.verse;
+    final coord = '${v.scripture.displayNameSafe} '
+        '${v.chapterNum}.${v.verseNum}';
+    final sanskrit = v.sanskrit.trim();
+    final english = v.english?.trim() ?? '';
+    const link = 'https://sanatanguide.app';
+    final buf = StringBuffer();
+    switch (_format) {
+      case _ShareFormat.sanskritOnly:
+        buf
+          ..writeln(coord)
+          ..writeln()
+          ..writeln(sanskrit);
+      case _ShareFormat.withTranslation:
+        buf
+          ..writeln(coord)
+          ..writeln()
+          ..writeln(sanskrit);
+        if (english.isNotEmpty) {
+          buf
+            ..writeln()
+            ..writeln('"$english"');
+        }
+      case _ShareFormat.fullCitation:
+        buf
+          ..writeln(coord)
+          ..writeln()
+          ..writeln(sanskrit);
+        if (english.isNotEmpty) {
+          buf
+            ..writeln()
+            ..writeln('"$english"');
+        }
+        buf
+          ..writeln()
+          ..writeln('— Sanatan Guide · $link');
+    }
+    return buf.toString().trimRight();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final isDark = widget.isDark;
+    final bg = isDark ? DColors.bg : LColors.bg;
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final saffronGlow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final onSaffron = isDark ? const Color(0xFF1A1208) : Colors.white;
+
+    final v = widget.verse;
+    final coordDeva = DandaCoord.toDevanagari(v.verseNum);
+    final chapterDeva = DandaCoord.toDevanagari(v.chapterNum);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: dividerSoft,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 14),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: dividerSoft)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      'Share this verse',
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.17,
+                        color: text1,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '‖$chapterDeva·$coordDeva‖',
+                      style: TextStyle(
+                        fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
+                        fontSize: 13,
+                        height: 1.0,
+                        color: saffron,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 22, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'WHAT TO INCLUDE',
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.28 * 9.5,
+                        color: text3,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _FormatChip(
+                            label: 'Sanskrit only',
+                            active: _format == _ShareFormat.sanskritOnly,
+                            saffron: saffron,
+                            saffronGlow: saffronGlow,
+                            text2: text2,
+                            dividerSoft: dividerSoft,
+                            onTap: () => setState(
+                                () => _format = _ShareFormat.sanskritOnly),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _FormatChip(
+                            label: '+ Translation',
+                            active: _format == _ShareFormat.withTranslation,
+                            saffron: saffron,
+                            saffronGlow: saffronGlow,
+                            text2: text2,
+                            dividerSoft: dividerSoft,
+                            onTap: () => setState(
+                                () => _format = _ShareFormat.withTranslation),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _FormatChip(
+                            label: 'Full citation',
+                            active: _format == _ShareFormat.fullCitation,
+                            saffron: saffron,
+                            saffronGlow: saffronGlow,
+                            text2: text2,
+                            dividerSoft: dividerSoft,
+                            onTap: () => setState(
+                                () => _format = _ShareFormat.fullCitation),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    // Preview card.
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 26, 20, 18),
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: divider),
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: -16,
+                            child: _SharePreviewBinding(
+                              divider: divider,
+                              saffron: saffron,
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                '‖ ${v.scripture.displayNameSafe} · '
+                                '$chapterDeva·$coordDeva ‖',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: Fonts.deva,
+                                  fontFamilyFallback: AppFontFallback.deva,
+                                  fontSize: 12,
+                                  color: saffron,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                v.sanskrit.trim(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: Fonts.deva,
+                                  fontFamilyFallback: AppFontFallback.deva,
+                                  fontSize: 16,
+                                  height: 1.6,
+                                  color: cream,
+                                ),
+                              ),
+                              if (_format !=
+                                      _ShareFormat.sanskritOnly &&
+                                  (v.english?.trim().isNotEmpty ?? false)) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  '"${v.english!.trim()}"',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: Fonts.serif,
+                                    fontFamilyFallback: AppFontFallback.latin,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 12.5,
+                                    height: 1.5,
+                                    color: text2,
+                                  ),
+                                ),
+                              ],
+                              if (_format == _ShareFormat.fullCitation) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  'sanatanguide.app/'
+                                  '${v.scripture.shortCode}/'
+                                  '${v.chapterNum}/${v.verseNum}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: Fonts.sans,
+                                    fontFamilyFallback: AppFontFallback.latin,
+                                    fontSize: 10,
+                                    letterSpacing: 0.06 * 10,
+                                    color: text3,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: dividerSoft)),
+                ),
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    _SheetGhostBtn(
+                      label: 'COPY TEXT',
+                      color: text2,
+                      onTap: () => widget.onCopy(_buildShareText()),
+                    ),
+                    const SizedBox(width: 8),
+                    _SheetFilledBtn(
+                      label: 'SHARE',
+                      bg: saffron,
+                      fg: onSaffron,
+                      enabled: true,
+                      onTap: () => widget.onShare(_buildShareText()),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FormatChip extends StatelessWidget {
+  const _FormatChip({
+    required this.label,
+    required this.active,
+    required this.saffron,
+    required this.saffronGlow,
+    required this.text2,
+    required this.dividerSoft,
+    required this.onTap,
+  });
+  final String label;
+  final bool active;
+  final Color saffron;
+  final Color saffronGlow;
+  final Color text2;
+  final Color dividerSoft;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: BoxDecoration(
+          color: active ? saffronGlow : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: active ? saffron : dividerSoft),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
+            fontSize: 10.5,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.04 * 10.5,
+            color: active ? saffron : text2,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `.share-binding` — line · saffron diamond · line. Sits at the top of
+/// the share preview card.
+class _SharePreviewBinding extends StatelessWidget {
+  const _SharePreviewBinding({required this.divider, required this.saffron});
+  final Color divider;
+  final Color saffron;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 12,
+      child: Row(
+        children: [
+          Expanded(child: Container(height: 1, color: divider)),
+          const SizedBox(width: 10),
+          Transform.rotate(
+            angle: 0.785,
+            child: Container(width: 5, height: 5, color: saffron),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Container(height: 1, color: divider)),
+        ],
+      ),
+    );
+  }
 }
