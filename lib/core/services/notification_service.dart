@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
@@ -104,6 +105,27 @@ final class NotificationService {
         AppLogger.instance.i('Exact alarm permission granted: $exactGranted');
       } catch (e, st) {
         AppLogger.instance.w('Exact alarm permission request failed', e, st);
+      }
+      // CMF/Nothing OS + Samsung One UI + Xiaomi MIUI aggressively suppress
+      // alarms unless the app is explicitly exempt from battery
+      // optimisation. The exact-alarm permission is necessary but not
+      // sufficient — OEM doze still kills scheduled fires. Prompt the user
+      // to whitelist us.
+      try {
+        final status = await Permission.ignoreBatteryOptimizations.status;
+        AppLogger.instance.i(
+          'Battery-optimisation exempt status: $status',
+        );
+        if (status != PermissionStatus.granted) {
+          final result = await Permission.ignoreBatteryOptimizations.request();
+          AppLogger.instance.i(
+            'Battery-optimisation exempt result: $result',
+          );
+        }
+      } catch (e, st) {
+        AppLogger.instance.w(
+          'Battery-optimisation request failed', e, st,
+        );
       }
       return granted ?? false;
     } catch (e, st) {

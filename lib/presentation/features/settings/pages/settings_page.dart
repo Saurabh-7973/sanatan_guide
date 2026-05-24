@@ -16,6 +16,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:sanatan_guide/core/services/analytics_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
@@ -102,6 +103,7 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       const _NotificationTimeRow(),
                       const _TestNotificationRow(),
+                      const _BatteryOptimizationRow(),
                       _Row(
                         isDark: isDark,
                         icon: Icons.celebration_outlined,
@@ -599,6 +601,79 @@ class _ExperienceRow extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+// ── Notifications: battery-optimisation exempt ────────────────────────────
+
+class _BatteryOptimizationRow extends ConsumerStatefulWidget {
+  const _BatteryOptimizationRow();
+  @override
+  ConsumerState<_BatteryOptimizationRow> createState() =>
+      _BatteryOptimizationRowState();
+}
+
+class _BatteryOptimizationRowState
+    extends ConsumerState<_BatteryOptimizationRow> {
+  PermissionStatus? _status;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    final s = await Permission.ignoreBatteryOptimizations.status;
+    if (mounted) setState(() => _status = s);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final ironRedBright =
+        isDark ? DColors.ironRedBright : LColors.ironRedBright;
+    final granted = _status == PermissionStatus.granted;
+    return _Row(
+      isDark: isDark,
+      icon: Icons.battery_saver_outlined,
+      title: 'Battery optimisation',
+      subtitle: granted
+          ? 'Reminder is exempt — fires reliably at the picked time'
+          : 'Vendor doze may delay notifications. Tap to exempt.',
+      trailing: granted
+          ? Text(
+              'EXEMPT',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.6,
+                color: saffron,
+              ),
+            )
+          : Text(
+              'NEEDS FIX',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.6,
+                color: ironRedBright,
+              ),
+            ),
+      onTap: () async {
+        if (granted) {
+          await openAppSettings();
+        } else {
+          await Permission.ignoreBatteryOptimizations.request();
+        }
+        await _refresh();
+      },
     );
   }
 }
