@@ -2142,6 +2142,12 @@ class _NotesSheetState extends State<_NotesSheet> {
     final length = widget.controller.text.characters.length;
     final coordDeva = DandaCoord.toDevanagari(widget.verse.verseNum);
     final chapterDeva = DandaCoord.toDevanagari(widget.verse.chapterNum);
+    final bookDeva = widget.verse.bookNum != null
+        ? DandaCoord.toDevanagari(widget.verse.bookNum!)
+        : null;
+    final fullCoordDeva = bookDeva != null
+        ? '$bookDeva·$chapterDeva·$coordDeva'
+        : '$chapterDeva·$coordDeva';
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -2193,7 +2199,7 @@ class _NotesSheetState extends State<_NotesSheet> {
                     ),
                     const Spacer(),
                     Text(
-                      '‖$chapterDeva·$coordDeva‖',
+                      '‖$fullCoordDeva‖',
                       style: TextStyle(
                         fontFamily: Fonts.deva,
                         fontFamilyFallback: AppFontFallback.deva,
@@ -2568,6 +2574,13 @@ class _ShareSheetState extends State<_ShareSheet> {
     final v = widget.verse;
     final coordDeva = DandaCoord.toDevanagari(v.verseNum);
     final chapterDeva = DandaCoord.toDevanagari(v.chapterNum);
+    // For nested texts (RV.M.S.V etc.) include the bookNum (mandala/kāṇḍa)
+    // as the first segment so the coord reads ‖१·१·१‖ not ‖१·१‖.
+    final bookDeva =
+        v.bookNum != null ? DandaCoord.toDevanagari(v.bookNum!) : null;
+    final fullCoordDeva = bookDeva != null
+        ? '$bookDeva·$chapterDeva·$coordDeva'
+        : '$chapterDeva·$coordDeva';
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -2616,7 +2629,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                     ),
                     const Spacer(),
                     Text(
-                      '‖$chapterDeva·$coordDeva‖',
+                      '‖$fullCoordDeva‖',
                       style: TextStyle(
                         fontFamily: Fonts.deva,
                         fontFamilyFallback: AppFontFallback.deva,
@@ -2719,7 +2732,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                             children: [
                               Text(
                                 '‖ ${v.scripture.displayNameSafe} · '
-                                '$chapterDeva·$coordDeva ‖',
+                                '$fullCoordDeva ‖',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: Fonts.deva,

@@ -6,6 +6,7 @@ part 'notification_time_provider.g.dart';
 
 const _kNotifHourKey = 'notif_verse_hour';
 const _kNotifMinuteKey = 'notif_verse_minute';
+const _kNotifEnabledKey = 'notif_verse_enabled';
 const TimeOfDay _kDefault = TimeOfDay(hour: 7, minute: 0);
 
 @Riverpod(keepAlive: true)
@@ -30,5 +31,28 @@ class NotificationTimeNotifier extends _$NotificationTimeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kNotifHourKey, time.hour);
     await prefs.setInt(_kNotifMinuteKey, time.minute);
+  }
+}
+
+/// Whether the Daily verse reminder is enabled. Defaults to true to honour
+/// the onboarding "Enable reminder" tap; user can toggle off in Settings.
+@Riverpod(keepAlive: true)
+class NotificationEnabled extends _$NotificationEnabled {
+  @override
+  bool build() {
+    _load();
+    return true;
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final v = prefs.getBool(_kNotifEnabledKey);
+    if (v != null) state = v;
+  }
+
+  Future<void> setEnabled(bool enabled) async {
+    state = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kNotifEnabledKey, enabled);
   }
 }

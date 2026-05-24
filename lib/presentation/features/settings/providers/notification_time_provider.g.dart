@@ -55,3 +55,60 @@ abstract class _$NotificationTimeNotifier extends $Notifier<TimeOfDay> {
     element.handleCreate(ref, build);
   }
 }
+
+/// Whether the Daily verse reminder is enabled. Defaults to true to honour
+/// the onboarding "Enable reminder" tap; user can toggle off in Settings.
+
+@ProviderFor(NotificationEnabled)
+final notificationEnabledProvider = NotificationEnabledProvider._();
+
+/// Whether the Daily verse reminder is enabled. Defaults to true to honour
+/// the onboarding "Enable reminder" tap; user can toggle off in Settings.
+final class NotificationEnabledProvider
+    extends $NotifierProvider<NotificationEnabled, bool> {
+  /// Whether the Daily verse reminder is enabled. Defaults to true to honour
+  /// the onboarding "Enable reminder" tap; user can toggle off in Settings.
+  NotificationEnabledProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notificationEnabledProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationEnabledHash();
+
+  @$internal
+  @override
+  NotificationEnabled create() => NotificationEnabled();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$notificationEnabledHash() =>
+    r'66ab5fd6e50523091db9548e1d43a66276d3d8e8';
+
+/// Whether the Daily verse reminder is enabled. Defaults to true to honour
+/// the onboarding "Enable reminder" tap; user can toggle off in Settings.
+
+abstract class _$NotificationEnabled extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

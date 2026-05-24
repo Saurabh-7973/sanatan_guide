@@ -11,6 +11,7 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/domain/repositories/i_scripture_repository.dart';
 import 'package:sanatan_guide/domain/usecases/get_verse_of_day_usecase.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 
 part 'verse_of_day_provider.g.dart';
 
@@ -54,12 +55,22 @@ Future<Either<Failure, Verse>> verseOfDay(Ref ref) async {
   final useCase = await ref.watch(getVerseOfDayUseCaseProvider.future);
   final result = await useCase.execute();
 
+  // User-set time + enabled flag from Settings. Watching them here is fine
+  // because verseOfDay rebuilds when either pref changes — the schedule
+  // call below re-fires with fresh hour/minute or cancels outright.
+  final enabled = ref.watch(notificationEnabledProvider);
+  final time = ref.watch(notificationTimeProvider);
+
   // Schedule tomorrow's notification when today's verse loads successfully.
   // This ensures the notification content always matches today's verse.
   // Fire-and-forget — notification failure must not affect verse display.
   result.fold(
     (_) {}, // failure — skip notification scheduling
     (verse) {
+      if (!enabled) {
+        NotificationService.cancelDailyNotification();
+        return;
+      }
       // Build notification content
       final title = '${verse.scripture.displayName} · ${getVerseLabel(verse)}';
 
@@ -77,6 +88,8 @@ Future<Either<Failure, Verse>> verseOfDay(Ref ref) async {
         verseId: verse.id,
         title: title,
         body: body,
+        hour: time.hour,
+        minute: time.minute,
       );
     },
   );

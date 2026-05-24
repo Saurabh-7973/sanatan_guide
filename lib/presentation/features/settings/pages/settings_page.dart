@@ -607,38 +607,68 @@ class _NotificationTimeRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
     final time = ref.watch(notificationTimeProvider);
+    final enabled = ref.watch(notificationEnabledProvider);
     return _Row(
       isDark: isDark,
       icon: Icons.notifications_outlined,
       title: 'Daily verse reminder',
-      trailing: TextButton(
-        onPressed: () async {
-          final picked = await showTimePicker(
-            context: context,
-            initialTime: time,
-            builder: (context, child) => Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme:
-                    Theme.of(context).colorScheme.copyWith(primary: saffron),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Time picker — disabled when reminder is off.
+          Opacity(
+            opacity: enabled ? 1 : 0.4,
+            child: TextButton(
+              onPressed: !enabled
+                  ? null
+                  : () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: time,
+                        builder: (context, child) => Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: Theme.of(context)
+                                .colorScheme
+                                .copyWith(primary: saffron),
+                          ),
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) {
+                        ref
+                            .read(notificationTimeProvider.notifier)
+                            .setTime(picked);
+                      }
+                    },
+              child: Text(
+                time.format(context),
+                style: TextStyle(
+                  fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: enabled ? saffron : text3,
+                ),
               ),
-              child: child!,
             ),
-          );
-          if (picked != null) {
-            ref.read(notificationTimeProvider.notifier).setTime(picked);
-          }
-        },
-        child: Text(
-          time.format(context),
-          style: TextStyle(
-            fontFamily: Fonts.sans,
-            fontFamilyFallback: AppFontFallback.latin,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: saffron,
           ),
-        ),
+          const SizedBox(width: 4),
+          // Toggle. Off → notification cancelled by verse-of-day provider.
+          Switch(
+            value: enabled,
+            onChanged: (v) => ref
+                .read(notificationEnabledProvider.notifier)
+                .setEnabled(v),
+            activeThumbColor: isDark ? const Color(0xFF1A1208) : Colors.white,
+            activeTrackColor: saffron,
+            inactiveThumbColor: text3,
+            inactiveTrackColor: isDark
+                ? DColors.dividerSoft
+                : LColors.dividerSoft,
+          ),
+        ],
       ),
     );
   }

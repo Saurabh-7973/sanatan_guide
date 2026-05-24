@@ -113,6 +113,8 @@ final class NotificationService {
     required String verseId,
     required String title,
     required String body,
+    int hour = 7,
+    int minute = 0,
   }) async {
     if (!_initialized) {
       AppLogger.instance.w('NotificationService not initialized — skipping');
@@ -123,8 +125,8 @@ final class NotificationService {
     // DateTime.now() always reflects the device's actual local timezone.
     final now = DateTime.now();
 
-    // Daily fire time in device local time (7:00 AM).
-    var targetLocal = DateTime(now.year, now.month, now.day, 7, 0, 0);
+    // Daily fire time in device local time at the user-picked hour/minute.
+    var targetLocal = DateTime(now.year, now.month, now.day, hour, minute);
 
     // If target time has already passed today, schedule for tomorrow.
     if (targetLocal.isBefore(now)) {
