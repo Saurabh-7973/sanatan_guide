@@ -22,6 +22,7 @@ import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -87,6 +88,7 @@ class SettingsPage extends ConsumerWidget {
                       const _ThemeRow(),
                       const _FontSizeRow(),
                       const _LanguageRow(),
+                      const _SanskritDisplayRow(),
                       const _ExperienceRow(),
 
                       // ── Notifications ───────────────────────────────────────
@@ -467,6 +469,30 @@ class _LanguageRow extends ConsumerWidget {
       icon: Icons.translate_rounded,
       title: l10n.settingsLanguage,
       subtitle: l10n.settingsLanguageEnglish,
+    );
+  }
+}
+
+// ── Reading: Sanskrit display (IAST toggle) ────────────────────────────────
+
+class _SanskritDisplayRow extends ConsumerWidget {
+  const _SanskritDisplayRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iast =
+        ref.watch(transliterationEnabledProvider).asData?.value ?? false;
+    return _Row(
+      isDark: isDark,
+      icon: Icons.spellcheck_rounded,
+      title: 'Sanskrit display',
+      subtitle: iast
+          ? 'Devanāgarī · IAST diacritics on'
+          : 'Devanāgarī only',
+      trailing: _Chevron(isDark: isDark),
+      onTap: () =>
+          ref.read(transliterationEnabledProvider.notifier).toggle(),
     );
   }
 }
