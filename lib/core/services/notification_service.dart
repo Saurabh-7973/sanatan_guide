@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
+import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -24,8 +25,10 @@ const _kChannelDesc = 'Daily morning verse from the Bhagavad Gita';
 void onNotificationTap(NotificationResponse response) {
   final verseId = response.payload;
   if (verseId == null || verseId.isEmpty) return;
-  // Store for router to pick up on next build cycle.
-  NotificationService.pendingDeepLink = '/browse/bhagavad_gita/verse/$verseId';
+  // Derive the scripture code from the verse id (BG.2.47 → bhagavad_gita,
+  // RV.1.1.1 → rigveda, etc.) instead of hard-coding bhagavad_gita.
+  final code = scriptureCodeFromVerseId(verseId);
+  NotificationService.pendingDeepLink = '/browse/$code/verse/$verseId';
 }
 
 // ── Service ───────────────────────────────────────────────────────────────
@@ -189,6 +192,41 @@ final class NotificationService {
   static Future<void> cancelDailyNotification() async {
     await _plugin.cancel(_kVerseOfDayNotifId);
     AppLogger.instance.i('Daily notification cancelled');
+  }
+
+  /// Fire a test notification immediately — for diagnosing delivery on a
+  /// real device without waiting for the scheduled hour. Uses the same
+  /// channel + payload as the daily reminder so a tap deep-links the
+  /// same way.
+  static Future<void> fireTestNotificationNow({
+    required String verseId,
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) {
+      AppLogger.instance.w('NotificationService not initialized — skipping');
+      return;
+    }
+    final androidDetails = AndroidNotificationDetails(
+      _kChannelId,
+      _kChannelName,
+      channelDescription: _kChannelDesc,
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+      color: AppColors.saffron,
+      enableVibration: true,
+      playSound: true,
+      autoCancel: true,
+    );
+    await _plugin.show(
+      _kVerseOfDayNotifId,
+      title,
+      body,
+      NotificationDetails(android: androidDetails),
+      payload: verseId,
+    );
+    AppLogger.instance.i('Test notification posted for $verseId');
   }
 }
 

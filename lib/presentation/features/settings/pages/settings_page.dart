@@ -16,7 +16,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:sanatan_guide/core/services/analytics_service.dart';
+import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
+import 'package:sanatan_guide/core/utils/verse_label.dart';
+import 'package:sanatan_guide/domain/entities/scripture.dart';
+import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
@@ -97,6 +101,7 @@ class SettingsPage extends ConsumerWidget {
                         isDark: isDark,
                       ),
                       const _NotificationTimeRow(),
+                      const _TestNotificationRow(),
                       _Row(
                         isDark: isDark,
                         icon: Icons.celebration_outlined,
@@ -594,6 +599,55 @@ class _ExperienceRow extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+// ── Notifications: test-fire button ───────────────────────────────────────
+
+class _TestNotificationRow extends ConsumerWidget {
+  const _TestNotificationRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return _Row(
+      isDark: isDark,
+      icon: Icons.send_outlined,
+      title: 'Send a test notification',
+      subtitle: 'Fires immediately — confirms delivery + tap deep-link',
+      onTap: () async {
+        final verseAsync = await ref.read(verseOfDayProvider.future);
+        verseAsync.fold(
+          (_) async {
+            await NotificationService.fireTestNotificationNow(
+              verseId: 'BG.2.47',
+              title: 'Sanatan Guide · test',
+              body: 'Test reminder — tap to open Verse Detail.',
+            );
+          },
+          (verse) async {
+            final en = verse.english?.trim() ?? '';
+            final body = en.isNotEmpty
+                ? (en.length > 100 ? '${en.substring(0, 97)}…' : en)
+                : verse.sanskrit.trim();
+            await NotificationService.fireTestNotificationNow(
+              verseId: verse.id,
+              title:
+                  '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
+              body: body,
+            );
+          },
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Test notification sent'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      },
     );
   }
 }
