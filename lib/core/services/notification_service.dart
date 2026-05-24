@@ -91,6 +91,17 @@ final class NotificationService {
       if (android == null) return true;
       final granted = await android.requestNotificationsPermission();
       AppLogger.instance.i('Notification permission granted: $granted');
+      // Also request the exact-alarm permission on Android 12+ so
+      // exactAllowWhileIdle schedules actually fire on time instead of
+      // being demoted to inexact. USE_EXACT_ALARM in the manifest covers
+      // most cases without a runtime prompt, but the call is a no-op
+      // when not needed.
+      try {
+        final exactGranted = await android.requestExactAlarmsPermission();
+        AppLogger.instance.i('Exact alarm permission granted: $exactGranted');
+      } catch (e, st) {
+        AppLogger.instance.w('Exact alarm permission request failed', e, st);
+      }
       return granted ?? false;
     } catch (e, st) {
       AppLogger.instance.w(
@@ -152,6 +163,11 @@ final class NotificationService {
 
     final notifDetails = NotificationDetails(android: androidDetails);
 
+    // exactAllowWhileIdle = fire at the picked minute even in doze.
+    // Requires SCHEDULE_EXACT_ALARM + USE_EXACT_ALARM in manifest (both
+    // already declared). inexactAllowWhileIdle was deferring delivery for
+    // hours on a real Samsung device — invisible to users who set a
+    // morning verse reminder and never saw it land at the picked time.
     await _plugin.zonedSchedule(
       _kVerseOfDayNotifId,
       title,
@@ -159,7 +175,7 @@ final class NotificationService {
       scheduledDate,
       notifDetails,
       payload: verseId,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
