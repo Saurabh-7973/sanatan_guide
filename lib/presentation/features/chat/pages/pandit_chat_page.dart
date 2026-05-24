@@ -6,11 +6,9 @@
 // § "AI CHAT — GENERAL MODE". The verse-anchored chat is a separate screen.
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:sanatan_guide/core/services/gemini_service.dart';
-import 'package:sanatan_guide/core/utils/coordinate_parser.dart';
-import 'package:sanatan_guide/domain/entities/scripture.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -466,7 +464,7 @@ class _Conversation extends StatelessWidget {
               final msg = messages[index];
               return msg.isUser
                   ? _UserBubble(isDark: isDark, text: msg.text)
-                  : _AiProse(isDark: isDark, text: msg.text);
+                  : AiRichProse(isDark: isDark, text: msg.text);
             },
           ),
         ),
@@ -529,220 +527,6 @@ class _UserBubble extends StatelessWidget {
               fontSize: 13.5,
               height: 1.45,
               color: text1,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AiProse extends StatelessWidget {
-  const _AiProse({required this.isDark, required this.text});
-
-  final bool isDark;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final text1 = isDark ? DColors.text1 : LColors.text1;
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final saffronGlow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
-    // Italic per the screen-14 general-chat mockup. The spec-09 verse-anchored
-    // chat uses non-italic reply prose — this divergence is deliberate.
-    final base = TextStyle(
-      fontFamily: Fonts.serif,
-      fontFamilyFallback: AppFontFallback.latin,
-      fontStyle: FontStyle.italic,
-      fontSize: 14.5,
-      height: 1.75,
-      color: text1,
-    );
-    final boldKeyTerm = base.copyWith(
-      fontWeight: FontWeight.w600,
-      fontStyle: FontStyle.normal,
-      color: saffron,
-    );
-
-    final paragraphs = text
-        .trim()
-        .split(RegExp(r'\n\s*\n'))
-        .where((p) => p.trim().isNotEmpty)
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (var i = 0; i < paragraphs.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            Text.rich(
-              TextSpan(
-                style: base,
-                children: _buildSpans(
-                  context: context,
-                  paragraph: paragraphs[i].trim(),
-                  base: base,
-                  boldKeyTerm: boldKeyTerm,
-                  saffron: saffron,
-                  saffronGlow: saffronGlow,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// Split one paragraph into `TextSpan`s alternating between plain prose,
-/// `**bold key term**` runs, and `(Bhagavad Gītā 2.47)` citation chips.
-///
-/// Citations are matched against [_kCitationRe]: a parenthesised
-/// scripture-name + 2-or-3-segment numeric coordinate (ASCII or
-/// Devanāgarī digits). When the substring parses via [parseScriptureCoordinate]
-/// it becomes a tap-target widget-span; otherwise it falls back to plain
-/// text so we never lose the user-visible reference if a name is unknown.
-List<InlineSpan> _buildSpans({
-  required BuildContext context,
-  required String paragraph,
-  required TextStyle base,
-  required TextStyle boldKeyTerm,
-  required Color saffron,
-  required Color saffronGlow,
-}) {
-  final tokens = <_Token>[];
-  // First pass: collect bold-term + citation match spans.
-  final boldRe = RegExp(r'\*\*([^*]+)\*\*');
-  for (final m in boldRe.allMatches(paragraph)) {
-    tokens.add(_Token.bold(m.start, m.end, m.group(1)!));
-  }
-  for (final m in _kCitationRe.allMatches(paragraph)) {
-    final inner = m.group(1)!.trim();
-    final coord = parseScriptureCoordinate(inner);
-    if (coord != null) {
-      tokens.add(_Token.citation(m.start, m.end, inner, coord));
-    }
-  }
-  tokens.sort((a, b) => a.start.compareTo(b.start));
-
-  // Drop overlapping tokens — bold inside citation is left as a citation.
-  final dropped = <bool>[for (final _ in tokens) false];
-  for (var i = 0; i < tokens.length; i++) {
-    if (dropped[i]) continue;
-    for (var j = i + 1; j < tokens.length; j++) {
-      if (tokens[j].start < tokens[i].end) dropped[j] = true;
-    }
-  }
-
-  final out = <InlineSpan>[];
-  var cursor = 0;
-  for (var i = 0; i < tokens.length; i++) {
-    if (dropped[i]) continue;
-    final t = tokens[i];
-    if (t.start > cursor) {
-      out.add(TextSpan(text: paragraph.substring(cursor, t.start)));
-    }
-    switch (t.kind) {
-      case _TokenKind.bold:
-        out.add(TextSpan(text: t.text, style: boldKeyTerm));
-      case _TokenKind.citation:
-        out.add(WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: _CitationChip(
-            label: t.text,
-            saffron: saffron,
-            glow: saffronGlow,
-            onTap: () => context.push(
-              '/browse/${t.coord!.scripture.code}/verse/${t.coord!.verseId}',
-            ),
-          ),
-        ));
-    }
-    cursor = t.end;
-  }
-  if (cursor < paragraph.length) {
-    out.add(TextSpan(text: paragraph.substring(cursor)));
-  }
-  return out;
-}
-
-/// Match a parenthesised citation. The body must start with a non-digit
-/// (so we don't grab plain numeric parentheticals like "(1)") and end with a
-/// 2-3 segment numeric coordinate using ASCII or Devanāgarī digits.
-final RegExp _kCitationRe = RegExp(
-  r'\(([A-Za-zĀ-žऀ-ॿ][^()]{1,80}?'
-  r'[\s.](?:[0-9०-९]+[.: ]){1,2}[0-9०-९]+)\)',
-);
-
-enum _TokenKind { bold, citation }
-
-class _Token {
-  _Token._({
-    required this.start,
-    required this.end,
-    required this.text,
-    required this.kind,
-    this.coord,
-  });
-
-  factory _Token.bold(int s, int e, String text) =>
-      _Token._(start: s, end: e, text: text, kind: _TokenKind.bold);
-  factory _Token.citation(
-          int s, int e, String text, ScriptureCoordinate coord) =>
-      _Token._(
-          start: s,
-          end: e,
-          text: text,
-          kind: _TokenKind.citation,
-          coord: coord);
-
-  final int start;
-  final int end;
-  final String text;
-  final _TokenKind kind;
-  final ScriptureCoordinate? coord;
-}
-
-class _CitationChip extends StatelessWidget {
-  const _CitationChip({
-    required this.label,
-    required this.saffron,
-    required this.glow,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color saffron;
-  final Color glow;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: glow,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: saffron.withValues(alpha: 0.4)),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontFamily: Fonts.serif,
-              fontFamilyFallback: AppFontFallback.latin,
-              fontStyle: FontStyle.italic,
-              fontSize: 13,
-              height: 1.0,
-              color: saffron,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ),

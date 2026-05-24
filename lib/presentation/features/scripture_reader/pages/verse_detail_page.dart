@@ -29,6 +29,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/v
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/verse_detail_glyphs.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart'
     as font_prefs;
+import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -1704,7 +1705,16 @@ class _ExplainCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 14),
-            ..._prose(prose, text1),
+            if (prose.trim().isNotEmpty)
+              AiRichProse(
+                isDark: isDark,
+                text: prose,
+                italic: false,
+                fontSize: 14.5,
+                height: 1.72,
+                horizontalPadding: 0,
+                color: text1,
+              ),
             if (thinking) ...[
               if (prose.trim().isNotEmpty) const SizedBox(height: 12),
               Row(
@@ -1752,26 +1762,6 @@ class _ExplainCard extends StatelessWidget {
     );
   }
 
-  // Renders paragraphs (blank-line separated) with *italic* spans.
-  List<Widget> _prose(String text, Color color) {
-    if (text.trim().isEmpty) return const [];
-    final base = AppText.translation(color: color, size: 14.5)
-        .copyWith(height: 1.72);
-    final italic = base.copyWith(fontStyle: FontStyle.italic);
-    final paras = text.trim().split(RegExp(r'\n{2,}'));
-    final out = <Widget>[];
-    for (var i = 0; i < paras.length; i++) {
-      if (i > 0) out.add(const SizedBox(height: 12));
-      final spans = <TextSpan>[];
-      final parts = paras[i].replaceAll('\n', ' ').split('*');
-      for (var j = 0; j < parts.length; j++) {
-        if (parts[j].isEmpty) continue;
-        spans.add(TextSpan(text: parts[j], style: j.isOdd ? italic : base));
-      }
-      out.add(Text.rich(TextSpan(children: spans)));
-    }
-    return out;
-  }
 }
 
 // ════════════════════════════════════════════════════════════════════════

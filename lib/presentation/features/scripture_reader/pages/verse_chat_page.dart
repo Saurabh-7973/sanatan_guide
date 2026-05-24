@@ -6,6 +6,7 @@ import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -459,12 +460,23 @@ class _MessageBubble extends StatelessWidget {
                             isDark ? AppColors.borderDark : AppColors.border,
                       ),
               ),
-              child: Text(
-                message.text,
-                style: context.ts.bodyMedium.copyWith(
-                  color: isUser ? Colors.white : null,
-                ),
-              ),
+              child: isUser
+                  ? Text(
+                      message.text,
+                      style: context.ts.bodyMedium.copyWith(
+                        color: Colors.white,
+                      ),
+                    )
+                  : AiRichProse(
+                      isDark: isDark,
+                      text: message.text,
+                      // Verse-anchored chat uses non-italic prose per
+                      // screen-09 (commentary tone) vs general-chat italic.
+                      italic: false,
+                      fontSize: 14,
+                      height: 1.5,
+                      horizontalPadding: 0,
+                    ),
             ),
           ),
           if (isUser) const SizedBox(width: 28 + AppSpacing.sm),
