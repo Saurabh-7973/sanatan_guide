@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
+import 'package:sanatan_guide/data/festivals/festival_dates_future.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 
 part 'festival_provider.g.dart';
@@ -54,8 +55,10 @@ Future<List<Festival>> festivals(Ref ref) async {
     final raw = rc.getString(_kFestivalDatesKey);
 
     if (raw.isEmpty) {
-      AppLogger.instance.i('FestivalProvider: using hardcoded 2026 dates');
-      return festivals2026;
+      // No Remote Config push — fall through to the bundled fallback below
+      // (year-aware) so the app keeps producing correct dates after 2026
+      // without depending on a server roll-out.
+      return _withBundledYearOverrides(festivals2026);
     }
 
     // Parse the date override map
@@ -81,6 +84,7 @@ Future<List<Festival>> festivals(Ref ref) async {
           emoji: festival.emoji,
           category: festival.category,
           howToObserve: festival.howToObserve,
+          readingVerseId: festival.readingVerseId,
         );
       } catch (e) {
         AppLogger.instance.w(
@@ -100,6 +104,42 @@ Future<List<Festival>> festivals(Ref ref) async {
       e,
       st,
     );
-    return festivals2026;
+    return _withBundledYearOverrides(festivals2026);
   }
+}
+
+/// Apply [futureFestivalDates] for the current device year. The base list
+/// is `festivals2026` so explainer + practices stay year-invariant; only
+/// the `date` field is rewritten when the device's year has a bundled
+/// override. Year < 2027 returns the base list unchanged.
+List<Festival> _withBundledYearOverrides(List<Festival> base) {
+  final year = DateTime.now().year;
+  if (year < 2027) return base;
+  final overrides = futureFestivalDates[year];
+  if (overrides == null) {
+    // Beyond bundled range — return base list, user sees 2026 dates as a
+    // best-effort fallback until Remote Config pushes new ones.
+    AppLogger.instance.w(
+      'FestivalProvider: no bundled dates for year $year; '
+      'falling back to 2026 dates. Push Remote Config to fix.',
+    );
+    return base;
+  }
+  return base.map((f) {
+    final d = overrides[f.id];
+    if (d == null) return f;
+    return Festival(
+      id: f.id,
+      name: f.name,
+      sanskritName: f.sanskritName,
+      date: d,
+      shortDesc: f.shortDesc,
+      explainer: f.explainer,
+      deity: f.deity,
+      emoji: f.emoji,
+      category: f.category,
+      howToObserve: f.howToObserve,
+      readingVerseId: f.readingVerseId,
+    );
+  }).toList();
 }
