@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keep notification-related drawables. R8 resource shrinker may
+     discard ic_notification_om otherwise, causing scheduled notifications
+     to silently fail at fire time when the icon lookup misses. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification_om,@drawable/ic_launcher_foreground,@mipmap/ic_launcher,@mipmap/ic_launcher_round"
+    tools:shrinkMode="safe" />

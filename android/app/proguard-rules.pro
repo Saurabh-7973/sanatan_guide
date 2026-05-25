@@ -33,3 +33,22 @@
 
 # Suppress warnings for missing Play Core classes
 -dontwarn com.google.android.play.core.**
+
+# flutter_local_notifications — keep receivers + plugin code; without this,
+# R8 strips internals referenced by AlarmManager via class-name strings, and
+# scheduled notifications silently fail in release builds.
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+
+# GSON (used internally by flutter_local_notifications to persist scheduled
+# notification specs across process restarts; field-name stripping breaks
+# the JSON round-trip when the receiver wakes after process death).
+-dontwarn sun.misc.**
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken

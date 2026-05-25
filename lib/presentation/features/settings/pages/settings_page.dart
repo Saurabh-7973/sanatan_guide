@@ -103,6 +103,7 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       const _NotificationTimeRow(),
                       const _TestNotificationRow(),
+                      const _Schedule30sRow(),
                       const _BatteryOptimizationRow(),
                       _Row(
                         isDark: isDark,
@@ -673,6 +674,56 @@ class _BatteryOptimizationRowState
           await Permission.ignoreBatteryOptimizations.request();
         }
         await _refresh();
+      },
+    );
+  }
+}
+
+// ── Notifications: 30-second scheduled test ───────────────────────────────
+
+class _Schedule30sRow extends ConsumerWidget {
+  const _Schedule30sRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return _Row(
+      isDark: isDark,
+      icon: Icons.schedule_outlined,
+      title: 'Schedule a test in 30 sec',
+      subtitle: 'Tests the *scheduled* fire path (lock screen, doze, etc)',
+      onTap: () async {
+        final verseAsync = await ref.read(verseOfDayProvider.future);
+        final t = await verseAsync.fold<Future<DateTime>>(
+          (_) => NotificationService.scheduleTestInSeconds(
+            verseId: 'BG.2.47',
+            title: 'Sanatan Guide · scheduled test',
+            body: 'Fired via zonedSchedule. If you see this, alarms work.',
+          ),
+          (verse) {
+            final en = verse.english?.trim() ?? '';
+            final body = en.isNotEmpty
+                ? (en.length > 100 ? '${en.substring(0, 97)}…' : en)
+                : verse.sanskrit.trim();
+            return NotificationService.scheduleTestInSeconds(
+              verseId: verse.id,
+              title:
+                  '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
+              body: body,
+            );
+          },
+        );
+        if (context.mounted) {
+          final hh = t.hour.toString().padLeft(2, '0');
+          final mm = t.minute.toString().padLeft(2, '0');
+          final ss = t.second.toString().padLeft(2, '0');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Scheduled for $hh:$mm:$ss — lock screen + wait'),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
       },
     );
   }

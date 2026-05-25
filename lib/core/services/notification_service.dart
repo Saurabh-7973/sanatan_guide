@@ -13,9 +13,21 @@ part 'notification_service.g.dart';
 // Use fixed IDs so rescheduling replaces the existing notification,
 // not stacks new ones.
 const _kVerseOfDayNotifId = 1001;
-const _kChannelId = 'verse_of_day';
+// Separate ID for the diagnostic "Schedule a test in 30 sec" row so it
+// doesn't replace the user's real daily reminder when tapped.
+const _kTestNotifId = 1099;
+
+// Channel ID bumped to _v2 because Android notification channels are
+// immutable after creation — toggling enableVibration on the original
+// channel was a no-op for existing installs. Bumping the ID forces the
+// system to create a new channel with the new defaults.
+const _kChannelId = 'verse_of_day_v2';
 const _kChannelName = 'Verse of the Day';
 const _kChannelDesc = 'Daily morning verse from the Bhagavad Gita';
+const _kNotificationIcon = 'ic_notification_om';
+// Bigger colored Om shown on the right side of the expanded notification.
+// Resolves to drawable/ic_launcher_foreground (saffron-on-transparent).
+const _kLargeIcon = DrawableResourceAndroidBitmap('ic_launcher_foreground');
 
 // ── Callback for notification taps ────────────────────────────────────────
 // This must be a top-level function (not a method) because
@@ -58,8 +70,12 @@ final class NotificationService {
     // is done via Dart's built-in DateTime in scheduleDailyVerseNotification.
     tz_data.initializeTimeZones();
 
+    // Use a dedicated white-silhouette icon (drawable/ic_notification_om).
+    // Android masks colored launcher icons to a solid blob on the status
+    // bar / lock screen; the AppColors.saffron `color` set in each detail
+    // tints the silhouette at render time so the Om still looks saffron.
     const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings(_kNotificationIcon);
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
@@ -73,7 +89,7 @@ final class NotificationService {
       _kChannelName,
       description: _kChannelDesc,
       importance: Importance.high,
-      enableVibration: false,
+      enableVibration: true,
       playSound: true,
     );
 
@@ -177,11 +193,13 @@ final class NotificationService {
       _kChannelId,
       _kChannelName,
       channelDescription: _kChannelDesc,
+      icon: _kNotificationIcon,
+      largeIcon: _kLargeIcon,
       importance: Importance.high,
-      priority: Priority.defaultPriority,
+      priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
       color: AppColors.saffron,
-      enableVibration: false,
+      enableVibration: true,
       playSound: true,
       autoCancel: true,
     );
@@ -216,6 +234,54 @@ final class NotificationService {
     AppLogger.instance.i('Daily notification cancelled');
   }
 
+  /// Schedule a one-off notification N seconds from now via the same
+  /// `zonedSchedule` path the real reminder uses. Lets us prove the
+  /// *scheduled* delivery flow works without depending on the time
+  /// picker. Differs from [fireTestNotificationNow] which uses `_plugin.
+  /// show()` (no scheduling involved).
+  static Future<DateTime> scheduleTestInSeconds({
+    required String verseId,
+    required String title,
+    required String body,
+    int seconds = 30,
+  }) async {
+    if (!_initialized) {
+      AppLogger.instance.w('NotificationService not initialized — skipping');
+      return DateTime.now();
+    }
+    final targetLocal = DateTime.now().add(Duration(seconds: seconds));
+    final scheduledDate = tz.TZDateTime.from(targetLocal.toUtc(), tz.UTC);
+    final androidDetails = AndroidNotificationDetails(
+      _kChannelId,
+      _kChannelName,
+      channelDescription: _kChannelDesc,
+      icon: _kNotificationIcon,
+      largeIcon: _kLargeIcon,
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+      color: AppColors.saffron,
+      enableVibration: true,
+      playSound: true,
+      autoCancel: true,
+    );
+    await _plugin.zonedSchedule(
+      _kTestNotifId,
+      title,
+      body,
+      scheduledDate,
+      NotificationDetails(android: androidDetails),
+      payload: verseId,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+    AppLogger.instance.i(
+      'Test notification scheduled for $targetLocal (local) — $verseId',
+    );
+    return targetLocal;
+  }
+
   /// Fire a test notification immediately — for diagnosing delivery on a
   /// real device without waiting for the scheduled hour. Uses the same
   /// channel + payload as the daily reminder so a tap deep-links the
@@ -233,6 +299,8 @@ final class NotificationService {
       _kChannelId,
       _kChannelName,
       channelDescription: _kChannelDesc,
+      icon: _kNotificationIcon,
+      largeIcon: _kLargeIcon,
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
@@ -242,7 +310,7 @@ final class NotificationService {
       autoCancel: true,
     );
     await _plugin.show(
-      _kVerseOfDayNotifId,
+      _kTestNotifId,
       title,
       body,
       NotificationDetails(android: androidDetails),
