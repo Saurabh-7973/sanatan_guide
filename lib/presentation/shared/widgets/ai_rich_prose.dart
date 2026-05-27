@@ -130,6 +130,16 @@ List<InlineSpan> _buildSpans({
       tokens.add(_Token.citation(m.start, m.end, inner, coord));
     }
   }
+  // Bare in-prose citations like "BG 2.47", "Bhagavad Gītā 11.37",
+  // "Kaṭha 1.2.18" — anything parseScriptureCoordinate can resolve.
+  // Restricted to 1-3 word names so we don't grab whole sentences.
+  for (final m in bareCitationRe.allMatches(paragraph)) {
+    final inner = m.group(1)!.trim();
+    final coord = parseScriptureCoordinate(inner);
+    if (coord != null) {
+      tokens.add(_Token.citation(m.start, m.end, inner, coord));
+    }
+  }
   tokens.sort((a, b) => a.start.compareTo(b.start));
 
   // Drop overlapping tokens — earlier wins, so bold inside citation stays a
@@ -182,6 +192,16 @@ List<InlineSpan> _buildSpans({
 final RegExp citationRe = RegExp(
   r'\(([A-Za-zĀ-žऀ-ॿ][^()]{1,80}?'
   r'[\s.](?:[0-9०-९]+[.: ]){1,2}[0-9०-९]+)\)',
+);
+
+/// Bare in-prose citation regex — alias word(s) + numeric coordinate, no
+/// parentheses. Caps the alias at 3 words so a whole sentence can't be
+/// swept up. parseScriptureCoordinate is the final arbiter: if the leading
+/// words don't match any known alias, the token is dropped.
+final RegExp bareCitationRe = RegExp(
+  r'\b([A-Za-zĀ-žऀ-ॿ][A-Za-zĀ-žऀ-ॿ’\-]*'
+  r'(?:\s[A-Za-zĀ-žऀ-ॿ][A-Za-zĀ-žऀ-ॿ’\-]*){0,2}'
+  r'\s+[0-9०-९]+\.[0-9०-९]+(?:\.[0-9०-९]+)?)\b',
 );
 
 enum _TokenKind { bold, italicEmph, citation }
