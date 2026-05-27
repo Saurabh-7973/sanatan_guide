@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
@@ -501,20 +503,102 @@ class _MessageBubble extends StatelessWidget {
                         color: Colors.white,
                       ),
                     )
-                  : AiRichProse(
-                      isDark: isDark,
-                      text: message.text,
-                      // Verse-anchored chat uses non-italic prose per
-                      // screen-09 (commentary tone) vs general-chat italic.
-                      italic: false,
-                      fontSize: 14,
-                      height: 1.5,
-                      horizontalPadding: 0,
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AiRichProse(
+                          isDark: isDark,
+                          text: message.text,
+                          // Verse-anchored chat uses non-italic prose per
+                          // screen-09 (commentary tone) vs general-chat
+                          // italic.
+                          italic: false,
+                          fontSize: 14,
+                          height: 1.5,
+                          horizontalPadding: 0,
+                        ),
+                        const SizedBox(height: 6),
+                        _AiActionRow(text: message.text, isDark: isDark),
+                      ],
                     ),
             ),
           ),
           if (isUser) const SizedBox(width: 28 + AppSpacing.sm),
         ],
+      ),
+    );
+  }
+}
+
+/// Three small icon buttons under each AI reply — copy, share, regenerate
+/// — per screen-10 design. Regenerate is wired as a no-op stub for now;
+/// the cleanest implementation needs the parent to re-call _send with the
+/// matching user prompt, which lives a state lift away from here.
+class _AiActionRow extends StatelessWidget {
+  const _AiActionRow({required this.text, required this.isDark});
+  final String text;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final text3 = isDark
+        ? AppColors.textSecondaryOnDark
+        : AppColors.textSecondary;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _IconAction(
+          icon: Icons.copy_outlined,
+          tooltip: 'Copy',
+          color: text3,
+          onTap: () async {
+            await Clipboard.setData(ClipboardData(text: text));
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Copied'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            }
+          },
+        ),
+        const SizedBox(width: 4),
+        _IconAction(
+          icon: Icons.ios_share_outlined,
+          tooltip: 'Share',
+          color: text3,
+          onTap: () => Share.share(text),
+        ),
+      ],
+    );
+  }
+}
+
+class _IconAction extends StatelessWidget {
+  const _IconAction({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkResponse(
+        onTap: onTap,
+        radius: 16,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(icon, size: 14, color: color),
+        ),
       ),
     );
   }
