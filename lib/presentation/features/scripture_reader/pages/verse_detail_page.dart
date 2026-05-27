@@ -355,7 +355,7 @@ class _TopBar extends StatelessWidget {
           _CircleButton(
             isDark: isDark,
             onTap: onBack,
-            child: Icon(Icons.chevron_left_rounded, size: 24, color: text1),
+            child: const MockupBackChevron(),
           ),
           Expanded(
             child: Column(

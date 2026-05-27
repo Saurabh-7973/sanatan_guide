@@ -11,6 +11,7 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmark_sort_provider.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
@@ -96,7 +97,7 @@ class _TopBar extends StatelessWidget {
                 context.go('/home');
               }
             },
-            icon: const Icon(Icons.chevron_left_rounded),
+            icon: const MockupBackChevron(),
           ),
           const Spacer(),
           IconButton(

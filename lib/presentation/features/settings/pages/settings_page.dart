@@ -66,7 +66,7 @@ class SettingsPage extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back, color: text1),
+                        icon: const MockupBackChevron(),
                         onPressed: () => Navigator.of(context).maybePop(),
                       ),
                       const SizedBox(width: 4),

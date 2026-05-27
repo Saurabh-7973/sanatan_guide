@@ -171,7 +171,7 @@ class _SearchTopBar extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             color: text1,
             onPressed: onBack,
-            icon: const Icon(Icons.chevron_left_rounded),
+            icon: const MockupBackChevron(),
           ),
           const SizedBox(width: 4),
           Expanded(

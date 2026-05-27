@@ -339,7 +339,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.arrow_back, size: 22, color: text1),
+            icon: const MockupBackChevron(),
             tooltip: 'Back',
             onPressed: () => Navigator.of(context).maybePop(),
           ),
