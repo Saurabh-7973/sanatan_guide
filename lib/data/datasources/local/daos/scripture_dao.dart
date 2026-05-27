@@ -387,10 +387,17 @@ LIMIT 1
   }
 
   /// Distinct chapters with [chapter_label] taken from the lowest [verse_num] row.
+  /// Each row also carries the chapter's total verse count so callers can
+  /// render "verse X of Y" and time-left without a per-chapter follow-up
+  /// query.
   Future<List<ChapterOutline>> getChapterOutlines(String scriptureCode) async {
     final rows = await customSelect(
       '''
-SELECT chapter_num, book_num, chapter_label
+SELECT
+  c.chapter_num,
+  c.book_num,
+  c.chapter_label,
+  vc.verse_count
 FROM (
   SELECT chapter_num, book_num, chapter_label,
     ROW_NUMBER() OVER (
@@ -399,10 +406,23 @@ FROM (
     ) AS rn
   FROM verses
   WHERE scripture = ?
-) WHERE rn = 1
-ORDER BY IFNULL(book_num, $_nullBookSentinel) ASC, chapter_num ASC
+) c
+JOIN (
+  SELECT chapter_num, IFNULL(book_num, $_nullBookSentinel) AS book_key,
+    COUNT(*) AS verse_count
+  FROM verses
+  WHERE scripture = ?
+  GROUP BY chapter_num, book_key
+) vc
+  ON vc.chapter_num = c.chapter_num
+  AND vc.book_key = IFNULL(c.book_num, $_nullBookSentinel)
+WHERE c.rn = 1
+ORDER BY IFNULL(c.book_num, $_nullBookSentinel) ASC, c.chapter_num ASC
 ''',
-      variables: [Variable<String>(scriptureCode)],
+      variables: [
+        Variable<String>(scriptureCode),
+        Variable<String>(scriptureCode),
+      ],
       readsFrom: {versesTable},
     ).get();
 
@@ -412,6 +432,7 @@ ORDER BY IFNULL(book_num, $_nullBookSentinel) ASC, chapter_num ASC
             chapterNum: row.read<int>('chapter_num'),
             bookNum: row.readNullable<int>('book_num'),
             chapterLabel: row.readNullable<String>('chapter_label'),
+            verseCount: row.read<int>('verse_count'),
           ),
         )
         .toList();

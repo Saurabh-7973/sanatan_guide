@@ -234,6 +234,7 @@ ChapterMeta Function(ChapterOutline) _outlineToMeta(String scriptureId) {
       chapterNum: o.chapterNum,
       bookNum: o.bookNum,
       enTitle: (label != null && label.isNotEmpty) ? label : fallback,
+      verseCount: o.verseCount > 0 ? o.verseCount : null,
     );
   };
 }
@@ -395,8 +396,16 @@ class _ChapterListHeader extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final unit = scripture.unitLabel;
 
+    // Once the user has read at least one chapter in a rollup scripture
+    // (e.g. Ṛgveda / Bhāgavata Purāṇa), the top-level unit row
+    // ("MAṆḌALAS", "SKANDAS", …) becomes noise — they're past orientation
+    // and want CHAPTERS · VERSES · READ instead.
+    final dropUnitRow = readChapters > 0 &&
+        totalChapters != null &&
+        totalChapters! > 0 &&
+        totalChapters != totalUnits;
     final parts = <(String, String)>[
-      ('$totalUnits', unit.toUpperCase()),
+      if (!dropUnitRow) ('$totalUnits', unit.toUpperCase()),
       if (totalChapters != null && totalChapters! > 0)
         (_fmt(totalChapters!), 'CHAPTERS'),
       if (totalVerses > 0) (_fmt(totalVerses), 'VERSES'),
@@ -659,12 +668,29 @@ class _ResumeRow extends StatelessWidget {
     final ch = chapter.chapterNum;
     final total = chapter.verseCount;
     if (verseNum != null && total != null) {
-      return '$unit $ch · verse $verseNum of $total';
+      final remaining = (total - verseNum!).clamp(0, total);
+      final minutes = _estimateMinutes(remaining, scripture.code);
+      final tail = minutes > 0 ? '  ·  ~$minutes min left' : '';
+      return '$unit $ch · verse $verseNum of $total$tail';
     }
     if (verseNum != null) {
       return '$unit $ch · verse $verseNum';
     }
     return '$unit $ch';
+  }
+
+  /// Rough reading-pace estimate. Veda mantras are short (~15 s),
+  /// gītā/purāṇa verses run longer (~30 s), bare sūtra texts are terse
+  /// (~10 s). Floor at 1 min so a single-verse remainder still shows.
+  static int _estimateMinutes(int versesRemaining, String code) {
+    if (versesRemaining <= 0) return 0;
+    final secondsPerVerse = switch (code) {
+      'rigveda' || 'samaveda' || 'yajurveda' || 'atharvaveda' => 15,
+      'brahma_sutras' || 'yoga_sutras' || 'tirukkural' => 10,
+      _ => 30,
+    };
+    final mins = (versesRemaining * secondsPerVerse / 60).round();
+    return mins < 1 ? 1 : mins;
   }
 }
 
