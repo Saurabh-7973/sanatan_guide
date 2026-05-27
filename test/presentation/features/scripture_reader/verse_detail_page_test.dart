@@ -40,7 +40,10 @@ Verse _verse() => Verse(
 
 Widget _harness({
   Verse? verse,
-  ({String? prevId, String? nextId}) adjacent = (prevId: null, nextId: 'BG.1.2'),
+  ({
+    String? prevId,
+    String? nextId
+  }) adjacent = (prevId: null, nextId: 'BG.1.2'),
   ({int index, int total})? position = (index: 1, total: 47),
   VerseExplanation? explanation,
 }) {
@@ -75,7 +78,8 @@ void main() {
     );
     expect(translation.style?.fontStyle, isNot(FontStyle.italic));
     // No explicit textAlign on the Text => defaults to start (left in LTR).
-    expect(translation.textAlign, anyOf(isNull, TextAlign.left, TextAlign.start));
+    expect(
+        translation.textAlign, anyOf(isNull, TextAlign.left, TextAlign.start));
     expect(find.text('— Swami Sivananda'), findsOneWidget);
   });
 

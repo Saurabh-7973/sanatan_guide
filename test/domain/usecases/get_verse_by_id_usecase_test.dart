@@ -28,7 +28,8 @@ void main() {
   });
 
   group('GetVerseByIdUseCase', () {
-    test('execute(\'BG.11.12\') — repository succeeds → Right(verse)', () async {
+    test('execute(\'BG.11.12\') — repository succeeds → Right(verse)',
+        () async {
       // Arrange
       when(() => mockRepository.getVerseById('BG.11.12'))
           .thenAnswer((_) async => Right(testVerse));
@@ -48,8 +49,7 @@ void main() {
       );
     });
 
-    test(
-        'execute(\'BG.99.99\') — repository returns NotFoundFailure → Left',
+    test('execute(\'BG.99.99\') — repository returns NotFoundFailure → Left',
         () async {
       // Arrange
       when(() => mockRepository.getVerseById('BG.99.99')).thenAnswer(

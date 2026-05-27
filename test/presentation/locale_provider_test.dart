@@ -17,9 +17,7 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
-    await container
-        .read(localeProvider.notifier)
-        .setLocale(const Locale('hi'));
+    await container.read(localeProvider.notifier).setLocale(const Locale('hi'));
     expect(container.read(localeProvider), const Locale('hi'));
 
     final prefs = await SharedPreferences.getInstance();

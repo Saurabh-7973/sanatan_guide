@@ -131,8 +131,7 @@ void main() {
     },
   );
 
-  testWidgets('view-all expansion toggles to COLLAPSE on tap',
-      (tester) async {
+  testWidgets('view-all expansion toggles to COLLAPSE on tap', (tester) async {
     final dharma = [
       for (var n = 1; n <= 5; n++)
         _v(id: 'BG.1.$n', chapterNum: 1, verseNum: n),

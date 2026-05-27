@@ -29,7 +29,8 @@ class CrashlyticsObserver extends NavigatorObserver {
     final src = _nameOf(from);
     if (dest.isEmpty && src.isEmpty) return;
     try {
-      FirebaseCrashlytics.instance.log('$kind: ${src.isEmpty ? '∅' : src} → $dest');
+      FirebaseCrashlytics.instance
+          .log('$kind: ${src.isEmpty ? '∅' : src} → $dest');
     } catch (_) {
       // Crashlytics not ready (tests, very-early boot) — silent.
     }

@@ -15,7 +15,8 @@ part 'learning_dao.g.dart';
     UserModuleProgressTable,
   ],
 )
-class LearningDao extends DatabaseAccessor<AppDatabase> with _$LearningDaoMixin {
+class LearningDao extends DatabaseAccessor<AppDatabase>
+    with _$LearningDaoMixin {
   LearningDao(super.db);
 
   Future<List<LearningModulesTableData>> getAllModulesOrdered() =>

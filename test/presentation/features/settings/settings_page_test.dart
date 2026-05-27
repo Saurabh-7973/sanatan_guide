@@ -111,8 +111,8 @@ void main() {
     // bottom sheet whose confirm CTA is an uppercase pill ("RESET").
     // The "Reset" section header also renders "RESET" — disambiguate by
     // tapping the descendant of the Material pill.
-    await tester
-        .tap(find.descendant(of: find.byType(InkWell), matching: find.text('RESET')));
+    await tester.tap(find.descendant(
+        of: find.byType(InkWell), matching: find.text('RESET')));
     await tester.pumpAndSettle();
 
     expect(container.read(themeModeProvider), ThemeMode.system);

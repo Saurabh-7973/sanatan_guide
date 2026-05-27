@@ -22,8 +22,7 @@ void main() {
     String verseId = 'BG.2.47',
     String? textSanskrit = 'कर्मण्येवाधिकारस्ते ...',
     String? textEnglish,
-    String sourceUrl =
-        'https://archive.org/details/bhagavadgitawith00shan',
+    String sourceUrl = 'https://archive.org/details/bhagavadgitawith00shan',
     String license = 'public_domain',
     String tradition = 'advaita',
   }) =>

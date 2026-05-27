@@ -32,8 +32,7 @@ void main() {
 
   group('IAST diacritical characters render correctly', () {
     for (final char in iastChars) {
-      testWidgets('renders "$char" without replacement glyph',
-          (tester) async {
+      testWidgets('renders "$char" without replacement glyph', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(

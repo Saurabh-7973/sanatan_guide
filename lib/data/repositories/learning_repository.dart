@@ -67,8 +67,9 @@ final class LearningRepository implements ILearningRepository {
         isCompleted: progress?.isCompleted ?? false,
       );
       final cardRows = await _dao.getCardsForModule(moduleId);
-      final cards =
-          cardRows.map(LearningModuleMapper.fromCardRow).toList(growable: false);
+      final cards = cardRows
+          .map(LearningModuleMapper.fromCardRow)
+          .toList(growable: false);
       final extras = await _dao.getExtrasForModule(moduleId);
       return Right(
         ModuleDetail(
@@ -116,7 +117,8 @@ final class LearningRepository implements ILearningRepository {
 
   @override
   Stream<Either<Failure, List<LearningModule>>> watchModules() {
-    late final StreamController<Either<Failure, List<LearningModule>>> controller;
+    late final StreamController<Either<Failure, List<LearningModule>>>
+        controller;
     StreamSubscription<void>? subModules;
     StreamSubscription<void>? subProgress;
 

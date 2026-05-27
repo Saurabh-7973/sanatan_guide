@@ -7,13 +7,13 @@ Widget _wrap(Widget child) => MaterialApp(
       home: Scaffold(body: Center(child: child)),
     );
 
-List<LinearGradient> _ruleGradients(WidgetTester tester) =>
-    tester.widgetList<Container>(find.byType(Container))
-        .map((c) => c.decoration)
-        .whereType<BoxDecoration>()
-        .map((d) => d.gradient)
-        .whereType<LinearGradient>()
-        .toList();
+List<LinearGradient> _ruleGradients(WidgetTester tester) => tester
+    .widgetList<Container>(find.byType(Container))
+    .map((c) => c.decoration)
+    .whereType<BoxDecoration>()
+    .map((d) => d.gradient)
+    .whereType<LinearGradient>()
+    .toList();
 
 void main() {
   group('faded BindingLine matches the verse-detail leaf-binding mockup', () {
@@ -32,7 +32,8 @@ void main() {
           reason: 'faded rule halves must be gradient Containers');
       final g = gradients.first;
       // Mockup: linear-gradient(90deg, transparent, color, transparent)
-      expect(g.colors.length, 3, reason: '3-stop transparent→color→transparent');
+      expect(g.colors.length, 3,
+          reason: '3-stop transparent→color→transparent');
       expect(g.colors.first, Colors.transparent);
       expect(g.colors.last, Colors.transparent);
       expect(g.colors[1], DColors.saffronDeep.withValues(alpha: 0.45),

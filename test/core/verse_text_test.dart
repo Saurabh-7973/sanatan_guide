@@ -43,8 +43,7 @@ void main() {
 
   group('formatTransliteration', () {
     test('keeps pāda line breaks, drops trailing verse marker', () {
-      const raw =
-          'karmaṇyevādhikāraste mā phaleṣu kadācana .\n'
+      const raw = 'karmaṇyevādhikāraste mā phaleṣu kadācana .\n'
           'mā karmaphalaheturbhūrmā te saṅgo.astvakarmaṇi ||2-47||';
       expect(
         formatTransliteration(raw),

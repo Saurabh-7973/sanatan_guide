@@ -408,8 +408,8 @@ class _PanchangaBanner extends StatelessWidget {
     // surface colour into both gradient stops — only the alpha-tinted overlay
     // differs at the top.
     final surface = isDark ? DColors.surface : LColors.surface;
-    final saffronOverlayTop =
-        Color.alphaBlend(saffron.withValues(alpha: isDark ? 0.05 : 0.04), surface);
+    final saffronOverlayTop = Color.alphaBlend(
+        saffron.withValues(alpha: isDark ? 0.05 : 0.04), surface);
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 14),
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),

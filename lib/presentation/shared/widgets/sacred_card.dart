@@ -24,7 +24,8 @@ class SacredCard extends StatelessWidget {
 
   final EdgeInsetsGeometry padding;
 
-  static const _radius = BorderRadius.all(Radius.circular(AppSpacing.cardRadius));
+  static const _radius =
+      BorderRadius.all(Radius.circular(AppSpacing.cardRadius));
 
   @override
   Widget build(BuildContext context) {

@@ -113,11 +113,9 @@ void main() {
       await db.into(db.commentariesTable).insert(
             makeCommentary(id: 'orphan', verseId: 'BG.999.999'),
           );
-      final rows = await db.scriptureDao
-          .getCommentariesByVerseId('BG.999.999');
+      final rows = await db.scriptureDao.getCommentariesByVerseId('BG.999.999');
       expect(rows, hasLength(1),
-          reason:
-              'commentary is reachable even without a matching verse row — '
+          reason: 'commentary is reachable even without a matching verse row — '
               'seed tool allowlist is the defence, not the schema.');
     });
 

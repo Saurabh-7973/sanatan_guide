@@ -113,7 +113,8 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     if (text.isEmpty || _loading) return;
 
     if (_remaining <= 0) {
-      setState(() => _error = 'Daily limit reached (${GeminiRateLimit.maxPerDay} questions/day). Try again tomorrow.');
+      setState(() => _error =
+          'Daily limit reached (${GeminiRateLimit.maxPerDay} questions/day). Try again tomorrow.');
       return;
     }
 
@@ -273,16 +274,18 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
           ),
         ],
       ),
-      bottomNavigationBar: state.whenData((either) => either.fold(
-        (_) => null,
-        (verse) => _InputBar(
-          controller: _controller,
-          focusNode: _focusNode,
-          remaining: _remaining,
-          loading: _loading,
-          onSend: () => _send(verse),
-        ),
-      )).value,
+      bottomNavigationBar: state
+          .whenData((either) => either.fold(
+                (_) => null,
+                (verse) => _InputBar(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  remaining: _remaining,
+                  loading: _loading,
+                  onSend: () => _send(verse),
+                ),
+              ))
+          .value,
     );
   }
 }
@@ -352,9 +355,8 @@ class _ChatMessages extends StatelessWidget {
                     // reply (re-running an older reply would invalidate the
                     // conversation history). Pass the callback only for that
                     // bubble; bubble hides the icon when the callback is null.
-                    final isLastAi = !m.isUser &&
-                        !loading &&
-                        index == messages.length - 1;
+                    final isLastAi =
+                        !m.isUser && !loading && index == messages.length - 1;
                     return _MessageBubble(
                       message: m,
                       verseId: verse.id,
@@ -439,8 +441,7 @@ class _StarterChip extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Bubble up via nearest _VerseChatPageState
-          final state = context
-              .findAncestorStateOfType<_VerseChatPageState>();
+          final state = context.findAncestorStateOfType<_VerseChatPageState>();
           state?._controller.text = label;
           state?._focusNode.requestFocus();
         },
@@ -533,8 +534,7 @@ class _MessageBubble extends StatelessWidget {
                 border: isUser
                     ? null
                     : Border.all(
-                        color:
-                            isDark ? AppColors.borderDark : AppColors.border,
+                        color: isDark ? AppColors.borderDark : AppColors.border,
                       ),
               ),
               child: isUser
@@ -595,9 +595,8 @@ class _AiActionRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final text3 = isDark
-        ? AppColors.textSecondaryOnDark
-        : AppColors.textSecondary;
+    final text3 =
+        isDark ? AppColors.textSecondaryOnDark : AppColors.textSecondary;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -858,72 +857,72 @@ class _InputBar extends StatelessWidget {
             AppSpacing.sm,
             AppSpacing.sm,
           ),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
-          border: Border(
-            top: BorderSide(
-              color: isDark ? AppColors.borderDark : AppColors.border,
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                style: context.ts.bodyMedium,
-                textInputAction: TextInputAction.send,
-                maxLines: 3,
-                minLines: 1,
-                enabled: canSend,
-                decoration: InputDecoration(
-                  hintText: remaining > 0
-                      ? 'Ask about this verse…'
-                      : 'Daily limit reached',
-                  hintStyle: context.ts.bodyMedium.copyWith(
-                    color: AppColors.textHint,
-                  ),
-                  // Field sits in a custom pill — strip the global
-                  // inputDecorationTheme (filled:true + bordered).
-                  filled: false,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                onSubmitted: (_) => onSend(),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            border: Border(
+              top: BorderSide(
+                color: isDark ? AppColors.borderDark : AppColors.border,
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            IconButton(
-              onPressed: canSend ? onSend : null,
-              icon: loading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.saffron,
-                      ),
-                    )
-                  : Icon(
-                      Icons.send_rounded,
-                      color: canSend
-                          ? AppColors.saffron
-                          : AppColors.textSecondary,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  style: context.ts.bodyMedium,
+                  textInputAction: TextInputAction.send,
+                  maxLines: 3,
+                  minLines: 1,
+                  enabled: canSend,
+                  decoration: InputDecoration(
+                    hintText: remaining > 0
+                        ? 'Ask about this verse…'
+                        : 'Daily limit reached',
+                    hintStyle: context.ts.bodyMedium.copyWith(
+                      color: AppColors.textHint,
                     ),
-            ),
-          ],
+                    // Field sits in a custom pill — strip the global
+                    // inputDecorationTheme (filled:true + bordered).
+                    filled: false,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
+                    ),
+                  ),
+                  onSubmitted: (_) => onSend(),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              IconButton(
+                onPressed: canSend ? onSend : null,
+                icon: loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.saffron,
+                        ),
+                      )
+                    : Icon(
+                        Icons.send_rounded,
+                        color: canSend
+                            ? AppColors.saffron
+                            : AppColors.textSecondary,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

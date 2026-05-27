@@ -16,7 +16,10 @@ void main() {
         verseSanskrit: 'कर्मण्येवाधिकारस्ते',
         scriptureLabel: 'Bhagavad Gita',
         enabledOverride: false,
-        ask: ({required systemContext, required history, required userMessage}) async =>
+        ask: (
+                {required systemContext,
+                required history,
+                required userMessage}) async =>
             fail('ask must not be called when disabled'),
       ),
       throwsA(isA<GeminiException>()),
@@ -84,7 +87,10 @@ void main() {
       verseSanskrit: 'धर्मक्षेत्रे',
       scriptureLabel: 'Bhagavad Gita',
       enabledOverride: false,
-      ask: ({required systemContext, required history, required userMessage}) async =>
+      ask: (
+              {required systemContext,
+              required history,
+              required userMessage}) async =>
           fail('cache must serve without calling Gemini'),
     );
     expect(cached.meaning, 'righteous duty');

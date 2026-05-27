@@ -20,11 +20,11 @@ abstract final class AppSpacing {
   // Different radii = different emotional weight. Same radius everywhere = SaaS.
   // Use these instead of cardRadius (kept below as deprecated alias).
 
-  static const double radiusRow   = 4.0;   // list rows — manuscript page feel
-  static const double radiusChip  = 8.0;   // small chips, badges
-  static const double radiusCard  = 16.0;  // content cards
-  static const double radiusHero  = 24.0;  // hero cards (VoD, featured scripture)
-  static const double radiusSheet = 20.0;  // share card, bottom sheets
+  static const double radiusRow = 4.0; // list rows — manuscript page feel
+  static const double radiusChip = 8.0; // small chips, badges
+  static const double radiusCard = 16.0; // content cards
+  static const double radiusHero = 24.0; // hero cards (VoD, featured scripture)
+  static const double radiusSheet = 20.0; // share card, bottom sheets
 
   /// @deprecated Use radiusCard (16dp) instead.
   static const double cardRadius = 12.0;

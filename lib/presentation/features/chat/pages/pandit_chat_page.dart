@@ -673,9 +673,8 @@ class _SendButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final glyphColor = enabled
-        ? (isDark ? const Color(0xFF1A1208) : Colors.white)
-        : text3;
+    final glyphColor =
+        enabled ? (isDark ? const Color(0xFF1A1208) : Colors.white) : text3;
     return InkResponse(
       onTap: onTap,
       radius: 26,

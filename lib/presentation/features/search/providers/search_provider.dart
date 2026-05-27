@@ -70,12 +70,9 @@ Future<Either<Failure, List<Verse>>> searchResults(Ref ref) async {
     return verses.where((v) {
       final q = query.trim().toLowerCase();
       return switch (filter) {
-        SearchFilter.sanskrit =>
-          v.sanskrit.toLowerCase().contains(q),
-        SearchFilter.english =>
-          v.english?.toLowerCase().contains(q) ?? false,
-        SearchFilter.hindi =>
-          v.hindi?.toLowerCase().contains(q) ?? false,
+        SearchFilter.sanskrit => v.sanskrit.toLowerCase().contains(q),
+        SearchFilter.english => v.english?.toLowerCase().contains(q) ?? false,
+        SearchFilter.hindi => v.hindi?.toLowerCase().contains(q) ?? false,
         SearchFilter.all => true,
       };
     }).toList();

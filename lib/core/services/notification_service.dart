@@ -78,8 +78,7 @@ final class NotificationService {
     // Android masks colored launcher icons to a solid blob on the status
     // bar / lock screen; the AppColors.saffron `color` set in each detail
     // tints the silhouette at render time so the Om still looks saffron.
-    const androidSettings =
-        AndroidInitializationSettings(_kNotificationIcon);
+    const androidSettings = AndroidInitializationSettings(_kNotificationIcon);
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
@@ -160,7 +159,9 @@ final class NotificationService {
         }
       } catch (e, st) {
         AppLogger.instance.w(
-          'Battery-optimisation request failed', e, st,
+          'Battery-optimisation request failed',
+          e,
+          st,
         );
       }
       return granted ?? false;

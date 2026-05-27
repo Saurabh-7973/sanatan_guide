@@ -4,7 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/pages/onboarding_page.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 
-Widget _harness({TextScaler textScaler = TextScaler.noScaling}) => ProviderScope(
+Widget _harness({TextScaler textScaler = TextScaler.noScaling}) =>
+    ProviderScope(
       child: MaterialApp(
         home: MediaQuery(
           data: MediaQueryData(textScaler: textScaler),
@@ -32,8 +33,8 @@ void main() {
     expect(find.text('ॐ'), findsOneWidget);
     expect(find.text('Sanatan Guide'), findsOneWidget);
     expect(find.text('TELL US WHERE TO BEGIN'), findsOneWidget);
-    expect(find.text('How familiar are you with the scriptures?'),
-        findsOneWidget);
+    expect(
+        find.text('How familiar are you with the scriptures?'), findsOneWidget);
     expect(find.text('Beginner'), findsOneWidget);
     expect(find.text('Regular'), findsOneWidget);
     expect(find.text('Scholar'), findsOneWidget);

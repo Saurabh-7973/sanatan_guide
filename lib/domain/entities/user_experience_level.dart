@@ -17,8 +17,7 @@ enum UserExperienceLevel {
           'New to Hindu scriptures — guided paths help most',
         UserExperienceLevel.regular =>
           'Comfortable with basics — mix learning and reading',
-        UserExperienceLevel.scholar =>
-          'Prefer direct texts and deeper study',
+        UserExperienceLevel.scholar => 'Prefer direct texts and deeper study',
       };
 
   static UserExperienceLevel? fromStorage(String? raw) {

@@ -7,8 +7,7 @@ Widget _shimmer(BuildContext context, {required Widget child}) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return Shimmer.fromColors(
     baseColor: isDark ? AppColors.surfaceDark : AppColors.surfaceVariant,
-    highlightColor:
-        isDark ? AppColors.surfaceElevated : AppColors.surface,
+    highlightColor: isDark ? AppColors.surfaceElevated : AppColors.surface,
     child: child,
   );
 }
@@ -134,45 +133,45 @@ class ChapterListShimmer extends StatelessWidget {
         itemBuilder: (_, index) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
           return Container(
-          padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isDark ? AppColors.borderDark : AppColors.border,
+            padding: const EdgeInsets.all(AppSpacing.cardPadding),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.border,
+              ),
             ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.surfaceElevated
-                      : AppColors.surfaceVariant,
-                  shape: BoxShape.circle,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.surfaceElevated
+                        : AppColors.surfaceVariant,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShimmerLine(
-                      height: 14,
-                      width: MediaQuery.sizeOf(context).width * 0.45,
-                      borderRadius: 4,
-                    ),
-                    const SizedBox(height: 6),
-                    const ShimmerLine(height: 11, width: 80, borderRadius: 4),
-                  ],
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerLine(
+                        height: 14,
+                        width: MediaQuery.sizeOf(context).width * 0.45,
+                        borderRadius: 4,
+                      ),
+                      const SizedBox(height: 6),
+                      const ShimmerLine(height: 11, width: 80, borderRadius: 4),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
         },
       ),
     );
@@ -241,45 +240,45 @@ class BookmarkShimmer extends StatelessWidget {
         itemBuilder: (_, index) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
           return Container(
-          padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark ? AppColors.borderDark : AppColors.border,
+            padding: const EdgeInsets.all(AppSpacing.cardPadding),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.border,
+              ),
             ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.surfaceElevated
-                      : AppColors.surfaceVariant,
-                  shape: BoxShape.circle,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.surfaceElevated
+                        : AppColors.surfaceVariant,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ShimmerLine(height: 14, borderRadius: 4),
-                    const SizedBox(height: AppSpacing.xs),
-                    ShimmerLine(
-                      height: 12,
-                      width: MediaQuery.sizeOf(context).width * 0.5,
-                      borderRadius: 4,
-                    ),
-                  ],
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const ShimmerLine(height: 14, borderRadius: 4),
+                      const SizedBox(height: AppSpacing.xs),
+                      ShimmerLine(
+                        height: 12,
+                        width: MediaQuery.sizeOf(context).width * 0.5,
+                        borderRadius: 4,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
         },
       ),
     );
@@ -315,7 +314,9 @@ class BookmarkRowShimmer extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceElevated : AppColors.surfaceVariant,
+                color: isDark
+                    ? AppColors.surfaceElevated
+                    : AppColors.surfaceVariant,
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -374,7 +375,9 @@ class LearningPathShimmer extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceElevated : AppColors.surface,
+                        color: isDark
+                            ? AppColors.surfaceElevated
+                            : AppColors.surface,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -382,7 +385,9 @@ class LearningPathShimmer extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 60,
-                        color: isDark ? AppColors.surfaceElevated : AppColors.surfaceVariant,
+                        color: isDark
+                            ? AppColors.surfaceElevated
+                            : AppColors.surfaceVariant,
                       ),
                   ],
                 ),
@@ -393,12 +398,14 @@ class LearningPathShimmer extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.cardPadding),
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.surfaceDark : AppColors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.cardRadius),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const ShimmerLine(height: 13, width: 60, borderRadius: 4),
+                        const ShimmerLine(
+                            height: 13, width: 60, borderRadius: 4),
                         const SizedBox(height: AppSpacing.xs),
                         ShimmerLine(
                           height: 16,
@@ -441,7 +448,8 @@ class ModuleReaderShimmer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Counter
-            const Center(child: ShimmerLine(height: 12, width: 48, borderRadius: 20)),
+            const Center(
+                child: ShimmerLine(height: 12, width: 48, borderRadius: 20)),
             const SizedBox(height: AppSpacing.xl),
             // Card
             Container(
@@ -507,29 +515,35 @@ class FestivalShimmer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
                 7,
-                (_) => const ShimmerLine(height: 10, width: 24, borderRadius: 4),
+                (_) =>
+                    const ShimmerLine(height: 10, width: 24, borderRadius: 4),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             // Calendar grid (5 rows × 7 cols)
-            ...List.generate(5, (_) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(
-                  7,
-                  (_) => const ShimmerLine(height: 32, width: 32, borderRadius: 6),
-                ),
-              ),
-            )),
+            ...List.generate(
+                5,
+                (_) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: List.generate(
+                          7,
+                          (_) => const ShimmerLine(
+                              height: 32, width: 32, borderRadius: 6),
+                        ),
+                      ),
+                    )),
             const SizedBox(height: AppSpacing.xl),
             // Upcoming events
             const ShimmerLine(height: 13, width: 120, borderRadius: 4),
             const SizedBox(height: AppSpacing.md),
-            ...List.generate(3, (_) => const Padding(
-              padding: EdgeInsets.only(bottom: AppSpacing.sm),
-              child: ShimmerLine(height: 52, borderRadius: 8),
-            )),
+            ...List.generate(
+                3,
+                (_) => const Padding(
+                      padding: EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: ShimmerLine(height: 52, borderRadius: 8),
+                    )),
           ],
         ),
       ),
@@ -568,7 +582,8 @@ class ScriptureLibraryShimmer extends StatelessWidget {
                 childAspectRatio: 1.1,
               ),
               itemCount: 8,
-              itemBuilder: (_, __) => const ShimmerLine(height: 120, borderRadius: 12),
+              itemBuilder: (_, __) =>
+                  const ShimmerLine(height: 120, borderRadius: 12),
             ),
           ],
         ),

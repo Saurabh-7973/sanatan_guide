@@ -98,15 +98,15 @@ abstract final class AppColors {
   // Use these instead of .withValues(alpha: X) in widgets.
   // Naming: <base>Faint = 8%, Muted = 12%, Light = 15%, Border = 30%.
 
-  static const Color saffronFaint  = Color(0x14E8820C); // 8%  chip/icon bg
-  static const Color saffronMuted  = Color(0x1FE8820C); // 12% badge, hover
-  static const Color saffronLight  = Color(0x26E8820C); // 15% card fill
+  static const Color saffronFaint = Color(0x14E8820C); // 8%  chip/icon bg
+  static const Color saffronMuted = Color(0x1FE8820C); // 12% badge, hover
+  static const Color saffronLight = Color(0x26E8820C); // 15% card fill
   static const Color saffronBorder = Color(0x4DE8820C); // 30% accent border
 
-  static const Color deepRedMuted  = Color(0x1F8B0000); // 12% anchor badge bg
-  static const Color successMuted  = Color(0x4D2E7D32); // 30% completion border
+  static const Color deepRedMuted = Color(0x1F8B0000); // 12% anchor badge bg
+  static const Color successMuted = Color(0x4D2E7D32); // 30% completion border
 
-  static const Color borderFaint     = Color(0x66CCC5BB); // 40% light border
+  static const Color borderFaint = Color(0x66CCC5BB); // 40% light border
   static const Color borderFaintDark = Color(0x66383330); // 40% dark border
 
   // ── Warm grey palette ─────────────────────────────────────────────────
@@ -132,5 +132,5 @@ abstract final class AppColors {
   static const Color catStotra = Color(0xFFB56576);
   static const Color catShastra = Color(0xFF8D6E63);
   static const Color catTantra = Color(0xFF7B5B8A); // muted plum
-  static const Color catTamil = Color(0xFF9B5E3A);  // warm terracotta
+  static const Color catTamil = Color(0xFF9B5E3A); // warm terracotta
 }

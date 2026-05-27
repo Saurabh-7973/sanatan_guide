@@ -26,7 +26,8 @@ class VersesTable extends Table {
 
   IntColumn get readCount => integer().withDefault(const Constant(0))();
 
-  TextColumn get noteText => text().nullable()(); // User's personal note on this verse
+  TextColumn get noteText =>
+      text().nullable()(); // User's personal note on this verse
 
   // Multi-scripture support (added schema v5)
   // bookNum: Parva for Mahabharata, Kanda for Ramayana,

@@ -221,8 +221,8 @@ class _SectionHeader extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: divider)),
       ),
-      child: Text(title.toUpperCase(),
-          style: AppText.sectionLabel(color: text3)),
+      child:
+          Text(title.toUpperCase(), style: AppText.sectionLabel(color: text3)),
     );
   }
 }
@@ -347,8 +347,7 @@ class _CreditRow extends StatelessWidget {
     final container = Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        border:
-            showDivider ? Border(bottom: BorderSide(color: sep)) : null,
+        border: showDivider ? Border(bottom: BorderSide(color: sep)) : null,
       ),
       child: hasUrl
           ? InkWell(

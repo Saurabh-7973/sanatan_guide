@@ -67,8 +67,7 @@ final class BhagavadGitaRemoteDataSource {
       if (response.statusCode != 200 || response.data == null) {
         return Left(
           ServerFailure(
-            message:
-                'HTTP ${response.statusCode} for BG.$chapter.$verseNum',
+            message: 'HTTP ${response.statusCode} for BG.$chapter.$verseNum',
             statusCode: response.statusCode,
           ),
         );
@@ -128,8 +127,8 @@ String? _extractHindi(Map<String, dynamic> data) {
   }
   for (final entry in data.entries) {
     if (entry.value is Map<String, dynamic>) {
-      final ht = ((entry.value as Map<String, dynamic>)['ht'] as String?)
-          ?.trim();
+      final ht =
+          ((entry.value as Map<String, dynamic>)['ht'] as String?)?.trim();
       if (ht != null && ht.isNotEmpty) return ht;
     }
   }
@@ -146,8 +145,8 @@ String? _extractEnglish(Map<String, dynamic> data) {
   }
   for (final entry in data.entries) {
     if (entry.value is Map<String, dynamic>) {
-      final et = ((entry.value as Map<String, dynamic>)['et'] as String?)
-          ?.trim();
+      final et =
+          ((entry.value as Map<String, dynamic>)['et'] as String?)?.trim();
       if (et != null && et.isNotEmpty) return et;
     }
   }

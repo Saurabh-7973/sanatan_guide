@@ -10,6 +10,7 @@ sealed class WordMeaning with _$WordMeaning {
     required String word,
     required String meaning,
     String? transliteration,
+
     /// Optional grammar tag — case, number, gender, part of speech.
     /// Free-text, e.g. "noun · locative · neuter".
     String? grammar,
@@ -24,16 +25,22 @@ sealed class Verse with _$Verse {
     required int chapterNum,
     required int verseNum,
     required Scripture scripture,
+
     /// Original Devanagari Sanskrit text. Never empty.
     required String sanskrit,
+
     /// IAST Roman transliteration. Null until loaded.
     String? transliteration,
+
     /// Hindi translation. Null if not yet populated.
     String? hindi,
+
     /// English translation. Null if not yet populated.
     String? english,
+
     /// Word-by-word meanings as a list. Null if not loaded.
     List<WordMeaning>? wordMeanings,
+
     /// User's personal note on this verse. Null if no note written.
     String? noteText,
     int? bookNum,

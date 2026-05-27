@@ -110,8 +110,7 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     // Live per-scripture read counts. Treat loading/error as zero so the
     // first render is stable; the provider revalidates when verses are read.
     final readCounts =
-        ref.watch(scriptureReadCountsProvider).value ??
-            const <String, int>{};
+        ref.watch(scriptureReadCountsProvider).value ?? const <String, int>{};
 
     // Worst-case header height (used by every pinned family delegate). Sized
     // for a two-line description + Devanāgarī name + English/meta row +
@@ -999,8 +998,7 @@ class _SearchResultsSliver extends StatelessWidget {
       for (final s in scriptures) {
         final inEn = _foldDiacritics(s.englishName).contains(q);
         final inDeva = s.devaName.contains(query);
-        final inAlias =
-            s.aliases.any((a) => _foldDiacritics(a).contains(q));
+        final inAlias = s.aliases.any((a) => _foldDiacritics(a).contains(q));
         if (inEn || inDeva || inAlias) {
           out.add(_SearchMatch(scripture: s, family: family));
         }

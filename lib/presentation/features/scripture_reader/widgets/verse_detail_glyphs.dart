@@ -153,12 +153,14 @@ class _TranslationEyePainter extends CustomPainter {
     // Almond "M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z"
     final path = Path()
       ..moveTo(2 * scale, 7 * scale)
-      ..cubicTo(3 * scale, 5 * scale, 5 * scale, 3 * scale, 7 * scale, 3 * scale)
+      ..cubicTo(
+          3 * scale, 5 * scale, 5 * scale, 3 * scale, 7 * scale, 3 * scale)
       ..cubicTo(
           9 * scale, 3 * scale, 11 * scale, 5 * scale, 12 * scale, 7 * scale)
       ..cubicTo(
           11 * scale, 9 * scale, 9 * scale, 11 * scale, 7 * scale, 11 * scale)
-      ..cubicTo(5 * scale, 11 * scale, 3 * scale, 9 * scale, 2 * scale, 7 * scale)
+      ..cubicTo(
+          5 * scale, 11 * scale, 3 * scale, 9 * scale, 2 * scale, 7 * scale)
       ..close();
     final stroke = Paint()
       ..color = color

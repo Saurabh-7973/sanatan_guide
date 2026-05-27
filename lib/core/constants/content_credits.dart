@@ -367,8 +367,7 @@ const List<AppToolCredit> appToolCredits = [
   AppToolCredit(
     term: 'GRETIL',
     title: 'Göttingen Register of Electronic Texts in Indian Languages',
-    description:
-        'Source Sanskrit e-texts for several Vedas, Upaniṣads, the '
+    description: 'Source Sanskrit e-texts for several Vedas, Upaniṣads, the '
         'Bhāgavata Purāṇa and the Yoga Sūtras.',
     meta: 'Universität Göttingen · Public domain',
     linksOut: true,

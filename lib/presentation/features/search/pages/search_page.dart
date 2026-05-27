@@ -232,8 +232,7 @@ class _SearchTopBar extends StatelessWidget {
                             disabledBorder: InputBorder.none,
                             errorBorder: InputBorder.none,
                             focusedErrorBorder: InputBorder.none,
-                            hintText:
-                                'Search verse, phrase, or coordinate…',
+                            hintText: 'Search verse, phrase, or coordinate…',
                             hintStyle: TextStyle(
                               fontFamily: Fonts.sans,
                               fontFamilyFallback: AppFontFallback.latin,
@@ -339,9 +338,28 @@ bool looksLikeQuestion(String q) {
   if (s.endsWith('?')) return true;
   // Common English question openers.
   const openers = <String>[
-    'what', 'why', 'how', 'when', 'where', 'who', 'which', 'whose',
-    'should', 'can', 'could', 'would', 'is', 'are', 'do', 'does', 'did',
-    'will', 'tell me', 'explain', 'meaning of', 'difference between',
+    'what',
+    'why',
+    'how',
+    'when',
+    'where',
+    'who',
+    'which',
+    'whose',
+    'should',
+    'can',
+    'could',
+    'would',
+    'is',
+    'are',
+    'do',
+    'does',
+    'did',
+    'will',
+    'tell me',
+    'explain',
+    'meaning of',
+    'difference between',
   ];
   for (final o in openers) {
     if (s == o || s.startsWith('$o ')) return true;
@@ -350,11 +368,34 @@ bool looksLikeQuestion(String q) {
   // These rarely match the FTS index but are exactly what the Pandit is
   // for; route the user to it.
   const emotional = <String>[
-    'grief', 'sad', 'sadness', 'depressed', 'depression', 'anxiety',
-    'anxious', 'worried', 'fear', 'afraid', 'angry', 'anger', 'lonely',
-    'loneliness', 'lost', 'confused', 'hopeless', 'guilt', 'shame',
-    'stress', 'stressed', 'overwhelmed', 'help me', 'i feel', 'i am',
-    'death', 'dying', 'suffering',
+    'grief',
+    'sad',
+    'sadness',
+    'depressed',
+    'depression',
+    'anxiety',
+    'anxious',
+    'worried',
+    'fear',
+    'afraid',
+    'angry',
+    'anger',
+    'lonely',
+    'loneliness',
+    'lost',
+    'confused',
+    'hopeless',
+    'guilt',
+    'shame',
+    'stress',
+    'stressed',
+    'overwhelmed',
+    'help me',
+    'i feel',
+    'i am',
+    'death',
+    'dying',
+    'suffering',
   ];
   for (final e in emotional) {
     if (s == e || s.contains(e)) return true;
@@ -573,7 +614,8 @@ class _SuggestRow extends StatelessWidget {
           if (showArrow)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: MockupRowChevron(color: text3.withValues(alpha: 0.6),
+              child: MockupRowChevron(
+                color: text3.withValues(alpha: 0.6),
               ),
             ),
         ],
@@ -631,64 +673,64 @@ class _PanditCta extends StatelessWidget {
             ),
           ),
           child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: saffron.withValues(alpha: 0.12),
-            ),
-            child: Text(
-              'ॐ',
-              style: TextStyle(
-                fontFamily: Fonts.deva,
-                fontFamilyFallback: AppFontFallback.deva,
-                fontSize: 16,
-                color: saffron,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'ASK THE PANDIT',
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: saffron.withValues(alpha: 0.12),
+                ),
+                child: Text(
+                  'ॐ',
                   style: TextStyle(
-                    fontFamily: Fonts.sans,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.24 * 9,
+                    fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
+                    fontSize: 16,
                     color: saffron,
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  'Pose a question. Receive guidance with verse citations.',
-                  style: TextStyle(
-                    fontFamily: Fonts.serif,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 13.5,
-                    height: 1.4,
-                    color: text1,
-                  ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'ASK THE PANDIT',
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.24 * 9,
+                        color: saffron,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Pose a question. Receive guidance with verse citations.',
+                      style: TextStyle(
+                        fontFamily: Fonts.serif,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13.5,
+                        height: 1.4,
+                        color: text1,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.arrow_forward_rounded,
+                size: 14,
+                color: saffron.withValues(alpha: 0.7),
+              ),
+            ],
           ),
-          Icon(
-            Icons.arrow_forward_rounded,
-            size: 14,
-            color: saffron.withValues(alpha: 0.7),
-          ),
-        ],
-      ),
         ),
       ),
     );
@@ -1315,9 +1357,7 @@ class _ResultGroup extends StatelessWidget {
                         behavior: HitTestBehavior.opaque,
                         onTap: onToggleViewAll,
                         child: Text(
-                          expanded
-                              ? 'COLLAPSE'
-                              : '${verses.length} · VIEW ALL',
+                          expanded ? 'COLLAPSE' : '${verses.length} · VIEW ALL',
                           style: TextStyle(
                             fontFamily: Fonts.sans,
                             fontFamilyFallback: AppFontFallback.latin,
@@ -1477,7 +1517,8 @@ class _ResultRow extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              MockupRowChevron(color: text3.withValues(alpha: 0.5),
+              MockupRowChevron(
+                color: text3.withValues(alpha: 0.5),
               ),
             ],
           ),

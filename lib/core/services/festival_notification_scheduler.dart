@@ -124,8 +124,7 @@ abstract final class FestivalNotificationScheduler {
       }
     }
     await prefs.setString(_kScheduledIdsKey, jsonEncode(scheduledIds));
-    AppLogger.instance
-        .i('Festival notifs scheduled: ${scheduledIds.length}');
+    AppLogger.instance.i('Festival notifs scheduled: ${scheduledIds.length}');
   }
 
   static Future<void> _cancelPrior(SharedPreferences prefs) async {

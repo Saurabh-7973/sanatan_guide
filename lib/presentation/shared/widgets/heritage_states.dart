@@ -117,8 +117,7 @@ class _PulseDotsState extends State<_PulseDots>
 class HeritageError extends StatelessWidget {
   const HeritageError({
     super.key,
-    this.message =
-        'Something went wrong loading this. Pull down or tap retry.',
+    this.message = 'Something went wrong loading this. Pull down or tap retry.',
     this.onRetry,
   });
 

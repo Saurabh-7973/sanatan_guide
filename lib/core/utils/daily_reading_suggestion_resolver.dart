@@ -35,7 +35,8 @@ DailyReadingSuggestion dailyReadingSuggestionFor(DateTime date) {
         scripture: Scripture.shvetashvataraUpanishad,
         verseId: 'SU.1.1',
         title: 'Shvetashvatara Upanishad',
-        subtitle: '$dayTag · ${vara.deity} — auspicious for Shiva-oriented study',
+        subtitle:
+            '$dayTag · ${vara.deity} — auspicious for Shiva-oriented study',
       );
     case DateTime.tuesday:
       return DailyReadingSuggestion(

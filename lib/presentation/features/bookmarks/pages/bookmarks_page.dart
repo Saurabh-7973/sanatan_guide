@@ -270,9 +270,7 @@ class _SortBar extends ConsumerWidget {
       final active = sort == value;
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => ref
-            .read(bookmarkSortProvider.notifier)
-            .select(value),
+        onTap: () => ref.read(bookmarkSortProvider.notifier).select(value),
         child: Container(
           padding: const EdgeInsets.only(bottom: 2),
           decoration: BoxDecoration(
@@ -423,7 +421,8 @@ class _GroupedLeaves extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 24),
       children: [
         for (final entry in ordered) ...[
-          _GroupHeader(scripture: entry.key, count: entry.value.length, isDark: isDark),
+          _GroupHeader(
+              scripture: entry.key, count: entry.value.length, isDark: isDark),
           for (final b in entry.value)
             _LeafCard(
               bookmark: b,
@@ -549,8 +548,8 @@ class _LeafCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           splashColor: Colors.transparent,
           highlightColor: saffron.withValues(alpha: 0.04),
-          onTap: () =>
-              context.push('/browse/${entry.scriptureCode}/verse/${bookmark.verseId}'),
+          onTap: () => context
+              .push('/browse/${entry.scriptureCode}/verse/${bookmark.verseId}'),
           child: Container(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
             decoration: BoxDecoration(
@@ -640,7 +639,8 @@ class _LeafCard extends StatelessWidget {
                                 width: 11,
                                 height: 11,
                                 child: CustomPaint(
-                                  painter: _LeafNotePencilPainter(color: saffron),
+                                  painter:
+                                      _LeafNotePencilPainter(color: saffron),
                                 ),
                               ),
                             ),
@@ -943,8 +943,7 @@ class _EmptyBody extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             onTap: () => context.go('/browse'),
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -956,18 +955,14 @@ class _EmptyBody extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.12 * 12,
-                      color: isDark
-                          ? const Color(0xFF1A1208)
-                          : Colors.white,
+                      color: isDark ? const Color(0xFF1A1208) : Colors.white,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Icon(
                     Icons.arrow_forward_rounded,
                     size: 14,
-                    color: isDark
-                        ? const Color(0xFF1A1208)
-                        : Colors.white,
+                    color: isDark ? const Color(0xFF1A1208) : Colors.white,
                   ),
                 ],
               ),

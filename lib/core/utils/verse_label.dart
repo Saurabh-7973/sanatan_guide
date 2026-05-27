@@ -139,9 +139,8 @@ int compareVerseIds(String a, String b) {
   for (var i = 0; i < pa.length && i < pb.length; i++) {
     final na = int.tryParse(pa[i]);
     final nb = int.tryParse(pb[i]);
-    final cmp = (na != null && nb != null)
-        ? na.compareTo(nb)
-        : pa[i].compareTo(pb[i]);
+    final cmp =
+        (na != null && nb != null) ? na.compareTo(nb) : pa[i].compareTo(pb[i]);
     if (cmp != 0) return cmp;
   }
   return pa.length.compareTo(pb.length);

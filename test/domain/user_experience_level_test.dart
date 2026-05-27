@@ -4,9 +4,12 @@ import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 void main() {
   group('UserExperienceLevel.fromStorage', () {
     test('parses known values', () {
-      expect(UserExperienceLevel.fromStorage('beginner'), UserExperienceLevel.beginner);
-      expect(UserExperienceLevel.fromStorage('regular'), UserExperienceLevel.regular);
-      expect(UserExperienceLevel.fromStorage('scholar'), UserExperienceLevel.scholar);
+      expect(UserExperienceLevel.fromStorage('beginner'),
+          UserExperienceLevel.beginner);
+      expect(UserExperienceLevel.fromStorage('regular'),
+          UserExperienceLevel.regular);
+      expect(UserExperienceLevel.fromStorage('scholar'),
+          UserExperienceLevel.scholar);
     });
 
     test('null or unknown → null', () {

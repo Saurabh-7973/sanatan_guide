@@ -173,15 +173,12 @@ extension ScriptureX on Scripture {
         Scripture.hathaYogaPradipika =>
           'Haṭha Yoga Pradīpikā · Light on the Forceful Path',
         Scripture.ramayana => 'Rāmāyaṇa · The Journey of Rāma',
-        Scripture.mahabharata =>
-          'Mahābhārata · The Great Tale of the Bhāratas',
+        Scripture.mahabharata => 'Mahābhārata · The Great Tale of the Bhāratas',
         Scripture.vishnuPurana => 'Viṣṇu Purāṇa · The Story of Viṣṇu',
         Scripture.deviBhagavataPurana =>
           'Devī Bhāgavata Purāṇa · The Glory of the Goddess',
-        Scripture.bhagavataPurana =>
-          'Bhāgavata Purāṇa · The Story of the Lord',
-        Scripture.markandeya =>
-          'Mārkaṇḍeya Purāṇa · The Purāṇa of Mārkaṇḍeya',
+        Scripture.bhagavataPurana => 'Bhāgavata Purāṇa · The Story of the Lord',
+        Scripture.markandeya => 'Mārkaṇḍeya Purāṇa · The Purāṇa of Mārkaṇḍeya',
         Scripture.vishnuSahasranama =>
           'Viṣṇu Sahasranāma · The Thousand Names of Viṣṇu',
         Scripture.arthashastra => 'Arthaśāstra · The Treatise on Polity',

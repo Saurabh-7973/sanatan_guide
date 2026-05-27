@@ -16,7 +16,10 @@ void main() {
         end: 20,
         contextText: 'aśocyān anvaśocas tvaṃ',
         enabledOverride: false,
-        ask: ({required systemContext, required history, required userMessage}) async =>
+        ask: (
+                {required systemContext,
+                required history,
+                required userMessage}) async =>
             fail('ask must not run when disabled'),
       ),
       throwsA(isA<GeminiException>()),
@@ -58,8 +61,7 @@ void main() {
     expect(calls, 1, reason: 'cached after first call');
   });
 
-  test('blank model reply caches null (no repeat calls, no suffix)',
-      () async {
+  test('blank model reply caches null (no repeat calls, no suffix)', () async {
     var calls = 0;
     Future<String> ask({
       required String systemContext,

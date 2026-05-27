@@ -128,8 +128,8 @@ abstract final class AppTheme {
         textTheme: TextTheme(
           displayLarge:
               AppTypography.displayLarge.copyWith(color: AppColors.textOnDark),
-          displayMedium: AppTypography.displayMedium
-              .copyWith(color: AppColors.textOnDark),
+          displayMedium:
+              AppTypography.displayMedium.copyWith(color: AppColors.textOnDark),
           bodyLarge:
               AppTypography.bodyLarge.copyWith(color: AppColors.textOnDark),
           bodyMedium:
@@ -138,8 +138,8 @@ abstract final class AppTheme {
               AppTypography.labelLarge.copyWith(color: AppColors.textOnDark),
           labelMedium:
               AppTypography.labelMedium.copyWith(color: AppColors.textOnDark),
-          bodySmall: AppTypography.caption
-              .copyWith(color: const Color(0xFF9B9390)),
+          bodySmall:
+              AppTypography.caption.copyWith(color: const Color(0xFF9B9390)),
         ),
         scaffoldBackgroundColor: const Color(0xFF0F0F0F),
         appBarTheme: AppBarTheme(

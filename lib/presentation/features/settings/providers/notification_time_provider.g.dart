@@ -159,7 +159,7 @@ final class FestivalAlertsEnabledProvider
 }
 
 String _$festivalAlertsEnabledHash() =>
-    r'83d76367c734aea7ee7e5a1f3bfc8ea40dbd666b';
+    r'4deafcdf373c9e7cbf65776f05bf84fbea53134c';
 
 /// Whether festival-day alerts are enabled. Default off — the scheduler
 /// gated on this won't post anything until the user opts in. The actual

@@ -35,7 +35,6 @@ const Map<String, Scripture> _aliases = {
   'gita': Scripture.bhagavadGita,
   'gītā': Scripture.bhagavadGita,
   'bg': Scripture.bhagavadGita,
-
   'rigveda': Scripture.rigveda,
   'ṛgveda': Scripture.rigveda,
   'rg veda': Scripture.rigveda,
@@ -47,7 +46,6 @@ const Map<String, Scripture> _aliases = {
   'yv': Scripture.yajurveda,
   'atharvaveda': Scripture.atharvaveda,
   'av': Scripture.atharvaveda,
-
   'isha': Scripture.ishaUpanishad,
   'īśa': Scripture.ishaUpanishad,
   'isavasya': Scripture.ishaUpanishad,
@@ -72,7 +70,6 @@ const Map<String, Scripture> _aliases = {
   'kauṣītaki': Scripture.kaushitakiUpanishad,
   'maitrayani': Scripture.maitrayaniUpanishad,
   'maitrāyaṇī': Scripture.maitrayaniUpanishad,
-
   'yoga sutras': Scripture.yogaSutras,
   'yoga sūtras': Scripture.yogaSutras,
   'patanjali': Scripture.yogaSutras,
@@ -83,14 +80,12 @@ const Map<String, Scripture> _aliases = {
   'hatha yoga pradipika': Scripture.hathaYogaPradipika,
   'haṭha yoga pradīpikā': Scripture.hathaYogaPradipika,
   'hyp': Scripture.hathaYogaPradipika,
-
   'ramayana': Scripture.ramayana,
   'rāmāyaṇa': Scripture.ramayana,
   'ram': Scripture.ramayana,
   'mahabharata': Scripture.mahabharata,
   'mahābhārata': Scripture.mahabharata,
   'mbh': Scripture.mahabharata,
-
   'vishnu purana': Scripture.vishnuPurana,
   'viṣṇu purāṇa': Scripture.vishnuPurana,
   'vp': Scripture.vishnuPurana,
@@ -108,7 +103,6 @@ const Map<String, Scripture> _aliases = {
   'vishnu sahasranama': Scripture.vishnuSahasranama,
   'viṣṇu sahasranāma': Scripture.vishnuSahasranama,
   'vsn': Scripture.vishnuSahasranama,
-
   'arthashastra': Scripture.arthashastra,
   'arthaśāstra': Scripture.arthashastra,
   'kautilya': Scripture.arthashastra,
@@ -190,10 +184,8 @@ ScriptureCoordinate? parseScriptureCoordinate(String input) {
   final ascii = _devanagariToAscii(trimmed);
 
   // Strip leading/trailing whitespace, normalize separators to '.'.
-  final normalized = ascii
-      .toLowerCase()
-      .replaceAll(RegExp(r'[\s ]+'), ' ')
-      .trim();
+  final normalized =
+      ascii.toLowerCase().replaceAll(RegExp(r'[\s ]+'), ' ').trim();
 
   // Match alias prefix (longest first).
   final aliasKeys = _aliases.keys.toList()
@@ -206,10 +198,8 @@ ScriptureCoordinate? parseScriptureCoordinate(String input) {
     }
     final scripture = _aliases[alias]!;
     final tail = normalized.substring(alias.length).trim();
-    final parts = tail
-        .split(RegExp(r'[\s.\:\-]+'))
-        .where((p) => p.isNotEmpty)
-        .toList();
+    final parts =
+        tail.split(RegExp(r'[\s.\:\-]+')).where((p) => p.isNotEmpty).toList();
     final nums = <int>[];
     for (final p in parts) {
       final n = int.tryParse(p);

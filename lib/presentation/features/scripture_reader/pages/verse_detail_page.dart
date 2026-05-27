@@ -77,7 +77,21 @@ List<String> sanskritDisplayLines(String cleaned) {
 String _roman(int n) {
   if (n < 1 || n > 3999) return '$n';
   const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
-  const syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+  const syms = [
+    'M',
+    'CM',
+    'D',
+    'CD',
+    'C',
+    'XC',
+    'L',
+    'XL',
+    'X',
+    'IX',
+    'V',
+    'IV',
+    'I'
+  ];
   final out = StringBuffer();
   var x = n;
   for (var i = 0; i < vals.length; i++) {
@@ -431,8 +445,8 @@ class _CircleButton extends StatelessWidget {
     return InkResponse(
       onTap: onTap,
       radius: 22,
-      highlightColor: (isDark ? DColors.saffron : LColors.saffron)
-          .withValues(alpha: 0.04),
+      highlightColor:
+          (isDark ? DColors.saffron : LColors.saffron).withValues(alpha: 0.04),
       splashColor: Colors.transparent,
       child: SizedBox(width: 36, height: 36, child: Center(child: child)),
     );
@@ -656,7 +670,8 @@ class _UtilAction extends StatelessWidget {
               children: [
                 glyphBuilder(c),
                 const SizedBox(width: 6),
-                Text(label, style: AppText.pill(color: c).copyWith(fontSize: 11)),
+                Text(label,
+                    style: AppText.pill(color: c).copyWith(fontSize: 11)),
               ],
             ),
           ),
@@ -800,8 +815,8 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
   void _onNoteChanged(String value) {
     _saveTimer?.cancel();
     final v = verse;
-    _saveTimer =
-        Timer(const Duration(milliseconds: 600), () => _persistNoteFor(v, value));
+    _saveTimer = Timer(
+        const Duration(milliseconds: 600), () => _persistNoteFor(v, value));
     setState(() {});
   }
 
@@ -955,10 +970,12 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
-    final position = ref.watch(verseChapterPositionProvider(verse.id)).asData?.value;
+    final position =
+        ref.watch(verseChapterPositionProvider(verse.id)).asData?.value;
     final translitOn =
         ref.watch(transliterationEnabledProvider).asData?.value ?? false;
-    final cachedExp = ref.watch(verseExplanationProvider(verse.id)).asData?.value;
+    final cachedExp =
+        ref.watch(verseExplanationProvider(verse.id)).asData?.value;
     final fontSize = ref.watch(font_prefs.fontSizeProvider);
     final hasNote = _noteController.text.trim().isNotEmpty ||
         (verse.noteText?.trim().isNotEmpty ?? false);
@@ -976,8 +993,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
           _Leaf(
             verse: verse,
             isDark: isDark,
-            sanskritSize:
-                compressed ? 18.0 : (24.0 * sanskritScale),
+            sanskritSize: compressed ? 18.0 : (24.0 * sanskritScale),
             compressed: compressed,
             selectedWord: _selectedWord,
             onSelectWord: _selectWord,
@@ -1070,8 +1086,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                               child: Text(
                                 '— ${_translatorName(verse)}',
                                 style: AppText.metaLabel(
-                                  color:
-                                      isDark ? DColors.text3 : LColors.text3,
+                                  color: isDark ? DColors.text3 : LColors.text3,
                                 ),
                               ),
                             ),
@@ -1114,9 +1129,8 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         position: position,
         onShare: _share,
         translationOn: translitOn,
-        onToggleTranslation: () => ref
-            .read(transliterationEnabledProvider.notifier)
-            .toggle(),
+        onToggleTranslation: () =>
+            ref.read(transliterationEnabledProvider.notifier).toggle(),
         onOpenNotes: _openNotes,
         hasNote: hasNote,
         child: Stack(
@@ -1217,8 +1231,8 @@ class _Leaf extends StatelessWidget {
     // translation inside the binding card itself instead of leaving the leaf
     // empty and showing the translation in a separate section below.
     final sanskritBody = readingSanskrit(verse.sanskrit).trim();
-    final translationOnly = sanskritBody.isEmpty &&
-        (verse.english?.trim().isNotEmpty ?? false);
+    final translationOnly =
+        sanskritBody.isEmpty && (verse.english?.trim().isNotEmpty ?? false);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -1231,8 +1245,8 @@ class _Leaf extends StatelessWidget {
                 Text(
                   _verseCoordLabel(verse),
                   textAlign: TextAlign.center,
-                  style: AppText.meta(color: saffron, size: 10)
-                      .copyWith(fontWeight: FontWeight.w600, letterSpacing: 2.8),
+                  style: AppText.meta(color: saffron, size: 10).copyWith(
+                      fontWeight: FontWeight.w600, letterSpacing: 2.8),
                 ),
                 const SizedBox(height: Spacing.sectionV),
                 if (translationOnly)
@@ -1515,8 +1529,7 @@ class _WordCallout extends ConsumerWidget {
           SizedBox(
             width: 12,
             height: 12,
-            child:
-                CircularProgressIndicator(strokeWidth: 1.5, color: saffron),
+            child: CircularProgressIndicator(strokeWidth: 1.5, color: saffron),
           ),
           const SizedBox(width: 8),
           Text('Looking up…', style: italic),
@@ -1599,7 +1612,8 @@ class _ExplainTrigger extends StatelessWidget {
     final saffronGlow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
-    final ironRedBright = isDark ? DColors.ironRedBright : LColors.ironRedBright;
+    final ironRedBright =
+        isDark ? DColors.ironRedBright : LColors.ironRedBright;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1643,8 +1657,10 @@ class _ExplainTrigger extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('EXPLAIN THIS VERSE',
-                            style: AppText.meta(color: saffron, size: 9).copyWith(
-                                fontWeight: FontWeight.w600, letterSpacing: 2.2)),
+                            style: AppText.meta(color: saffron, size: 9)
+                                .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 2.2)),
                         const SizedBox(height: 2),
                         Text(question,
                             style: AppText.commentary(color: text1, size: 14)),
@@ -1659,8 +1675,7 @@ class _ExplainTrigger extends StatelessWidget {
           ),
           if (errorText != null) ...[
             const SizedBox(height: 8),
-            Text(errorText!,
-                style: AppText.rowSub(color: ironRedBright)),
+            Text(errorText!, style: AppText.rowSub(color: ironRedBright)),
           ],
         ],
       ),
@@ -1745,8 +1760,7 @@ class _ExplainCard extends StatelessWidget {
               Row(
                 children: [
                   Text('Reflecting on this verse',
-                      style: AppText.translation(
-                              color: text2, size: 14.5)
+                      style: AppText.translation(color: text2, size: 14.5)
                           .copyWith(height: 1.72)),
                   const SizedBox(width: 8),
                   AIThinkingDots(isDark: isDark),
@@ -1768,8 +1782,8 @@ class _ExplainCard extends StatelessWidget {
                   splashColor: Colors.transparent,
                   highlightColor: saffron.withValues(alpha: 0.04),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(Radii.card),
                       border: Border.all(color: dividerSoft),
@@ -1786,7 +1800,6 @@ class _ExplainCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1892,8 +1905,8 @@ class _Shimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = (isDark ? DColors.saffron : LColors.saffron)
-        .withValues(alpha: 0.08);
+    final color =
+        (isDark ? DColors.saffron : LColors.saffron).withValues(alpha: 0.08);
     Widget bar = Container(
       width: width,
       height: height,
@@ -1930,7 +1943,8 @@ class _ErrorBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ironRed = isDark ? DColors.ironRed : LColors.ironRed;
-    final ironRedBright = isDark ? DColors.ironRedBright : LColors.ironRedBright;
+    final ironRedBright =
+        isDark ? DColors.ironRedBright : LColors.ironRedBright;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
@@ -1960,8 +1974,9 @@ class _ErrorBody extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text('!',
-                      style: AppText.sanskritBody(color: ironRedBright, size: 18)
-                          .copyWith(height: 1.0)),
+                      style:
+                          AppText.sanskritBody(color: ironRedBright, size: 18)
+                              .copyWith(height: 1.0)),
                 ),
               ),
               const SizedBox(height: 14),
@@ -1979,8 +1994,8 @@ class _ErrorBody extends StatelessWidget {
               InkWell(
                 onTap: onRetry,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Text('↻  TRY AGAIN',
                       style: AppText.primaryButton(color: saffron)
                           .copyWith(fontSize: 11, letterSpacing: 2.0)),
@@ -2471,9 +2486,7 @@ class _BookmarkAction extends ConsumerWidget {
             color: isBookmarked ? saffron : text1,
             filled: isBookmarked,
             size: 18,
-          )
-              .animate(key: ValueKey(isBookmarked))
-              .scale(
+          ).animate(key: ValueKey(isBookmarked)).scale(
                 begin: const Offset(0.8, 0.8),
                 end: const Offset(1, 1),
                 duration: 300.ms,
@@ -2760,66 +2773,66 @@ class _ShareSheetState extends State<_ShareSheet> {
                           SizedBox(
                             width: double.infinity,
                             child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                '‖ ${v.scripture.displayNameSafe} · '
-                                '$fullCoordDeva ‖',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Fonts.deva,
-                                  fontFamilyFallback: AppFontFallback.deva,
-                                  fontSize: 12,
-                                  color: saffron,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                v.sanskrit.trim(),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Fonts.deva,
-                                  fontFamilyFallback: AppFontFallback.deva,
-                                  fontSize: 16,
-                                  height: 1.6,
-                                  color: cream,
-                                ),
-                              ),
-                              if (_format !=
-                                      _ShareFormat.sanskritOnly &&
-                                  (v.english?.trim().isNotEmpty ?? false)) ...[
-                                const SizedBox(height: 12),
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
                                 Text(
-                                  '"${v.english!.trim()}"',
+                                  '‖ ${v.scripture.displayNameSafe} · '
+                                  '$fullCoordDeva ‖',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: Fonts.serif,
-                                    fontFamilyFallback: AppFontFallback.latin,
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 12.5,
-                                    height: 1.5,
-                                    color: text2,
+                                    fontFamily: Fonts.deva,
+                                    fontFamilyFallback: AppFontFallback.deva,
+                                    fontSize: 12,
+                                    color: saffron,
                                   ),
                                 ),
-                              ],
-                              if (_format == _ShareFormat.fullCitation) ...[
                                 const SizedBox(height: 12),
                                 Text(
-                                  'sanatanguide.app/'
-                                  '${v.scripture.shortCode}/'
-                                  '${v.chapterNum}/${v.verseNum}',
+                                  v.sanskrit.trim(),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: Fonts.sans,
-                                    fontFamilyFallback: AppFontFallback.latin,
-                                    fontSize: 10,
-                                    letterSpacing: 0.06 * 10,
-                                    color: text3,
+                                    fontFamily: Fonts.deva,
+                                    fontFamilyFallback: AppFontFallback.deva,
+                                    fontSize: 16,
+                                    height: 1.6,
+                                    color: cream,
                                   ),
                                 ),
+                                if (_format != _ShareFormat.sanskritOnly &&
+                                    (v.english?.trim().isNotEmpty ??
+                                        false)) ...[
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    '"${v.english!.trim()}"',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: Fonts.serif,
+                                      fontFamilyFallback: AppFontFallback.latin,
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 12.5,
+                                      height: 1.5,
+                                      color: text2,
+                                    ),
+                                  ),
+                                ],
+                                if (_format == _ShareFormat.fullCitation) ...[
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'sanatanguide.app/'
+                                    '${v.scripture.shortCode}/'
+                                    '${v.chapterNum}/${v.verseNum}',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: Fonts.sans,
+                                      fontFamilyFallback: AppFontFallback.latin,
+                                      fontSize: 10,
+                                      letterSpacing: 0.06 * 10,
+                                      color: text3,
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
                           ),
                         ],
                       ),

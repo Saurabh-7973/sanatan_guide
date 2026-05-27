@@ -8,9 +8,8 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 /// when available, else off the scripture + coordinate. A curated per-verse
 /// question bank is a later content task.
 String explainQuestion(Verse verse) {
-  final firstWord = verse.wordMeanings?.isNotEmpty == true
-      ? verse.wordMeanings!.first
-      : null;
+  final firstWord =
+      verse.wordMeanings?.isNotEmpty == true ? verse.wordMeanings!.first : null;
   if (firstWord != null) {
     return 'What does "${firstWord.word}" mean here, and why does '
         '${verse.scripture.displayName} open this verse with it?';

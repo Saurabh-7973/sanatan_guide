@@ -150,136 +150,145 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
         children: [
           const Positioned.fill(child: WarmBackdrop()),
           state.when(
-        loading: () => const ModuleReaderShimmer(),
-        error: (e, _) => const ErrorStateWidget(),
-        data: (either) => either.fold(
-          (failure) => ErrorStateWidget(message: failure.message),
-          (detail) {
-            final cards = _buildCardSequence(detail);
-            if (cards.isEmpty) return const Center(child: Text('No cards for this module.'));
+            loading: () => const ModuleReaderShimmer(),
+            error: (e, _) => const ErrorStateWidget(),
+            data: (either) => either.fold(
+              (failure) => ErrorStateWidget(message: failure.message),
+              (detail) {
+                final cards = _buildCardSequence(detail);
+                if (cards.isEmpty) {
+                  return const Center(
+                    child: Text('No cards for this module.'),
+                  );
+                }
 
-            if (_currentIndex == null) {
-              final read = detail.module.cardsRead;
-              if (detail.module.isCompleted) {
-                // Already completed — land on completion card so user can
-                // review book recs / "Read in App" without replaying all cards.
-                _currentIndex = cards.length - 1;
-              } else if (read <= 0) {
-                _currentIndex = 0;
-              } else {
-                // Resume at the next unread card (cardsRead is 1-based sequence
-                // of the last card the user tapped through, so index = cardsRead).
-                // Clamp in case extras (anchor/reflection/completion) were counted.
-                _currentIndex = read.clamp(0, cards.length - 1);
-              }
-            }
+                if (_currentIndex == null) {
+                  final read = detail.module.cardsRead;
+                  if (detail.module.isCompleted) {
+                    // Already completed — land on completion card so user can
+                    // review book recs / "Read in App" without replaying all cards.
+                    _currentIndex = cards.length - 1;
+                  } else if (read <= 0) {
+                    _currentIndex = 0;
+                  } else {
+                    // Resume at the next unread card (cardsRead is 1-based sequence
+                    // of the last card the user tapped through, so index = cardsRead).
+                    // Clamp in case extras (anchor/reflection/completion) were counted.
+                    _currentIndex = read.clamp(0, cards.length - 1);
+                  }
+                }
 
-            final currentIdx = _currentIndex!;
-            if (currentIdx >= cards.length) {
-              return const Center(child: Text('No cards for this module.'));
-            }
+                final currentIdx = _currentIndex!;
+                if (currentIdx >= cards.length) {
+                  return const Center(child: Text('No cards for this module.'));
+                }
 
-            final card = cards[currentIdx];
-            final isLast = currentIdx == cards.length - 1;
-            final progress = (currentIdx + 1) / cards.length;
+                final card = cards[currentIdx];
+                final isLast = currentIdx == cards.length - 1;
+                final progress = (currentIdx + 1) / cards.length;
 
-            return GestureDetector(
-              onTap: () => _advance(detail, cards),
-              behavior: HitTestBehavior.opaque,
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        AppSpacing.md,
-                        AppSpacing.lg,
-                        0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // ── Module title ──────────────────────────────────────────
-                          Row(
+                return GestureDetector(
+                  onTap: () => _advance(detail, cards),
+                  behavior: HitTestBehavior.opaque,
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.lg,
+                            AppSpacing.md,
+                            AppSpacing.lg,
+                            0,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                  minWidth: 48,
-                                  minHeight: 48,
-                                ),
-                                tooltip: 'Close',
-                                icon: const Icon(
-                                  Icons.close_rounded,
-                                  color: AppColors.textSecondary,
-                                ),
-                                onPressed: () {
-                                  if (context.canPop()) {
-                                    context.pop();
-                                  } else {
-                                    context.go('/learn');
-                                  }
-                                },
+                              // ── Module title ──────────────────────────────────────────
+                              Row(
+                                children: [
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 48,
+                                      minHeight: 48,
+                                    ),
+                                    tooltip: 'Close',
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    onPressed: () {
+                                      if (context.canPop()) {
+                                        context.pop();
+                                      } else {
+                                        context.go('/learn');
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Text(
+                                      detail.module.title,
+                                      style: context.ts.captionHighlight,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_currentIndex! + 1} / ${cards.length}',
+                                    style: context.ts.caption,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: AppSpacing.md),
-                              Expanded(
-                                child: Text(
-                                  detail.module.title,
-                                  style: context.ts.captionHighlight,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                              const SizedBox(height: AppSpacing.sm),
+                              // ── Progress bar ──────────────────────────────────────────
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  backgroundColor: isDark
+                                      ? AppColors.borderDark
+                                      : AppColors.border,
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                    AppColors.saffron,
+                                  ),
+                                  minHeight: 6,
                                 ),
-                              ),
-                              Text(
-                                '${_currentIndex! + 1} / ${cards.length}',
-                                style: context.ts.caption,
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppSpacing.sm),
-                          // ── Progress bar ──────────────────────────────────────────
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: progress,
-                              backgroundColor: isDark ? AppColors.borderDark : AppColors.border,
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                AppColors.saffron,
-                              ),
-                              minHeight: 6,
+                        ),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) =>
+                                FadeTransition(
+                                    opacity: animation, child: child),
+                            child: KeyedSubtree(
+                              key: ValueKey<int>(_currentIndex!),
+                              child: _buildCard(context, card, detail),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) =>
-                            FadeTransition(opacity: animation, child: child),
-                        child: KeyedSubtree(
-                          key: ValueKey<int>(_currentIndex!),
-                          child: _buildCard(context, card, detail),
                         ),
-                      ),
-                    ),
-                    if (!isLast)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                        child: Text(
-                          'Tap anywhere to continue',
-                          style: context.ts.caption.copyWith(
-                            color: AppColors.textHint,
+                        if (!isLast)
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: AppSpacing.lg),
+                            child: Text(
+                              'Tap anywhere to continue',
+                              style: context.ts.caption.copyWith(
+                                color: AppColors.textHint,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -352,48 +361,48 @@ class _AnchorCard extends StatelessWidget {
     return ColoredBox(
       color: isDark ? Colors.transparent : AppColors.saffronFaint,
       child: Padding(
-      padding: const EdgeInsets.all(AppSpacing.pagePadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const Spacer(flex: 2),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.deepRedMuted,
-              borderRadius: BorderRadius.circular(AppSpacing.sm),
-            ),
-            child: Text(
-              'KEY VERSE',
-              style: context.ts.cardLabel.copyWith(
-                color: AppColors.deepRed,
-                letterSpacing: 1.0,
+        padding: const EdgeInsets.all(AppSpacing.pagePadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Spacer(flex: 2),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.deepRedMuted,
+                borderRadius: BorderRadius.circular(AppSpacing.sm),
+              ),
+              child: Text(
+                'KEY VERSE',
+                style: context.ts.cardLabel.copyWith(
+                  color: AppColors.deepRed,
+                  letterSpacing: 1.0,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(card.body, style: context.ts.bodyLarge),
-          if (card.verseId != null) ...[
-            const SizedBox(height: AppSpacing.xl),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.menu_book_outlined, size: 16),
-              label: Text('Read ${card.verseId} in the Gita'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.saffron,
-                side: const BorderSide(color: AppColors.saffron),
+            const SizedBox(height: AppSpacing.lg),
+            Text(card.body, style: context.ts.bodyLarge),
+            if (card.verseId != null) ...[
+              const SizedBox(height: AppSpacing.xl),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.menu_book_outlined, size: 16),
+                label: Text('Read ${card.verseId} in the Gita'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.saffron,
+                  side: const BorderSide(color: AppColors.saffron),
+                ),
+                onPressed: () => context.push(
+                  '/browse/bhagavad_gita/verse/${card.verseId}',
+                ),
               ),
-              onPressed: () => context.push(
-                '/browse/bhagavad_gita/verse/${card.verseId}',
-              ),
-            ),
+            ],
+            const Spacer(flex: 3),
           ],
-          const Spacer(flex: 3),
-        ],
-      ),
+        ),
       ),
     );
   }
@@ -459,7 +468,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Essentials of Hinduism',
         author: 'Swami Bhaskarananda',
-        url: 'https://www.amazon.in/s?k=Essentials+of+Hinduism+Swami+Bhaskarananda',
+        url:
+            'https://www.amazon.in/s?k=Essentials+of+Hinduism+Swami+Bhaskarananda',
       ),
     ],
     // mod_02: The Five Core Concepts
@@ -467,12 +477,14 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Essentials of Hinduism',
         author: 'Swami Bhaskarananda',
-        url: 'https://www.amazon.in/s?k=Essentials+of+Hinduism+Swami+Bhaskarananda',
+        url:
+            'https://www.amazon.in/s?k=Essentials+of+Hinduism+Swami+Bhaskarananda',
       ),
       _BookRec(
         title: 'An Introduction to Hindu Philosophy',
         author: 'Subhash Kak',
-        url: 'https://www.amazon.in/s?k=Introduction+to+Hindu+Philosophy+Subhash+Kak',
+        url:
+            'https://www.amazon.in/s?k=Introduction+to+Hindu+Philosophy+Subhash+Kak',
       ),
     ],
     // mod_03: The Trimurti and Major Deities
@@ -480,12 +492,14 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Hindu Gods and Goddesses',
         author: 'Swami Harshananda',
-        url: 'https://www.amazon.in/s?k=Hindu+Gods+and+Goddesses+Swami+Harshananda',
+        url:
+            'https://www.amazon.in/s?k=Hindu+Gods+and+Goddesses+Swami+Harshananda',
       ),
       _BookRec(
         title: 'Myths and Symbols in Indian Art and Civilization',
         author: 'Heinrich Zimmer',
-        url: 'https://www.amazon.in/s?k=Myths+Symbols+Indian+Art+Civilization+Zimmer',
+        url:
+            'https://www.amazon.in/s?k=Myths+Symbols+Indian+Art+Civilization+Zimmer',
       ),
     ],
     // mod_04: Sacred Symbols and Their Meanings
@@ -493,7 +507,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Symbolism in Hinduism',
         author: 'Swami Chinmayananda',
-        url: 'https://www.amazon.in/s?k=Symbolism+in+Hinduism+Swami+Chinmayananda',
+        url:
+            'https://www.amazon.in/s?k=Symbolism+in+Hinduism+Swami+Chinmayananda',
       ),
       _BookRec(
         title: 'Hindu Symbols and Their Meanings',
@@ -511,7 +526,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Hindu Fasts and Festivals',
         author: 'Swami Sivananda',
-        url: 'https://www.amazon.in/s?k=Hindu+Fasts+and+Festivals+Swami+Sivananda',
+        url:
+            'https://www.amazon.in/s?k=Hindu+Fasts+and+Festivals+Swami+Sivananda',
       ),
     ],
     // mod_06: Daily Practice: Dinacharya
@@ -519,7 +535,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Complete Book of Ayurvedic Home Remedies',
         author: 'Dr. Vasant Lad',
-        url: 'https://www.amazon.in/s?k=Complete+Book+Ayurvedic+Home+Remedies+Vasant+Lad',
+        url:
+            'https://www.amazon.in/s?k=Complete+Book+Ayurvedic+Home+Remedies+Vasant+Lad',
       ),
       _BookRec(
         title: 'Daily Life in Ancient India',
@@ -550,7 +567,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Aims of Life',
         author: 'Patrick Olivelle',
-        url: 'https://www.amazon.in/s?k=Aims+of+Life+Dharma+Artha+Kama+Moksha+Olivelle',
+        url:
+            'https://www.amazon.in/s?k=Aims+of+Life+Dharma+Artha+Kama+Moksha+Olivelle',
       ),
     ],
     // mod_09: The 4 Vedas — Structure & Essence
@@ -558,7 +576,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Rig Veda: An Anthology',
         author: 'Wendy Doniger',
-        url: 'https://www.amazon.in/s?k=The+Rig+Veda+An+Anthology+Wendy+Doniger',
+        url:
+            'https://www.amazon.in/s?k=The+Rig+Veda+An+Anthology+Wendy+Doniger',
       ),
       _BookRec(
         title: 'The Vedas: An Introduction',
@@ -576,7 +595,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Principal Upanishads',
         author: 'S. Radhakrishnan',
-        url: 'https://www.amazon.in/s?k=The+Principal+Upanishads+S+Radhakrishnan',
+        url:
+            'https://www.amazon.in/s?k=The+Principal+Upanishads+S+Radhakrishnan',
       ),
     ],
     // mod_11: Bhagavad Gita — Full 18-Chapter Study
@@ -602,7 +622,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Valmiki Ramayana (abridged)',
         author: 'Arshia Sattar',
-        url: 'https://www.amazon.in/s?k=Valmiki+Ramayana+abridged+Arshia+Sattar',
+        url:
+            'https://www.amazon.in/s?k=Valmiki+Ramayana+abridged+Arshia+Sattar',
       ),
     ],
     // mod_13: Mahabharata — The War Within
@@ -615,7 +636,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Difficulty of Being Good',
         author: 'Gurcharan Das',
-        url: 'https://www.amazon.in/s?k=The+Difficulty+of+Being+Good+Gurcharan+Das',
+        url:
+            'https://www.amazon.in/s?k=The+Difficulty+of+Being+Good+Gurcharan+Das',
       ),
     ],
     // mod_14: The 18 Mahapuranas — A Guide
@@ -628,7 +650,8 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'The Puranas: An Encyclopaedia',
         author: 'Swami Harshananda',
-        url: 'https://www.amazon.in/s?k=Puranas+Encyclopaedia+Swami+Harshananda',
+        url:
+            'https://www.amazon.in/s?k=Puranas+Encyclopaedia+Swami+Harshananda',
       ),
     ],
     // mod_15: The 4 Paths of Yoga
@@ -649,12 +672,14 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Ayurveda: The Science of Self-Healing',
         author: 'Dr. Vasant Lad',
-        url: 'https://www.amazon.in/s?k=Ayurveda+The+Science+of+Self-Healing+Vasant+Lad',
+        url:
+            'https://www.amazon.in/s?k=Ayurveda+The+Science+of+Self-Healing+Vasant+Lad',
       ),
       _BookRec(
         title: 'The Complete Book of Ayurvedic Home Remedies',
         author: 'Dr. Vasant Lad',
-        url: 'https://www.amazon.in/s?k=The+Complete+Book+of+Ayurvedic+Home+Remedies',
+        url:
+            'https://www.amazon.in/s?k=The+Complete+Book+of+Ayurvedic+Home+Remedies',
       ),
     ],
     // mod_17: Sanskrit Starter — 30 Days of Devanagari
@@ -662,12 +687,14 @@ class _CompletionCard extends StatelessWidget {
       _BookRec(
         title: 'Teach Yourself Sanskrit',
         author: 'Michael Coulson',
-        url: 'https://www.amazon.in/s?k=Teach+Yourself+Sanskrit+Michael+Coulson',
+        url:
+            'https://www.amazon.in/s?k=Teach+Yourself+Sanskrit+Michael+Coulson',
       ),
       _BookRec(
         title: 'The Sanskrit Heritage Site',
         author: 'Gérard Huet',
-        url: 'https://www.amazon.in/s?k=Sanskrit+language+learning+Devanagari+beginners',
+        url:
+            'https://www.amazon.in/s?k=Sanskrit+language+learning+Devanagari+beginners',
       ),
     ],
   };
@@ -680,7 +707,10 @@ class _CompletionCard extends StatelessWidget {
     'mod_11': (label: 'Read the Bhagavad Gita', route: '/browse/bhagavad_gita'),
     'mod_12': (label: 'Read the Ramayana', route: '/browse/ramayana'),
     'mod_13': (label: 'Read the Mahabharata', route: '/browse/mahabharata'),
-    'mod_14': (label: 'Read the Bhagavata Purana', route: '/browse/bhagavata_purana'),
+    'mod_14': (
+      label: 'Read the Bhagavata Purana',
+      route: '/browse/bhagavata_purana'
+    ),
     'mod_15': (label: 'Read the Yoga Sutras', route: '/browse/yoga_sutras'),
   };
 

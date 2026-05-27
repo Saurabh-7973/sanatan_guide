@@ -62,9 +62,8 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
     final countQuery = selectOnly(db.versesTable)..addColumns([countCol]);
     if (filter != null) countQuery.where(filter(db.versesTable));
 
-    final count = await countQuery
-        .map((row) => row.read(countCol) ?? 0)
-        .getSingle();
+    final count =
+        await countQuery.map((row) => row.read(countCol) ?? 0).getSingle();
 
     if (count == 0) return null;
 
@@ -159,8 +158,7 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
     // are handled separately by the search screen's direct-match path.
     final ftsQuery = query
         .split(RegExp(r'\s+'))
-        .map((w) =>
-            w.replaceAll(RegExp(r'[^\p{L}\p{N}]', unicode: true), ''))
+        .map((w) => w.replaceAll(RegExp(r'[^\p{L}\p{N}]', unicode: true), ''))
         .where((w) => w.isNotEmpty)
         .map((w) => '$w*')
         .join(' ');

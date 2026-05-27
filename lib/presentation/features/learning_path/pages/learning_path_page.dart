@@ -103,8 +103,7 @@ class _PathBody extends StatelessWidget {
           isDark: isDark,
           marker: 'I.',
           name: 'Foundations',
-          description:
-              'Eight modules on the essentials of Sanātana Dharma.',
+          description: 'Eight modules on the essentials of Sanātana Dharma.',
           completed: foundationsDone,
           total: foundations.length,
           locked: false,
@@ -126,8 +125,7 @@ class _PathBody extends StatelessWidget {
           isDark: isDark,
           marker: 'II.',
           name: 'Deepening',
-          description:
-              'The primary scriptures, in their structure — Vedas, '
+          description: 'The primary scriptures, in their structure — Vedas, '
               'Upaniṣads, the Gītā in full.',
           completed: deepening.where((m) => m.isCompleted).length,
           total: deepening.length,
@@ -370,8 +368,8 @@ class _WeekDot extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration:
-              BoxDecoration(color: dotColor, shape: BoxShape.circle, border: border),
+          decoration: BoxDecoration(
+              color: dotColor, shape: BoxShape.circle, border: border),
         ),
       ],
     );
@@ -615,8 +613,8 @@ class _ContinueAnchor extends StatelessWidget {
               const SizedBox(width: 14),
               Padding(
                 padding: const EdgeInsets.only(right: 18),
-                child: Icon(Icons.arrow_forward_rounded,
-                    size: 16, color: saffron),
+                child:
+                    Icon(Icons.arrow_forward_rounded, size: 16, color: saffron),
               ),
             ],
           ),
@@ -819,133 +817,128 @@ class _ModuleRow extends StatelessWidget {
     // Applying alpha at each Text gives more granular contrast: title
     // stays legible while desc/meta/num recede.
     return InkWell(
-        onTap: locked
-            ? () => _showLockedSheet(context, isDark)
-            : () => context.push('/learn/${module.id}'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            border: showDivider
-                ? Border(bottom: BorderSide(color: dividerSoft))
-                : null,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Knot — a 12px diamond riding the thread.
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: SizedBox(
-                  width: 13,
-                  child: Center(
-                    child: Transform.rotate(
-                      angle: 0.7853981633974483, // 45°
-                      child: Container(
-                        width: 11,
-                        height: 11,
-                        decoration: BoxDecoration(
-                          color: knotColor,
-                          boxShadow: isActive && !locked
-                              ? [
-                                  BoxShadow(
-                                    color: saffron.withValues(alpha: 0.55),
-                                    blurRadius: 8,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              SizedBox(
-                width: 22,
-                child: Text(
-                  '${module.sequence}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: Fonts.serif,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.2,
-                    color: locked
-                        ? text3.withValues(alpha: 0.4)
-                        : done
-                            ? text3
-                            : text2,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      module.title,
-                      style: TextStyle(
-                        fontFamily: Fonts.serif,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontSize: 15.5,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w500,
-                        height: 1.3,
-                        letterSpacing: -0.08,
-                        color: titleColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      module.hook,
-                      style: TextStyle(
-                        fontFamily: Fonts.serif,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12.5,
-                        height: 1.45,
-                        color: locked
-                            ? text2.withValues(alpha: 0.5)
-                            : text2,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      metaText,
-                      style: TextStyle(
-                        fontFamily: Fonts.sans,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.06,
-                        color: locked
-                            ? text3.withValues(alpha: 0.5)
-                            : text3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 14),
-              SizedBox(
-                width: 16,
-                child: _ModuleStateIcon(
-                  done: done,
-                  active: isActive,
-                  locked: locked,
-                  saffron: saffron,
-                  text2: text2,
-                  text3: text3,
-                ),
-              ),
-            ],
-          ),
+      onTap: locked
+          ? () => _showLockedSheet(context, isDark)
+          : () => context.push('/learn/${module.id}'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          border: showDivider
+              ? Border(bottom: BorderSide(color: dividerSoft))
+              : null,
         ),
-      );
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Knot — a 12px diamond riding the thread.
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: SizedBox(
+                width: 13,
+                child: Center(
+                  child: Transform.rotate(
+                    angle: 0.7853981633974483, // 45°
+                    child: Container(
+                      width: 11,
+                      height: 11,
+                      decoration: BoxDecoration(
+                        color: knotColor,
+                        boxShadow: isActive && !locked
+                            ? [
+                                BoxShadow(
+                                  color: saffron.withValues(alpha: 0.55),
+                                  blurRadius: 8,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            SizedBox(
+              width: 22,
+              child: Text(
+                '${module.sequence}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: Fonts.serif,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  color: locked
+                      ? text3.withValues(alpha: 0.4)
+                      : done
+                          ? text3
+                          : text2,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    module.title,
+                    style: TextStyle(
+                      fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 15.5,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                      height: 1.3,
+                      letterSpacing: -0.08,
+                      color: titleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    module.hook,
+                    style: TextStyle(
+                      fontFamily: Fonts.serif,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12.5,
+                      height: 1.45,
+                      color: locked ? text2.withValues(alpha: 0.5) : text2,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    metaText,
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.06,
+                      color: locked ? text3.withValues(alpha: 0.5) : text3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 14),
+            SizedBox(
+              width: 16,
+              child: _ModuleStateIcon(
+                done: done,
+                active: isActive,
+                locked: locked,
+                saffron: saffron,
+                text2: text2,
+                text3: text3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -977,8 +970,7 @@ class _ModuleStateIcon extends StatelessWidget {
     if (done) {
       return Padding(
         padding: const EdgeInsets.only(top: 3),
-        child: Icon(Icons.check_circle_outline_rounded,
-            size: 15, color: text2),
+        child: Icon(Icons.check_circle_outline_rounded, size: 15, color: text2),
       );
     }
     if (active) {

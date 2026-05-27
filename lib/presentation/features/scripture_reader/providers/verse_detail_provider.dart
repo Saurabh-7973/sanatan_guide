@@ -195,8 +195,7 @@ Future<({String? prevId, String? nextId})> adjacentVerseIds(
       bookNum: current.bookNum,
     );
     if (verses.isEmpty) return (prevId: null, nextId: null);
-    final sorted = [...verses]
-      ..sort((a, b) => compareVerseIds(a.id, b.id));
+    final sorted = [...verses]..sort((a, b) => compareVerseIds(a.id, b.id));
     final idx = sorted.indexWhere((e) => e.id == verseId);
     if (idx < 0) return (prevId: null, nextId: null);
     return (

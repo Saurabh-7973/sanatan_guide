@@ -29,9 +29,8 @@ abstract final class RecentSearchesService {
     final prefs = await SharedPreferences.getInstance();
     final existing = await load();
     final lc = trimmed.toLowerCase();
-    final filtered = existing
-        .where((e) => e.toLowerCase() != lc)
-        .toList(growable: true);
+    final filtered =
+        existing.where((e) => e.toLowerCase() != lc).toList(growable: true);
     filtered.insert(0, trimmed);
     if (filtered.length > _maxEntries) {
       filtered.removeRange(_maxEntries, filtered.length);

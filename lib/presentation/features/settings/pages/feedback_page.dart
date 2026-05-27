@@ -100,8 +100,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         ..write('OS: ${Platform.operatingSystem} '
             '${Platform.operatingSystemVersion}\n')
         ..write('App: $_version\n')
-        ..write(
-            'Locale: ${WidgetsBinding.instance.platformDispatcher.locale}');
+        ..write('Locale: ${WidgetsBinding.instance.platformDispatcher.locale}');
     }
     buffer.write('\nReply requested: ${_allowReply ? 'yes' : 'no'}');
     final uri = Uri(
@@ -178,8 +177,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                           allowReply: _allowReply,
                           onToggleDeviceInfo: (v) =>
                               setState(() => _attachDeviceInfo = v),
-                          onToggleReply: (v) =>
-                              setState(() => _allowReply = v),
+                          onToggleReply: (v) => setState(() => _allowReply = v),
                           onSend: _send,
                         ),
                 ),
@@ -258,8 +256,8 @@ class _PickKind extends StatelessWidget {
         const SizedBox(height: 26),
         Container(
           padding: const EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: divider))),
+          decoration:
+              BoxDecoration(border: Border(bottom: BorderSide(color: divider))),
           child: Text('WHAT KIND OF FEEDBACK?',
               style: AppText.sectionLabel(color: text3)),
         ),
@@ -584,8 +582,7 @@ class _Check extends StatelessWidget {
       onTap: () => onChanged(!value),
       child: Container(
         decoration: BoxDecoration(
-          border:
-              topBorder ? Border(top: BorderSide(color: divider)) : null,
+          border: topBorder ? Border(top: BorderSide(color: divider)) : null,
         ),
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
@@ -698,8 +695,7 @@ class _KindGlyphPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_KindGlyphPainter o) =>
-      o.kind != kind || o.color != color;
+  bool shouldRepaint(_KindGlyphPainter o) => o.kind != kind || o.color != color;
 }
 
 class _ChevronPainter extends CustomPainter {

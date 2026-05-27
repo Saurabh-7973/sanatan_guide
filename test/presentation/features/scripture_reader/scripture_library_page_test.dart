@@ -4,7 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/pages/scripture_library_page.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
-Widget _harness({TextScaler textScaler = TextScaler.noScaling}) => ProviderScope(
+Widget _harness({TextScaler textScaler = TextScaler.noScaling}) =>
+    ProviderScope(
       child: MaterialApp(
         home: MediaQuery(
           data: MediaQueryData(textScaler: textScaler),
@@ -80,7 +81,8 @@ void main() {
     expect(find.text('Bhagavad Gītā'), findsOneWidget); // the match
   });
 
-  testWidgets('search border drops to unfocused after tapping outside, '
+  testWidgets(
+      'search border drops to unfocused after tapping outside, '
       'even with a non-empty query', (tester) async {
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();

@@ -163,8 +163,7 @@ class AppText {
         color: color,
       );
 
-  static TextStyle devUI({required Color color, double size = 13}) =>
-      TextStyle(
+  static TextStyle devUI({required Color color, double size = 13}) => TextStyle(
         fontFamily: Fonts.devaUI,
         fontSize: size,
         height: 1.0,

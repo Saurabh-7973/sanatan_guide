@@ -468,14 +468,12 @@ class _ThemeRow extends ConsumerWidget {
                 : Colors.transparent,
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
-            (states) => states.contains(WidgetState.selected)
-                ? activeFg
-                : inactiveFg,
+            (states) =>
+                states.contains(WidgetState.selected) ? activeFg : inactiveFg,
           ),
           iconColor: WidgetStateProperty.resolveWith(
-            (states) => states.contains(WidgetState.selected)
-                ? activeFg
-                : inactiveFg,
+            (states) =>
+                states.contains(WidgetState.selected) ? activeFg : inactiveFg,
           ),
           side: WidgetStateProperty.all(BorderSide(color: divider)),
         ),
@@ -578,12 +576,9 @@ class _SanskritDisplayRow extends ConsumerWidget {
       isDark: isDark,
       icon: Icons.spellcheck_rounded,
       title: 'Sanskrit display',
-      subtitle: iast
-          ? 'Devanāgarī · IAST diacritics on'
-          : 'Devanāgarī only',
+      subtitle: iast ? 'Devanāgarī · IAST diacritics on' : 'Devanāgarī only',
       trailing: _Chevron(isDark: isDark),
-      onTap: () =>
-          ref.read(transliterationEnabledProvider.notifier).toggle(),
+      onTap: () => ref.read(transliterationEnabledProvider.notifier).toggle(),
     );
   }
 }
@@ -790,8 +785,7 @@ class _Schedule30sRow extends ConsumerWidget {
                 : verse.sanskrit.trim();
             return NotificationService.scheduleTestInSeconds(
               verseId: verse.id,
-              title:
-                  '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
+              title: '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
               body: body,
             );
           },
@@ -834,9 +828,8 @@ class _FestivalAlertsRow extends ConsumerWidget {
       trailing: Switch(
         value: enabled,
         activeThumbColor: saffron,
-        onChanged: (v) => ref
-            .read(festivalAlertsEnabledProvider.notifier)
-            .setEnabled(v),
+        onChanged: (v) =>
+            ref.read(festivalAlertsEnabledProvider.notifier).setEnabled(v),
       ),
     );
   }
@@ -935,8 +928,7 @@ class _TestNotificationRow extends ConsumerWidget {
                 : verse.sanskrit.trim();
             await NotificationService.fireTestNotificationNow(
               verseId: verse.id,
-              title:
-                  '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
+              title: '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
               body: body,
             );
           },
@@ -1006,15 +998,13 @@ class _NotificationTimeRow extends ConsumerWidget {
           // Toggle. Off → notification cancelled by verse-of-day provider.
           Switch(
             value: enabled,
-            onChanged: (v) => ref
-                .read(notificationEnabledProvider.notifier)
-                .setEnabled(v),
+            onChanged: (v) =>
+                ref.read(notificationEnabledProvider.notifier).setEnabled(v),
             activeThumbColor: isDark ? const Color(0xFF1A1208) : Colors.white,
             activeTrackColor: saffron,
             inactiveThumbColor: text3,
-            inactiveTrackColor: isDark
-                ? DColors.dividerSoft
-                : LColors.dividerSoft,
+            inactiveTrackColor:
+                isDark ? DColors.dividerSoft : LColors.dividerSoft,
           ),
         ],
       ),
@@ -1147,8 +1137,7 @@ Future<TimeOfDay?> showHeritageTimePicker({
                         text2: text2,
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           ':',
                           style: TextStyle(
@@ -1221,9 +1210,8 @@ Future<TimeOfDay?> showHeritageTimePicker({
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.12 * 12,
-                            color: isDark
-                                ? const Color(0xFF1A1208)
-                                : Colors.white,
+                            color:
+                                isDark ? const Color(0xFF1A1208) : Colors.white,
                           ),
                         ),
                       ),
@@ -1413,9 +1401,8 @@ Future<bool?> showHeritageConfirmSheet({
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.12 * 12,
-                            color: isDark
-                                ? const Color(0xFF1A1208)
-                                : Colors.white,
+                            color:
+                                isDark ? const Color(0xFF1A1208) : Colors.white,
                           ),
                         ),
                       ),
