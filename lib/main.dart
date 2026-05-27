@@ -6,8 +6,11 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:sanatan_guide/core/router/app_router.dart';
 import 'package:sanatan_guide/core/services/ad_service.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
@@ -30,6 +33,14 @@ void main() async {
   // doesn't pollute production crash reports.
   await FirebaseCrashlytics.instance
       .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+  // Apply the user's persisted Analytics opt-out before any event is sent.
+  // The Settings provider also wires this, but reading the pref here means
+  // an "off" choice is honoured on boot before the first frame, not after
+  // the user opens Settings.
+  final prefs = await SharedPreferences.getInstance();
+  final analyticsEnabled = prefs.getBool('privacy_analytics_enabled') ?? true;
+  await AnalyticsService.setCollectionEnabled(analyticsEnabled);
 
   if (!kDebugMode) {
     FlutterError.onError = (details) {

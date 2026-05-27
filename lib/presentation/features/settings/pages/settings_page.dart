@@ -28,6 +28,7 @@ import 'package:sanatan_guide/presentation/features/onboarding/providers/user_ex
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/analytics_enabled_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -126,6 +127,13 @@ class SettingsPage extends ConsumerWidget {
                         trailing: const _SoonTag(),
                       ),
                       const _ClearHistoryRow(),
+
+                      // ── Privacy ─────────────────────────────────────────────
+                      _SectionHeader(
+                        title: 'Privacy',
+                        isDark: isDark,
+                      ),
+                      const _AnalyticsOptOutRow(),
 
                       // ── About ───────────────────────────────────────────────
                       _SectionHeader(
@@ -827,6 +835,39 @@ class _FestivalAlertsRow extends ConsumerWidget {
         onChanged: (v) => ref
             .read(festivalAlertsEnabledProvider.notifier)
             .setEnabled(v),
+      ),
+    );
+  }
+}
+
+// ── Privacy: analytics opt-out ────────────────────────────────────────────
+//
+// Firebase Analytics + Crashlytics ship enabled by default. Letting the
+// user flip Analytics off (Crashlytics stays — fatal crashes are still
+// captured) is a Play Console "Data Safety" hygiene win and a privacy
+// nicety. The provider both persists the choice and calls
+// FirebaseAnalytics.setAnalyticsCollectionEnabled at the SDK level so
+// no events leave the device when it's off.
+
+class _AnalyticsOptOutRow extends ConsumerWidget {
+  const _AnalyticsOptOutRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final enabled = ref.watch(analyticsEnabledProvider);
+    return _Row(
+      isDark: isDark,
+      icon: Icons.analytics_outlined,
+      title: 'Anonymous usage analytics',
+      subtitle:
+          'Helps improve the app. No personal data is collected. Crash reports are unaffected.',
+      trailing: Switch(
+        value: enabled,
+        activeThumbColor: saffron,
+        onChanged: (v) =>
+            ref.read(analyticsEnabledProvider.notifier).setEnabled(v),
       ),
     );
   }

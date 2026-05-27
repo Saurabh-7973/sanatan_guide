@@ -111,7 +111,12 @@ void main() {
     await tester.tap(find.text('कुरुक्षेत्रे'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Enable the AI guide'), findsOneWidget);
+    // Copy was reworded in 757be61 — no more "Enable the AI guide
+    // (GEMINI_API_KEY)" tech leak. The new wording promises nothing.
+    expect(
+      find.textContaining('isn’t available offline yet'),
+      findsOneWidget,
+    );
     expect(
       find.textContaining('not available for this verse yet'),
       findsNothing,

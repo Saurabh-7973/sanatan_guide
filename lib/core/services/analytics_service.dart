@@ -7,6 +7,19 @@ abstract final class AnalyticsService {
   static FirebaseAnalyticsObserver get observer =>
       FirebaseAnalyticsObserver(analytics: _analytics);
 
+  /// Toggles Firebase Analytics collection at the SDK level. Off → no
+  /// events are buffered, queued, or sent. Called by the
+  /// analyticsEnabledProvider whenever the user flips the Settings switch
+  /// and at app boot to apply the persisted preference.
+  static Future<void> setCollectionEnabled(bool enabled) async {
+    try {
+      await _analytics.setAnalyticsCollectionEnabled(enabled);
+      AppLogger.instance.i('Firebase Analytics collection: $enabled');
+    } catch (e, st) {
+      AppLogger.instance.w('setAnalyticsCollectionEnabled failed', e, st);
+    }
+  }
+
   // ── Scripture reading ───────────────────────────────────────────────────
 
   static Future<void> verseRead({
