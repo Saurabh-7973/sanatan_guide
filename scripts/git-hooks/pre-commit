@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Pre-commit gate: refuse to commit if `flutter analyze` reports issues
+# on the staged Dart files. Skip when no staged Dart files exist.
+#
+# Bypass with: git commit --no-verify  (use sparingly).
+
+set -euo pipefail
+
+STAGED_DART="$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.dart$' || true)"
+
+if [[ -z "$STAGED_DART" ]]; then
+  exit 0
+fi
+
+echo "→ pre-commit: flutter analyze on staged Dart files"
+if ! flutter analyze --no-pub --no-fatal-warnings >/tmp/sanatan-analyze.log 2>&1; then
+  echo "✗ flutter analyze failed. See /tmp/sanatan-analyze.log" >&2
+  tail -n 30 /tmp/sanatan-analyze.log >&2
+  echo
+  echo "Bypass with: git commit --no-verify" >&2
+  exit 1
+fi
+echo "✓ analyze clean"

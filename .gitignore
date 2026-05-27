@@ -46,6 +46,19 @@ app.*.map.json
 
 key.properties
 android/app/*.jks
+android/app/*.keystore
+android/local.properties
+
+# Release artifacts — never commit
+*.aab
+*.apk
+*.apks
+
+# Environment / secret files
+.env
+.env.local
+.env.production
+*.dart_defines.json
 
 # One-off LLM export (dart run tool/export_code_for_llm.dart)
 deepseek_code_bundle.md
