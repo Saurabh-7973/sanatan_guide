@@ -929,7 +929,12 @@ class _ResultsBody extends StatelessWidget {
             child: _PanditCta(isDark: isDark, onTap: onPandit),
           ),
         ],
-        if (coord != null) ...[
+        if (coord != null)
+          // A literal coord match (e.g. "BG 2.47") is exclusive — the user
+          // wants that specific verse, not a sidebar of FTS-related matches.
+          // The related list scrolled into view below the card and made the
+          // page feel like a search response when the user already knew the
+          // answer. Show only the resolved card.
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
             child: _CoordResolvedCard(
@@ -937,23 +942,8 @@ class _ResultsBody extends StatelessWidget {
               isDark: isDark,
               query: query,
             ),
-          ),
-          if (verses.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
-              child: Text(
-                'OR RELATED VERSES',
-                style: TextStyle(
-                  fontFamily: Fonts.sans,
-                  fontFamilyFallback: AppFontFallback.latin,
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.24 * 9.5,
-                  color: text3,
-                ),
-              ),
-            ),
-        ] else
+          )
+        else ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
             child: Text.rich(
@@ -975,17 +965,18 @@ class _ResultsBody extends StatelessWidget {
               ),
             ),
           ),
-        for (final entry in groups.entries)
-          _ResultGroup(
-            scripture: entry.key,
-            verses: entry.value,
-            query: query,
-            isDark: isDark,
-            expanded: expandedGroups.contains(entry.key.code),
-            onToggleViewAll: entry.value.length > 3
-                ? () => onToggleGroup(entry.key.code)
-                : null,
-          ),
+          for (final entry in groups.entries)
+            _ResultGroup(
+              scripture: entry.key,
+              verses: entry.value,
+              query: query,
+              isDark: isDark,
+              expanded: expandedGroups.contains(entry.key.code),
+              onToggleViewAll: entry.value.length > 3
+                  ? () => onToggleGroup(entry.key.code)
+                  : null,
+            ),
+        ],
       ],
     );
   }
