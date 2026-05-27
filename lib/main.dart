@@ -24,6 +24,24 @@ import 'package:sanatan_guide/presentation/features/settings/providers/theme_mod
 import 'package:sanatan_guide/presentation/theme/app_theme.dart';
 
 void main() async {
+  // Wrap boot in runZonedGuarded so any synchronous or asynchronous
+  // exception in pre-runApp code (Firebase init, NotificationService.init,
+  // AdService init, SharedPreferences read) is captured by Crashlytics
+  // instead of silently killing the splash. PlatformDispatcher.onError +
+  // FlutterError.onError handle the post-runApp paths; this zone handles
+  // everything before.
+  await runZonedGuarded<Future<void>>(_bootstrap, (error, stack) {
+    try {
+      FirebaseCrashlytics.instance
+          .recordError(error, stack, fatal: true, reason: 'boot-zone');
+    } catch (_) {
+      // If Crashlytics itself isn't ready, swallow — at least we don't
+      // crash silently in a way that leaves the splash hanging.
+    }
+  });
+}
+
+Future<void> _bootstrap() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   // Keep the native splash visible until we explicitly remove it below.
   FlutterNativeSplash.preserve(widgetsBinding: binding);
