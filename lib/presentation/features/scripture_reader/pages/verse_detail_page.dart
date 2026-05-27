@@ -996,28 +996,42 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (translitOn &&
-                      (verse.transliteration?.trim().isNotEmpty ?? false)) ...[
+                  if (translitOn) ...[
                     const SizedBox(height: Spacing.xxxl),
                     _SectionRule(label: 'Transliteration', isDark: isDark),
                     const SizedBox(height: Spacing.md),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24 + 8),
-                      child: Text(
-                        formatTransliteration(verse.transliteration!),
-                        textAlign: TextAlign.center,
-                        // IAST dot-diacritics (ṛ ṣ ṭ ṇ) tofu in Lora — only
-                        // TiroDevanagari covers them (see commit f6647d6).
-                        style: AppText.commentary(
-                          color: isDark ? DColors.text2 : LColors.text2,
-                          size: 14 * sanskritScale,
-                        ).copyWith(
-                          fontFamily: Fonts.deva,
-                          fontFamilyFallback: AppFontFallback.deva,
-                          fontStyle: FontStyle.normal,
-                          height: 1.75,
-                        ),
-                      ),
+                      child: (verse.transliteration?.trim().isNotEmpty ?? false)
+                          ? Text(
+                              formatTransliteration(verse.transliteration!),
+                              textAlign: TextAlign.center,
+                              // IAST dot-diacritics (ṛ ṣ ṭ ṇ) tofu in Lora —
+                              // only TiroDevanagari covers them (commit
+                              // f6647d6).
+                              style: AppText.commentary(
+                                color: isDark ? DColors.text2 : LColors.text2,
+                                size: 14 * sanskritScale,
+                              ).copyWith(
+                                fontFamily: Fonts.deva,
+                                fontFamilyFallback: AppFontFallback.deva,
+                                fontStyle: FontStyle.normal,
+                                height: 1.75,
+                              ),
+                            )
+                          // Translit toggle ON but DB has no IAST for this
+                          // verse (common in Atharva / Yajur tail-end DB
+                          // imports). Tell the reader the section is
+                          // intentionally empty rather than silently
+                          // omitting it — otherwise the toggle looks broken.
+                          : Text(
+                              'Transliteration not yet available for this verse.',
+                              textAlign: TextAlign.center,
+                              style: AppText.commentary(
+                                color: isDark ? DColors.text3 : LColors.text3,
+                                size: 12 * sanskritScale,
+                              ).copyWith(fontStyle: FontStyle.italic),
+                            ),
                     ),
                   ],
                   // Skip the separate "Translation" section when the leaf

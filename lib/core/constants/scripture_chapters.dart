@@ -224,11 +224,12 @@ const Map<String, List<ChapterMeta>> _chapters = {
     ChapterMeta(chapterNum: 4, enTitle: 'Prapāṭhaka IV — Songs of Praise', subtitle: 'Songs of praise to Indra. Wondrous gifts and the king of immortality.'),
     ChapterMeta(chapterNum: 5, enTitle: 'Prapāṭhaka V — The OM Invocation', subtitle: 'OM — the supreme invocation. Soma pressed for the All-Divine.'),
   ],
-  'yajurveda': [
-    ChapterMeta(chapterNum: 1, enTitle: 'Kāṇḍa I — Sacrificial Formulas', subtitle: 'For food, for strength. From falsehood I step to truth. The sacred waters.'),
-    ChapterMeta(chapterNum: 2, enTitle: 'Kāṇḍa II — Soma Sacrifice', subtitle: 'King Soma called for shelter. Agni is head of heaven and lord of earth.'),
-    ChapterMeta(chapterNum: 3, enTitle: 'Kāṇḍa III — The Śatarudriya', subtitle: 'The 108 names of Rudra. Reverence to the blue-throated, to Paśupati, to Śiva.'),
-  ],
+  // Yajurveda: the previous curated list claimed 3 "kāṇḍas" but the DB
+  // holds 40 flat chapter_nums. With curated taking precedence the chapter
+  // list rendered only the first 3 entries and chapterReadCount(chapter=1)
+  // never matched a user-perceived "Kāṇḍa 1" completion (user complaint
+  // 2026-05-27). Dropping the curated entries lets chapterOutlinesProvider
+  // drive all 40 from the DB so reads + completion line up.
   'vishnu_purana': [
     ChapterMeta(
       chapterNum: 1,

@@ -225,6 +225,7 @@ ChapterMeta Function(ChapterOutline) _outlineToMeta(String scriptureId) {
     final fallback = switch (scriptureId) {
       'rigveda' => 'Maṇḍala ${o.chapterNum}',
       'atharvaveda' => 'Kāṇḍa ${o.chapterNum}',
+      'yajurveda' => 'Kāṇḍa ${o.chapterNum}',
       'mahabharata' => 'Parva ${o.chapterNum}',
       'ramayana' => 'Kāṇḍa ${o.chapterNum}',
       'bhagavata_purana' => 'Skanda ${o.chapterNum}',
