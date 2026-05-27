@@ -626,6 +626,96 @@ class _ContinueAnchor extends StatelessWidget {
   }
 }
 
+/// Bottom sheet shown when the user taps a locked module. Heritage-toned
+/// — lock glyph + Devanāgarī + serif body + dismiss CTA — replaces an
+/// earlier flat SnackBar that felt out of place on this screen.
+void _showLockedSheet(BuildContext context, bool isDark) {
+  final saffron = isDark ? DColors.saffron : LColors.saffron;
+  final surface = isDark ? DColors.surface : LColors.surface;
+  final text1 = isDark ? DColors.text1 : LColors.text1;
+  final text2 = isDark ? DColors.text2 : LColors.text2;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: surface,
+    showDragHandle: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: saffron.withValues(alpha: isDark ? 0.12 : 0.10),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.lock_outline_rounded, color: saffron, size: 22),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Deepening is locked',
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                color: text1,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Complete more Foundations modules to open the Deepening path. '
+              'Each module you finish carries forward to your daily streak.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontStyle: FontStyle.italic,
+                fontSize: 13,
+                height: 1.5,
+                color: text2,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Material(
+              color: saffron,
+              borderRadius: BorderRadius.circular(24),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(24),
+                onTap: () => Navigator.of(ctx).pop(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  child: Text(
+                    'GOT IT',
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.12 * 12,
+                      color: isDark ? const Color(0xFF1A1208) : Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 // ── Module list ────────────────────────────────────────────────────────────
 
 class _ModuleList extends StatelessWidget {
@@ -730,14 +820,7 @@ class _ModuleRow extends StatelessWidget {
     // stays legible while desc/meta/num recede.
     return InkWell(
         onTap: locked
-            ? () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Complete more Foundations modules to unlock Deepening.',
-                    ),
-                    duration: Duration(seconds: 2),
-                  ),
-                )
+            ? () => _showLockedSheet(context, isDark)
             : () => context.push('/learn/${module.id}'),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),

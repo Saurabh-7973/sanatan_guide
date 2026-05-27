@@ -147,7 +147,11 @@ class _AlmanacViewState extends State<_AlmanacView> {
     super.initState();
     final now = DateTime.now();
     _today = DateTime(now.year, now.month, now.day);
-    _windowStart = DateTime(now.year, now.month, 1);
+    // Window starts at today so the current day is the first cell the user
+    // sees — yesterday and earlier days drop into the "earlier" section
+    // below. Was first-of-month before, which forced users to scroll past
+    // days already gone to find today.
+    _windowStart = _today;
     final windowEnd = DateTime(now.year, 12, 31);
     _todayPanchanga = computePanchanga(
       DateTime(now.year, now.month, now.day, 6),
