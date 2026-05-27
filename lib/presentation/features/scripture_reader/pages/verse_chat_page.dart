@@ -8,6 +8,7 @@ import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/offline_banner.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -223,20 +224,27 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
               padding: EdgeInsets.only(
                 top: kToolbarHeight + MediaQuery.paddingOf(context).top,
               ),
-              child: state.when(
-                loading: () => const VerseDetailShimmer(),
-                error: (_, __) =>
-                    const Center(child: Text('Could not load verse.')),
-                data: (either) => either.fold(
-                  (failure) => Center(child: Text(failure.message)),
-                  (verse) => _ChatMessages(
-                    verse: verse,
-                    messages: _messages,
-                    loading: _loading,
-                    error: _error,
-                    scrollController: _scrollController,
+              child: Column(
+                children: [
+                  const OfflineBanner(),
+                  Expanded(
+                    child: state.when(
+                      loading: () => const VerseDetailShimmer(),
+                      error: (_, __) =>
+                          const Center(child: Text('Could not load verse.')),
+                      data: (either) => either.fold(
+                        (failure) => Center(child: Text(failure.message)),
+                        (verse) => _ChatMessages(
+                          verse: verse,
+                          messages: _messages,
+                          loading: _loading,
+                          error: _error,
+                          scrollController: _scrollController,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),

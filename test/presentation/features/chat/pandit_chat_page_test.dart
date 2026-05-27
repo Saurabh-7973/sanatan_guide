@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:sanatan_guide/presentation/features/chat/pages/pandit_chat_page.dart';
 
-Widget _harness({Brightness brightness = Brightness.light}) => MaterialApp(
-      theme: ThemeData(brightness: brightness),
-      home: const PanditChatPage(),
+Widget _harness({Brightness brightness = Brightness.light}) => ProviderScope(
+      child: MaterialApp(
+        theme: ThemeData(brightness: brightness),
+        home: const PanditChatPage(),
+      ),
     );
 
 void main() {

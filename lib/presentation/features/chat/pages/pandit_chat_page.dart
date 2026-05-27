@@ -11,6 +11,7 @@ import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/offline_banner.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -180,6 +181,7 @@ class _PanditChatPageState extends State<PanditChatPage> {
                   showClear: _messages.isNotEmpty,
                   onClear: _clearConversation,
                 ),
+                const OfflineBanner(),
                 Expanded(
                   child: showEmpty
                       ? _EmptyState(
