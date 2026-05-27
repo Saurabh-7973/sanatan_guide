@@ -768,9 +768,12 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         final wasUnread = v.readCount == 0;
         await repo.markVerseRead(v.id);
         if (mounted) {
-          ref.invalidate(
-            chapterReadCountProvider(v.scripture.code, v.chapterNum, v.bookNum),
-          );
+          ref
+            ..invalidate(
+              chapterReadCountProvider(
+                  v.scripture.code, v.chapterNum, v.bookNum),
+            )
+            ..invalidate(scriptureReadCountsProvider);
         }
         if (wasUnread && !_chapterJustCompleted) {
           final total = await repo.getChapterVerseCount(

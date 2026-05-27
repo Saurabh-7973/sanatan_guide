@@ -18,3 +18,12 @@ Future<int> chapterReadCount(
     bookNum: bookNum,
   );
 }
+
+/// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
+/// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
+/// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+@riverpod
+Future<Map<String, int>> scriptureReadCounts(Ref ref) async {
+  final db = await ref.watch(appDatabaseProvider.future);
+  return db.scriptureDao.getReadVerseCountsByScripture();
+}

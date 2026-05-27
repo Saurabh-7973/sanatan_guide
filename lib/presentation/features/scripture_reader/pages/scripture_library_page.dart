@@ -4,6 +4,7 @@ import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
@@ -30,6 +31,33 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     _ctrl.dispose();
     _focus.dispose();
     super.dispose();
+  }
+
+  // DB scripture codes that roll up into the single "Mukhya Upaniṣads" card.
+  // Counts for any of these contribute to the displayed total. Sourced from
+  // the seed DB — keep in sync with assets/db/sanatan_guide.db.
+  static const _mukhyaUpanishadCodes = <String>{
+    'isha_upanishad',
+    'kena_upanishad',
+    'katha_upanishad',
+    'prashna_upanishad',
+    'mundaka_upanishad',
+    'mandukya_upanishad',
+    'taittiriya_upanishad',
+    'aitareya_upanishad',
+    'chandogya_upanishad',
+    'brihadaranyaka_upanishad',
+    'shvetashvatara_upanishad',
+    'maitrayani_upanishad',
+    'kaushitaki_upanishad',
+  };
+
+  static int _mukhyaReadCount(Map<String, int> counts) {
+    var total = 0;
+    for (final code in _mukhyaUpanishadCodes) {
+      total += counts[code] ?? 0;
+    }
+    return total;
   }
 
   void _onQueryChanged(String v) =>
@@ -79,6 +107,11 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? DColors.bg : LColors.bg;
+    // Live per-scripture read counts. Treat loading/error as zero so the
+    // first render is stable; the provider revalidates when verses are read.
+    final readCounts =
+        ref.watch(scriptureReadCountsProvider).value ??
+            const <String, int>{};
 
     // Worst-case header height (used by every pinned family delegate). Sized
     // for a two-line description + Devanāgarī name + English/meta row +
@@ -123,16 +156,18 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
                       ),
                     ),
                     if (_kFamilies[i].kind == _FamilyKind.shruti)
-                      _VedasGridSliver(isDark: isDark)
+                      _VedasGridSliver(isDark: isDark, readCounts: readCounts)
                     else
                       SliverList.builder(
                         itemCount: _kFamilies[i].scriptures.length,
                         itemBuilder: (context, j) {
+                          final s = _kFamilies[i].scriptures[j];
                           return _ScriptureRow(
                             isDark: isDark,
-                            scripture: _kFamilies[i].scriptures[j],
+                            scripture: s,
                             isLast: j == _kFamilies[i].scriptures.length - 1,
                             family: _kFamilies[i],
+                            readCount: readCounts[s.id] ?? 0,
                           );
                         },
                       ),
@@ -145,6 +180,9 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
                             scripture: _kMukhyaUpanishads,
                             isLast: true,
                             family: _kFamilies[i],
+                            // Mukhya card aggregates 13 individual upaniṣad
+                            // codes in the DB; sum each match into one count.
+                            readCount: _mukhyaReadCount(readCounts),
                           ),
                         ),
                       ),
@@ -551,9 +589,10 @@ class _FamilyHeaderDelegate extends SliverPersistentHeaderDelegate {
 // _VedasGridSliver — 2×2 grid, 3:2 aspect (Sulba brick)
 // ============================================================
 class _VedasGridSliver extends StatelessWidget {
-  const _VedasGridSliver({required this.isDark});
+  const _VedasGridSliver({required this.isDark, required this.readCounts});
 
   final bool isDark;
+  final Map<String, int> readCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -568,7 +607,12 @@ class _VedasGridSliver extends StatelessWidget {
         ),
         itemCount: _kVedas.length,
         itemBuilder: (context, i) {
-          return _VedaCell(isDark: isDark, scripture: _kVedas[i]);
+          final s = _kVedas[i];
+          return _VedaCell(
+            isDark: isDark,
+            scripture: s,
+            readCount: readCounts[s.id] ?? 0,
+          );
         },
       ),
     );
@@ -576,10 +620,15 @@ class _VedasGridSliver extends StatelessWidget {
 }
 
 class _VedaCell extends StatelessWidget {
-  const _VedaCell({required this.isDark, required this.scripture});
+  const _VedaCell({
+    required this.isDark,
+    required this.scripture,
+    required this.readCount,
+  });
 
   final bool isDark;
   final _Scripture scripture;
+  final int readCount;
 
   @override
   Widget build(BuildContext context) {
@@ -588,6 +637,7 @@ class _VedaCell extends StatelessWidget {
     final cream = isDark ? DColors.cream : LColors.text1;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text3 = isDark ? DColors.text3 : LColors.text3;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
 
     return GestureDetector(
       onTap: () => _openScripture(context, scripture.id),
@@ -630,15 +680,27 @@ class _VedaCell extends StatelessWidget {
                 ),
               ],
             ),
-            Text(
-              '${_indianFmtStatic(scripture.verseCount)}  ${scripture.unitLabel}',
-              style: TextStyle(
-                fontFamily: Fonts.sans,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 1.4,
-                color: text3,
+            Text.rich(
+              TextSpan(
+                style: TextStyle(
+                  fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 1.4,
+                  color: text3,
+                ),
+                children: [
+                  TextSpan(
+                    text:
+                        '${_indianFmtStatic(scripture.verseCount)}  ${scripture.unitLabel}',
+                  ),
+                  if (readCount > 0)
+                    TextSpan(
+                      text: '  ·  $readCount READ',
+                      style: TextStyle(color: saffron),
+                    ),
+                ],
               ),
             ),
           ],
@@ -657,12 +719,14 @@ class _ScriptureRow extends StatelessWidget {
     required this.scripture,
     required this.isLast,
     required this.family,
+    required this.readCount,
   });
 
   final bool isDark;
   final _Scripture scripture;
   final bool isLast;
   final _Family family;
+  final int readCount;
 
   Color _glyphColor() {
     // Brief §5.1.2: iron-red is reserved for Festivals + destructive only.
@@ -789,10 +853,10 @@ class _ScriptureRow extends StatelessWidget {
                             ),
                             if (scripture.subdivision != null)
                               TextSpan(text: '  ·  ${scripture.subdivision}'),
-                            if (scripture.versesRead > 0)
+                            if (readCount > 0)
                               TextSpan(
                                 text:
-                                    '  ·  ${scripture.versesRead} verse${scripture.versesRead == 1 ? '' : 's'} read',
+                                    '  ·  $readCount verse${readCount == 1 ? '' : 's'} read',
                                 style: TextStyle(
                                   color: saffron,
                                   fontWeight: FontWeight.w500,
@@ -1235,7 +1299,6 @@ class _Scripture {
     required this.unitLabel,
     this.subdivision,
     this.aliases = const [],
-    this.versesRead = 0,
   });
 
   final String id;
@@ -1245,7 +1308,6 @@ class _Scripture {
   final String unitLabel; // verses / mantras / sūtras / couplets
   final String? subdivision; // e.g. "18 chapters", "7 kāṇḍas"
   final List<String> aliases;
-  final int versesRead;
 }
 
 class _SearchMatch {
@@ -1329,7 +1391,6 @@ const _kFamilies = <_Family>[
         unitLabel: 'verses',
         subdivision: '18 chapters',
         aliases: ['gita', 'geeta', 'bhagavad'],
-        versesRead: 1,
       ),
       _Scripture(
         id: 'ramayana',

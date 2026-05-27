@@ -42,7 +42,7 @@ final class NotificationTimeNotifierProvider
 }
 
 String _$notificationTimeNotifierHash() =>
-    r'b3d11066ce56ccb62ef738d1f42ee052e6922c27';
+    r'4d49c92a3edbae2ac2c2d4c553e7e7926edce8f8';
 
 abstract class _$NotificationTimeNotifier extends $Notifier<TimeOfDay> {
   TimeOfDay build();
@@ -96,7 +96,7 @@ final class NotificationEnabledProvider
 }
 
 String _$notificationEnabledHash() =>
-    r'66ab5fd6e50523091db9548e1d43a66276d3d8e8';
+    r'30d41e56be2de00d6f0a7531eab4031308a0c0fb';
 
 /// Whether the Daily verse reminder is enabled. Defaults to true to honour
 /// the onboarding "Enable reminder" tap; user can toggle off in Settings.

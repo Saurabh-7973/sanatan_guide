@@ -232,4 +232,4 @@ final class VerseOfDayProvider extends $FunctionalProvider<
   }
 }
 
-String _$verseOfDayHash() => r'f58d8255c261dae3784deb2efe969247f814b07a';
+String _$verseOfDayHash() => r'8f74a3bc6d216f40e6d6e927a03437016d01d401';

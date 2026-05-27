@@ -114,3 +114,51 @@ final class ChapterReadCountFamily extends $Family
   @override
   String toString() => r'chapterReadCountProvider';
 }
+
+/// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
+/// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
+/// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+
+@ProviderFor(scriptureReadCounts)
+final scriptureReadCountsProvider = ScriptureReadCountsProvider._();
+
+/// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
+/// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
+/// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+
+final class ScriptureReadCountsProvider extends $FunctionalProvider<
+        AsyncValue<Map<String, int>>,
+        Map<String, int>,
+        FutureOr<Map<String, int>>>
+    with $FutureModifier<Map<String, int>>, $FutureProvider<Map<String, int>> {
+  /// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
+  /// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
+  /// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+  ScriptureReadCountsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'scriptureReadCountsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$scriptureReadCountsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, int>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, int>> create(Ref ref) {
+    return scriptureReadCounts(ref);
+  }
+}
+
+String _$scriptureReadCountsHash() =>
+    r'c40b2e15d9e7531aebd4a4c5b7e72ef1b11fc052';

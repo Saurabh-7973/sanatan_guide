@@ -227,6 +227,26 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
     return getVerseById(id);
   }
 
+  /// One pass: how many verses in each scripture have been read at least
+  /// once. Returns a map keyed by scripture code (e.g. 'bhagavad_gita' → 47).
+  /// Scriptures with zero reads are omitted; callers should default to 0.
+  Future<Map<String, int>> getReadVerseCountsByScripture() async {
+    final scriptureCol = db.versesTable.scripture;
+    final countCol = db.versesTable.id.count();
+    final rows = await (selectOnly(db.versesTable)
+          ..addColumns([scriptureCol, countCol])
+          ..where(db.versesTable.readCount.isBiggerThan(const Constant(0)))
+          ..groupBy([scriptureCol]))
+        .get();
+    final out = <String, int>{};
+    for (final row in rows) {
+      final code = row.read(scriptureCol);
+      final count = row.read(countCol) ?? 0;
+      if (code != null) out[code] = count;
+    }
+    return out;
+  }
+
   /// How many verses in this chapter have been read at least once.
   Future<int> getReadVerseCountInChapter({
     required String scriptureCode,
