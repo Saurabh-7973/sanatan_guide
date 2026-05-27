@@ -623,11 +623,11 @@ class _LeafCard extends StatelessWidget {
                     ],
                     if (note != null) ...[
                       const SizedBox(height: 14),
-                      // Mockup `.leaf-note`: 1px dashed top border (not
-                      // solid), saffron pencil glyph @ 60% opacity, text-1
-                      // italic body — was a solid divider + Material edit
-                      // icon before.
-                      _DashedTopRule(color: dividerSoft),
+                      // Updated 2026-05-27: design screen-07 now uses a
+                      // solid 1px divider above the leaf-note (was dashed
+                      // earlier). Solid reads cleaner against the warm
+                      // surface and matches the rest of the divider system.
+                      Container(height: 1, color: dividerSoft),
                       const SizedBox(height: 14),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,41 +730,6 @@ class _LeafCard extends StatelessWidget {
       ),
     );
   }
-}
-
-/// 1-px dashed top rule for the leaf-note section.
-class _DashedTopRule extends StatelessWidget {
-  const _DashedTopRule({required this.color});
-  final Color color;
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 1,
-      child: CustomPaint(painter: _BookmarkDashedPainter(color: color)),
-    );
-  }
-}
-
-class _BookmarkDashedPainter extends CustomPainter {
-  const _BookmarkDashedPainter({required this.color});
-  final Color color;
-  @override
-  void paint(Canvas canvas, Size size) {
-    const dash = 3.0;
-    const gap = 3.0;
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-    var x = 0.0;
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, 0), Offset(x + dash, 0), paint);
-      x += dash + gap;
-    }
-  }
-
-  @override
-  bool shouldRepaint(_BookmarkDashedPainter old) => old.color != color;
 }
 
 /// Mockup `.leaf-note-icon` glyph: 11×11 viewBox, pencil/quill path,
@@ -969,32 +934,43 @@ class _EmptyBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 28),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => context.go('/browse'),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'BEGIN READING',
-                  style: TextStyle(
-                    fontFamily: Fonts.sans,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.18 * 11,
-                    color: saffron,
+        // Saffron pill CTA per screen-07 .empty-cta:
+        // 12×24 padding, 24px radius, uppercase 12px sans, arrow trail.
+        Material(
+          color: saffron,
+          borderRadius: BorderRadius.circular(24),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTap: () => context.go('/browse'),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'BEGIN READING',
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.12 * 12,
+                      color: isDark
+                          ? const Color(0xFF1A1208)
+                          : Colors.white,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 12,
-                  color: saffron,
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 14,
+                    color: isDark
+                        ? const Color(0xFF1A1208)
+                        : Colors.white,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
