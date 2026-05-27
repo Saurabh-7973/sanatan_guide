@@ -346,6 +346,19 @@ bool looksLikeQuestion(String q) {
   for (final o in openers) {
     if (s == o || s.startsWith('$o ')) return true;
   }
+  // Emotional / situational queries — "grief", "anxiety", "feeling lost".
+  // These rarely match the FTS index but are exactly what the Pandit is
+  // for; route the user to it.
+  const emotional = <String>[
+    'grief', 'sad', 'sadness', 'depressed', 'depression', 'anxiety',
+    'anxious', 'worried', 'fear', 'afraid', 'angry', 'anger', 'lonely',
+    'loneliness', 'lost', 'confused', 'hopeless', 'guilt', 'shame',
+    'stress', 'stressed', 'overwhelmed', 'help me', 'i feel', 'i am',
+    'death', 'dying', 'suffering',
+  ];
+  for (final e in emotional) {
+    if (s == e || s.contains(e)) return true;
+  }
   return false;
 }
 
