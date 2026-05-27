@@ -962,6 +962,33 @@ class _VerseStateGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isBookmarked && isRead) {
+      // Bookmark wins for primary glyph; tiny tick badge in bottom-right
+      // signals "and also read" without doubling the row's trailing width.
+      final bgColor = Theme.of(context).brightness == Brightness.dark
+          ? DColors.bg
+          : LColors.bg;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(Icons.bookmark_rounded, size: 14, color: saffron),
+          Positioned(
+            right: -3,
+            bottom: -3,
+            child: Container(
+              width: 9,
+              height: 9,
+              decoration: BoxDecoration(
+                color: saffron,
+                shape: BoxShape.circle,
+                border: Border.all(color: bgColor, width: 1),
+              ),
+              child: Icon(Icons.check_rounded, size: 6, color: bgColor),
+            ),
+          ),
+        ],
+      );
+    }
     if (isBookmarked) {
       return Icon(Icons.bookmark_rounded, size: 14, color: saffron);
     }

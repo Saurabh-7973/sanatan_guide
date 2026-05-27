@@ -108,7 +108,7 @@ void main() {
     expect(find.byIcon(Icons.bookmark_rounded), findsNothing);
   });
 
-  testWidgets('bookmark wins over read state', (tester) async {
+  testWidgets('bookmark + read shows bookmark with tick badge', (tester) async {
     final verses = [_v(n: 1, readCount: 1, isBookmarked: true)];
     await tester.pumpWidget(
       _harness(
@@ -119,7 +119,9 @@ void main() {
     );
     await tester.pumpAndSettle(const Duration(milliseconds: 600));
 
+    // Bookmark stays the primary glyph; small tick badge overlays to signal
+    // "also completed" without inflating the trailing width.
     expect(find.byIcon(Icons.bookmark_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.check_rounded), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
   });
 }
