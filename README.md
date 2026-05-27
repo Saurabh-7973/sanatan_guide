@@ -39,8 +39,69 @@ A winding journey through curated modules designed for everyone from beginners t
 - **Framework**: Flutter (Material 3)
 - **State Management**: Riverpod
 - **Navigation**: GoRouter
-- **Persistence**: SQLite (FTS5 Search)
+- **Persistence**: SQLite (FTS5 Search) via Drift
+- **AI**: Gemini 2.5 Flash (verse explanations, word gloss, Pandit chat)
 - **Animations**: flutter_animate + Custom Painters
+
+---
+
+## 🚀 Build & Run
+
+```bash
+# Dev (debug + ads off)
+flutter run --dart-define=ADS_ENABLED=false \
+            --dart-define=GEMINI_API_KEY=<your-key>
+
+# Release App Bundle for Play upload (Play splits per-device → ~20MB user APK)
+./scripts/release.sh <GEMINI_API_KEY>
+
+# Release universal APK for sideload QA
+./scripts/release.sh <GEMINI_API_KEY> --apk
+
+# Size analysis (DevTools App Size tool)
+./scripts/analyze_size.sh <GEMINI_API_KEY>
+```
+
+### Codegen
+
+`build_runner` drives Drift, Riverpod, Freezed, json_serializable.
+After modifying any annotated source:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### Tests + analyze
+
+```bash
+flutter analyze && flutter test
+```
+
+CI runs both on push to `main` (`.github/workflows/flutter.yml`). Install
+the local pre-commit hook to catch analyze regressions before pushing:
+
+```bash
+./scripts/install_git_hooks.sh
+```
+
+---
+
+## 🔒 Release checklist
+
+Before shipping a new version to Play Store:
+1. **Restrict the Gemini key in GCP Console** — Android-app-only + SHA-1
+   fingerprint + quota cap. Without this, anyone who extracts the APK
+   can drain your billing.
+2. **Back up the release keystore offsite** — `android/app/sanatan-guide-release.jks`
+   and `android/key.properties`. Losing them means no future updates.
+3. **Verify Firebase Security Rules** are locked (Firestore + Storage,
+   Remote Config is read-only by design).
+4. Build via `./scripts/release.sh` (defaults to App Bundle).
+5. Upload to Play Console → Internal testing track, soak for 3 days on
+   real devices, then promote to Production.
+
+See `LAUNCH_ASSESSMENT_2026-05-27.md` for the full pre-launch audit
+(security, performance, app size, code quality, legal/Play store gaps).
 
 ---
 
