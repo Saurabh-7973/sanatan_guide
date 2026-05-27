@@ -138,7 +138,6 @@ class SettingsPage extends ConsumerWidget {
                         title: l10n.settingsSectionAbout,
                         isDark: isDark,
                       ),
-                      const _AppVersionRow(),
                       _Row(
                         isDark: isDark,
                         icon: Icons.auto_stories_outlined,
@@ -178,6 +177,8 @@ class SettingsPage extends ConsumerWidget {
                       _SectionHeader(
                           title: 'Reset', isDark: isDark, danger: true),
                       const _ResetRow(),
+
+                      const _BrandFooter(),
                     ],
                   ),
                 ),
@@ -227,7 +228,7 @@ class _SectionHeader extends StatelessWidget {
 class _Row extends StatelessWidget {
   const _Row({
     required this.isDark,
-    required this.icon,
+    this.icon,
     required this.title,
     this.subtitle,
     this.trailing,
@@ -236,7 +237,9 @@ class _Row extends StatelessWidget {
   });
 
   final bool isDark;
-  final IconData icon;
+  // Per screen-09 design, some rows (Reading font size, Theme) don't carry
+  // a leading icon — the section header alone is enough visual context.
+  final IconData? icon;
   final String title;
   final String? subtitle;
   final Widget? trailing;
@@ -256,8 +259,10 @@ class _Row extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: danger ? iron : saffron),
-            const SizedBox(width: 16),
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: danger ? iron : saffron),
+              const SizedBox(width: 16),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,6 +295,81 @@ class _Row extends StatelessWidget {
             if (trailing != null) ...[const SizedBox(width: 8), trailing!],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Bottom-of-page footer with brand + version. Replaces the older
+/// "Sanatan Guide" row that lived inside the About section — design
+/// screen-09 places the version line at the very bottom of the
+/// scroll, after every actionable row.
+class _BrandFooter extends StatelessWidget {
+  const _BrandFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 36, 24, 28),
+      child: Column(
+        children: [
+          Text(
+            'सनातन',
+            style: TextStyle(
+              fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
+              fontSize: 22,
+              color: saffron,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Sanatan Guide',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontStyle: FontStyle.italic,
+              fontSize: 13,
+              color: text3,
+            ),
+          ),
+          const SizedBox(height: 10),
+          FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snap) {
+              final version = snap.data;
+              final label = version == null
+                  ? '...'
+                  : 'Version ${version.version} · build ${version.buildNumber}';
+              return Text(
+                label,
+                style: TextStyle(
+                  fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.18 * 10.5,
+                  color: text3,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Made in Bhārata',
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.22 * 10,
+              color: text3,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -416,7 +496,6 @@ class _FontSizeRow extends ConsumerWidget {
       children: [
         _Row(
           isDark: isDark,
-          icon: Icons.format_size_rounded,
           title: 'Reading font size',
         ),
         Padding(
@@ -905,33 +984,6 @@ class _ClearHistoryRow extends ConsumerWidget {
         );
       }
     }
-  }
-}
-
-// ── About: app version ─────────────────────────────────────────────────────
-
-class _AppVersionRow extends StatelessWidget {
-  const _AppVersionRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text3 = isDark ? DColors.text3 : LColors.text3;
-    return FutureBuilder<PackageInfo>(
-      future: PackageInfo.fromPlatform(),
-      builder: (context, snapshot) {
-        final version = snapshot.data;
-        final text = version != null
-            ? 'v${version.version} (${version.buildNumber})'
-            : '...';
-        return _Row(
-          isDark: isDark,
-          icon: Icons.info_outline_rounded,
-          title: 'Sanatan Guide',
-          trailing: Text(text, style: AppText.meta(color: text3)),
-        );
-      },
-    );
   }
 }
 
