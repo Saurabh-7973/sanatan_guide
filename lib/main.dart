@@ -29,16 +29,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Disable Crashlytics collection during development so debug noise
-  // doesn't pollute production crash reports.
-  await FirebaseCrashlytics.instance
-      .setCrashlyticsCollectionEnabled(!kDebugMode);
-
-  // Apply the user's persisted Analytics opt-out before any event is sent.
-  // The Settings provider also wires this, but reading the pref here means
-  // an "off" choice is honoured on boot before the first frame, not after
-  // the user opens Settings.
+  // Apply the user's persisted privacy preferences before any event or
+  // crash report can leave the device. The Settings providers also wire
+  // these, but reading the prefs here honours the persisted choice on
+  // boot — not just after the user opens Settings.
   final prefs = await SharedPreferences.getInstance();
+  // Crashlytics: default off in debug (dev noise), on in release.
+  final crashlyticsEnabled =
+      prefs.getBool('privacy_crashlytics_enabled') ?? !kDebugMode;
+  await FirebaseCrashlytics.instance
+      .setCrashlyticsCollectionEnabled(crashlyticsEnabled);
+  // Analytics: default on for everyone, off only if the user opted out.
   final analyticsEnabled = prefs.getBool('privacy_analytics_enabled') ?? true;
   await AnalyticsService.setCollectionEnabled(analyticsEnabled);
 

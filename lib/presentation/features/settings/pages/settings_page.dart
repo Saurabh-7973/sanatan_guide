@@ -29,6 +29,7 @@ import 'package:sanatan_guide/presentation/features/settings/providers/font_size
 import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/analytics_enabled_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/crashlytics_enabled_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -134,6 +135,7 @@ class SettingsPage extends ConsumerWidget {
                         isDark: isDark,
                       ),
                       const _AnalyticsOptOutRow(),
+                      const _CrashlyticsOptOutRow(),
 
                       // ── About ───────────────────────────────────────────────
                       _SectionHeader(
@@ -868,6 +870,36 @@ class _AnalyticsOptOutRow extends ConsumerWidget {
         activeThumbColor: saffron,
         onChanged: (v) =>
             ref.read(analyticsEnabledProvider.notifier).setEnabled(v),
+      ),
+    );
+  }
+}
+
+// ── Privacy: crashlytics opt-out ──────────────────────────────────────────
+//
+// Pairs with _AnalyticsOptOutRow. Defaults match the prior global policy
+// (off in debug, on in release). The toggle still works in debug if a
+// developer wants to test the flow; it just persists the choice.
+
+class _CrashlyticsOptOutRow extends ConsumerWidget {
+  const _CrashlyticsOptOutRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final enabled = ref.watch(crashlyticsEnabledProvider);
+    return _Row(
+      isDark: isDark,
+      icon: Icons.bug_report_outlined,
+      title: 'Crash reports',
+      subtitle:
+          'Sends a stack trace when the app crashes so we can fix it. No personal data.',
+      trailing: Switch(
+        value: enabled,
+        activeThumbColor: saffron,
+        onChanged: (v) =>
+            ref.read(crashlyticsEnabledProvider.notifier).setEnabled(v),
       ),
     );
   }
