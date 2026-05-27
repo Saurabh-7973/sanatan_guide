@@ -11,6 +11,7 @@ part 'notification_time_provider.g.dart';
 const _kNotifHourKey = 'notif_verse_hour';
 const _kNotifMinuteKey = 'notif_verse_minute';
 const _kNotifEnabledKey = 'notif_verse_enabled';
+const _kFestivalAlertsEnabledKey = 'notif_festival_alerts_enabled';
 const TimeOfDay _kDefault = TimeOfDay(hour: 7, minute: 0);
 
 @Riverpod(keepAlive: true)
@@ -67,5 +68,30 @@ class NotificationEnabled extends _$NotificationEnabled {
     // re-runs and either cancels or re-fires immediately.
     ref.invalidate(verseOfDayProvider);
     unawaited(ref.read(verseOfDayProvider.future));
+  }
+}
+
+/// Whether festival-day alerts are enabled. Default off — the scheduler
+/// gated on this won't post anything until the user opts in. The actual
+/// scheduling job is wired separately; this preference is the on/off pin
+/// that any future festival-notification path reads before firing.
+@Riverpod(keepAlive: true)
+class FestivalAlertsEnabled extends _$FestivalAlertsEnabled {
+  @override
+  bool build() {
+    _load();
+    return false;
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final v = prefs.getBool(_kFestivalAlertsEnabledKey);
+    if (v != null) state = v;
+  }
+
+  Future<void> setEnabled(bool enabled) async {
+    state = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kFestivalAlertsEnabledKey, enabled);
   }
 }

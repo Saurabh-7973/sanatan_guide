@@ -112,3 +112,68 @@ abstract class _$NotificationEnabled extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+/// Whether festival-day alerts are enabled. Default off — the scheduler
+/// gated on this won't post anything until the user opts in. The actual
+/// scheduling job is wired separately; this preference is the on/off pin
+/// that any future festival-notification path reads before firing.
+
+@ProviderFor(FestivalAlertsEnabled)
+final festivalAlertsEnabledProvider = FestivalAlertsEnabledProvider._();
+
+/// Whether festival-day alerts are enabled. Default off — the scheduler
+/// gated on this won't post anything until the user opts in. The actual
+/// scheduling job is wired separately; this preference is the on/off pin
+/// that any future festival-notification path reads before firing.
+final class FestivalAlertsEnabledProvider
+    extends $NotifierProvider<FestivalAlertsEnabled, bool> {
+  /// Whether festival-day alerts are enabled. Default off — the scheduler
+  /// gated on this won't post anything until the user opts in. The actual
+  /// scheduling job is wired separately; this preference is the on/off pin
+  /// that any future festival-notification path reads before firing.
+  FestivalAlertsEnabledProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'festivalAlertsEnabledProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$festivalAlertsEnabledHash();
+
+  @$internal
+  @override
+  FestivalAlertsEnabled create() => FestivalAlertsEnabled();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$festivalAlertsEnabledHash() =>
+    r'83d76367c734aea7ee7e5a1f3bfc8ea40dbd666b';
+
+/// Whether festival-day alerts are enabled. Default off — the scheduler
+/// gated on this won't post anything until the user opts in. The actual
+/// scheduling job is wired separately; this preference is the on/off pin
+/// that any future festival-notification path reads before firing.
+
+abstract class _$FestivalAlertsEnabled extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

@@ -105,13 +105,7 @@ class SettingsPage extends ConsumerWidget {
                       const _TestNotificationRow(),
                       const _Schedule30sRow(),
                       const _BatteryOptimizationRow(),
-                      _Row(
-                        isDark: isDark,
-                        icon: Icons.celebration_outlined,
-                        title: 'Festival alerts',
-                        subtitle: 'Day before each major parva',
-                        trailing: const _SoonTag(),
-                      ),
+                      const _FestivalAlertsRow(),
 
                       // ── Data ────────────────────────────────────────────────
                       _SectionHeader(
@@ -804,6 +798,36 @@ class _Schedule30sRow extends ConsumerWidget {
           );
         }
       },
+    );
+  }
+}
+
+// ── Notifications: festival alerts toggle ─────────────────────────────────
+//
+// Persists the user's preference. The scheduling job that posts day-of
+// festival notifications is wired separately; this switch is the gate
+// the scheduler reads before firing — off by default.
+
+class _FestivalAlertsRow extends ConsumerWidget {
+  const _FestivalAlertsRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final enabled = ref.watch(festivalAlertsEnabledProvider);
+    return _Row(
+      isDark: isDark,
+      icon: Icons.celebration_outlined,
+      title: 'Festival alerts',
+      subtitle: 'Day before each major parva',
+      trailing: Switch(
+        value: enabled,
+        activeThumbColor: saffron,
+        onChanged: (v) => ref
+            .read(festivalAlertsEnabledProvider.notifier)
+            .setEnabled(v),
+      ),
     );
   }
 }
