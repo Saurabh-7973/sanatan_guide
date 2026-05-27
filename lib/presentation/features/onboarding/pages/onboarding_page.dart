@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
+import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/onboarding_service.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/daily_reminder_provider.dart';
@@ -32,6 +33,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     await notifier.setEnabled(reminderEnabled);
     if (reminderEnabled && reminderTime != null) {
       await notifier.setTime(reminderTime);
+    }
+    // User explicitly opted in to daily reminders → ask the OS for the
+    // permissions we need (POST_NOTIFICATIONS on Android 13+, exact-alarm,
+    // battery-optimisation exemption). Done here instead of at app launch
+    // so the native dialog only appears after the user has already said
+    // yes to reminders.
+    if (reminderEnabled) {
+      unawaited(NotificationService.requestPermission());
     }
     unawaited(
       AnalyticsService.onboardingReminderChosen(

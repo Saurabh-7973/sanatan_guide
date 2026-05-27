@@ -84,10 +84,13 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
       // from getNotificationAppLaunchDetails(). Consume it now that the
       // router is attached.
       _consumePendingDeepLink();
-      Future<void>.delayed(const Duration(seconds: 1), () async {
-        if (!mounted) return;
-        await NotificationService.requestPermission();
-      });
+      // Notification permission is no longer auto-requested at launch.
+      // The native dialogs (POST_NOTIFICATIONS + SCHEDULE_EXACT_ALARM +
+      // IGNORE_BATTERY_OPTIMIZATIONS) firing back-to-back on first open
+      // felt hostile and didn't match the app's calm tone. Permission is
+      // now requested only when the user explicitly opts in to the daily
+      // reminder — in onboarding or via the Settings switch. Users who
+      // never opt in never see the prompt.
     });
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 
 part 'notification_time_provider.g.dart';
@@ -64,6 +65,12 @@ class NotificationEnabled extends _$NotificationEnabled {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kNotifEnabledKey, enabled);
+    // Opting in for the first time → ask the OS for notification + exact
+    // alarm permissions now, not at next app launch. requestPermission is
+    // idempotent so re-enables after an earlier grant are no-ops.
+    if (enabled) {
+      unawaited(NotificationService.requestPermission());
+    }
     // Same fix as setTime — force verseOfDay rebuild so the schedule path
     // re-runs and either cancels or re-fires immediately.
     ref.invalidate(verseOfDayProvider);
