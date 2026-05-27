@@ -10,6 +10,7 @@ import 'package:sanatan_guide/core/router/app_router.dart';
 import 'package:sanatan_guide/core/services/ad_service.dart';
 import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
+import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/firebase_options.dart';
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
@@ -68,11 +69,24 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
     // After [MaterialApp.router] attaches, Android Activity is non-null for
     // flutter_local_notifications permission APIs.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Cold-start: NotificationService.init() may have queued a deep link
+      // from getNotificationAppLaunchDetails(). Consume it now that the
+      // router is attached.
+      _consumePendingDeepLink();
       Future<void>.delayed(const Duration(seconds: 1), () async {
         if (!mounted) return;
         await NotificationService.requestPermission();
       });
     });
+  }
+
+  void _consumePendingDeepLink() {
+    final deepLink = NotificationService.pendingDeepLink;
+    if (deepLink == null || deepLink.isEmpty) return;
+    NotificationService.pendingDeepLink = null;
+    if (!mounted) return;
+    AppLogger.instance.i('Applying pending deep link: $deepLink');
+    ref.read(appRouterProvider).go(deepLink);
   }
 
   @override
@@ -87,16 +101,10 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      final deepLink = NotificationService.pendingDeepLink;
-      if (deepLink != null && deepLink.isNotEmpty) {
-        NotificationService.pendingDeepLink = null;
-        // Defer until after the current frame so the router is ready.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ref.read(appRouterProvider).go(deepLink);
-          }
-        });
-      }
+      // Defer until after the current frame so the router is ready.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _consumePendingDeepLink();
+      });
     }
   }
 

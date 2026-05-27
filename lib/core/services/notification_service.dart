@@ -98,6 +98,22 @@ final class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    // Cold-start deep link: when the app is launched *from* a notification
+    // tap (process not already alive), onDidReceiveNotificationResponse is
+    // NOT invoked — instead, the payload is delivered via
+    // getNotificationAppLaunchDetails(). Capture it here so the router can
+    // consume `pendingDeepLink` on first frame.
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      final verseId = launchDetails?.notificationResponse?.payload;
+      if (verseId != null && verseId.isNotEmpty) {
+        final code = scriptureCodeFromVerseId(verseId);
+        pendingDeepLink = '/browse/$code/verse/$verseId';
+        AppLogger.instance
+            .i('Cold-start notif deep link queued: $pendingDeepLink');
+      }
+    }
+
     _initialized = true;
     AppLogger.instance.i('NotificationService initialized');
   }
