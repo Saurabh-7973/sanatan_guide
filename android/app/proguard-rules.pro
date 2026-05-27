@@ -11,8 +11,8 @@
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 
-# AdMob
--keep class com.google.android.gms.ads.** { *; }
+# AdMob — google_mobile_ads dep dropped in v1; restore this keep along
+# with the package when ads return.
 
 # Drift / SQLite
 -keep class com.tekartik.sqflite.** { *; }

@@ -10,10 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class GeminiService {
   static const String _apiKey =
       String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
-  static const String _model = 'gemini-2.5-flash';
-  static const String _endpoint =
+  // Primary model — kept overridable via --dart-define for ops control.
+  // 2026-05-27: per-user-research, gemini-3.5-flash is the current stable
+  // flash tier. If the call 404s (model identifier wrong or rolled back),
+  // we fall back to gemini-2.5-flash transparently.
+  static const String _primaryModel = String.fromEnvironment(
+    'GEMINI_MODEL',
+    defaultValue: 'gemini-3.5-flash',
+  );
+  static const String _fallbackModel = 'gemini-2.5-flash';
+
+  static String _endpointFor(String model) =>
       'https://generativelanguage.googleapis.com/v1beta/models/'
-      '$_model:generateContent';
+      '$model:generateContent';
 
   static bool get isEnabled => _apiKey.isNotEmpty;
 
@@ -62,11 +71,24 @@ class GeminiService {
       },
     ];
 
-    final response = await http.post(
-      Uri.parse('$_endpoint?key=$_apiKey'),
+    final body = jsonEncode({'contents': contents});
+    var response = await http.post(
+      Uri.parse('${_endpointFor(_primaryModel)}?key=$_apiKey'),
       headers: const {'Content-Type': 'application/json'},
-      body: jsonEncode({'contents': contents}),
+      body: body,
     );
+
+    // Primary model unavailable (e.g. identifier not yet rolled out to all
+    // regions, or rolled back). Retry once on the prior-generation flash
+    // tier so users still get a reply. 404 + 400 (BAD_REQUEST for unknown
+    // model) both trigger the fallback.
+    if (response.statusCode == 404 || response.statusCode == 400) {
+      response = await http.post(
+        Uri.parse('${_endpointFor(_fallbackModel)}?key=$_apiKey'),
+        headers: const {'Content-Type': 'application/json'},
+        body: body,
+      );
+    }
 
     if (response.statusCode != 200) {
       final friendlyMessage = switch (response.statusCode) {

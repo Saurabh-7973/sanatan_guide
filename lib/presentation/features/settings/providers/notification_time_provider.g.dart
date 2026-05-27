@@ -96,7 +96,7 @@ final class NotificationEnabledProvider
 }
 
 String _$notificationEnabledHash() =>
-    r'30d41e56be2de00d6f0a7531eab4031308a0c0fb';
+    r'7e09a84e90f1e429092e4e77caf74c32c3e67282';
 
 /// Whether the Daily verse reminder is enabled. Defaults to true to honour
 /// the onboarding "Enable reminder" tap; user can toggle off in Settings.

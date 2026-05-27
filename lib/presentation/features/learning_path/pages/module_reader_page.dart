@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
-import 'package:sanatan_guide/core/services/ad_service.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
@@ -30,17 +28,10 @@ class ModuleReaderPage extends ConsumerStatefulWidget {
 
 class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
   int? _currentIndex;
-  InterstitialAd? _interstitialAd;
   late final String _moduleId = widget.moduleId;
   // Stored in didChangeDependencies so dispose() can invalidate safely
   // without touching ref (forbidden by Riverpod 3.x during unmount).
   ProviderContainer? _container;
-
-  @override
-  void initState() {
-    super.initState();
-    if (AdService.isEnabled) _preloadInterstitial();
-  }
 
   @override
   void didChangeDependencies() {
@@ -48,26 +39,8 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
     _container = ProviderScope.containerOf(context, listen: false);
   }
 
-  void _preloadInterstitial() {
-    InterstitialAd.load(
-      adUnitId: AdService.interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          if (mounted) {
-            _interstitialAd = ad;
-          } else {
-            ad.dispose();
-          }
-        },
-        onAdFailedToLoad: (_) => _interstitialAd = null,
-      ),
-    );
-  }
-
   @override
   void dispose() {
-    _interstitialAd?.dispose();
     super.dispose();
     _container?.invalidate(modulesProvider);
     _container?.invalidate(moduleDetailProvider(_moduleId));
@@ -131,22 +104,7 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
         }
       }
 
-      if (AdService.isEnabled && _interstitialAd != null) {
-        _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-          onAdDismissedFullScreenContent: (ad) {
-            ad.dispose();
-            if (context.mounted) navigateBack();
-          },
-          onAdFailedToShowFullScreenContent: (ad, _) {
-            ad.dispose();
-            if (context.mounted) navigateBack();
-          },
-        );
-        await _interstitialAd!.show();
-        _interstitialAd = null;
-      } else {
-        if (context.mounted) navigateBack();
-      }
+      if (context.mounted) navigateBack();
       return;
     }
 

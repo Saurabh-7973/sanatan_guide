@@ -19,9 +19,8 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules">
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-4975489929669005~8682185854"/>
+        <!-- google_mobile_ads dropped from v1 — APPLICATION_ID meta removed
+             along with the dep. Restore both together when ads return. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -37,7 +37,9 @@ dependencies:
   dio: ^5.6.0
 
   # ── Monetisation ──────────────────────────────────────────────────────────
-  google_mobile_ads: ^5.2.0
+  # google_mobile_ads dropped from v1 (2026-05-27). Stub services live in
+  # lib/core/services/ad_service.dart + app_open_ad_service.dart. Re-add
+  # this dep + restore manifest meta + proguard keep when ads return.
 
   # ── Firebase ──────────────────────────────────────────────────────────────
   firebase_core: ^3.6.0

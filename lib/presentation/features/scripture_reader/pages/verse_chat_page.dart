@@ -7,6 +7,7 @@ import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
+import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
@@ -356,6 +357,7 @@ class _ChatMessages extends StatelessWidget {
                         index == messages.length - 1;
                     return _MessageBubble(
                       message: m,
+                      verseId: verse.id,
                       onRegenerate: isLastAi ? onRegenerate : null,
                     );
                   },
@@ -466,8 +468,13 @@ class _StarterChip extends StatelessWidget {
 // ── Message bubble ────────────────────────────────────────────────────────
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message, this.onRegenerate});
+  const _MessageBubble({
+    required this.message,
+    required this.verseId,
+    this.onRegenerate,
+  });
   final ChatMessage message;
+  final String verseId;
   final VoidCallback? onRegenerate;
 
   @override
@@ -556,6 +563,7 @@ class _MessageBubble extends StatelessWidget {
                         _AiActionRow(
                           text: message.text,
                           isDark: isDark,
+                          verseId: verseId,
                           onRegenerate: onRegenerate,
                         ),
                       ],
@@ -573,18 +581,20 @@ class _MessageBubble extends StatelessWidget {
 /// — per screen-10 design. Regenerate is wired as a no-op stub for now;
 /// the cleanest implementation needs the parent to re-call _send with the
 /// matching user prompt, which lives a state lift away from here.
-class _AiActionRow extends StatelessWidget {
+class _AiActionRow extends ConsumerWidget {
   const _AiActionRow({
     required this.text,
     required this.isDark,
+    required this.verseId,
     this.onRegenerate,
   });
   final String text;
   final bool isDark;
+  final String verseId;
   final VoidCallback? onRegenerate;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text3 = isDark
         ? AppColors.textSecondaryOnDark
         : AppColors.textSecondary;
@@ -609,6 +619,13 @@ class _AiActionRow extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         _IconAction(
+          icon: Icons.bookmark_add_outlined,
+          tooltip: 'Save to notes',
+          color: text3,
+          onTap: () => _saveToNotes(context, ref),
+        ),
+        const SizedBox(width: 4),
+        _IconAction(
           icon: Icons.ios_share_outlined,
           tooltip: 'Share',
           color: text3,
@@ -625,6 +642,38 @@ class _AiActionRow extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  /// Appends this AI reply to the verse's personal notes (a timestamped
+  /// snippet), so the user can revisit the explanation alongside the
+  /// verse itself. Existing note text is preserved.
+  Future<void> _saveToNotes(BuildContext context, WidgetRef ref) async {
+    try {
+      final repo = await ref.read(scriptureRepositoryProvider.future);
+      final existing = await repo.getVerseById(verseId);
+      final prior = existing.fold((_) => '', (v) => v.noteText ?? '');
+      final stamp = DateTime.now().toIso8601String().substring(0, 10);
+      final separator = prior.trim().isEmpty ? '' : '\n\n— $stamp —\n';
+      final merged = '${prior.trimRight()}$separator${text.trim()}';
+      await repo.updateVerseNote(verseId, merged);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Saved to verse notes'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not save note'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 }
 

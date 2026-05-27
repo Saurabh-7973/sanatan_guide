@@ -925,7 +925,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
       await db.scriptureDao.upsertVerseExplanation(
         verseId: verse.id,
         explanationText: reply.trim(),
-        modelVersion: 'gemini-2.5-flash',
+        modelVersion: 'gemini-3.5-flash',
       );
       if (mounted) {
         ref.invalidate(verseExplanationProvider(verse.id));
