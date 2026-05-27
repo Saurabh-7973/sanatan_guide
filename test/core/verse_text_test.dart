@@ -40,4 +40,61 @@ void main() {
       expect(stripVedicAccents(''), '');
     });
   });
+
+  group('formatTransliteration', () {
+    test('keeps pāda line breaks, drops trailing verse marker', () {
+      const raw =
+          'karmaṇyevādhikāraste mā phaleṣu kadācana .\n'
+          'mā karmaphalaheturbhūrmā te saṅgo.astvakarmaṇi ||2-47||';
+      expect(
+        formatTransliteration(raw),
+        'karmaṇyevādhikāraste mā phaleṣu kadācana .\n'
+        'mā karmaphalaheturbhūrmā te saṅgo.astvakarmaṇi',
+      );
+    });
+
+    test('drops blank lines and trims', () {
+      const raw = '\n  pāda one .\n\n   pāda two ||1-1||  \n';
+      expect(formatTransliteration(raw), 'pāda one .\npāda two');
+    });
+
+    test('handles single-line input without marker', () {
+      expect(formatTransliteration('eka mantra'), 'eka mantra');
+    });
+  });
+
+  group('formatTranslation', () {
+    test('splits multi-sentence prose onto its own lines', () {
+      const raw =
+          'Thy right is to work only. Never with its fruits. Let attachment '
+          'not be to inaction.';
+      expect(
+        formatTranslation(raw),
+        'Thy right is to work only.\n'
+        'Never with its fruits.\n'
+        'Let attachment not be to inaction.',
+      );
+    });
+
+    test('strips a leading verse coordinate', () {
+      expect(
+        formatTranslation('2.47 Thy right is to work only.'),
+        'Thy right is to work only.',
+      );
+    });
+
+    test('does not split on decimals like "Krishna 3.5"', () {
+      expect(
+        formatTranslation('Krishna spoke. The number was 3.5 in value.'),
+        'Krishna spoke.\nThe number was 3.5 in value.',
+      );
+    });
+
+    test('single sentence stays a single line', () {
+      expect(
+        formatTranslation('All beings perish at the end of the age.'),
+        'All beings perish at the end of the age.',
+      );
+    });
+  });
 }

@@ -1003,7 +1003,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24 + 8),
                       child: Text(
-                        verse.transliteration!.trim(),
+                        formatTransliteration(verse.transliteration!),
                         textAlign: TextAlign.center,
                         // IAST dot-diacritics (ṛ ṣ ṭ ṇ) tofu in Lora — only
                         // TiroDevanagari covers them (see commit f6647d6).
@@ -1033,7 +1033,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            verse.english!.trim(),
+                            formatTranslation(verse.english!),
                             style: AppText.translation(
                               color: isDark ? DColors.text1 : LColors.text1,
                               size: 16 * sanskritScale,
