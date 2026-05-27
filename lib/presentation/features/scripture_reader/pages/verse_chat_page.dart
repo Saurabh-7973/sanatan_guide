@@ -7,10 +7,13 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
 class VerseChatPage extends ConsumerStatefulWidget {
   const VerseChatPage({super.key, required this.verseId, this.seed});
@@ -166,6 +169,9 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     final state = ref.watch(verseDetailProvider(widget.verseId));
     state.whenData((either) => either.fold((_) {}, _maybeFireSeed));
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -173,14 +179,34 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const MockupBackChevron(),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Ask about this verse', style: context.ts.labelLarge),
+            Text(
+              'Ask about this verse',
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: text1,
+              ),
+            ),
+            const SizedBox(height: 2),
             Text(
               '$_remaining question${_remaining == 1 ? '' : 's'} remaining today',
-              style: context.ts.caption,
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontStyle: FontStyle.italic,
+                fontSize: 11.5,
+                color: text3,
+              ),
             ),
           ],
         ),
