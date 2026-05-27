@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/router/app_routes.dart';
+import 'package:sanatan_guide/core/services/crashlytics_observer.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/onboarding_service.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/pages/onboarding_page.dart';
@@ -38,6 +39,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: kDebugMode,
+    observers: [CrashlyticsObserver()],
     redirect: (context, state) {
       final deepLink = NotificationService.pendingDeepLink;
       if (deepLink != null && deepLink.isNotEmpty) {
