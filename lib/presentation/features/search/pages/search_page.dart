@@ -1442,7 +1442,10 @@ class _ResultRow extends ConsumerWidget {
                         ),
                         saffron,
                       ),
-                      maxLines: 2,
+                      // One-line previews per design — search results are
+                      // scannable lists, not full verses. Tap opens the verse
+                      // detail page where the user sees everything.
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (enLine.isNotEmpty) ...[
@@ -1462,7 +1465,7 @@ class _ResultRow extends ConsumerWidget {
                           saffron,
                           highlightDropsItalic: true,
                         ),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
