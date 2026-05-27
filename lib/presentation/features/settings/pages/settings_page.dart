@@ -980,17 +980,9 @@ class _NotificationTimeRow extends ConsumerWidget {
               onPressed: !enabled
                   ? null
                   : () async {
-                      final picked = await showTimePicker(
+                      final picked = await showHeritageTimePicker(
                         context: context,
-                        initialTime: time,
-                        builder: (context, child) => Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: Theme.of(context)
-                                .colorScheme
-                                .copyWith(primary: saffron),
-                          ),
-                          child: child!,
-                        ),
+                        initial: time,
                       );
                       if (picked != null) {
                         ref
@@ -1064,6 +1056,240 @@ class _ClearHistoryRow extends ConsumerWidget {
         const SnackBar(content: Text('Reading history cleared')),
       );
     }
+  }
+}
+
+/// Heritage-toned time picker bottom sheet — replaces Material's
+/// showTimePicker for the daily-reminder row. Two scroll wheels (hour
+/// 0-23 + minute 0-59) inside a saffron-tinted center band, paired
+/// Cancel + Save pill buttons. Returns the picked TimeOfDay, or null
+/// on cancel.
+Future<TimeOfDay?> showHeritageTimePicker({
+  required BuildContext context,
+  required TimeOfDay initial,
+}) async {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final saffron = isDark ? DColors.saffron : LColors.saffron;
+  final surface = isDark ? DColors.surface : LColors.surface;
+  final text1 = isDark ? DColors.text1 : LColors.text1;
+  final text2 = isDark ? DColors.text2 : LColors.text2;
+  final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+
+  var hour = initial.hour;
+  var minute = initial.minute;
+  final hourCtrl = FixedExtentScrollController(initialItem: hour);
+  final minuteCtrl = FixedExtentScrollController(initialItem: minute);
+
+  final result = await showModalBottomSheet<TimeOfDay>(
+    context: context,
+    backgroundColor: surface,
+    showDragHandle: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Daily reminder',
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                color: text1,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Pick the hour for your verse to arrive',
+              style: TextStyle(
+                fontFamily: Fonts.serif,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontStyle: FontStyle.italic,
+                fontSize: 12.5,
+                color: text2,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 160,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Center band — saffron-tinted, hairline borders.
+                  IgnorePointer(
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: saffron.withValues(alpha: isDark ? 0.08 : 0.06),
+                        border: Border(
+                          top: BorderSide(color: dividerSoft, width: 1),
+                          bottom: BorderSide(color: dividerSoft, width: 1),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _Wheel(
+                        controller: hourCtrl,
+                        count: 24,
+                        initial: hour,
+                        onChanged: (v) => hour = v,
+                        formatter: (v) => v.toString().padLeft(2, '0'),
+                        text1: text1,
+                        text2: text2,
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          ':',
+                          style: TextStyle(
+                            fontFamily: Fonts.serif,
+                            fontFamilyFallback: AppFontFallback.latin,
+                            fontSize: 24,
+                            color: text1,
+                          ),
+                        ),
+                      ),
+                      _Wheel(
+                        controller: minuteCtrl,
+                        count: 60,
+                        initial: minute,
+                        onChanged: (v) => minute = v,
+                        formatter: (v) => v.toString().padLeft(2, '0'),
+                        text1: text1,
+                        text2: text2,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: text2.withValues(alpha: 0.4),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.12 * 12,
+                        color: text2,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Material(
+                    color: saffron,
+                    borderRadius: BorderRadius.circular(24),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () => Navigator.of(ctx)
+                          .pop(TimeOfDay(hour: hour, minute: minute)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'SAVE',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.12 * 12,
+                            color: isDark
+                                ? const Color(0xFF1A1208)
+                                : Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  hourCtrl.dispose();
+  minuteCtrl.dispose();
+  return result;
+}
+
+class _Wheel extends StatelessWidget {
+  const _Wheel({
+    required this.controller,
+    required this.count,
+    required this.initial,
+    required this.onChanged,
+    required this.formatter,
+    required this.text1,
+    required this.text2,
+  });
+
+  final FixedExtentScrollController controller;
+  final int count;
+  final int initial;
+  final void Function(int) onChanged;
+  final String Function(int) formatter;
+  final Color text1;
+  final Color text2;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 64,
+      child: ListWheelScrollView.useDelegate(
+        controller: controller,
+        itemExtent: 40,
+        physics: const FixedExtentScrollPhysics(),
+        perspective: 0.003,
+        diameterRatio: 1.8,
+        onSelectedItemChanged: onChanged,
+        childDelegate: ListWheelChildBuilderDelegate(
+          childCount: count,
+          builder: (_, i) => Center(
+            child: Text(
+              formatter(i),
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                color: i == initial ? text1 : text2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
