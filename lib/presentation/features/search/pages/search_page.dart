@@ -307,6 +307,7 @@ class _SearchBody extends ConsumerWidget {
       loading: () => _SearchingBody(
         coord: coord,
         isDark: isDark,
+        query: trimmed,
       ),
       error: (e, _) => ErrorStateWidget(
         onRetry: () => ref.invalidate(searchResultsProvider),
@@ -686,10 +687,15 @@ class _PanditCta extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────
 
 class _SearchingBody extends StatelessWidget {
-  const _SearchingBody({required this.coord, required this.isDark});
+  const _SearchingBody({
+    required this.coord,
+    required this.isDark,
+    required this.query,
+  });
 
   final ScriptureCoordinate? coord;
   final bool isDark;
+  final String query;
 
   @override
   Widget build(BuildContext context) {
@@ -705,7 +711,11 @@ class _SearchingBody extends StatelessWidget {
         if (coord != null) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-            child: _CoordResolvedCard(coord: coord!, isDark: isDark),
+            child: _CoordResolvedCard(
+              coord: coord!,
+              isDark: isDark,
+              query: query,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
@@ -922,7 +932,11 @@ class _ResultsBody extends StatelessWidget {
         if (coord != null) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
-            child: _CoordResolvedCard(coord: coord!, isDark: isDark),
+            child: _CoordResolvedCard(
+              coord: coord!,
+              isDark: isDark,
+              query: query,
+            ),
           ),
           if (verses.isNotEmpty)
             Padding(
@@ -1078,14 +1092,29 @@ class _ErrorMessage extends StatelessWidget {
 // Coord-resolved card
 // ─────────────────────────────────────────────────────────────────────────
 
-class _CoordResolvedCard extends StatelessWidget {
-  const _CoordResolvedCard({required this.coord, required this.isDark});
+/// Records [query] as a recent search when the user taps an actual result.
+/// Skipped when the query is too short or empty (e.g. the user opened a coord
+/// chip from the loading body before typing anything else).
+void _recordRecentOnTap(WidgetRef ref, String query) {
+  final trimmed = query.trim();
+  if (trimmed.length < 2) return;
+  // Fire-and-forget — recent list write should never block navigation.
+  ref.read(recentSearchesProvider.notifier).add(trimmed);
+}
+
+class _CoordResolvedCard extends ConsumerWidget {
+  const _CoordResolvedCard({
+    required this.coord,
+    required this.isDark,
+    required this.query,
+  });
 
   final ScriptureCoordinate coord;
   final bool isDark;
+  final String query;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text1 = isDark ? DColors.text1 : LColors.text1;
@@ -1114,12 +1143,15 @@ class _CoordResolvedCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         splashColor: Colors.transparent,
         highlightColor: saffron.withValues(alpha: 0.04),
-        onTap: () => context.push(
-          browseVersePath(
-            scriptureCode: coord.scripture.code,
-            verseId: coord.verseId,
-          ),
-        ),
+        onTap: () {
+          _recordRecentOnTap(ref, query);
+          context.push(
+            browseVersePath(
+              scriptureCode: coord.scripture.code,
+              verseId: coord.verseId,
+            ),
+          );
+        },
         child: Container(
           padding: const EdgeInsets.fromLTRB(18, 12, 14, 12),
           decoration: BoxDecoration(
@@ -1317,7 +1349,7 @@ class _ResultGroup extends StatelessWidget {
   }
 }
 
-class _ResultRow extends StatelessWidget {
+class _ResultRow extends ConsumerWidget {
   const _ResultRow({
     required this.verse,
     required this.query,
@@ -1329,7 +1361,7 @@ class _ResultRow extends StatelessWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
@@ -1351,12 +1383,15 @@ class _ResultRow extends StatelessWidget {
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: saffron.withValues(alpha: 0.04),
-        onTap: () => context.push(
-          browseVersePath(
-            scriptureCode: verse.scripture.code,
-            verseId: verse.id,
-          ),
-        ),
+        onTap: () {
+          _recordRecentOnTap(ref, query);
+          context.push(
+            browseVersePath(
+              scriptureCode: verse.scripture.code,
+              verseId: verse.id,
+            ),
+          );
+        },
         child: Container(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
           decoration: BoxDecoration(
