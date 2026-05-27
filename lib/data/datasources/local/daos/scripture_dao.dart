@@ -247,6 +247,35 @@ class ScriptureDao extends DatabaseAccessor<AppDatabase>
     return out;
   }
 
+  /// Per-chapter read counts for one scripture. One GROUP BY beats N
+  /// chapterReadCount watches on long chapter lists (Mahābhārata, Bhāgavata
+  /// Purāṇa, etc.). Returned key is encoded as "bookNum:chapterNum" so the
+  /// nested-id texts (RV, MB) round-trip; flat texts use "0:chapterNum".
+  Future<Map<String, int>> getReadVerseCountsForScripture(
+    String scriptureCode,
+  ) async {
+    final bookCol = db.versesTable.bookNum;
+    final chapterCol = db.versesTable.chapterNum;
+    final countCol = db.versesTable.id.count();
+    final rows = await (selectOnly(db.versesTable)
+          ..addColumns([bookCol, chapterCol, countCol])
+          ..where(
+            db.versesTable.scripture.equals(scriptureCode) &
+                db.versesTable.readCount.isBiggerThan(const Constant(0)),
+          )
+          ..groupBy([bookCol, chapterCol]))
+        .get();
+    final out = <String, int>{};
+    for (final row in rows) {
+      final ch = row.read(chapterCol);
+      if (ch == null) continue;
+      final book = row.read(bookCol) ?? 0;
+      final count = row.read(countCol) ?? 0;
+      out['$book:$ch'] = count;
+    }
+    return out;
+  }
+
   /// How many verses in this chapter have been read at least once.
   Future<int> getReadVerseCountInChapter({
     required String scriptureCode,

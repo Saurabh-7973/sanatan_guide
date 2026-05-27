@@ -13,11 +13,17 @@ Widget _bgHarness({
   ({String verseId, String scriptureCode})? lastRead,
 }) {
   assert(readCounts.length == 18, 'BG has 18 chapters');
+  // Chapter list now reads through scriptureChapterReadCountsProvider
+  // (a single GROUP BY query) instead of one chapterReadCountProvider
+  // per chapter — so the harness overrides the map provider.
+  final countsMap = <String, int>{
+    for (var i = 0; i < 18; i++)
+      if (readCounts[i] > 0) '0:${i + 1}': readCounts[i],
+  };
   return ProviderScope(
     overrides: [
-      for (var i = 0; i < 18; i++)
-        chapterReadCountProvider('bhagavad_gita', i + 1, null)
-            .overrideWith((_) async => readCounts[i]),
+      scriptureChapterReadCountsProvider('bhagavad_gita')
+          .overrideWith((_) async => countsMap),
       lastReadVerseProvider.overrideWith((_) async => lastRead),
     ],
     child: const MaterialApp(

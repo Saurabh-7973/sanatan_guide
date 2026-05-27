@@ -162,3 +162,106 @@ final class ScriptureReadCountsProvider extends $FunctionalProvider<
 
 String _$scriptureReadCountsHash() =>
     r'c40b2e15d9e7531aebd4a4c5b7e72ef1b11fc052';
+
+/// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+/// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+/// BY query replaces N [chapterReadCountProvider] watches on long chapter
+/// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+
+@ProviderFor(scriptureChapterReadCounts)
+final scriptureChapterReadCountsProvider = ScriptureChapterReadCountsFamily._();
+
+/// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+/// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+/// BY query replaces N [chapterReadCountProvider] watches on long chapter
+/// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+
+final class ScriptureChapterReadCountsProvider extends $FunctionalProvider<
+        AsyncValue<Map<String, int>>,
+        Map<String, int>,
+        FutureOr<Map<String, int>>>
+    with $FutureModifier<Map<String, int>>, $FutureProvider<Map<String, int>> {
+  /// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+  /// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+  /// BY query replaces N [chapterReadCountProvider] watches on long chapter
+  /// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+  ScriptureChapterReadCountsProvider._(
+      {required ScriptureChapterReadCountsFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'scriptureChapterReadCountsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$scriptureChapterReadCountsHash();
+
+  @override
+  String toString() {
+    return r'scriptureChapterReadCountsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, int>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, int>> create(Ref ref) {
+    final argument = this.argument as String;
+    return scriptureChapterReadCounts(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ScriptureChapterReadCountsProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$scriptureChapterReadCountsHash() =>
+    r'1d711141a695c19f7fb0c2f314371498fdc32b43';
+
+/// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+/// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+/// BY query replaces N [chapterReadCountProvider] watches on long chapter
+/// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+
+final class ScriptureChapterReadCountsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Map<String, int>>, String> {
+  ScriptureChapterReadCountsFamily._()
+      : super(
+          retry: null,
+          name: r'scriptureChapterReadCountsProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+  /// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+  /// BY query replaces N [chapterReadCountProvider] watches on long chapter
+  /// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+
+  ScriptureChapterReadCountsProvider call(
+    String scriptureCode,
+  ) =>
+      ScriptureChapterReadCountsProvider._(argument: scriptureCode, from: this);
+
+  @override
+  String toString() => r'scriptureChapterReadCountsProvider';
+}

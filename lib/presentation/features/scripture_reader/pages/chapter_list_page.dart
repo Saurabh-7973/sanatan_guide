@@ -256,16 +256,16 @@ class _LoadedBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // One GROUP BY for the whole scripture instead of N per-chapter watches.
+    // Empty map on loading/error keeps the first render stable; provider
+    // revalidates when verses are read.
+    final countsMap = ref
+            .watch(scriptureChapterReadCountsProvider(scripture.code))
+            .value ??
+        const <String, int>{};
     final readCounts = [
       for (final e in entries)
-        ref
-                .watch(chapterReadCountProvider(
-                  scripture.code,
-                  e.chapterNum,
-                  e.bookNum,
-                ))
-                .value ??
-            0,
+        chapterReadCountFromMap(countsMap, e.chapterNum, e.bookNum),
     ];
 
     final totalUnits = entries.length;

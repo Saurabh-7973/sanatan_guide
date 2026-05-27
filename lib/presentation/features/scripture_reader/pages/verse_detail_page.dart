@@ -773,7 +773,8 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
               chapterReadCountProvider(
                   v.scripture.code, v.chapterNum, v.bookNum),
             )
-            ..invalidate(scriptureReadCountsProvider);
+            ..invalidate(scriptureReadCountsProvider)
+            ..invalidate(scriptureChapterReadCountsProvider(v.scripture.code));
         }
         if (wasUnread && !_chapterJustCompleted) {
           final total = await repo.getChapterVerseCount(

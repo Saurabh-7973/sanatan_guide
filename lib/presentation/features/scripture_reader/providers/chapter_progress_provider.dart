@@ -27,3 +27,24 @@ Future<Map<String, int>> scriptureReadCounts(Ref ref) async {
   final db = await ref.watch(appDatabaseProvider.future);
   return db.scriptureDao.getReadVerseCountsByScripture();
 }
+
+/// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
+/// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
+/// BY query replaces N [chapterReadCountProvider] watches on long chapter
+/// lists. Use [chapterReadCountFromMap] to read a single chapter's count.
+@riverpod
+Future<Map<String, int>> scriptureChapterReadCounts(
+  Ref ref,
+  String scriptureCode,
+) async {
+  final db = await ref.watch(appDatabaseProvider.future);
+  return db.scriptureDao.getReadVerseCountsForScripture(scriptureCode);
+}
+
+/// Helper for the keying convention used by [scriptureChapterReadCounts].
+int chapterReadCountFromMap(
+  Map<String, int> counts,
+  int chapterNum, [
+  int? bookNum,
+]) =>
+    counts['${bookNum ?? 0}:$chapterNum'] ?? 0;
