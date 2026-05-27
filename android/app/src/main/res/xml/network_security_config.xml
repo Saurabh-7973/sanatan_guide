@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network security policy.
+
+  base-config trust-anchors include only the OS-bundled system CAs.
+  User-installed CAs are NOT trusted, so a TLS-intercepting proxy a
+  user might install (corporate MITM, malware) can't read or rewrite
+  our traffic to Firebase / Gemini / Google services.
+
+  cleartextTrafficPermitted=false matches the manifest setting; even
+  if some library wanted plain HTTP, the platform will refuse the
+  connection.
+
+  No domain-specific overrides — every host we talk to is HTTPS over
+  a system-trusted CA chain (googleapis.com, firebaseio.com,
+  generativelanguage.googleapis.com).
+-->
+<network-security-config>
+  <base-config cleartextTrafficPermitted="false">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>

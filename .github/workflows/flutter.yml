@@ -1,0 +1,47 @@
+name: flutter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    name: Analyze + Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pin the Flutter channel to "stable" rather than a version so the
+      # workflow doesn't break when we bump locally. If you need to lock
+      # to a specific Flutter version add `flutter-version: 3.35.4`.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dart + Flutter versions
+        run: |
+          dart --version
+          flutter --version
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      # Code generation (Drift, Riverpod, freezed, json_serializable) —
+      # generated .g.dart files are not checked in for every package, so
+      # they need to exist before analyze can pass.
+      - name: Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: flutter analyze
+        run: flutter analyze
+
+      # No coverage upload — keep CI lean. flutter test exits non-zero
+      # on any failed test or thrown exception during widget tests.
+      - name: flutter test
+        run: flutter test --reporter expanded
