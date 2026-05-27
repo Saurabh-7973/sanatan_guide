@@ -88,8 +88,27 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     return buffer.toString();
   }
 
-  Future<void> _send(Verse verse) async {
-    final text = _controller.text.trim();
+  /// Reruns the most-recent user prompt: removes the trailing AI reply (if
+  /// any), pops the user message that produced it, and calls [_send] with
+  /// the same text. Daily-quota counter is decremented again — a regenerate
+  /// is a real new API call. No-op if the last message is from the user
+  /// (we're already loading or the reply hasn't arrived).
+  Future<void> _regenerate(Verse verse) async {
+    if (_loading || _messages.isEmpty) return;
+    if (_messages.last.isUser) return;
+    final lastAi = _messages.removeLast();
+    if (_messages.isNotEmpty && _messages.last.isUser) {
+      final prompt = _messages.removeLast();
+      setState(() {});
+      await _send(verse, overrideText: prompt.text);
+      return;
+    }
+    // Couldn't find the prompt that produced this reply — restore it.
+    setState(() => _messages.add(lastAi));
+  }
+
+  Future<void> _send(Verse verse, {String? overrideText}) async {
+    final text = (overrideText ?? _controller.text).trim();
     if (text.isEmpty || _loading) return;
 
     if (_remaining <= 0) {
@@ -242,6 +261,7 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
                           loading: _loading,
                           error: _error,
                           scrollController: _scrollController,
+                          onRegenerate: () => _regenerate(verse),
                         ),
                       ),
                     ),
@@ -275,6 +295,7 @@ class _ChatMessages extends StatelessWidget {
     required this.loading,
     required this.error,
     required this.scrollController,
+    required this.onRegenerate,
   });
 
   final Verse verse;
@@ -282,6 +303,7 @@ class _ChatMessages extends StatelessWidget {
   final bool loading;
   final String? error;
   final ScrollController scrollController;
+  final VoidCallback onRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -324,7 +346,18 @@ class _ChatMessages extends StatelessWidget {
                     if (index == messages.length) {
                       return const _TypingBubble();
                     }
-                    return _MessageBubble(message: messages[index]);
+                    final m = messages[index];
+                    // Regenerate is only meaningful on the most recent AI
+                    // reply (re-running an older reply would invalidate the
+                    // conversation history). Pass the callback only for that
+                    // bubble; bubble hides the icon when the callback is null.
+                    final isLastAi = !m.isUser &&
+                        !loading &&
+                        index == messages.length - 1;
+                    return _MessageBubble(
+                      message: m,
+                      onRegenerate: isLastAi ? onRegenerate : null,
+                    );
                   },
                 ),
         ),
@@ -433,8 +466,9 @@ class _StarterChip extends StatelessWidget {
 // ── Message bubble ────────────────────────────────────────────────────────
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message});
+  const _MessageBubble({required this.message, this.onRegenerate});
   final ChatMessage message;
+  final VoidCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -519,7 +553,11 @@ class _MessageBubble extends StatelessWidget {
                           horizontalPadding: 0,
                         ),
                         const SizedBox(height: 6),
-                        _AiActionRow(text: message.text, isDark: isDark),
+                        _AiActionRow(
+                          text: message.text,
+                          isDark: isDark,
+                          onRegenerate: onRegenerate,
+                        ),
                       ],
                     ),
             ),
@@ -536,9 +574,14 @@ class _MessageBubble extends StatelessWidget {
 /// the cleanest implementation needs the parent to re-call _send with the
 /// matching user prompt, which lives a state lift away from here.
 class _AiActionRow extends StatelessWidget {
-  const _AiActionRow({required this.text, required this.isDark});
+  const _AiActionRow({
+    required this.text,
+    required this.isDark,
+    this.onRegenerate,
+  });
   final String text;
   final bool isDark;
+  final VoidCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -571,6 +614,15 @@ class _AiActionRow extends StatelessWidget {
           color: text3,
           onTap: () => Share.share(text),
         ),
+        if (onRegenerate != null) ...[
+          const SizedBox(width: 4),
+          _IconAction(
+            icon: Icons.refresh_rounded,
+            tooltip: 'Regenerate',
+            color: text3,
+            onTap: onRegenerate!,
+          ),
+        ],
       ],
     );
   }
