@@ -1473,13 +1473,14 @@ class _WordCallout extends ConsumerWidget {
       );
     }
 
-    // 2. No API key → calm, honest copy (no false "yet": data isn't coming).
+    // 2. No API key → calm, honest copy. Avoid leaking the build-flag name
+    //    to end users; if the key isn't compiled in, that's our problem, not
+    //    something they can do anything about.
     if (!GeminiService.isEnabled) {
       return shell(
         translit: word.transliteration,
         body: Text(
-          'Per-word meaning isn’t bundled. Enable the AI guide '
-          '(GEMINI_API_KEY) for live word lookups.',
+          'A per-word meaning for this word isn’t available offline yet.',
           style: italic,
         ),
       );
