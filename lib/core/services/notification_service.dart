@@ -58,6 +58,10 @@ final class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
+  /// Exposed for [FestivalNotificationScheduler] which shares the same
+  /// channel so the user sees one entry in OS notification settings.
+  static FlutterLocalNotificationsPlugin get plugin => _plugin;
+
   static bool _initialized = false;
 
   /// Call once from main() before runApp().

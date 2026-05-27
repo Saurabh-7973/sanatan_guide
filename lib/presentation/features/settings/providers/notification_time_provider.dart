@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:sanatan_guide/core/services/festival_notification_scheduler.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
+import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 
 part 'notification_time_provider.g.dart';
@@ -100,5 +102,15 @@ class FestivalAlertsEnabled extends _$FestivalAlertsEnabled {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kFestivalAlertsEnabledKey, enabled);
+    // Trigger the scheduler immediately so the user doesn't have to
+    // restart the app to see the alerts take effect (or be cancelled).
+    final festivals = ref.read(festivalsProvider).value ?? const [];
+    final time = ref.read(notificationTimeProvider);
+    await FestivalNotificationScheduler.sync(
+      all: festivals,
+      enabled: enabled,
+      hour: time.hour,
+      minute: time.minute,
+    );
   }
 }

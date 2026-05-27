@@ -12,8 +12,11 @@ import 'package:sanatan_guide/core/router/app_router.dart';
 import 'package:sanatan_guide/core/services/ad_service.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/app_open_ad_service.dart';
+import 'package:sanatan_guide/core/services/festival_notification_scheduler.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
+import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 import 'package:sanatan_guide/firebase_options.dart';
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/locale_provider.dart';
@@ -55,6 +58,11 @@ void main() async {
   }
 
   await NotificationService.init();
+  // Wire the festival scheduler to the same plugin so both schedules share
+  // the verse_of_day_v2 channel. Actual sync runs from the Settings
+  // toggle and from a post-runApp callback (festivals data loads via
+  // Firebase Remote Config + bundled JSON; we don't have it here).
+  FestivalNotificationScheduler.wirePlugin(NotificationService.plugin);
   await AdService.initialize();
   // Pre-load the App Open Ad in the background.
   // It will be shown once when the splash completes.
@@ -92,7 +100,30 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
       // now requested only when the user explicitly opts in to the daily
       // reminder — in onboarding or via the Settings switch. Users who
       // never opt in never see the prompt.
+      _maybeSyncFestivalAlerts();
     });
+  }
+
+  /// Once the festivals provider has loaded and the user has opted in to
+  /// festival alerts, schedule day-of notifications for the next ~30
+  /// upcoming festivals. Cancels any prior scheduled set first so we
+  /// don't accumulate orphans across launches.
+  Future<void> _maybeSyncFestivalAlerts() async {
+    if (!mounted) return;
+    try {
+      final enabled = ref.read(festivalAlertsEnabledProvider);
+      if (!enabled) return;
+      final festivals = await ref.read(festivalsProvider.future);
+      final time = ref.read(notificationTimeProvider);
+      await FestivalNotificationScheduler.sync(
+        all: festivals,
+        enabled: enabled,
+        hour: time.hour,
+        minute: time.minute,
+      );
+    } catch (e, st) {
+      AppLogger.instance.w('Festival alerts boot-sync failed', e, st);
+    }
   }
 
   void _consumePendingDeepLink() {
