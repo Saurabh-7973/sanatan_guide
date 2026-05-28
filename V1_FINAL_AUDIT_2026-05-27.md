@@ -134,6 +134,20 @@ Status legend: ☐ open · ◐ partial · ✓ done · ⚙ user-action.
 ## §15.5 — Notification deep-link
 - ◐ Code shipped (ee23838); cold-start device-test owed.
 
+## §16 — Backdrop uniformity (NEW, 2026-05-28)
+- ☐ **(a)** Background wash is not visually consistent across all screens.
+      `WarmBackdrop` is used in most places but intensity / variant /
+      stacking differs. Audit every screen's Scaffold + Stack base layer
+      and either:
+      1. Standardise on `WarmBackdrop()` default (intensity 1.0) for
+         primary screens + `WarmBackdrop(intensity: 0.3)` for onboarding
+         per spec, OR
+      2. Define explicit `BackdropTone` enum {primary, dim, onboarding,
+         settings} and centralise lookup.
+- Likely-mismatched screens to audit: home, library, chapter_list,
+      verse_list, verse_detail, bookmarks, festivals, settings, pandit
+      chat, search, learning_path.
+
 ## §15 — Build/perf/security
 - ☐ R8/proguard rules — confirm AI key not stripped.
 - ⚙ Gemini API key restrictions on Google Cloud (package-name lock).
