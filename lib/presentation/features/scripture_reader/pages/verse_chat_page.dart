@@ -10,6 +10,7 @@ import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_states.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/offline_banner.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -253,10 +254,13 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
                   Expanded(
                     child: state.when(
                       loading: () => const VerseDetailShimmer(),
-                      error: (_, __) =>
-                          const Center(child: Text('Could not load verse.')),
+                      error: (_, __) => HeritageError(
+                        message: 'Could not load this verse — pull down or retry.',
+                        onRetry: () =>
+                            ref.invalidate(verseDetailProvider(widget.verseId)),
+                      ),
                       data: (either) => either.fold(
-                        (failure) => Center(child: Text(failure.message)),
+                        (failure) => HeritageError(message: failure.message),
                         (verse) => _ChatMessages(
                           verse: verse,
                           messages: _messages,
@@ -652,8 +656,7 @@ class _AiActionRow extends ConsumerWidget {
       final existing = await repo.getVerseById(verseId);
       final prior = existing.fold((_) => '', (v) => v.noteText ?? '');
       final stamp = DateTime.now().toIso8601String().substring(0, 10);
-      final separator = prior.trim().isEmpty ? '' : '\n\n— $stamp —\n';
-      final merged = '${prior.trimRight()}$separator${text.trim()}';
+      final merged = mergeAiReplyIntoNote(prior: prior, reply: text, stamp: stamp);
       await repo.updateVerseNote(verseId, merged);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -925,4 +928,17 @@ class _InputBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Appends [reply] to [prior] note text with a dated separator block.
+/// Empty / whitespace-only [prior] yields the reply alone. Trailing
+/// whitespace on the prior text is trimmed so successive saves don't
+/// leak blank lines.
+String mergeAiReplyIntoNote({
+  required String prior,
+  required String reply,
+  required String stamp,
+}) {
+  final separator = prior.trim().isEmpty ? '' : '\n\n— $stamp —\n';
+  return '${prior.trimRight()}$separator${reply.trim()}';
 }

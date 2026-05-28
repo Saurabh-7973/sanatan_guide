@@ -54,6 +54,10 @@ class _PanditChatPageState extends State<PanditChatPage> {
   bool _loading = false;
   int _remaining = GeminiRateLimit.maxPerDay;
   String? _error;
+  // Last user prompt that hit the network (or attempted to). Powers the
+  // "Try again" pill on transient failures; cleared on rate-limit since
+  // retry is meaningless until midnight.
+  String? _retryableText;
 
   @override
   void initState() {
@@ -85,13 +89,17 @@ class _PanditChatPageState extends State<PanditChatPage> {
     if (text.isEmpty || _loading || !GeminiService.isEnabled) return;
 
     if (_remaining <= 0) {
-      setState(() => _error = 'Daily question limit reached.');
+      setState(() {
+        _error = 'Daily question limit reached — resets at midnight local.';
+        _retryableText = null;
+      });
       return;
     }
     final allowed = await GeminiRateLimit.consume();
     if (!allowed) {
       setState(() {
-        _error = 'Daily question limit reached.';
+        _error = 'Daily question limit reached — resets at midnight local.';
+        _retryableText = null;
         _remaining = 0;
       });
       return;
@@ -102,10 +110,28 @@ class _PanditChatPageState extends State<PanditChatPage> {
       _controller.clear();
       _loading = true;
       _error = null;
+      _retryableText = text;
       _remaining -= 1;
     });
     _scrollToBottom();
+    await _dispatch(text);
+  }
 
+  /// Retry path for the "Try again" pill — re-sends [_retryableText] without
+  /// consuming the rate-limit budget (the previous send already did) and
+  /// without re-pushing the user bubble (it's already in [_messages]).
+  Future<void> _retry() async {
+    final text = _retryableText;
+    if (text == null || _loading) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    _scrollToBottom();
+    await _dispatch(text);
+  }
+
+  Future<void> _dispatch(String text) async {
     try {
       final reply = await GeminiService.ask(
         systemContext: _kSystemPrompt,
@@ -194,6 +220,7 @@ class _PanditChatPageState extends State<PanditChatPage> {
                           messages: _messages,
                           loading: _loading,
                           error: _error,
+                          onRetry: _retryableText == null ? null : _retry,
                           scrollController: _scrollController,
                         ),
                 ),
@@ -432,6 +459,7 @@ class _Conversation extends StatelessWidget {
     required this.messages,
     required this.loading,
     required this.error,
+    required this.onRetry,
     required this.scrollController,
   });
 
@@ -439,6 +467,10 @@ class _Conversation extends StatelessWidget {
   final List<ChatMessage> messages;
   final bool loading;
   final String? error;
+
+  /// Non-null when the last error is retryable (network / transient).
+  /// Null on rate-limit errors so we don't render a pill that can't help.
+  final VoidCallback? onRetry;
   final ScrollController scrollController;
 
   @override
@@ -474,19 +506,64 @@ class _Conversation extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            child: Text(
-              error!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: Fonts.sans,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontSize: 12,
-                height: 1.4,
-                color: iron,
-              ),
+            child: Column(
+              children: [
+                Text(
+                  error!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontSize: 12,
+                    height: 1.4,
+                    color: iron,
+                  ),
+                ),
+                if (onRetry != null) ...[
+                  const SizedBox(height: 8),
+                  _RetryPill(isDark: isDark, onTap: onRetry!),
+                ],
+              ],
             ),
           ),
       ],
+    );
+  }
+}
+
+class _RetryPill extends StatelessWidget {
+  const _RetryPill({required this.isDark, required this.onTap});
+
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: glow,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: saffron.withValues(alpha: 0.45)),
+        ),
+        child: Text(
+          'Try again',
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
+            fontSize: 12,
+            height: 1.2,
+            color: saffron,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ),
     );
   }
 }

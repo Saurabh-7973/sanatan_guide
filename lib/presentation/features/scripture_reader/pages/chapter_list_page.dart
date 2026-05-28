@@ -298,6 +298,10 @@ class _LoadedBody extends ConsumerWidget {
           totalChapters: hasRollup ? totalChapters : null,
           totalVerses: totalVerses,
           readChapters: readChapters,
+          // Swap "MAṆḌALAS / KĀṆḌAS" → "CHAPTERS · VERSES · READ" as soon
+          // as the user has started this scripture, even if the per-chapter
+          // read-count GROUP BY hasn't refreshed yet.
+          hasStarted: showResume,
           isDark: isDark,
         ),
         Expanded(
@@ -375,6 +379,7 @@ class _ChapterListHeader extends StatelessWidget {
     required this.totalChapters,
     required this.totalVerses,
     required this.readChapters,
+    required this.hasStarted,
     required this.isDark,
   });
 
@@ -386,6 +391,9 @@ class _ChapterListHeader extends StatelessWidget {
   final int? totalChapters;
   final int totalVerses;
   final int readChapters;
+  // True when this scripture is the last-read one — independent of the
+  // per-chapter read-count GROUP BY (which can lag invalidation).
+  final bool hasStarted;
   final bool isDark;
 
   @override
@@ -396,11 +404,12 @@ class _ChapterListHeader extends StatelessWidget {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final unit = scripture.unitLabel;
 
-    // Once the user has read at least one chapter in a rollup scripture
-    // (e.g. Ṛgveda / Bhāgavata Purāṇa), the top-level unit row
-    // ("MAṆḌALAS", "SKANDAS", …) becomes noise — they're past orientation
-    // and want CHAPTERS · VERSES · READ instead.
-    final dropUnitRow = readChapters > 0 &&
+    // Once the user has started reading this scripture, the top-level
+    // unit row ("MAṆḌALAS", "SKANDAS", …) becomes noise — they're past
+    // orientation and want CHAPTERS · VERSES · READ instead. Trigger on
+    // either readChapters > 0 (group-by query) OR hasStarted (last-read
+    // pointer), so an in-flight invalidation doesn't show stale labels.
+    final dropUnitRow = (readChapters > 0 || hasStarted) &&
         totalChapters != null &&
         totalChapters! > 0 &&
         totalChapters != totalUnits;
@@ -1081,6 +1090,7 @@ class _LoadingBody extends StatelessWidget {
           totalChapters: null,
           totalVerses: 0,
           readChapters: 0,
+          hasStarted: false,
           isDark: isDark,
         ),
         const SizedBox(height: 18),
