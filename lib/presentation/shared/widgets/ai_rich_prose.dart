@@ -198,10 +198,19 @@ final RegExp citationRe = RegExp(
 /// parentheses. Caps the alias at 3 words so a whole sentence can't be
 /// swept up. parseScriptureCoordinate is the final arbiter: if the leading
 /// words don't match any known alias, the token is dropped.
+///
+/// The Devanāgarī letter range is split around U+0966-U+096F so digits
+/// (०-९) stay out of the alias class — otherwise "BG २.४७" never
+/// separates into alias + numeric. The trailing boundary uses an explicit
+/// negative-lookahead instead of `\b` because Dart's default `\b` treats
+/// Devanāgarī digits as non-word characters.
 final RegExp bareCitationRe = RegExp(
-  r'\b([A-Za-zĀ-žऀ-ॿ][A-Za-zĀ-žऀ-ॿ’\-]*'
-  r'(?:\s[A-Za-zĀ-žऀ-ॿ][A-Za-zĀ-žऀ-ॿ’\-]*){0,2}'
-  r'\s+[0-9०-९]+\.[0-9०-९]+(?:\.[0-9०-९]+)?)\b',
+  r'\b([A-Za-zĀ-žऀ-॥॰-ॿ]'
+  r'[A-Za-zĀ-žऀ-॥॰-ॿ’\-]*'
+  r'(?:\s[A-Za-zĀ-žऀ-॥॰-ॿ]'
+  r'[A-Za-zĀ-žऀ-॥॰-ॿ’\-]*){0,2}'
+  r'\s+[0-9०-९]+\.[0-9०-९]+(?:\.[0-9०-९]+)?)'
+  r'(?![0-9०-९.])',
 );
 
 enum _TokenKind { bold, italicEmph, citation }

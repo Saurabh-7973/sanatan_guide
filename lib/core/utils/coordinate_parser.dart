@@ -170,14 +170,18 @@ bool _isThreeLevel(Scripture s) => switch (s) {
       _ => false,
     };
 
-/// Parses a query string like "BG 2.47", "Gita 11.37", "Katha 1.2.18",
+/// Parses a query string like "BG 2.47", "Gita 11.37", "Katha 1.18",
 /// "BG.2.47", "RV 1:1:1" into a [ScriptureCoordinate], or null if the input
 /// doesn't match a recognized coordinate pattern.
 ///
 /// Recognizes:
-/// - 2-level: `{alias}{sep}{ch}{sep}{verse}` (e.g. "BG 2.47", "BG.2.47")
+/// - 2-level: `{alias}{sep}{ch}{sep}{verse}` (e.g. "BG 2.47", "Katha 1.18")
 /// - 3-level: `{alias}{sep}{book}{sep}{ch}{sep}{verse}` (e.g. "RV 1.1.1")
 /// - Devanāgarī numerals (२.४७) map back to 1-9 digits.
+///
+/// Whether a scripture is 2- or 3-level is decided by [_isThreeLevel].
+/// Katha, Mundaka, Mandukya, Taittiriya, Aitareya, etc. ship as 2-level
+/// in `assets/db/sanatan_guide.db` (chapter encodes Vallī/Section).
 ScriptureCoordinate? parseScriptureCoordinate(String input) {
   final trimmed = input.trim();
   if (trimmed.isEmpty) return null;
