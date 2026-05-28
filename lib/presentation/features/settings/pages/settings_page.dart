@@ -438,19 +438,14 @@ class _ThemeRow extends ConsumerWidget {
       icon: icon,
       title: 'Theme',
       trailing: SegmentedButton<ThemeMode>(
+        // Three segments with short text labels matching design mockup
+        // "Light · Dark · System". Labels chosen over icons-only so the
+        // active segment reads from the heritage-tone label, not an
+        // ambiguous glyph.
         segments: const [
-          ButtonSegment(
-            value: ThemeMode.system,
-            icon: Icon(Icons.brightness_auto, size: 18),
-          ),
-          ButtonSegment(
-            value: ThemeMode.light,
-            icon: Icon(Icons.light_mode, size: 18),
-          ),
-          ButtonSegment(
-            value: ThemeMode.dark,
-            icon: Icon(Icons.dark_mode, size: 18),
-          ),
+          ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+          ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+          ButtonSegment(value: ThemeMode.system, label: Text('Auto')),
         ],
         selected: {themeMode},
         onSelectionChanged: (selection) {
@@ -474,6 +469,18 @@ class _ThemeRow extends ConsumerWidget {
           iconColor: WidgetStateProperty.resolveWith(
             (states) =>
                 states.contains(WidgetState.selected) ? activeFg : inactiveFg,
+          ),
+          textStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+          padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           ),
           side: WidgetStateProperty.all(BorderSide(color: divider)),
         ),

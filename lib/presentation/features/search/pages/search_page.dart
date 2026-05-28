@@ -89,7 +89,14 @@ class _SearchPageState extends ConsumerState<SearchPage>
                   isDark: isDark,
                   onChanged: _setQuery,
                   onSubmitted: _commitRecent,
-                  onClear: () => _setQuery(''),
+                  onClear: () {
+                    // Save the abandoned query into recents before clearing
+                    // — users who type then tap X expect that query in their
+                    // history (and _commitRecent's len>=2 guard ignores
+                    // single-letter typos).
+                    _commitRecent(_controller.text);
+                    _setQuery('');
+                  },
                   onBack: () {
                     if (context.canPop()) {
                       context.pop();

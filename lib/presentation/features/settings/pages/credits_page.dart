@@ -45,6 +45,28 @@ Uri? _deriveUrl(String text) {
   return Uri.parse('https://$host');
 }
 
+/// Per-scripture deep-link override. When a row's [scriptureId] maps to an
+/// entry here, the credit row tap opens this URL instead of the bare host
+/// derived from [ScriptureCredit.source]. Without this, every row that
+/// names "sacred-texts.com" lands on the same homepage — see audit doc.
+///
+/// Add entries as authoritative source URLs are verified. Falsy default
+/// keeps the bare-host fallback rather than blocking the tap entirely.
+const Map<String, String> _scriptureSourceUrls = <String, String>{
+  // Examples — verify the path before un-commenting. Left empty for v1.
+  // 'bhagavad_gita': 'https://vedabase.io/en/library/bg/',
+  // 'rigveda': 'https://www.sacred-texts.com/hin/rigveda/',
+  // 'bhagavata_purana': 'https://vedabase.io/en/library/sb/',
+};
+
+/// Pick the best URL for a credit row: per-scripture override if present,
+/// else the bare host parsed from [source].
+Uri? _resolveCreditUrl({required String scriptureId, required String source}) {
+  final override = _scriptureSourceUrls[scriptureId];
+  if (override != null && override.isNotEmpty) return Uri.parse(override);
+  return _deriveUrl(source);
+}
+
 class _Section {
   const _Section(this.title, this.rows);
   final String title;
@@ -63,7 +85,10 @@ List<_Section> _buildSections() {
                   : '${c.translators.join(' · ')}. ${c.licenseNote}',
               meta: '${c.source} · ${c.licenseLabel}',
               linksOut: c.source.contains('.'),
-              url: _deriveUrl(c.source),
+              url: _resolveCreditUrl(
+                scriptureId: c.scriptureId,
+                source: c.source,
+              ),
             ))
         .toList();
     if (rows.isNotEmpty) sections.add(_Section(s.catalogTitle, rows));

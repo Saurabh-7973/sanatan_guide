@@ -141,6 +141,9 @@ class _AlmanacViewState extends State<_AlmanacView> {
   late final List<_LunarSegment> _segments;
   late final Map<String, List<Festival>> _festByDay;
   late final List<Festival> _earlier;
+  // Default-collapse "earlier this year" so past months stay tucked under
+  // a single header tap — keeps the calendar oriented forward by default.
+  bool _showEarlier = false;
 
   @override
   void initState() {
@@ -282,20 +285,29 @@ class _AlmanacViewState extends State<_AlmanacView> {
     if (earlier.isNotEmpty) {
       anyRows = true;
       slivers.add(
-        SliverToBoxAdapter(child: _EarlierHeader(isDark: isDark)),
-      );
-      slivers.add(
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) => _EarlierRow(
-              festival: earlier[i],
-              isDark: isDark,
-              onTap: () => _openFestival(earlier[i]),
-            ),
-            childCount: earlier.length,
+        SliverToBoxAdapter(
+          child: _EarlierHeader(
+            isDark: isDark,
+            expanded: _showEarlier,
+            count: earlier.length,
+            onTap: () => setState(() => _showEarlier = !_showEarlier),
           ),
         ),
       );
+      if (_showEarlier) {
+        slivers.add(
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => _EarlierRow(
+                festival: earlier[i],
+                isDark: isDark,
+                onTap: () => _openFestival(earlier[i]),
+              ),
+              childCount: earlier.length,
+            ),
+          ),
+        );
+      }
     }
 
     if (!anyRows) {
@@ -1083,18 +1095,47 @@ class _MoonPhase extends StatelessWidget {
 // ── Earlier-this-year section ───────────────────────────────────────────────
 
 class _EarlierHeader extends StatelessWidget {
-  const _EarlierHeader({required this.isDark});
+  const _EarlierHeader({
+    required this.isDark,
+    required this.expanded,
+    required this.count,
+    required this.onTap,
+  });
 
   final bool isDark;
+  final bool expanded;
+  final int count;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      child: Text(
-        'EARLIER THIS YEAR',
-        style: AppText.sectionLabel(
-          color: isDark ? DColors.text3 : LColors.text3,
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        child: Row(
+          children: [
+            Text(
+              'EARLIER THIS YEAR',
+              style: AppText.sectionLabel(color: text3),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '·  $count',
+              style: AppText.sectionLabel(color: text3),
+            ),
+            const Spacer(),
+            AnimatedRotation(
+              turns: expanded ? 0.5 : 0,
+              duration: const Duration(milliseconds: 180),
+              child: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 18,
+                color: text3,
+              ),
+            ),
+          ],
         ),
       ),
     );
