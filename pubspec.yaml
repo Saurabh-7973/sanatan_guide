@@ -107,8 +107,10 @@ flutter:
     - assets/db/                     # Pre-populated scripture SQLite DB
     - assets/fonts/                  # Bundled Devanagari fonts (offline guarantee)
     - assets/images/                 # Static app images
-    - assets/icons/                  # SVG icons
     - assets/ornaments/              # Illustration-tier SVG ornaments
+    # NOTE: assets/icons/ removed from runtime bundle — launcher source PNG
+    # lives in tool/launcher_icon/ now. Re-add this line only if real
+    # runtime icons land in assets/icons/.
 
   fonts:
     # Sanskrit shloka display — scholarly, beautiful Vedic diacritic support
@@ -137,8 +139,9 @@ flutter:
           weight: 500
         - asset: assets/fonts/Lora-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Lora-Bold.ttf
-          weight: 700
+        # Lora-Bold removed — codebase uses only w500/w600 with serif (audit
+        # 2026-05-28). If a heading at w700 appears in design later, re-add
+        # this entry and drop the TTF back into assets/fonts/.
         - asset: assets/fonts/Lora-Italic.ttf
           style: italic
 
@@ -158,7 +161,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: false
-  image_path: "assets/icons/ic_foreground.png"
+  image_path: "tool/launcher_icon/ic_foreground.png"
   adaptive_icon_background: "#1A1A2E"
-  adaptive_icon_foreground: "assets/icons/ic_foreground.png"
+  adaptive_icon_foreground: "tool/launcher_icon/ic_foreground.png"
   min_sdk_android: 21
