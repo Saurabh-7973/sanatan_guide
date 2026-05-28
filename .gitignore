@@ -80,3 +80,9 @@ _review_delete/
 **/SANATAN_GUIDE_FULL_SOURCE_EXPORT.txt
 **/PHASE*_CODE_EXPORT.txt
 **/REDESIGN_*.md
+
+# Personal Claude Code skills (drift across machines, not project-specific)
+.claude/skills/
+
+# Personal device-test notes — keep local
+A015_AUDIT.md

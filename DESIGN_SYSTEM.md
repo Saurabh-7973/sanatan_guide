@@ -1,6 +1,5 @@
 # Sanatan Guide — Design System Reference
 
-> **Synthesized from:** Reference Design System (reference) audit  
 > **Philosophy:** Sacred Minimalism — editorial calm, not corporate polish  
 > **Stack:** Flutter · Material 3 · Riverpod · Outfit / Lora / TiroDevanagari
 
@@ -8,12 +7,14 @@
 
 ## 1. Design Philosophy
 
-The Reference system excels at:
+The reference design systems we drew structural cues from share three traits:
 - **Systematic component coverage** — every state designed (default, focused, error, disabled)
 - **Tonal elevation** — layers of dark surfaces without harsh shadows
-- **Purposeful color** — purple/blue for data, orange for CTAs, green/red for semantics
+- **Purposeful color** — restrained accent palette with semantic roles
 
-**Sanatan Guide adapts these structural strengths** while replacing financial aesthetics with warmth, sacred weight, and editorial calm. We borrow the *engineering discipline* of Reference, not its *visual vocabulary*.
+**Sanatan Guide adapts those structural strengths** while replacing the
+corporate aesthetic with warmth, sacred weight, and editorial calm. We borrow
+the *engineering discipline*, not the *visual vocabulary*.
 
 ---
 
@@ -50,7 +51,7 @@ The Reference system excels at:
 | `surfaceElevated` | `#221E1B` | Modals, sheets (L2) |
 | `surfaceHighest` | `#2A2520` | Chips, interactive (L3) |
 
-> **Reference Lesson:** Reference uses `#12111A → #1C1B29 → #252438` — three distinct tonal steps. We mirror this with *warm* (saffron-tinted) equivalents instead of cool (blue-tinted).
+> **Tonal-step note:** Reference dark systems often use three distinct tonal steps (e.g. `#12 → #1C → #25`). We mirror this with *warm* (saffron-tinted) equivalents instead of cool (blue-tinted).
 
 ### Text
 | Token | Hex | Usage |
@@ -118,7 +119,7 @@ The Reference system excels at:
 | `sanskritSmall` | TiroDevanagari | 18 | 2.0 | Compact verse |
 | `transliteration` | Lora | 15 | 1.6 | Italic, translitText color |
 
-> **Reference Lesson:** Reference uses Inter at 10/12/14/16/18/20/24sp — purely functional. We keep the same *structural discipline* (no skipping steps) but use editorial fonts for content and geometric (Outfit) for UI — creating a sacred/functional duality.
+> **Type-ramp note:** A purely-functional system would use one neutral sans (e.g. Inter) at 10/12/14/16/18/20/24sp. We keep the same *structural discipline* (no skipping steps) but use editorial fonts for content and a geometric sans (Outfit) for UI — creating a sacred/functional duality.
 
 ---
 
@@ -145,7 +146,7 @@ The Reference system excels at:
 | `radiusHero` | 24dp | Hero cards, featured content |
 | `radiusSheet` | 20dp | Bottom sheets |
 
-> **Reference Lesson:** Reference uses consistent 8dp radius throughout. Our tiered system is the key differentiator — giving Sanatan Guide an organic, editorial feel vs. uniform "SaaS" look.
+> **Radius note:** Many systems use a single 8dp radius throughout. Our tiered radius is a deliberate differentiator — gives Sanatan Guide an organic, editorial feel vs. a uniform "SaaS" look.
 
 ---
 
@@ -153,14 +154,14 @@ The Reference system excels at:
 
 ### 5.1 Buttons
 
-Reference reference shows SM/MD/LG sizes × Primary/Secondary/Ghost/Destructive variants × 4 states.
+Typical button system: SM/MD/LG sizes × Primary/Secondary/Ghost/Destructive variants × 4 states (default/hover/pressed/disabled).
 
 ```
 Primary CTA
   Background:  saffron (#E8820C)
   Text:        white, labelLarge (Outfit 16 w600)
   Padding:     horizontal 24dp, vertical 14dp
-  Radius:      10dp  [Reference uses 8dp; we soften slightly]
+  Radius:      10dp  [softer than the conventional 8dp]
   Elevation:   0
 
 Secondary / Outlined
@@ -180,7 +181,7 @@ All variants — Disabled state: 38% opacity, no interaction
 
 ### 5.2 Input Fields
 
-Reference shows: Default → Focused (purple border) → Error (red border) → Disabled → Filled.
+Typical input system: Default → Focused → Error → Disabled → Filled.
 
 ```
 Default
@@ -203,7 +204,7 @@ Disabled
 
 ### 5.3 Chips / Tags
 
-Reference shows SM/MD/LG × Normal/Purple/Orange × with/without left+right icons × dismissible.
+Typical chip system: SM/MD/LG × Neutral/Accent/Warning × with/without left+right icons × dismissible.
 
 ```
 Category Chip (scripture filter)
@@ -232,7 +233,7 @@ Top border:          divider, 1dp
 
 ### 5.5 App Bar / Title Bar
 
-Reference shows: back + title, back + title + subtitle, title + up to 3 action icons.
+Typical app-bar set: back + title, back + title + subtitle, title + up to 3 action icons.
 
 ```
 Background:    transparent (scaffold color)
@@ -245,7 +246,7 @@ Elevation:     0
 
 ### 5.6 Modals / Bottom Sheets
 
-Reference shows: Info, Form, List picker, Confirmation, Full-screen variants.
+Typical sheet set: Info, Form, List picker, Confirmation, Full-screen variants.
 
 ```
 Background:   surfaceElevated (dark) / surface (light)
@@ -278,7 +279,7 @@ List row
 
 ### 5.8 Snackbars
 
-Reference shows: Success/Normal/Error/Warning × with icon / without icon × with action / without.
+Typical snackbar set: Success/Normal/Error/Warning × with icon / without icon × with action / without.
 
 ```
 Background:   surfaceHighest (#2A2520 dark)
@@ -292,7 +293,7 @@ Margin:       16dp horizontal, 12dp above nav bar
 
 ### 5.9 Search Bar
 
-Reference shows: Default → Active (typing) → With filter chip → Multi-token.
+Typical search-field flow: Default → Active (typing) → With filter chip → Multi-token.
 
 ```
 Background:    surfaceVariant / surfaceHighest
@@ -306,7 +307,7 @@ Filter tokens: chips inside field for active filters
 
 ### 5.10 Controls
 
-Reference shows Toggle/Checkbox/Radio at sizes 12/16/20/24dp × On/Off × Enabled/Disabled.
+Typical control set: Toggle/Checkbox/Radio at sizes 12/16/20/24dp × On/Off × Enabled/Disabled.
 
 ```
 Toggle
@@ -354,7 +355,7 @@ Default → Hover/Focus → Pressed → Disabled
 
 ## 7. Elevation & Shadow
 
-Reference uses **zero drop shadows** — pure tonal elevation (surface color shifts). We adopt the same.
+Reference dark systems use **zero drop shadows** — pure tonal elevation (surface color shifts). We adopt the same.
 
 ```
 L0 → L1:  Surface color change only
@@ -450,4 +451,4 @@ Before shipping any new screen, verify:
 
 ---
 
-*Last updated: April 2026 | Source: Reference Design System audit (reference) + Sanatan Guide codebase*
+*Last updated: April 2026 | Source: Sanatan Guide codebase*
