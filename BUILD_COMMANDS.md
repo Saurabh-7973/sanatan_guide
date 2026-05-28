@@ -5,11 +5,15 @@
 Save these in your shell — add to `~/.zshrc`:
 
 ```bash
-export GEMINI_API_KEY="REDACTED_GEMINI_KEY"  # Your Gemini API key from https://aistudio.google.com/app/apikey
-export AD_NATIVE_ID="ca-app-pub-4975489929669005/5597586464"
-export AD_INTERSTITIAL_ID="ca-app-pub-4975489929669005/9263602370"
-export AD_APP_OPEN_ID="ca-app-pub-4975489929669005/1969234584"
+export GEMINI_API_KEY="<your-gemini-api-key>"  # Get one at https://aistudio.google.com/app/apikey — restrict by Android package + SHA-1
+export AD_NATIVE_ID="<your-admob-native-unit-id>"
+export AD_INTERSTITIAL_ID="<your-admob-interstitial-unit-id>"
+export AD_APP_OPEN_ID="<your-admob-app-open-unit-id>"
 ```
+
+> **Never commit real keys to this file.** Keep them in `~/.zshrc` or
+> `~/.bashrc` (or a gitignored `.env.local`) and reference via `$GEMINI_API_KEY`
+> in the build commands below.
 
 Then `source ~/.zshrc` once. After that, every terminal will have these.
 
