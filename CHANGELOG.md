@@ -5,6 +5,125 @@ versions follow Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.0.0-rc] — 2026-05-29 (production-readiness pass)
+
+### Added
+- **Crashlytics**
+  - R8 mapping upload pinned in `android/app/build.gradle.kts` so
+    obfuscated stack traces deobfuscate in the Crashlytics console.
+  - Hidden QA gesture: triple-tap the version label in Settings to
+    throw an uncaught exception, verifying the symbolication pipeline
+    end-to-end on real release builds.
+- **GeminiService — quality + reliability**
+  - In-memory LRU cache (100 entries) keyed by model + systemContext +
+    history digest + userMessage. Repeated identical asks return
+    instantly without re-paying network or billing.
+  - Circuit breaker: 3 failures within 60 s opens the breaker for
+    2 minutes. While open, `ask()` short-circuits with a friendly
+    error — saves 6 s timeout per attempt during regional outages.
+  - 5xx and network/timeout count toward the breaker; 4xx
+    (auth, quota) do not.
+- **Notifications**
+  - Deep-link payload validation in `notification_service.dart` — the
+    cold-start + warm-tap callbacks now run the payload through
+    `parseScriptureCoordinate` + reject path-traversal characters
+    before routing.
+- **Pandit chat**
+  - 2000-character client-side prompt cap with maxLength on the text
+    field + on-send guard. Refuses pasted-blob abuse before it hits
+    Gemini billing.
+- **Festivals calendar**
+  - "Earlier this year" past months now collapse behind a tappable
+    header with rotating chevron + count badge, default closed.
+    Calendar reads forward-by-default.
+- **Settings**
+  - Theme picker swapped from icon-only SegmentedButton to text
+    labels ("Light · Dark · Auto") matching design mockup.
+  - Backdrop wash added on Home + Library — both screens were the
+    only ones still using a flat scaffold bg color. Bottom-nav
+    rotation now reads consistent.
+- **Reader**
+  - Chapter list header swap "MAṆḌALAS / KĀṆḌAS → CHAPTERS · VERSES
+    · READ" now triggers on either readChapters > 0 OR `hasStarted`
+    (last-read pointer), so the swap happens immediately on resume
+    even while the per-chapter GROUP BY is mid-invalidation.
+  - Chapter list converted to CustomScrollView + SliverList.builder
+    so long lists (Mahābhārata 18 parvas, Bhāgavata Purāṇa 12
+    skandhas) render lazily.
+- **Search**
+  - Tapping the X to clear the field now saves the query into recents
+    before clearing — abandoned typed queries are remembered.
+
+### Changed
+- **SharedPreferences key registry** — `PrefsKeys` (lib/core/constants/
+  preferences_keys.dart) expanded from 4 → 27 static keys + 2 dynamic
+  prefixes. 15 files swept replacing inline `_kFooKey` strings with
+  `PrefsKeys.X`. Future additions go through the registry.
+- **GeminiService timeout** — 10 s implicit → 6 s explicit per
+  request. Worst case 12 s (primary + fallback).
+- **`scriptureReadCountsProvider` is now `keepAlive: true`** — Library
+  remounts no longer re-issue the GROUP BY between bottom-nav
+  round-trips.
+- **DB gunzip moved to a background isolate** via `compute()`. Splash
+  screen stays animated on the very first cold launch (~600-900 ms
+  off the main thread).
+- **APK slim** — `assets/icons/ic_foreground.png` (1.38 MB) moved out
+  of the runtime bundle (was only used by `flutter_launcher_icons` at
+  build time). `Lora-Bold.ttf` (131 KB) dropped — codebase audit
+  confirmed only w500/w600 + italic are referenced with the serif
+  family. Net ~1.5 MB APK reduction; arm64 release is now 39 MB.
+- **AdId permissions removed via manifest merge** — Firebase Analytics
+  auto-adds four AdId / Privacy-Sandbox permissions; all four
+  overridden with `tools:node="remove"` so the merged manifest matches
+  the "v1 ships without ads" story. Play Console Data Safety form's
+  "Device or other IDs" question can stay "No".
+
+### Fixed
+- **`bareCitationRe` Devanāgarī digits** — the regex's alias-letter
+  class swallowed U+0966-U+096F. "BG २.४७" never separated into
+  alias + numeric. Range split + negative-lookahead trailing
+  boundary; both forms ("(BG २.४७)" and bare "BG २.४७") now parse.
+- **`parseScriptureCoordinate` Katha doc-comment** — example
+  "Katha 1.2.18" did not parse (kathaUpanishad is 2-level in the
+  bundled DB, not 3-level). Updated example to "Katha 1.18".
+
+### Security
+- **Git history scrub** — `git filter-repo` rewrote all 230+ commits
+  to: drop the live Gemini API key from `BUILD_COMMANDS.md`, swap
+  the author email to a personal account, drop a `_review_delete/`
+  bundle that carried a full source export with Firebase keys, drop
+  an employer design-system reference folder, and drop personal
+  device-audit + Claude Code config files. Followed by GCP key
+  rotation + Android package + SHA-1 restriction.
+- **Crashlytics + Analytics opt-out wiring** verified honoured on
+  boot via `setCrashlyticsCollectionEnabled` and
+  `setAnalyticsCollectionEnabled` reading `PrefsKeys.privacy*Enabled`
+  before `runApp`.
+
+### Docs
+- `docs/V1_AUDIT_REPORT_2026-05-28.md` — code audit covering APK
+  breakdown, R8/key safety, Drift schema contract, Pandit code walk.
+- `docs/V1_ARCHITECTURE_AUDIT_2026-05-28.md` — 13-dimension
+  architecture audit (composite 7/10) with v1.1 + v2 refactor
+  roadmap.
+- `docs/PRE_PRODUCTION_TEST_2026-05-29.md` — systems-level pre-launch
+  audit on real Samsung A015 (cold start 1789 ms, PSS 229 MB,
+  APK 39 MB, debuggable=false, R8 mapping.txt 21 MB).
+- `docs/legal/{privacy,terms}.md` — Lora-tone Privacy Policy + Terms
+  drafts.
+- `store_assets/` — Play Store listing copy + screenshot capture
+  plan + feature-graphic prompt.
+- `scripts/verify_festival_dates.md` — 48-row checklist for
+  cross-checking 2027-2030 dates against Drik Panchang.
+
+### Build
+- `scripts/release.sh` now gzip-extracts and validates the bundled
+  DB before kicking off Gradle: `PRAGMA user_version=6` + verse
+  count ≥ 20K. Fails fast if the bundled DB regresses.
+- Schema bumped 9 → 10: adds
+  `idx_verse_explanations_verse_id` on the AI-explanation cache.
+- `LICENSE` file added at repo root.
+
 ## [1.0.0] — 2026-05-27 (v1 final-audit sprint)
 
 ### Added

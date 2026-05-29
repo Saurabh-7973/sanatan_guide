@@ -36,11 +36,13 @@ A winding journey through curated modules designed for everyone from beginners t
 ---
 
 ## 🛠 Tech Stack
-- **Framework**: Flutter (Material 3)
-- **State Management**: Riverpod
+- **Framework**: Flutter (Material 3, Impeller / Vulkan)
+- **State Management**: Riverpod (56 code-gen providers)
 - **Navigation**: GoRouter
-- **Persistence**: SQLite (FTS5 Search) via Drift
-- **AI**: Gemini 2.5 Flash (verse explanations, word gloss, Pandit chat)
+- **Persistence**: SQLite + FTS5 search via Drift (schema v10, 8 tables, 133K verses)
+- **AI**: Gemini 3.5 Flash (primary) with 2.5 Flash fallback —
+  in-memory LRU cache + 3-fail/60s circuit breaker + 6 s timeout
+- **Crash reporting**: Firebase Crashlytics with R8 mapping upload
 - **Animations**: flutter_animate + Custom Painters
 
 ---
@@ -100,8 +102,23 @@ Before shipping a new version to Play Store:
 5. Upload to Play Console → Internal testing track, soak for 3 days on
    real devices, then promote to Production.
 
-See `LAUNCH_ASSESSMENT_2026-05-27.md` for the full pre-launch audit
-(security, performance, app size, code quality, legal/Play store gaps).
+## 📋 Audits
+
+- `docs/V1_AUDIT_REPORT_2026-05-28.md` — code audit (APK breakdown, R8
+  / key safety, Drift schema contract, Pandit code walk).
+- `docs/V1_ARCHITECTURE_AUDIT_2026-05-28.md` — 13-dimension architecture
+  audit with v1.1 + v2 refactor roadmap (composite 7/10 — production-ready).
+- `docs/PRE_PRODUCTION_TEST_2026-05-29.md` — systems-level pre-launch
+  audit on a real device.
+- `LAUNCH_ASSESSMENT_2026-05-27.md` — sprint-baseline assessment.
+
+---
+
+## 📜 License
+
+See `LICENSE`. Source is provided for reference + personal study; commercial
+redistribution and Play Store republication require written permission.
+Bundled fonts are SIL OFL 1.1 (see `LICENSES/FONTS.md`).
 
 ---
 

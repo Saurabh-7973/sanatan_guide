@@ -1,0 +1,42 @@
+Sanatan Guide — Copyright (c) 2026 Saurabh Upadhyay
+
+This source code is provided for reference and personal study. The
+following terms govern its use.
+
+PERMITTED
+- Read and study the source for personal learning.
+- Reuse small snippets (under 50 lines) for unrelated personal projects
+  with attribution to this repository.
+- Cite or quote the source in articles, talks, or educational material
+  with a link back to this repository.
+
+NOT PERMITTED without prior written permission
+- Redistribute the codebase, in whole or substantially, under any name.
+- Publish a derivative app on Google Play, Apple App Store, or any
+  similar distribution channel.
+- Reuse the bundled scripture corpus (`assets/db/sanatan_guide.db.gz`)
+  or any translation packaging derived from it in a commercial product.
+- Reuse the art assets, illustrations, ornaments, or the curated
+  design system in any other product or publication.
+
+Scripture text translations bundled under `assets/db/` carry their own
+public-domain licensing terms (see `LICENSES/FONTS.md` for fonts;
+`docs/legal/` for full attribution). Where individual translators are
+named in the app, please respect their attribution requests.
+
+THIRD-PARTY DEPENDENCIES
+- Flutter, Dart, Drift, Riverpod, GoRouter, etc. — see `pubspec.yaml`,
+  each carries its own license (MIT / BSD-3-Clause / Apache-2.0).
+- Bundled fonts (Tiro Devanagari Sanskrit, Noto Sans Devanagari, Lora,
+  Outfit) — SIL Open Font License 1.1; see `LICENSES/FONTS.md`.
+- Firebase, Google Gemini API — Google's terms apply at runtime.
+
+NO WARRANTY
+This software is provided "as is", without warranty of any kind. The
+author is not liable for any incidental or consequential damage arising
+from its use. AI-generated commentary in the Pandit feature is not a
+substitute for qualified spiritual or scholarly counsel.
+
+CONTACT
+For licensing inquiries or republication permission, write to
+saurabhupadhyay7973@gmail.com.
