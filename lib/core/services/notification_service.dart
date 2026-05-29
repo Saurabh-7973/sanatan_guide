@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
+import 'package:sanatan_guide/core/utils/coordinate_parser.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -36,12 +37,22 @@ const _kLargeIcon = DrawableResourceAndroidBitmap('ic_launcher_foreground');
 
 @pragma('vm:entry-point')
 void onNotificationTap(NotificationResponse response) {
-  final verseId = response.payload;
-  if (verseId == null || verseId.isEmpty) return;
-  // Derive the scripture code from the verse id (BG.2.47 → bhagavad_gita,
-  // RV.1.1.1 → rigveda, etc.) instead of hard-coding bhagavad_gita.
-  final code = scriptureCodeFromVerseId(verseId);
-  NotificationService.pendingDeepLink = '/browse/$code/verse/$verseId';
+  final route = _safeDeepLinkFor(response.payload);
+  if (route != null) NotificationService.pendingDeepLink = route;
+}
+
+/// Build a GoRouter path from a notification payload, refusing anything
+/// that is not a legitimate scripture coordinate. Defence-in-depth in case
+/// another app on-device tries to spoof our notification channel with a
+/// path-traversal or arbitrary-route payload.
+String? _safeDeepLinkFor(String? payload) {
+  if (payload == null || payload.isEmpty) return null;
+  if (parseScriptureCoordinate(payload) == null) return null;
+  // Drop anything that smells like a separator we don't expect in a verse
+  // id (covers '..', '/', backslash, query/fragment markers).
+  if (RegExp(r'[\\/?#]').hasMatch(payload)) return null;
+  final code = scriptureCodeFromVerseId(payload);
+  return '/browse/$code/verse/$payload';
 }
 
 // ── Service ───────────────────────────────────────────────────────────────
@@ -108,12 +119,12 @@ final class NotificationService {
     // consume `pendingDeepLink` on first frame.
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
     if (launchDetails?.didNotificationLaunchApp ?? false) {
-      final verseId = launchDetails?.notificationResponse?.payload;
-      if (verseId != null && verseId.isNotEmpty) {
-        final code = scriptureCodeFromVerseId(verseId);
-        pendingDeepLink = '/browse/$code/verse/$verseId';
-        AppLogger.instance
-            .i('Cold-start notif deep link queued: $pendingDeepLink');
+      final route = _safeDeepLinkFor(
+        launchDetails?.notificationResponse?.payload,
+      );
+      if (route != null) {
+        pendingDeepLink = route;
+        AppLogger.instance.i('Cold-start notif deep link queued: $route');
       }
     }
 

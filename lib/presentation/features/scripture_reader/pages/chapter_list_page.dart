@@ -305,44 +305,56 @@ class _LoadedBody extends ConsumerWidget {
           isDark: isDark,
         ),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 24),
-            children: [
+          // Slivers instead of a materialised ListView so long scripture
+          // chapter lists (Mahābhārata 18 parvas, Bhāgavata Purāṇa 12
+          // skandhas, etc.) build chapter rows lazily.
+          child: CustomScrollView(
+            slivers: [
               if (showResume && resumeChapter != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-                  child: _ResumeRow(
-                    scripture: scripture,
-                    chapter: resumeChapter,
-                    verseNum: _resumeVerseNumFor(lastRead.verseId),
-                    isDark: isDark,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                    child: _ResumeRow(
+                      scripture: scripture,
+                      chapter: resumeChapter,
+                      verseNum: _resumeVerseNumFor(lastRead.verseId),
+                      isDark: isDark,
+                    ),
                   ),
                 ),
-              const SizedBox(height: 18),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _ChaptersLabel(scripture: scripture, isDark: isDark),
-              ),
-              ...List.generate(entries.length, (i) {
-                final entry = entries[i];
-                final read = i < readCounts.length ? readCounts[i] : 0;
-                return Padding(
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
+              SliverToBoxAdapter(
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: _ChapterRow(
-                    entry: entry,
-                    scripture: scripture,
-                    readCount: read,
-                    isDark: isDark,
-                  ),
-                )
-                    .animate(
-                      delay: Duration(
-                        milliseconds: 60 + 30 * math.min(i, 7),
+                  child: _ChaptersLabel(scripture: scripture, isDark: isDark),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) {
+                    final entry = entries[i];
+                    final read = i < readCounts.length ? readCounts[i] : 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: _ChapterRow(
+                        entry: entry,
+                        scripture: scripture,
+                        readCount: read,
+                        isDark: isDark,
                       ),
                     )
-                    .fadeIn(duration: 400.ms)
-                    .slideY(begin: 0.025, end: 0, duration: 400.ms);
-              }),
+                        .animate(
+                          delay: Duration(
+                            milliseconds: 60 + 30 * math.min(i, 7),
+                          ),
+                        )
+                        .fadeIn(duration: 400.ms)
+                        .slideY(begin: 0.025, end: 0, duration: 400.ms);
+                  },
+                  childCount: entries.length,
+                ),
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
             ],
           ),
         ),

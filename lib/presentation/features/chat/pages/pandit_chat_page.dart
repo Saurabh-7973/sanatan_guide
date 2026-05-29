@@ -37,6 +37,11 @@ const _kSystemPrompt =
     'every tradition within Sanatan Dharma. Keep answers concise — under 200 '
     'words unless the user asks for more depth.';
 
+/// Max characters a user's Pandit prompt may carry. Covers any sensible
+/// question; a pasted full-article or hostile blob is refused before it
+/// hits the Gemini billing meter.
+const int _kMaxPromptChars = 2000;
+
 /// General-mode "Ask the Pandit" chat, served at `/chat`.
 class PanditChatPage extends StatefulWidget {
   const PanditChatPage({super.key});
@@ -87,6 +92,19 @@ class _PanditChatPageState extends State<PanditChatPage> {
   Future<void> _send() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _loading || !GeminiService.isEnabled) return;
+
+    // Cap prompt length to keep Gemini billing predictable and to refuse
+    // pasted-blob attacks. 2000 chars covers any reasonable user question;
+    // longer pastes are almost always copy-pastes of scripture or full
+    // articles that the system prompt already has context for.
+    if (text.length > _kMaxPromptChars) {
+      setState(() {
+        _error = 'Your question is too long. Please keep it under '
+            '$_kMaxPromptChars characters.';
+        _retryableText = null;
+      });
+      return;
+    }
 
     if (_remaining <= 0) {
       setState(() {
@@ -681,6 +699,10 @@ class _InputArea extends StatelessWidget {
                   focusNode: focusNode,
                   minLines: 1,
                   maxLines: 5,
+                  maxLength: _kMaxPromptChars,
+                  // Counter is noisy at 2000 cap; keep input clean and rely
+                  // on the hard-limit clamp + on-send guard for safety.
+                  buildCounter: (_, {required currentLength, maxLength, required isFocused}) => null,
                   textInputAction: TextInputAction.send,
                   onChanged: (_) => onChanged(),
                   onSubmitted: (_) => onSend(),

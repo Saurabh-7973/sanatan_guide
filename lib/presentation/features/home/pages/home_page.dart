@@ -11,6 +11,7 @@ import 'package:sanatan_guide/presentation/features/home/widgets/panchang_block.
 import 'package:sanatan_guide/presentation/features/home/widgets/verse_hero_card.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Home — the "Today" tab.
@@ -52,7 +53,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
-    final bg = isDark ? DColors.bg : LColors.bg;
     final surface = isDark ? DColors.surface : LColors.surface;
 
     // First day = onboarding done but nothing read yet. Stay in steady state
@@ -61,8 +61,14 @@ class _HomePageState extends ConsumerState<HomePage> {
     final isFirstDay = lastReadAsync.hasValue && lastReadAsync.value == null;
 
     return Scaffold(
-      backgroundColor: bg,
-      body: RefreshIndicator(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Same WarmBackdrop wash every other primary screen uses, so the
+          // home backdrop reads consistent across the bottom-nav rotation.
+          const WarmBackdrop(),
+          RefreshIndicator(
         color: saffron,
         backgroundColor: surface,
         onRefresh: _refresh,
@@ -106,6 +112,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             ],
           ),
         ),
+          ),
+        ],
       ),
     );
   }

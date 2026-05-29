@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -37,7 +38,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +81,15 @@ class AppDatabase extends _$AppDatabase {
               'ON commentaries (verse_id)',
             );
           }
+          if (from <= 9) {
+            // Audit D-3: verse_explanations lookups go by verse_id; the
+            // implicit primary-key index covers `id` only. At 1000+
+            // cached explanations the scan cost is noticeable.
+            await m.database.customStatement(
+              'CREATE INDEX IF NOT EXISTS idx_verse_explanations_verse_id '
+              'ON verse_explanations (verse_id)',
+            );
+          }
         },
       );
 
@@ -95,6 +105,10 @@ class AppDatabase extends _$AppDatabase {
     await m.database.customStatement(
       'CREATE INDEX IF NOT EXISTS idx_commentaries_verse_id '
       'ON commentaries (verse_id)',
+    );
+    await m.database.customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_verse_explanations_verse_id '
+      'ON verse_explanations (verse_id)',
     );
   }
 
@@ -165,7 +179,12 @@ Future<QueryExecutor> openAppDatabaseConnection() async {
   if (!dbFile.existsSync()) {
     try {
       final compressed = await rootBundle.load('assets/db/sanatan_guide.db.gz');
-      final decoded = gzip.decode(compressed.buffer.asUint8List());
+      final bytes = compressed.buffer.asUint8List();
+      // gzip.decode on a 14 MB blob → ~65 MB takes ~600-900 ms on a low-end
+      // device. Run it on a worker isolate so the splash screen stays
+      // animated and the main thread doesn't drop frames during the very
+      // first cold launch.
+      final decoded = await compute(_gzipDecode, bytes);
       await dbFile.writeAsBytes(decoded, flush: true);
       AppLogger.instance.i(
         'Bundled DB decompressed to: ${dbFile.path} '
@@ -182,3 +201,6 @@ Future<QueryExecutor> openAppDatabaseConnection() async {
 
   return NativeDatabase.createInBackground(dbFile);
 }
+
+/// Top-level so `compute` can serialize it to a background isolate.
+List<int> _gzipDecode(Uint8List bytes) => gzip.decode(bytes);

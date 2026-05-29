@@ -72,22 +72,31 @@ class GeminiService {
     ];
 
     final body = jsonEncode({'contents': contents});
-    var response = await http.post(
-      Uri.parse('${_endpointFor(_primaryModel)}?key=$_apiKey'),
-      headers: const {'Content-Type': 'application/json'},
-      body: body,
-    );
+    // Tightened timeout: most gemini-flash replies finish in <3s. 6s gives
+    // headroom for slow networks without forcing the user to stare at a
+    // spinner. The single fallback retry below provides an additional 6s,
+    // for a 12s worst case rather than the previous open-ended wait.
+    const reqTimeout = Duration(seconds: 6);
+    var response = await http
+        .post(
+          Uri.parse('${_endpointFor(_primaryModel)}?key=$_apiKey'),
+          headers: const {'Content-Type': 'application/json'},
+          body: body,
+        )
+        .timeout(reqTimeout);
 
     // Primary model unavailable (e.g. identifier not yet rolled out to all
     // regions, or rolled back). Retry once on the prior-generation flash
     // tier so users still get a reply. 404 + 400 (BAD_REQUEST for unknown
     // model) both trigger the fallback.
     if (response.statusCode == 404 || response.statusCode == 400) {
-      response = await http.post(
-        Uri.parse('${_endpointFor(_fallbackModel)}?key=$_apiKey'),
-        headers: const {'Content-Type': 'application/json'},
-        body: body,
-      );
+      response = await http
+          .post(
+            Uri.parse('${_endpointFor(_fallbackModel)}?key=$_apiKey'),
+            headers: const {'Content-Type': 'application/json'},
+            body: body,
+          )
+          .timeout(reqTimeout);
     }
 
     if (response.statusCode != 200) {

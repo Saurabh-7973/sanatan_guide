@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Scripture Library — Śruti / Smṛti taxonomy in 6 families.
@@ -106,7 +107,6 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? DColors.bg : LColors.bg;
     // Live per-scripture read counts. Treat loading/error as zero so the
     // first render is stable; the provider revalidates when verses are read.
     final readCounts =
@@ -120,8 +120,14 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     final headerHeight = 46.0 + textScaler.scale(88.0);
 
     return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Match every other primary screen's wash so bottom-nav
+          // navigation doesn't flip background tones between tabs.
+          const WarmBackdrop(),
+          SafeArea(
         bottom: false,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(
@@ -197,6 +203,8 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
               ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

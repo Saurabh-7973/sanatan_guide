@@ -22,7 +22,11 @@ Future<int> chapterReadCount(
 /// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
 /// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
 /// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
-@riverpod
+///
+/// `keepAlive: true` survives Library remounts (e.g. bottom-nav round-trips)
+/// so the user doesn't see a flash of zero counts every time they return.
+/// The provider is still invalidated on writes from verse_detail_page.dart.
+@Riverpod(keepAlive: true)
 Future<Map<String, int>> scriptureReadCounts(Ref ref) async {
   final db = await ref.watch(appDatabaseProvider.future);
   return db.scriptureDao.getReadVerseCountsByScripture();

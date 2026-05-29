@@ -118,6 +118,10 @@ final class ChapterReadCountFamily extends $Family
 /// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
 /// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
 /// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+///
+/// `keepAlive: true` survives Library remounts (e.g. bottom-nav round-trips)
+/// so the user doesn't see a flash of zero counts every time they return.
+/// The provider is still invalidated on writes from verse_detail_page.dart.
 
 @ProviderFor(scriptureReadCounts)
 final scriptureReadCountsProvider = ScriptureReadCountsProvider._();
@@ -125,6 +129,10 @@ final scriptureReadCountsProvider = ScriptureReadCountsProvider._();
 /// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
 /// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
 /// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+///
+/// `keepAlive: true` survives Library remounts (e.g. bottom-nav round-trips)
+/// so the user doesn't see a flash of zero counts every time they return.
+/// The provider is still invalidated on writes from verse_detail_page.dart.
 
 final class ScriptureReadCountsProvider extends $FunctionalProvider<
         AsyncValue<Map<String, int>>,
@@ -134,13 +142,17 @@ final class ScriptureReadCountsProvider extends $FunctionalProvider<
   /// Returns per-scripture read counts in a single query (`GROUP BY scripture`).
   /// Map keys are scripture codes (`bhagavad_gita`, `rigveda`, …). Missing keys
   /// mean zero. Invalidate after [markVerseRead] so Library reflects new reads.
+  ///
+  /// `keepAlive: true` survives Library remounts (e.g. bottom-nav round-trips)
+  /// so the user doesn't see a flash of zero counts every time they return.
+  /// The provider is still invalidated on writes from verse_detail_page.dart.
   ScriptureReadCountsProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
           name: r'scriptureReadCountsProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -161,7 +173,7 @@ final class ScriptureReadCountsProvider extends $FunctionalProvider<
 }
 
 String _$scriptureReadCountsHash() =>
-    r'c40b2e15d9e7531aebd4a4c5b7e72ef1b11fc052';
+    r'5da38483adf80b9bd043e111bd1c6795818cab42';
 
 /// Per-chapter read counts within one scripture, keyed by "bookNum:chapterNum"
 /// ("0:1" for flat texts, "1:1" for nested-id texts like Ṛgveda). One GROUP
