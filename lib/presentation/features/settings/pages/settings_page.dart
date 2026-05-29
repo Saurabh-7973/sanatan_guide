@@ -7,6 +7,8 @@
 
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 // `kDefaultFontSize` is also exported by material.dart (14.0); we need the
 // app's reading-font default (16.0) from font_size_provider.
 import 'package:flutter/material.dart' hide kDefaultFontSize;
@@ -304,10 +306,11 @@ class _Row extends StatelessWidget {
   }
 }
 
-/// QA helper: 3 taps within 1.5 s on the version label throws an
-/// uncaught exception so we can verify the Crashlytics symbolication
-/// pipeline on a real release build. Hidden by design — production
-/// users won't discover the gesture by accident.
+/// QA helper: 3 taps within 1.5 s on the version label fires a hard
+/// Crashlytics test crash so we can verify the symbolication pipeline
+/// on a real release build. Each tap shows a small toast so QA knows
+/// the gesture is registering. Hidden by design — production users
+/// won't discover the gesture by accident.
 abstract final class _CrashTestCounter {
   static int _count = 0;
   static DateTime _firstAt = DateTime(2000);
@@ -321,18 +324,37 @@ abstract final class _CrashTestCounter {
     } else {
       _count += 1;
     }
-    if (_count >= 3) {
-      _count = 0;
-      // Throw outside the gesture handler so the zone-guarded
-      // runZonedGuarded in main.dart catches it and forwards to
-      // Crashlytics.
-      Future<void>.microtask(() {
-        throw StateError(
-          'CRASHLYTICS_TEST_CRASH: deliberate uncaught throw from '
-          'Settings → version triple-tap. Safe to ignore in console.',
-        );
-      });
+
+    // Toast feedback so QA knows the tap registered. SnackBar is
+    // cheap enough for a debug-only path.
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (_count < 3) {
+      messenger?.removeCurrentSnackBar();
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text('Crash test: tap ${3 - _count} more time(s) within 1.5 s'),
+          duration: const Duration(milliseconds: 900),
+        ),
+      );
+      return;
     }
+
+    _count = 0;
+    messenger?.removeCurrentSnackBar();
+    messenger?.showSnackBar(
+      const SnackBar(
+        content: Text('Crash test fired — app will close. Reopen + wait 5 min for Crashlytics.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    // Fire the hard native crash AFTER the SnackBar paints, so the
+    // tester actually sees the confirmation before the process dies.
+    // FirebaseCrashlytics.instance.crash() calls Process.killProcess
+    // on Android — guarantees the report uploads on next launch.
+    Future<void>.delayed(
+      const Duration(milliseconds: 600),
+      FirebaseCrashlytics.instance.crash,
+    );
   }
 }
 
@@ -377,14 +399,22 @@ class _BrandFooter extends StatelessWidget {
             future: PackageInfo.fromPlatform(),
             builder: (context, snap) {
               final version = snap.data;
+              // Flutter's split-per-abi build offsets versionCode per ABI
+              // (armv7 +1000, arm64 +2000, x86_64 +4000). The user-visible
+              // build number is the pubspec `+N`, which is `versionCode %
+              // 1000` on every ABI.
+              final rawBuild = int.tryParse(version?.buildNumber ?? '');
+              final displayBuild =
+                  rawBuild == null ? version?.buildNumber : '${rawBuild % 1000}';
               final label = version == null
                   ? '...'
-                  : 'Version ${version.version} · build ${version.buildNumber}';
+                  : 'Version ${version.version} · build $displayBuild';
               return GestureDetector(
-                // Hidden QA gesture: triple-tap the version label to throw
-                // an uncaught exception so we can verify the Crashlytics
-                // pipeline end-to-end on a real release build. Production
-                // users won't discover this by accident.
+                // Hidden QA gesture: triple-tap the version label to fire
+                // a hard native crash via FirebaseCrashlytics.instance.crash()
+                // so we can verify the Crashlytics pipeline end-to-end on
+                // a real release build. Production users won't discover
+                // the gesture by accident.
                 onTap: () => _CrashTestCounter.bump(context),
                 child: Text(
                   label,

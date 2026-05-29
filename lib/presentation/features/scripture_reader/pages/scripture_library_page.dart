@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
-import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
 /// Scripture Library — Śruti / Smṛti taxonomy in 6 families.
@@ -118,16 +117,11 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
     // setting so the accessibility path doesn't clip.
     final textScaler = MediaQuery.textScalerOf(context);
     final headerHeight = 46.0 + textScaler.scale(88.0);
+    final bg = isDark ? DColors.bg : LColors.bg;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Match every other primary screen's wash so bottom-nav
-          // navigation doesn't flip background tones between tabs.
-          const WarmBackdrop(),
-          SafeArea(
+      backgroundColor: bg,
+      body: SafeArea(
         bottom: false,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(
@@ -203,8 +197,6 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
               ),
           ],
         ),
-      ),
-        ],
       ),
     );
   }
