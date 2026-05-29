@@ -1,15 +1,12 @@
 import 'package:in_app_review/in_app_review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 
 enum ReviewTrigger { streak7Day, chapterCompleted, moduleCompleted }
 
 final class ReviewService {
   ReviewService._();
-
-  static const _kLastReviewMsKey = 'review_last_requested_ms';
-  static const _kFirstChapterDoneKey = 'review_first_chapter_done';
-  static const _kFirstModuleDoneKey = 'review_first_module_done';
   static const _thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
 
   static final InAppReview _inAppReview = InAppReview.instance;
@@ -33,18 +30,18 @@ final class ReviewService {
 
       // ── One-time guards for chapter / module triggers ─────────────────────
       if (trigger == ReviewTrigger.chapterCompleted) {
-        final done = prefs.getBool(_kFirstChapterDoneKey) ?? false;
+        final done = prefs.getBool(PrefsKeys.reviewFirstChapterDone) ?? false;
         if (done) return; // only fire once
-        await prefs.setBool(_kFirstChapterDoneKey, true);
+        await prefs.setBool(PrefsKeys.reviewFirstChapterDone, true);
       }
       if (trigger == ReviewTrigger.moduleCompleted) {
-        final done = prefs.getBool(_kFirstModuleDoneKey) ?? false;
+        final done = prefs.getBool(PrefsKeys.reviewFirstModuleDone) ?? false;
         if (done) return; // only fire once
-        await prefs.setBool(_kFirstModuleDoneKey, true);
+        await prefs.setBool(PrefsKeys.reviewFirstModuleDone, true);
       }
 
       // ── 30-day global cooldown ────────────────────────────────────────────
-      final lastMs = prefs.getInt(_kLastReviewMsKey) ?? 0;
+      final lastMs = prefs.getInt(PrefsKeys.reviewLastRequestedMs) ?? 0;
       final nowMs = DateTime.now().millisecondsSinceEpoch;
       if (nowMs - lastMs < _thirtyDaysMs) {
         AppLogger.instance.i(
@@ -62,7 +59,7 @@ final class ReviewService {
       }
 
       await _inAppReview.requestReview();
-      await prefs.setInt(_kLastReviewMsKey, nowMs);
+      await prefs.setInt(PrefsKeys.reviewLastRequestedMs, nowMs);
       AppLogger.instance.i('ReviewService: review dialog shown ($trigger)');
     } catch (e, st) {
       AppLogger.instance.w(

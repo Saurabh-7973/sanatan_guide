@@ -1,16 +1,16 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 
 /// Persists the user's recent search queries to SharedPreferences.
 /// Capped at 20 entries; most-recent-first ordering preserved on add.
 abstract final class RecentSearchesService {
-  static const _kKey = 'recent_searches_v1';
   static const _maxEntries = 20;
 
   static Future<List<String>> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kKey);
+    final raw = prefs.getString(PrefsKeys.recentSearches);
     if (raw == null || raw.isEmpty) return const [];
     try {
       final decoded = jsonDecode(raw);
@@ -35,11 +35,11 @@ abstract final class RecentSearchesService {
     if (filtered.length > _maxEntries) {
       filtered.removeRange(_maxEntries, filtered.length);
     }
-    await prefs.setString(_kKey, jsonEncode(filtered));
+    await prefs.setString(PrefsKeys.recentSearches, jsonEncode(filtered));
   }
 
   static Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kKey);
+    await prefs.remove(PrefsKeys.recentSearches);
   }
 }

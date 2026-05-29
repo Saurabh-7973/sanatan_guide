@@ -4,7 +4,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
@@ -26,6 +25,7 @@ abstract final class FestivalNotificationScheduler {
   // SharedPreferences key tracking the IDs we scheduled last sync so we can
   // cancel them precisely (versus blowing away every notification with
   // cancelAll, which would also kill the daily verse reminder).
+  static const PrefsKeys.festivalNotifIds = 'festival_notif_ids';
 
   // Stay well clear of _kVerseOfDayNotifId (1001) and _kTestNotifId (1099).
   static const _kIdBase = 2000;

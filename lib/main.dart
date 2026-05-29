@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/router/app_router.dart';
 import 'package:sanatan_guide/core/services/ad_service.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
@@ -57,11 +58,12 @@ Future<void> _bootstrap() async {
   final prefs = await SharedPreferences.getInstance();
   // Crashlytics: default off in debug (dev noise), on in release.
   final crashlyticsEnabled =
-      prefs.getBool('privacy_crashlytics_enabled') ?? !kDebugMode;
+      prefs.getBool(PrefsKeys.privacyCrashlyticsEnabled) ?? !kDebugMode;
   await FirebaseCrashlytics.instance
       .setCrashlyticsCollectionEnabled(crashlyticsEnabled);
   // Analytics: default on for everyone, off only if the user opted out.
-  final analyticsEnabled = prefs.getBool('privacy_analytics_enabled') ?? true;
+  final analyticsEnabled =
+      prefs.getBool(PrefsKeys.privacyAnalyticsEnabled) ?? true;
   await AnalyticsService.setCollectionEnabled(analyticsEnabled);
 
   if (!kDebugMode) {

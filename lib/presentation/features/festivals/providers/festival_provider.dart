@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
 import 'package:sanatan_guide/data/festivals/festival_dates_future.dart';
@@ -25,7 +26,6 @@ part 'festival_provider.g.dart';
 //   "diwali": "2027-10-19",
 //   "dev_deepawali": "2027-11-02"
 // }
-const _kFestivalDatesKey = 'festival_dates_override';
 
 // ── Provider ──────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ Future<List<Festival>> festivals(Ref ref) async {
     final rc = FirebaseRemoteConfig.instance;
 
     // Set defaults so the app works offline or before first RC fetch
-    await rc.setDefaults({_kFestivalDatesKey: ''});
+    await rc.setDefaults({PrefsKeys.festivalDatesOverride: ''});
 
     // Configure fetch settings
     await rc.setConfigSettings(
@@ -52,7 +52,7 @@ Future<List<Festival>> festivals(Ref ref) async {
     // Fetch and activate — non-blocking, fails silently
     await rc.fetchAndActivate();
 
-    final raw = rc.getString(_kFestivalDatesKey);
+    final raw = rc.getString(PrefsKeys.festivalDatesOverride);
 
     if (raw.isEmpty) {
       // No Remote Config push — fall through to the bundled fallback below

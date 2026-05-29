@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/constants/bhagavad_gita_chapters.dart';
 import 'package:sanatan_guide/core/errors/failures.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
@@ -48,21 +49,20 @@ Future<SharedPreferences> sharedPreferences(Ref ref) =>
 // ── Transliteration Toggle ────────────────────────────────────────────────
 // Persisted preference: whether to show IAST transliteration on verse detail.
 
-const _kTransliterationKey = 'transliteration_enabled';
 
 @riverpod
 class TransliterationEnabled extends _$TransliterationEnabled {
   @override
   Future<bool> build() async {
     final prefs = await ref.watch(sharedPreferencesProvider.future);
-    return prefs.getBool(_kTransliterationKey) ?? false;
+    return prefs.getBool(PrefsKeys.transliterationEnabled) ?? false;
   }
 
   Future<void> toggle() async {
     final current = await future;
     final prefs = await ref.read(sharedPreferencesProvider.future);
     final next = !current;
-    await prefs.setBool(_kTransliterationKey, next);
+    await prefs.setBool(PrefsKeys.transliterationEnabled, next);
     state = AsyncData(next);
   }
 }

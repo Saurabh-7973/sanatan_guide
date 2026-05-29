@@ -2,19 +2,12 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 
 part 'streak_service.g.dart';
-
-// ── Keys ──────────────────────────────────────────────────────────────────
-const _kLastReadDateKey = 'streak_last_read_date';
-const _kCurrentStreakKey = 'streak_current_count';
-const _kLongestStreakKey = 'streak_longest_count';
-const _kReadHistoryKey = 'streak_read_history'; // comma-separated yyyy-MM-dd
-const _kLastReadVerseIdKey = 'last_read_verse_id';
-const _kLastReadScriptureKey = 'last_read_scripture_code';
 
 // ── Service ───────────────────────────────────────────────────────────────
 
@@ -34,24 +27,24 @@ final class StreakService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = formatReadDateKey(DateTime.now());
-      final lastRead = prefs.getString(_kLastReadDateKey);
+      final lastRead = prefs.getString(PrefsKeys.streakLastReadDate);
 
       // Already recorded today — but still ensure today is in history
       // (handles the case where history tracking was added after the streak
       // was already recorded for today)
       if (lastRead == today) {
-        final historyRaw = prefs.getString(_kReadHistoryKey) ?? '';
+        final historyRaw = prefs.getString(PrefsKeys.streakReadHistory) ?? '';
         if (!historyRaw.contains(today)) {
           final history =
               historyRaw.isEmpty ? <String>{} : historyRaw.split(',').toSet();
           history.add(today);
-          await prefs.setString(_kReadHistoryKey, history.join(','));
+          await prefs.setString(PrefsKeys.streakReadHistory, history.join(','));
         }
         return;
       }
 
-      final current = prefs.getInt(_kCurrentStreakKey) ?? 0;
-      final longest = prefs.getInt(_kLongestStreakKey) ?? 0;
+      final current = prefs.getInt(PrefsKeys.streakCurrentCount) ?? 0;
+      final longest = prefs.getInt(PrefsKeys.streakLongestCount) ?? 0;
 
       final yesterday = formatReadDateKey(
         DateTime.now().subtract(const Duration(days: 1)),
@@ -68,7 +61,7 @@ final class StreakService {
 
       // ── Update read history ───────────────────────────────────────────
       // Keep a rolling set of the last 60 days max
-      final historyRaw = prefs.getString(_kReadHistoryKey) ?? '';
+      final historyRaw = prefs.getString(PrefsKeys.streakReadHistory) ?? '';
       final history =
           historyRaw.isEmpty ? <String>{} : historyRaw.split(',').toSet();
       history.add(today);
@@ -83,10 +76,10 @@ final class StreakService {
         }
       });
 
-      await prefs.setString(_kLastReadDateKey, today);
-      await prefs.setInt(_kCurrentStreakKey, newStreak);
-      await prefs.setInt(_kLongestStreakKey, newLongest);
-      await prefs.setString(_kReadHistoryKey, history.join(','));
+      await prefs.setString(PrefsKeys.streakLastReadDate, today);
+      await prefs.setInt(PrefsKeys.streakCurrentCount, newStreak);
+      await prefs.setInt(PrefsKeys.streakLongestCount, newLongest);
+      await prefs.setString(PrefsKeys.streakReadHistory, history.join(','));
 
       if (newStreak == 7) {
         // duringReading=false: StreakService is called from verse_detail_page
@@ -116,10 +109,10 @@ final class StreakService {
       final yesterday = formatReadDateKey(
         DateTime.now().subtract(const Duration(days: 1)),
       );
-      final lastRead = prefs.getString(_kLastReadDateKey);
+      final lastRead = prefs.getString(PrefsKeys.streakLastReadDate);
 
       if (lastRead == today || lastRead == yesterday) {
-        return prefs.getInt(_kCurrentStreakKey) ?? 0;
+        return prefs.getInt(PrefsKeys.streakCurrentCount) ?? 0;
       }
       return 0;
     } catch (e, st) {
@@ -135,8 +128,8 @@ final class StreakService {
   ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kLastReadVerseIdKey, verseId);
-      await prefs.setString(_kLastReadScriptureKey, scriptureCode);
+      await prefs.setString(PrefsKeys.lastReadVerseId, verseId);
+      await prefs.setString(PrefsKeys.lastReadScriptureCode, scriptureCode);
     } catch (e, st) {
       AppLogger.instance.w('saveLastReadVerse failed', e, st);
     }
@@ -147,8 +140,8 @@ final class StreakService {
       getLastReadVerse() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final id = prefs.getString(_kLastReadVerseIdKey);
-      final code = prefs.getString(_kLastReadScriptureKey);
+      final id = prefs.getString(PrefsKeys.lastReadVerseId);
+      final code = prefs.getString(PrefsKeys.lastReadScriptureCode);
       if (id != null && code != null) {
         return (verseId: id, scriptureCode: code);
       }
@@ -163,12 +156,12 @@ final class StreakService {
   Future<void> clearAllHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await Future.wait([
-      prefs.remove(_kLastReadDateKey),
-      prefs.remove(_kCurrentStreakKey),
-      prefs.remove(_kLongestStreakKey),
-      prefs.remove(_kReadHistoryKey),
-      prefs.remove(_kLastReadVerseIdKey),
-      prefs.remove(_kLastReadScriptureKey),
+      prefs.remove(PrefsKeys.streakLastReadDate),
+      prefs.remove(PrefsKeys.streakCurrentCount),
+      prefs.remove(PrefsKeys.streakLongestCount),
+      prefs.remove(PrefsKeys.streakReadHistory),
+      prefs.remove(PrefsKeys.lastReadVerseId),
+      prefs.remove(PrefsKeys.lastReadScriptureCode),
     ]);
   }
 
@@ -176,7 +169,7 @@ final class StreakService {
   static Future<Set<String>> getReadHistory() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kReadHistoryKey) ?? '';
+      final raw = prefs.getString(PrefsKeys.streakReadHistory) ?? '';
       if (raw.isEmpty) return {};
       return raw.split(',').toSet();
     } catch (e, st) {

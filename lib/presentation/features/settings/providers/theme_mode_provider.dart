@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sanatan_guide/core/constants/preferences_keys.dart';
 
 part 'theme_mode_provider.g.dart';
 
-const _kThemeModeKey = 'app_theme_mode';
 
 @Riverpod(keepAlive: true)
 class ThemeModeNotifier extends _$ThemeModeNotifier {
@@ -16,7 +16,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_kThemeModeKey);
+    final raw = prefs.getString(PrefsKeys.appThemeMode);
     if (raw != null) {
       state = _fromString(raw);
     }
@@ -25,7 +25,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kThemeModeKey, mode.name);
+    await prefs.setString(PrefsKeys.appThemeMode, mode.name);
   }
 
   static ThemeMode _fromString(String value) => switch (value) {
