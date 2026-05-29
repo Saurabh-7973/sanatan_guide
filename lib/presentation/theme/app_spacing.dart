@@ -26,7 +26,10 @@ abstract final class AppSpacing {
   static const double radiusHero = 24.0; // hero cards (VoD, featured scripture)
   static const double radiusSheet = 20.0; // share card, bottom sheets
 
-  /// @deprecated Use radiusCard (16dp) instead.
+  /// Compact 12dp radius. Used on shimmer skeletons + the secondary card
+  /// surface in `module_reader_page` to read softer than the 16dp
+  /// `radiusCard` they sit alongside. Kept as an intentional token —
+  /// don't fold into `radiusCard`.
   static const double cardRadius = 12.0;
 
   // Typography (line height multipliers)
