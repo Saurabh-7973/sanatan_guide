@@ -54,7 +54,7 @@ final class CrashlyticsEnabledProvider
 }
 
 String _$crashlyticsEnabledHash() =>
-    r'4d1227647eeedd1b128279d2dfad63a10ccbe1c2';
+    r'b3687b1e912ccab0ba8c88117e42c13c9d03e098';
 
 /// User-facing opt-out for Firebase Crashlytics. Default ON in release
 /// (so we can fix actual crashes), default OFF in debug (so dev noise

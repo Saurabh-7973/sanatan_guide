@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -9,6 +10,21 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+    <!-- Firebase Analytics auto-merges com.google.android.gms.permission.AD_ID
+         (advertising-id) into the manifest. v1 ships without advertising,
+         so strip the auto-merged permission to keep the Play Console Data
+         Safety form's "Device IDs" answer truthful + reduce permission
+         surface. If we ever bring AdMob back, drop these `tools:node`
+         entries and re-declare in Data Safety. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS"
+        tools:node="remove"/>
 
     <application
         android:label="Sanatan Guide"

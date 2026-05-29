@@ -50,7 +50,7 @@ final class AnalyticsEnabledProvider
   }
 }
 
-String _$analyticsEnabledHash() => r'1b65f7fdd5f23ab0025a56bc75571438cb9c039d';
+String _$analyticsEnabledHash() => r'd7279ad510c8f26a9dbf644f5ddf43a94d63e482';
 
 /// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
 /// notifier persists to SharedPreferences and immediately flips the SDK-level

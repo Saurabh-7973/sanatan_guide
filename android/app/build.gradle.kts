@@ -1,4 +1,5 @@
 import java.util.Properties
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
     id("com.android.application")
@@ -55,6 +56,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Crashlytics R8 mapping upload — defaults to true when minify
+            // is on, but pin it explicitly so a future build-config change
+            // doesn't silently disable obfuscated-stack-trace symbolication.
+            // Native symbol upload skipped on purpose: Flutter strips
+            // libapp.so by default, and Dart-side crashes are captured by
+            // FlutterError.onError → recordFlutterFatalError before they
+            // reach native — so the Crashlytics native path is rarely
+            // exercised. Re-enable with `nativeSymbolUploadEnabled = true`
+            // + flutter build --split-debug-info=<dir> if that changes.
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = true
+            }
         }
     }
 

@@ -42,7 +42,7 @@ final class NotificationTimeNotifierProvider
 }
 
 String _$notificationTimeNotifierHash() =>
-    r'4d49c92a3edbae2ac2c2d4c553e7e7926edce8f8';
+    r'7a13e5475d4155b5ba82ee67dbdc8cf8e326545c';
 
 abstract class _$NotificationTimeNotifier extends $Notifier<TimeOfDay> {
   TimeOfDay build();
@@ -96,7 +96,7 @@ final class NotificationEnabledProvider
 }
 
 String _$notificationEnabledHash() =>
-    r'7e09a84e90f1e429092e4e77caf74c32c3e67282';
+    r'5c6cf605313b46daebf1450b4ba4e198eaf8b469';
 
 /// Whether the Daily verse reminder is enabled. Defaults to true to honour
 /// the onboarding "Enable reminder" tap; user can toggle off in Settings.
@@ -159,7 +159,7 @@ final class FestivalAlertsEnabledProvider
 }
 
 String _$festivalAlertsEnabledHash() =>
-    r'4deafcdf373c9e7cbf65776f05bf84fbea53134c';
+    r'1d3b777f481bca12f9f1cac9348c38b574d05aaa';
 
 /// Whether festival-day alerts are enabled. Default off — the scheduler
 /// gated on this won't post anything until the user opts in. The actual

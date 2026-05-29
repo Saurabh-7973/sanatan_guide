@@ -72,7 +72,7 @@ final class TransliterationEnabledProvider
 }
 
 String _$transliterationEnabledHash() =>
-    r'ee5eae7919abefa9ada88ffbb1efe9f58c46bb94';
+    r'8d7d303c0698ff21a8443809371750bad7509b5c';
 
 abstract class _$TransliterationEnabled extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

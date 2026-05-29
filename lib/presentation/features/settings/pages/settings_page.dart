@@ -304,6 +304,38 @@ class _Row extends StatelessWidget {
   }
 }
 
+/// QA helper: 3 taps within 1.5 s on the version label throws an
+/// uncaught exception so we can verify the Crashlytics symbolication
+/// pipeline on a real release build. Hidden by design — production
+/// users won't discover the gesture by accident.
+abstract final class _CrashTestCounter {
+  static int _count = 0;
+  static DateTime _firstAt = DateTime(2000);
+  static const _window = Duration(milliseconds: 1500);
+
+  static void bump(BuildContext context) {
+    final now = DateTime.now();
+    if (now.difference(_firstAt) > _window) {
+      _count = 1;
+      _firstAt = now;
+    } else {
+      _count += 1;
+    }
+    if (_count >= 3) {
+      _count = 0;
+      // Throw outside the gesture handler so the zone-guarded
+      // runZonedGuarded in main.dart catches it and forwards to
+      // Crashlytics.
+      Future<void>.microtask(() {
+        throw StateError(
+          'CRASHLYTICS_TEST_CRASH: deliberate uncaught throw from '
+          'Settings → version triple-tap. Safe to ignore in console.',
+        );
+      });
+    }
+  }
+}
+
 /// Bottom-of-page footer with brand + version. Replaces the older
 /// "Sanatan Guide" row that lived inside the About section — design
 /// screen-09 places the version line at the very bottom of the
@@ -348,15 +380,22 @@ class _BrandFooter extends StatelessWidget {
               final label = version == null
                   ? '...'
                   : 'Version ${version.version} · build ${version.buildNumber}';
-              return Text(
-                label,
-                style: TextStyle(
-                  fontFamily: Fonts.sans,
-                  fontFamilyFallback: AppFontFallback.latin,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.18 * 10.5,
-                  color: text3,
+              return GestureDetector(
+                // Hidden QA gesture: triple-tap the version label to throw
+                // an uncaught exception so we can verify the Crashlytics
+                // pipeline end-to-end on a real release build. Production
+                // users won't discover this by accident.
+                onTap: () => _CrashTestCounter.bump(context),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: Fonts.sans,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.18 * 10.5,
+                    color: text3,
+                  ),
                 ),
               );
             },

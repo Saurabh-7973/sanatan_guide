@@ -48,4 +48,4 @@ final class FestivalsProvider extends $FunctionalProvider<
   }
 }
 
-String _$festivalsHash() => r'9c683b8a30dac38e7e5a5d7390d0a3f42dc6abc0';
+String _$festivalsHash() => r'60a729a03b0d7735eaef6f78e5eee3f08159d61c';
