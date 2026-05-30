@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/constants/bhagavad_gita_chapters.dart';
 import 'package:sanatan_guide/core/constants/scripture_chapters.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
-import 'package:sanatan_guide/core/utils/devanagari.dart';
 import 'package:sanatan_guide/core/utils/nav_logger.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/chapter_outline.dart';
@@ -812,26 +811,15 @@ class _ChapterRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Numeral block. Width tightened so the chapter title
-              // begins closer to the page edge — the previous 38px column
-              // pushed content past the natural left-margin reading point.
-              SizedBox(
-                width: 28,
+              // Title column at the left page edge — the previous 38px /
+              // 28px numeral column pushed every chapter row's content
+              // visibly inward. The chapter number is now a small inline
+              // tag above the title so content reads from the edge.
+              Expanded(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      arabicToDevanagari(entry.chapterNum),
-                      style: TextStyle(
-                        fontFamily: Fonts.deva,
-                        fontFamilyFallback: AppFontFallback.deva,
-                        fontSize: 22,
-                        height: 1,
-                        color: numColor,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
                     Text(
                       '${scripture.unitCode} ${entry.chapterNum}',
                       style: TextStyle(
@@ -840,18 +828,10 @@ class _ChapterRow extends StatelessWidget {
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.16 * 9,
-                        color: text3,
+                        color: numColor,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                    const SizedBox(height: 4),
                     if (entry.devaTitle != null) ...[
                       Text(
                         entry.devaTitle!,
