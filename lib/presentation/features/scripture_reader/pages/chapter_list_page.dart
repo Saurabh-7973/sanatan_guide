@@ -289,6 +289,7 @@ class _LoadedBody extends ConsumerWidget {
         showResume ? _resumeChapterFor(lastRead.verseId) : null;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Pinned header — only the resume + chapter list scrolls.
         _ChapterListHeader(
