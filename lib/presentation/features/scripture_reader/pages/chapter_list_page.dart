@@ -812,11 +812,14 @@ class _ChapterRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Numeral block
+              // Numeral block. Width tightened so the chapter title
+              // begins closer to the page edge — the previous 38px column
+              // pushed content past the natural left-margin reading point.
               SizedBox(
-                width: 38,
+                width: 28,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       arabicToDevanagari(entry.chapterNum),
@@ -843,7 +846,7 @@ class _ChapterRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

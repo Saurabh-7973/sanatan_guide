@@ -1326,26 +1326,31 @@ class _ResultGroup extends StatelessWidget {
                     Expanded(
                       child: Text.rich(
                         TextSpan(children: [
-                          TextSpan(
-                            text: scripture.devaName,
-                            style: TextStyle(
+                          _highlight(
+                            scripture.devaName,
+                            query,
+                            TextStyle(
                               fontFamily: Fonts.deva,
                               fontFamilyFallback: AppFontFallback.deva,
                               fontSize: 14,
                               height: 1,
                               color: cream,
                             ),
+                            saffron,
                           ),
                           const TextSpan(text: '   '),
-                          TextSpan(
-                            text: scripture.displayName,
-                            style: TextStyle(
+                          _highlight(
+                            scripture.displayName,
+                            query,
+                            TextStyle(
                               fontFamily: Fonts.serif,
                               fontFamilyFallback: AppFontFallback.latin,
                               fontStyle: FontStyle.italic,
                               fontSize: 11.5,
                               color: text2,
                             ),
+                            saffron,
+                            highlightDropsItalic: true,
                           ),
                         ]),
                       ),

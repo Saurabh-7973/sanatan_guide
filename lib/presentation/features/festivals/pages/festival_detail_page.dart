@@ -125,12 +125,25 @@ class FestivalDetailPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                              // Per screen-08 mockup the section is titled
-                              // "Practices" (upavāsa / dāna / pāṭha), not the
-                              // older "How to observe". Each step shows the
-                              // ॐ glyph instead of a numeral.
+                              // Per screen-08 mockup the section has a
+                              // saffron label plus a calm one-line lead
+                              // ("Sacred observances for this day").
                               _SectionLabel('Practices', isDark: isDark),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Sacred observances for this day',
+                                style: TextStyle(
+                                  fontFamily: Fonts.serif,
+                                  fontFamilyFallback: AppFontFallback.latin,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 13,
+                                  height: 1.45,
+                                  color: isDark
+                                      ? DColors.text2
+                                      : LColors.text2,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
                               ...festival.howToObserve.map(
                                 (text) => _ObserveStep(
                                   text: text,
@@ -143,7 +156,21 @@ class FestivalDetailPage extends StatelessWidget {
                                   'Read on this day',
                                   isDark: isDark,
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'A verse that resonates with this parva',
+                                  style: TextStyle(
+                                    fontFamily: Fonts.serif,
+                                    fontFamilyFallback: AppFontFallback.latin,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 13,
+                                    height: 1.45,
+                                    color: isDark
+                                        ? DColors.text2
+                                        : LColors.text2,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
                                 _ReadingVerseCard(
                                   verseId: festival.readingVerseId!,
                                   isDark: isDark,
@@ -563,7 +590,6 @@ class _ReadingVerseCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final cream = isDark ? DColors.cream : LColors.text1;
-    final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
@@ -577,7 +603,6 @@ class _ReadingVerseCard extends ConsumerWidget {
           final coord = '${verse.scripture.shortCode} '
               '${verse.chapterNum}·${verse.verseNum}';
           final sanskrit = verse.sanskrit.trim();
-          final english = verse.english?.trim();
           return InkWell(
             onTap: () => context.push(
               '/browse/${verse.scripture.code}/verse/${verse.id}',
@@ -603,39 +628,21 @@ class _ReadingVerseCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 14),
+                  // Single line — Sanskrit only — keeps the row compact;
+                  // the forward chevron is the action affordance, the
+                  // verse-detail tap reveals the English.
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          sanskrit,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: Fonts.deva,
-                            fontFamilyFallback: AppFontFallback.deva,
-                            fontSize: 14,
-                            height: 1.6,
-                            color: cream,
-                          ),
-                        ),
-                        if (english != null && english.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            '"$english"',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontFamily: Fonts.serif,
-                              fontFamilyFallback: AppFontFallback.latin,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 12,
-                              height: 1.45,
-                              color: text2,
-                            ),
-                          ),
-                        ],
-                      ],
+                    child: Text(
+                      sanskrit,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
+                        fontSize: 14,
+                        height: 1.4,
+                        color: cream,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),

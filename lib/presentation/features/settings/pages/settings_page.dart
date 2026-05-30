@@ -121,6 +121,16 @@ class SettingsPage extends ConsumerWidget {
                         icon: Icons.folder_outlined,
                         title: 'Storage',
                         subtitle: 'Scripture library bundled with the app',
+                        trailing: Text(
+                          '~65 MB',
+                          style: TextStyle(
+                            fontFamily: Fonts.sans,
+                            fontFamilyFallback: AppFontFallback.latin,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isDark ? DColors.text3 : LColors.text3,
+                          ),
+                        ),
                       ),
                       // Export bookmarks deferred until v1.1 — the
                       // backing flow needs share_plus + a small JSON
@@ -559,6 +569,7 @@ class _FontSizeRow extends ConsumerWidget {
       children: [
         _Row(
           isDark: isDark,
+          icon: Icons.format_size_rounded,
           title: 'Reading font size',
         ),
         Padding(
@@ -1090,6 +1101,7 @@ class _ClearHistoryRow extends ConsumerWidget {
       title: 'Clear reading history',
       subtitle: 'Resets streaks and read counts',
       onTap: () => _showConfirmDialog(context, ref),
+      danger: true,
     );
   }
 
