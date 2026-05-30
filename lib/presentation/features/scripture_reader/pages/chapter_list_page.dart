@@ -973,9 +973,26 @@ class _MetaText extends StatelessWidget {
             ),
           ),
         );
+      } else if (isStarted) {
+        // Resume state — consistent across every scripture: show the
+        // minutes-to-finish estimate + "X of N read" pill regardless of
+        // whether this is a leaf chapter row or a canto/skanda rollup.
+        if (readingMins > 0) {
+          spans.add(TextSpan(text: ' ·  ~$readingMins min', style: base));
+        }
+        spans.add(TextSpan(text: ' · ', style: base));
+        spans.add(
+          TextSpan(
+            text: '$readCount of ${entry.verseCount} read',
+            style: base.copyWith(
+              fontWeight: FontWeight.w500,
+              color: saffron,
+            ),
+          ),
+        );
       } else if (entry.chapterCount != null && entry.chapterCount! > 0) {
-        // Canto-rollup row — chapter count is more informative than a
-        // ~minutes-to-read estimate against thousands of verses.
+        // Canto-rollup first-visit row — chapter count is more informative
+        // than a ~minutes estimate against thousands of verses.
         spans.add(TextSpan(text: ' ·  ', style: base));
         spans.add(
           TextSpan(
@@ -983,22 +1000,8 @@ class _MetaText extends StatelessWidget {
             style: base,
           ),
         );
-      } else {
-        if (readingMins > 0) {
-          spans.add(TextSpan(text: ' ·  ~$readingMins min', style: base));
-        }
-        if (isStarted) {
-          spans.add(TextSpan(text: ' · ', style: base));
-          spans.add(
-            TextSpan(
-              text: '$readCount of ${entry.verseCount} read',
-              style: base.copyWith(
-                fontWeight: FontWeight.w500,
-                color: saffron,
-              ),
-            ),
-          );
-        }
+      } else if (readingMins > 0) {
+        spans.add(TextSpan(text: ' ·  ~$readingMins min', style: base));
       }
     } else if (hasSubtitle) {
       spans.add(TextSpan(text: entry.subtitle, style: base));

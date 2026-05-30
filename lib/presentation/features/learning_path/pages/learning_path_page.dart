@@ -413,10 +413,10 @@ class _SectionHeader extends StatelessWidget {
     final status = locked
         ? null
         : allDone
-            ? 'Complete'
+            ? 'COMPLETE'
             : completed > 0
-                ? 'In progress'
-                : 'Not started';
+                ? 'IN PROGRESS'
+                : 'NOT STARTED';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
@@ -454,7 +454,14 @@ class _SectionHeader extends StatelessWidget {
               if (locked)
                 _LockPill(isDark: isDark)
               else
-                Text(status!, style: AppText.sectionLabel(color: text3)),
+                Text(
+                  status!,
+                  // In-progress / not-started read in muted text3 as before;
+                  // Complete pops in saffron to celebrate the win.
+                  style: AppText.sectionLabel(
+                    color: allDone ? saffron : text3,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 6),

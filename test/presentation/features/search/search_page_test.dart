@@ -102,7 +102,7 @@ void main() {
 
     expect(find.text('DIRECT MATCH'), findsOneWidget);
     expect(
-      find.textContaining('Bhagavad Gita'),
+      find.textContaining('Bhagavad Gītā'),
       findsWidgets,
     );
   });

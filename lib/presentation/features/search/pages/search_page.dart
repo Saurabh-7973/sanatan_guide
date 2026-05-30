@@ -771,26 +771,17 @@ class _SearchingBody extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 24),
       children: [
         if (coord != null) ...[
+          // Direct-coord match is exclusive — render only the resolved
+          // card. The loading skeleton no longer pre-renders an "OR
+          // RELATED VERSES" section, matching the final `_ResultsBody`
+          // state. Avoids a flash of "related verses" copy that won't
+          // appear once the actual results land.
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 0),
             child: _CoordResolvedCard(
               coord: coord!,
               isDark: isDark,
               query: query,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
-            child: Text(
-              'OR RELATED VERSES',
-              style: TextStyle(
-                fontFamily: Fonts.sans,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontSize: 9.5,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.24 * 9.5,
-                color: text3,
-              ),
             ),
           ),
         ] else ...[
@@ -815,7 +806,7 @@ class _SearchingBody extends StatelessWidget {
             ),
           ),
         ],
-        for (var g = 0; g < 2; g++) ...[
+        if (coord == null) for (var g = 0; g < 2; g++) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 24, 10),
             child: DecoratedBox(
@@ -1443,8 +1434,14 @@ class _ResultRow extends ConsumerWidget {
             ),
           );
         },
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+        // Same divider-inset pattern as recents (_SuggestRow): outer
+        // horizontal padding lives outside the bordered box so the
+        // bottom divider runs only across the content area, not the
+        // full screen edge-to-edge.
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: dividerSoft, width: 1)),
           ),
@@ -1529,6 +1526,7 @@ class _ResultRow extends ConsumerWidget {
               ),
             ],
           ),
+          ),
         ),
       ),
     );
@@ -1547,32 +1545,33 @@ TextSpan _highlight(
   }
   final lc = body.toLowerCase();
   final qlc = query.toLowerCase();
-  final idx = lc.indexOf(qlc);
-  if (idx < 0) {
+  if (!lc.contains(qlc)) {
     return TextSpan(text: body, style: base);
   }
-  final spans = <InlineSpan>[];
-  if (idx > 0) {
-    spans.add(TextSpan(text: body.substring(0, idx), style: base));
-  }
-  spans.add(
-    TextSpan(
-      text: body.substring(idx, idx + query.length),
-      style: base.copyWith(
-        fontWeight: FontWeight.w500,
-        fontStyle: highlightDropsItalic ? FontStyle.normal : null,
-        backgroundColor: saffron.withValues(alpha: 0.18),
-        color: saffron,
-      ),
-    ),
+  final hi = base.copyWith(
+    fontWeight: FontWeight.w500,
+    fontStyle: highlightDropsItalic ? FontStyle.normal : null,
+    backgroundColor: saffron.withValues(alpha: 0.18),
+    color: saffron,
   );
-  if (idx + query.length < body.length) {
+  // Highlight EVERY occurrence (not just the first) so "dharma" lights up
+  // both the English line and the Hindi/IAST line when the result card
+  // shows both.
+  final spans = <InlineSpan>[];
+  var cursor = 0;
+  while (cursor < body.length) {
+    final idx = lc.indexOf(qlc, cursor);
+    if (idx < 0) {
+      spans.add(TextSpan(text: body.substring(cursor), style: base));
+      break;
+    }
+    if (idx > cursor) {
+      spans.add(TextSpan(text: body.substring(cursor, idx), style: base));
+    }
     spans.add(
-      TextSpan(
-        text: body.substring(idx + query.length),
-        style: base,
-      ),
+      TextSpan(text: body.substring(idx, idx + query.length), style: hi),
     );
+    cursor = idx + query.length;
   }
   return TextSpan(children: spans);
 }

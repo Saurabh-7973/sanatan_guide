@@ -43,8 +43,8 @@ void main() {
     expect(find.text('Regional'), findsOneWidget);
     // The four aṅga cells of the banner (ASCII labels — the bundled sans
     // font lacks the IAST dot-diacritics; see the Tiro-font note).
-    expect(find.text('VARA'), findsOneWidget);
-    expect(find.text('NAKSHATRA'), findsOneWidget);
+    expect(find.text('VĀRA'), findsOneWidget);
+    expect(find.text('NAKṢATRA'), findsOneWidget);
     expect(find.text('YOGA'), findsOneWidget);
     expect(find.text('KARANA'), findsOneWidget);
   });

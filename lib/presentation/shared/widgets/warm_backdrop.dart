@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
-/// Subtle saffron radial fade used as the common backdrop across stripped
-/// screens (search, bookmarks, festivals, library, learning, module reader,
-/// settings, credits, verse chat, onboarding).
+/// Flat opaque page backdrop. Previously rendered a subtle saffron radial
+/// fade; the radial visibly desynced behind scroll viewports on the real
+/// device — content scrolled while the gradient stayed fixed — so the
+/// gradient is now removed and every screen uses the plain scaffold base.
 ///
-/// Mirrors the warmth of the home screen's dawn glow at lower intensity so
-/// screens feel unified without duplicating home's sun-arc identity.
+/// Kept as a widget (rather than collapsing every caller to a flat
+/// `backgroundColor`) so a future intensity-aware backdrop can be
+/// reintroduced in one place without sweeping every page again. The
+/// `intensity` parameter is retained for source-compat — no-op today.
 ///
-/// Place behind page content with [Stack] and [extendBodyBehindAppBar]:
+/// Place behind page content with [Stack]:
 ///
 /// ```dart
 /// Scaffold(
-///   extendBodyBehindAppBar: true,
+///   backgroundColor: Colors.transparent,
 ///   body: Stack(
 ///     fit: StackFit.expand,
 ///     children: [const WarmBackdrop(), content],
@@ -23,44 +25,13 @@ import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 class WarmBackdrop extends StatelessWidget {
   const WarmBackdrop({super.key, this.intensity = 1.0});
 
-  /// Multiplier for opacity stops. 1.0 = default, 0.6 = subtler.
+  /// Retained for source-compat. Today the backdrop is flat regardless.
   final double intensity;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Light mode wants the muted brown-saffron (#C26508), NOT the vivid
-    // dark-mode orange (#E8820C) — at the vivid one even a few percent reads
-    // distinctly yellow over the near-white cream. The mockups' light wash is
-    // `rgba(194,101,8, 0.04), transparent 50%` over #FDFAF6.
-    final base = isDark ? AppColors.saffronOnDark : LColors.saffron;
     final scaffold = isDark ? AppColors.bgDark : AppColors.cream;
-
-    final topAlpha = (isDark ? 0.14 : 0.05) * intensity;
-    final midAlpha = (isDark ? 0.04 : 0.015) * intensity;
-
-    // A BoxDecoration with both `color` and `gradient` paints only the gradient
-    // (a Paint ignores `color` when a shader is set), so the opaque scaffold
-    // base must be a separate layer beneath the translucent radial wash —
-    // otherwise transparent-Scaffold screens bleed through to clear-black.
-    return IgnorePointer(
-      child: ColoredBox(
-        color: scaffold,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(0, -1.1),
-              radius: 1.1,
-              colors: [
-                base.withValues(alpha: topAlpha),
-                base.withValues(alpha: midAlpha),
-                base.withValues(alpha: 0),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-        ),
-      ),
-    );
+    return IgnorePointer(child: ColoredBox(color: scaffold));
   }
 }

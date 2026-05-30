@@ -492,7 +492,7 @@ class _PanchangaBanner extends StatelessWidget {
               children: [
                 Expanded(
                   child: _BannerCell(
-                    label: 'Vara',
+                    label: 'Vāra',
                     value: panchanga.vara.deva,
                     en: _weekdaysFull[date.weekday - 1],
                     isDark: isDark,
@@ -500,7 +500,7 @@ class _PanchangaBanner extends StatelessWidget {
                 ),
                 Expanded(
                   child: _BannerCell(
-                    label: 'Nakshatra',
+                    label: 'Nakṣatra',
                     value: panchanga.nakshatra.deva,
                     en: panchanga.nakshatra.iast,
                     isDark: isDark,
@@ -1049,18 +1049,17 @@ class _MoonPhase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lit = isDark ? DColors.cream : LColors.text1;
-    final dark = isDark ? DColors.text3 : LColors.text3;
     final waxing = paksha == Paksha.shukla;
     final fraction =
         (waxing ? (tithiIndex + 1) / 15.0 : (29 - tithiIndex) / 15.0)
             .clamp(0.0, 1.0);
-    final outline = fraction >= 0.99 ? lit : dark;
 
     return SizedBox(
       width: 16,
       height: 16,
       child: Stack(
         children: [
+          // Lit portion of the moon.
           ClipOval(
             child: Align(
               alignment: waxing ? Alignment.centerRight : Alignment.centerLeft,
@@ -1071,19 +1070,13 @@ class _MoonPhase extends StatelessWidget {
               ),
             ),
           ),
+          // Always-visible outline ring so the moon glyph reads as a circle
+          // even on Amāvāsyā (fraction = 0) when the fill collapses to
+          // nothing. White in dark mode, near-black in light mode.
           DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              // Mockup uses 1px text-3 inset shadow. text-3 reads very light
-              // in the warm light theme on a small 16-px circle — bump the
-              // stroke to 1.25 px and the colour to text-2 for legibility
-              // without losing the moon-phase contrast.
-              border: Border.all(
-                color: outline == (isDark ? DColors.text3 : LColors.text3)
-                    ? (isDark ? DColors.text2 : LColors.text2)
-                    : outline,
-                width: 1.25,
-              ),
+              border: Border.all(color: lit, width: 1.25),
             ),
           ),
         ],

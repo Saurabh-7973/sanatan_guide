@@ -122,13 +122,9 @@ class SettingsPage extends ConsumerWidget {
                         title: 'Storage',
                         subtitle: 'Scripture library bundled with the app',
                       ),
-                      _Row(
-                        isDark: isDark,
-                        icon: Icons.ios_share_outlined,
-                        title: 'Export bookmarks',
-                        subtitle: 'Save your saved verses to a file',
-                        trailing: const _SoonTag(),
-                      ),
+                      // Export bookmarks deferred until v1.1 — the
+                      // backing flow needs share_plus + a small JSON
+                      // schema; tracking in V1_FINAL_AUDIT.
                       const _ClearHistoryRow(),
 
                       // ── Privacy ─────────────────────────────────────────────
@@ -408,7 +404,7 @@ class _BrandFooter extends StatelessWidget {
                   rawBuild == null ? version?.buildNumber : '${rawBuild % 1000}';
               final label = version == null
                   ? '...'
-                  : 'Version ${version.version} · build $displayBuild';
+                  : 'V${version.version} · BUILD $displayBuild';
               return GestureDetector(
                 // Hidden QA gesture: triple-tap the version label to fire
                 // a hard native crash via FirebaseCrashlytics.instance.crash()
@@ -467,17 +463,6 @@ class _ExternalIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     return Icon(Icons.open_in_new_rounded, size: 16, color: text3);
-  }
-}
-
-/// Honest "not yet available" tag for deferred rows — not a fake control.
-class _SoonTag extends StatelessWidget {
-  const _SoonTag();
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text3 = isDark ? DColors.text3 : LColors.text3;
-    return Text('SOON', style: AppText.sectionLabel(color: text3));
   }
 }
 
@@ -903,7 +888,8 @@ class _FestivalAlertsRow extends ConsumerWidget {
       subtitle: 'Day before each major parva',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: saffron,
+        activeThumbColor: Colors.white,
+        activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(festivalAlertsEnabledProvider.notifier).setEnabled(v),
       ),
@@ -936,7 +922,8 @@ class _AnalyticsOptOutRow extends ConsumerWidget {
           'Helps improve the app. No personal data is collected. Crash reports are unaffected.',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: saffron,
+        activeThumbColor: Colors.white,
+        activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(analyticsEnabledProvider.notifier).setEnabled(v),
       ),
@@ -966,7 +953,8 @@ class _CrashlyticsOptOutRow extends ConsumerWidget {
           'Sends a stack trace when the app crashes so we can fix it. No personal data.',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: saffron,
+        activeThumbColor: Colors.white,
+        activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(crashlyticsEnabledProvider.notifier).setEnabled(v),
       ),

@@ -194,12 +194,19 @@ class _Hero extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '$monthLabel · ${panchanga.tithiLabelIast}',
+            // Caps + IAST so the row reads "VAIŚĀKHA · ŚUKLA PŪRṆIMĀ"
+            // not "Aswina · Sukla Navami".
+            '$monthLabel · ${panchanga.tithiLabelIast}'.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: Fonts.deva,
-              fontFamilyFallback: AppFontFallback.deva,
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: const <String>[
+                Fonts.serif,
+                'NotoSansDevanagari',
+                'serif',
+              ],
               fontSize: 11,
+              fontWeight: FontWeight.w600,
               letterSpacing: 1.5,
               color: saffron,
             ),
@@ -350,7 +357,7 @@ class _DataGrid extends StatelessWidget {
             children: [
               Expanded(
                 child: _DataCell(
-                  label: 'Nakshatra',
+                  label: 'Nakṣatra',
                   value: panchanga.nakshatra.deva,
                   en: panchanga.nakshatra.iast,
                   isDark: isDark,

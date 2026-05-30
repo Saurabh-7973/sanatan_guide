@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/constants/bhagavad_gita_chapters.dart';
+import 'package:sanatan_guide/core/constants/scripture_chapters.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/services/section_theme_service.dart';
 import 'package:sanatan_guide/core/utils/devanagari.dart';
@@ -397,18 +398,30 @@ class _ChapterHeader extends StatelessWidget {
   final int total;
   final bool isDark;
 
+  /// Find the chapter meta for this scripture+chapter from the curated
+  /// `scriptureChaptersFor` table. Returns null when the scripture isn't
+  /// curated (then the header falls back to scripture display name).
+  ChapterMeta? _chapterMeta() {
+    final list = scriptureChaptersFor(scriptureId);
+    if (list == null) return null;
+    for (final c in list) {
+      if (c.chapterNum == chapterNum) return c;
+    }
+    return null;
+  }
+
   String? _devaTitle() {
     if (scriptureId == 'bhagavad_gita') {
       return BhagavadGitaChapters.byNumber(chapterNum).sanskritName;
     }
-    return null;
+    return _chapterMeta()?.devaTitle;
   }
 
   String? _englishTitle() {
     if (scriptureId == 'bhagavad_gita') {
       return BhagavadGitaChapters.byNumber(chapterNum).englishName;
     }
-    return null;
+    return _chapterMeta()?.enTitle;
   }
 
   @override
