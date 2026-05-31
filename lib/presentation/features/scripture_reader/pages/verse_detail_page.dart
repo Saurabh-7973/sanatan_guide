@@ -556,6 +556,9 @@ class _UtilBar extends StatelessWidget {
               color: text3,
               activeColor: saffron,
               onTap: prevId == null ? null : () => nav(prevId!),
+              onDisabledTap: prevId != null
+                  ? null
+                  : () => showHeritageToast(context, 'This is the first verse'),
             ),
             _UtilAction(
               glyphBuilder: (c) => TranslationEyeGlyph(color: c, size: 16),
@@ -584,6 +587,9 @@ class _UtilBar extends StatelessWidget {
               color: text3,
               activeColor: saffron,
               onTap: nextId == null ? null : () => nav(nextId!),
+              onDisabledTap: nextId != null
+                  ? null
+                  : () => showHeritageToast(context, 'This is the last verse'),
             ),
           ],
         ),
@@ -599,6 +605,7 @@ class _UtilNav extends StatelessWidget {
     required this.color,
     required this.activeColor,
     required this.onTap,
+    this.onDisabledTap,
   });
 
   final IconData icon;
@@ -607,13 +614,17 @@ class _UtilNav extends StatelessWidget {
   final Color activeColor;
   final VoidCallback? onTap;
 
+  /// Tapping a disabled chevron (chapter edge) shows a toast instead of a
+  /// dead no-op — brief Screen 16 verse-detail edge case.
+  final VoidCallback? onDisabledTap;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 44,
       height: 44,
       child: InkResponse(
-        onTap: onTap,
+        onTap: onTap ?? onDisabledTap,
         radius: 24,
         splashColor: Colors.transparent,
         highlightColor: activeColor.withValues(alpha: 0.04),
