@@ -1,8 +1,15 @@
+// lib/presentation/features/scripture_reader/pages/verse_chat_page.dart
+//
+// Verse-anchored "Explain this verse" chat (brief Screen 10). Differs from
+// the general Ask-the-Pandit chat (pandit_chat_page) only in the topbar +
+// verse anchor; the message/input/thinking chrome is the shared heritage
+// vocabulary. Gemini-backed, daily-rate-limited, key-gated. All chat logic
+// (seed, regenerate, save-to-notes) preserved from the pre-heritage version.
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
@@ -11,12 +18,12 @@ import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_states.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/offline_banner.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/system_chrome.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
-import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
@@ -42,6 +49,9 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
   bool _loading = false;
   int _remaining = GeminiRateLimit.maxPerDay;
   String? _error;
+  // Last user prompt that hit the network — powers the "Try again" pill on
+  // transient failures. Null on rate-limit (retry can't help until midnight).
+  String? _retryableText;
   bool _seedFired = false;
 
   static const String _systemPrompt =
@@ -114,8 +124,11 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     if (text.isEmpty || _loading) return;
 
     if (_remaining <= 0) {
-      setState(() => _error =
-          'Daily limit reached (${GeminiRateLimit.maxPerDay} questions/day). Try again tomorrow.');
+      setState(() {
+        _error =
+            'Daily limit reached (${GeminiRateLimit.maxPerDay} questions/day). Try again tomorrow.';
+        _retryableText = null;
+      });
       return;
     }
 
@@ -123,6 +136,7 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     if (!allowed) {
       setState(() {
         _error = 'Daily limit reached. Try again tomorrow.';
+        _retryableText = null;
         _remaining = 0;
       });
       return;
@@ -133,10 +147,28 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
       _controller.clear();
       _loading = true;
       _error = null;
+      _retryableText = text;
       _remaining--;
     });
     _scrollToBottom();
+    await _dispatch(verse, text);
+  }
 
+  /// Retry path for the "Try again" pill — re-runs [_retryableText] without
+  /// consuming the rate-limit budget again (the original send already did)
+  /// and without re-pushing the user bubble (it's already in [_messages]).
+  Future<void> _retry(Verse verse) async {
+    final text = _retryableText;
+    if (text == null || _loading) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    _scrollToBottom();
+    await _dispatch(verse, text);
+  }
+
+  Future<void> _dispatch(Verse verse, String text) async {
     try {
       final reply = await GeminiService.ask(
         systemContext: _buildContext(verse),
@@ -161,7 +193,8 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
       if (mounted) {
         setState(() {
           _error =
-              "Couldn't reach the Pandit. Check your connection and try again.";
+              'The connection couldn’t reach the texts. The verses are '
+              'still here, but the Pandit needs internet to think.';
           _loading = false;
         });
       }
@@ -195,195 +228,215 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     state.whenData((either) => either.fold((_) {}, _maybeFireSeed));
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final text1 = isDark ? DColors.text1 : LColors.text1;
-    final text3 = isDark ? DColors.text3 : LColors.text3;
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const MockupBackChevron(),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Ask about this verse',
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: text1,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '$_remaining question${_remaining == 1 ? '' : 's'} remaining today',
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontStyle: FontStyle.italic,
-                fontSize: 11.5,
-                color: text3,
-              ),
-            ),
-          ],
-        ),
-        centerTitle: false,
-      ),
       resizeToAvoidBottomInset: true,
       body: Stack(
         fit: StackFit.expand,
         children: [
           const WarmBackdrop(),
           SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: kToolbarHeight + MediaQuery.paddingOf(context).top,
-              ),
-              child: Column(
-                children: [
-                  const OfflineBanner(),
-                  Expanded(
-                    child: state.when(
-                      loading: () => const VerseDetailShimmer(),
-                      error: (_, __) => HeritageError(
-                        message: 'Could not load this verse — pull down or retry.',
-                        onRetry: () =>
-                            ref.invalidate(verseDetailProvider(widget.verseId)),
-                      ),
-                      data: (either) => either.fold(
-                        (failure) => HeritageError(message: failure.message),
-                        (verse) => _ChatMessages(
-                          verse: verse,
-                          messages: _messages,
-                          loading: _loading,
-                          error: _error,
-                          scrollController: _scrollController,
-                          onRegenerate: () => _regenerate(verse),
-                        ),
+            child: Column(
+              children: [
+                _TopBar(isDark: isDark, remaining: _remaining),
+                const OfflineBanner(),
+                Expanded(
+                  child: state.when(
+                    loading: () => const VerseDetailShimmer(),
+                    error: (_, __) => HeritageError(
+                      message:
+                          'Could not load this verse — pull down or retry.',
+                      onRetry: () =>
+                          ref.invalidate(verseDetailProvider(widget.verseId)),
+                    ),
+                    data: (either) => either.fold(
+                      (failure) => HeritageError(message: failure.message),
+                      (verse) => _ChatBody(
+                        verse: verse,
+                        messages: _messages,
+                        loading: _loading,
+                        error: _error,
+                        isDark: isDark,
+                        scrollController: _scrollController,
+                        onRegenerate: () => _regenerate(verse),
+                        onRetry:
+                            _retryableText == null ? null : () => _retry(verse),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                state
+                        .whenData((either) => either.fold(
+                              (_) => const SizedBox.shrink(),
+                              (verse) => _InputBar(
+                                controller: _controller,
+                                focusNode: _focusNode,
+                                remaining: _remaining,
+                                loading: _loading,
+                                isDark: isDark,
+                                onChanged: () => setState(() {}),
+                                onSend: () => _send(verse),
+                              ),
+                            ))
+                        .value ??
+                    const SizedBox.shrink(),
+              ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: state
-          .whenData((either) => either.fold(
-                (_) => null,
-                (verse) => _InputBar(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  remaining: _remaining,
-                  loading: _loading,
-                  onSend: () => _send(verse),
-                ),
-              ))
-          .value,
     );
   }
 }
 
-// ── Chat messages (body only — input bar is in Scaffold.bottomNavigationBar) ──
+// ── Top bar ──────────────────────────────────────────────────────────────
 
-class _ChatMessages extends StatelessWidget {
-  const _ChatMessages({
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.isDark, required this.remaining});
+
+  final bool isDark;
+  final int remaining;
+
+  @override
+  Widget build(BuildContext context) {
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 6, 16, 12),
+      child: Row(
+        children: [
+          InkResponse(
+            onTap: () => Navigator.of(context).maybePop(),
+            radius: 22,
+            child: const SizedBox(
+              width: 36,
+              height: 36,
+              child: Center(child: MockupBackChevron()),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Ask about this verse',
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: text1,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$remaining question${remaining == 1 ? '' : 's'} remaining today',
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 11.5,
+                    color: text3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Chat body: verse anchor + messages + error ─────────────────────────────
+
+class _ChatBody extends StatelessWidget {
+  const _ChatBody({
     required this.verse,
     required this.messages,
     required this.loading,
     required this.error,
+    required this.isDark,
     required this.scrollController,
     required this.onRegenerate,
+    required this.onRetry,
   });
 
   final Verse verse;
   final List<ChatMessage> messages;
   final bool loading;
   final String? error;
+  final bool isDark;
   final ScrollController scrollController;
   final VoidCallback onRegenerate;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iron = isDark ? DColors.ironRedBright : LColors.ironRedBright;
 
     return Column(
       children: [
-        // ── Verse context pill ──────────────────────────────────────────
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.pagePadding,
-            AppSpacing.sm,
-            AppSpacing.pagePadding,
-            AppSpacing.sm,
-          ),
-          color: isDark ? AppColors.surfaceDark : AppColors.warmGrey10,
-          child: Text(
-            verse.sanskrit.split('\n').first.trim(),
-            style: context.ts.sanskritSmall,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-
-        // ── Messages ────────────────────────────────────────────────────
+        _VerseAnchor(verse: verse, isDark: isDark),
         Expanded(
           child: messages.isEmpty && !loading
-              ? _WelcomePrompt(verse: verse)
-              : ListView.builder(
+              ? _WelcomePrompt(isDark: isDark)
+              : ListView.separated(
                   controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.pagePadding,
-                    AppSpacing.md,
-                    AppSpacing.pagePadding,
-                    AppSpacing.md,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                   itemCount: messages.length + (loading ? 1 : 0),
+                  separatorBuilder: (_, __) => const SizedBox(height: 18),
                   itemBuilder: (context, index) {
                     if (index == messages.length) {
-                      return const _TypingBubble();
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: AIThinkingDots(isDark: isDark),
+                        ),
+                      );
                     }
                     final m = messages[index];
-                    // Regenerate is only meaningful on the most recent AI
-                    // reply (re-running an older reply would invalidate the
-                    // conversation history). Pass the callback only for that
-                    // bubble; bubble hides the icon when the callback is null.
+                    if (m.isUser) {
+                      return _UserBubble(isDark: isDark, text: m.text);
+                    }
                     final isLastAi =
-                        !m.isUser && !loading && index == messages.length - 1;
-                    return _MessageBubble(
-                      message: m,
+                        !loading && index == messages.length - 1;
+                    return _AiReply(
+                      text: m.text,
                       verseId: verse.id,
+                      isDark: isDark,
                       onRegenerate: isLastAi ? onRegenerate : null,
                     );
                   },
                 ),
         ),
-
-        // ── Error banner ────────────────────────────────────────────────
         if (error != null)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.pagePadding,
-              vertical: AppSpacing.sm,
-            ),
-            color: AppColors.error.withValues(alpha: 0.08),
-            child: Text(
-              error!,
-              style: context.ts.caption.copyWith(color: AppColors.error),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            child: Column(
+              children: [
+                Text(
+                  error!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13.5,
+                    height: 1.45,
+                    color: iron,
+                  ),
+                ),
+                if (onRetry != null) ...[
+                  const SizedBox(height: 8),
+                  _RetryPill(isDark: isDark, onTap: onRetry!),
+                ],
+              ],
             ),
           ),
       ],
@@ -391,11 +444,85 @@ class _ChatMessages extends StatelessWidget {
   }
 }
 
-// ── Welcome state ─────────────────────────────────────────────────────────
+/// Verse anchor at the top of the conversation — LeafThread + Devanāgarī
+/// incipit + scripture coordinate. "Your place" for the chat.
+class _VerseAnchor extends StatelessWidget {
+  const _VerseAnchor({required this.verse, required this.isDark});
+
+  final Verse verse;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final incipit = verse.sanskrit.split('\n').first.trim();
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: dividerSoft)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
+        child: Stack(
+          children: [
+            Positioned(
+              left: 0,
+              top: 2,
+              bottom: 2,
+              child: LeafThread(isDark: isDark),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${verse.scripture.displayName} · '
+                    '${compactVerseLocationLabel(verse)}',
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2 * 9.5,
+                      color: saffron,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    incipit.isEmpty ? '—' : incipit,
+                    style: TextStyle(
+                      fontFamily: Fonts.deva,
+                      fontFamilyFallback: AppFontFallback.deva,
+                      fontSize: 15,
+                      height: 1.4,
+                      color: cream,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Welcome state ──────────────────────────────────────────────────────────
 
 class _WelcomePrompt extends StatelessWidget {
-  const _WelcomePrompt({required this.verse});
-  final Verse verse;
+  const _WelcomePrompt({required this.isDark});
+
+  final bool isDark;
 
   static const _starters = [
     'What does this verse mean?',
@@ -406,26 +533,46 @@ class _WelcomePrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Ask anything about this verse',
-            style: context.ts.bodyLarge,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+              color: text1,
+            ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 6),
           Text(
-            'Context, meaning, application, Sanskrit terms — the guide will help.',
-            style: context.ts.caption,
+            'Context, meaning, application, Sanskrit terms — the guide will '
+            'help.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontStyle: FontStyle.italic,
+              fontSize: 13.5,
+              height: 1.55,
+              color: text2,
+            ),
           ),
-          const SizedBox(height: AppSpacing.xl),
-          Text('SUGGESTED QUESTIONS', style: context.ts.sectionLabel),
-          const SizedBox(height: AppSpacing.md),
-          ..._starters.map(
-            (q) => _StarterChip(label: q),
-          ),
+          const SizedBox(height: 24),
+          Text('SUGGESTED QUESTIONS', style: AppText.sectionLabel(color: text3)),
+          const SizedBox(height: 14),
+          for (final q in _starters) ...[
+            _StarterChip(isDark: isDark, label: q),
+            const SizedBox(height: 10),
+          ],
         ],
       ),
     );
@@ -433,158 +580,127 @@ class _WelcomePrompt extends StatelessWidget {
 }
 
 class _StarterChip extends StatelessWidget {
-  const _StarterChip({required this.label});
+  const _StarterChip({required this.isDark, required this.label});
+
+  final bool isDark;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Find ancestor VerseChatPage state via nearest ConsumerStatefulWidget
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: InkWell(
-        onTap: () {
-          // Bubble up via nearest _VerseChatPageState
-          final state = context.findAncestorStateOfType<_VerseChatPageState>();
-          state?._controller.text = label;
-          state?._focusNode.requestFocus();
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusChip),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+
+    return InkWell(
+      onTap: () {
+        final state = context.findAncestorStateOfType<_VerseChatPageState>();
+        if (state == null) return;
+        state._controller.text = label;
+        state._focusNode.requestFocus();
+      },
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: divider),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: Fonts.serif,
+            fontFamilyFallback: AppFontFallback.latin,
+            fontStyle: FontStyle.italic,
+            fontSize: 13.5,
+            height: 1.3,
+            color: text1,
           ),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusChip),
-            border: Border.all(
-              color: isDark ? AppColors.borderDark : AppColors.border,
-            ),
-          ),
-          child: Text(label, style: context.ts.bodyMedium),
         ),
       ),
     );
   }
 }
 
-// ── Message bubble ────────────────────────────────────────────────────────
+// ── AI reply (flowing prose, no bubble) + user bubble ──────────────────────
 
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
-    required this.message,
+class _AiReply extends StatelessWidget {
+  const _AiReply({
+    required this.text,
     required this.verseId,
+    required this.isDark,
     this.onRegenerate,
   });
-  final ChatMessage message;
+
+  final String text;
   final String verseId;
+  final bool isDark;
   final VoidCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isUser = message.isUser;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AiRichProse(isDark: isDark, text: text, horizontalPadding: 0),
+        const SizedBox(height: 6),
+        _AiActionRow(
+          text: text,
+          isDark: isDark,
+          verseId: verseId,
+          onRegenerate: onRegenerate,
+        ),
+      ],
+    );
+  }
+}
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isUser) ...[
-            Container(
-              width: 28,
-              height: 28,
-              decoration: const BoxDecoration(
-                color: AppColors.saffronFaint,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'ॐ',
-                style: TextStyle(
-                  fontFamily: 'TiroDevanagari',
-                  fontSize: 14,
-                  color: AppColors.saffron,
-                  height: 1,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-          ],
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: isUser
-                    ? AppColors.saffron
-                    : isDark
-                        ? AppColors.surfaceDark
-                        : AppColors.surface,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(AppSpacing.radiusCard),
-                  topRight: const Radius.circular(AppSpacing.radiusCard),
-                  bottomLeft: Radius.circular(
-                      isUser ? AppSpacing.radiusCard : AppSpacing.radiusRow),
-                  bottomRight: Radius.circular(
-                      isUser ? AppSpacing.radiusRow : AppSpacing.radiusCard),
-                ),
-                border: isUser
-                    ? null
-                    : Border.all(
-                        color: isDark ? AppColors.borderDark : AppColors.border,
-                      ),
-              ),
-              child: isUser
-                  ? Text(
-                      message.text,
-                      style: context.ts.bodyMedium.copyWith(
-                        color: Colors.white,
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AiRichProse(
-                          isDark: isDark,
-                          text: message.text,
-                          // Verse-anchored chat uses non-italic prose per
-                          // screen-09 (commentary tone) vs general-chat
-                          // italic.
-                          italic: false,
-                          fontSize: 14,
-                          height: 1.5,
-                          horizontalPadding: 0,
-                        ),
-                        const SizedBox(height: 6),
-                        _AiActionRow(
-                          text: message.text,
-                          isDark: isDark,
-                          verseId: verseId,
-                          onRegenerate: onRegenerate,
-                        ),
-                      ],
-                    ),
+class _UserBubble extends StatelessWidget {
+  const _UserBubble({required this.isDark, required this.text});
+
+  final bool isDark;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+
+    return Align(
+      alignment: Alignment.centerRight,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: glow,
+            border: Border.all(color: divider),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(18),
+              topRight: Radius.circular(18),
+              bottomRight: Radius.circular(4),
+              bottomLeft: Radius.circular(18),
             ),
           ),
-          if (isUser) const SizedBox(width: 28 + AppSpacing.sm),
-        ],
+          child: Text(
+            text,
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 13.5,
+              height: 1.45,
+              color: text1,
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-/// Three small icon buttons under each AI reply — copy, share, regenerate
-/// — per screen-10 design. Regenerate is wired as a no-op stub for now;
-/// the cleanest implementation needs the parent to re-call _send with the
-/// matching user prompt, which lives a state lift away from here.
+/// Copy · save-to-notes · share · regenerate, under each AI reply.
 class _AiActionRow extends ConsumerWidget {
   const _AiActionRow({
     required this.text,
@@ -599,8 +715,7 @@ class _AiActionRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final text3 =
-        isDark ? AppColors.textSecondaryOnDark : AppColors.textSecondary;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -610,14 +725,7 @@ class _AiActionRow extends ConsumerWidget {
           color: text3,
           onTap: () async {
             await Clipboard.setData(ClipboardData(text: text));
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Copied'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-            }
+            if (context.mounted) showHeritageToast(context, 'Copied');
           },
         ),
         const SizedBox(width: 4),
@@ -656,25 +764,12 @@ class _AiActionRow extends ConsumerWidget {
       final existing = await repo.getVerseById(verseId);
       final prior = existing.fold((_) => '', (v) => v.noteText ?? '');
       final stamp = DateTime.now().toIso8601String().substring(0, 10);
-      final merged = mergeAiReplyIntoNote(prior: prior, reply: text, stamp: stamp);
+      final merged =
+          mergeAiReplyIntoNote(prior: prior, reply: text, stamp: stamp);
       await repo.updateVerseNote(verseId, merged);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Saved to verse notes'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
+      if (context.mounted) showHeritageToast(context, 'Saved to verse notes');
     } catch (_) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not save note'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
+      if (context.mounted) showHeritageToast(context, 'Could not save note');
     }
   }
 }
@@ -707,125 +802,51 @@ class _IconAction extends StatelessWidget {
   }
 }
 
-// ── Typing indicator ──────────────────────────────────────────────────────
+class _RetryPill extends StatelessWidget {
+  const _RetryPill({required this.isDark, required this.onTap});
 
-class _TypingBubble extends StatelessWidget {
-  const _TypingBubble();
+  final bool isDark;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: const BoxDecoration(
-              color: AppColors.saffronFaint,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: const Text(
-              'ॐ',
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final glow = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: glow,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: saffron.withValues(alpha: 0.45)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.refresh_rounded, size: 14, color: saffron),
+            const SizedBox(width: 6),
+            Text(
+              'RETRY',
               style: TextStyle(
-                fontFamily: 'TiroDevanagari',
-                fontSize: 14,
-                color: AppColors.saffron,
-                height: 1,
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 12,
+                height: 1.2,
+                color: saffron,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.08 * 12,
               ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppSpacing.radiusCard),
-                topRight: Radius.circular(AppSpacing.radiusCard),
-                bottomLeft: Radius.circular(AppSpacing.radiusRow),
-                bottomRight: Radius.circular(AppSpacing.radiusCard),
-              ),
-              border: Border.all(
-                color: isDark ? AppColors.borderDark : AppColors.border,
-              ),
-            ),
-            child: SizedBox(
-              width: 40,
-              height: 18,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(
-                  3,
-                  (i) => _Dot(delayMs: i * 160),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Dot extends StatefulWidget {
-  const _Dot({required this.delayMs});
-  final int delayMs;
-
-  @override
-  State<_Dot> createState() => _DotState();
-}
-
-class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _anim = Tween<double>(begin: 0, end: -6).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
-    Future<void>.delayed(Duration(milliseconds: widget.delayMs), () {
-      if (mounted) _ctrl.repeat(reverse: true);
-    });
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, __) => Transform.translate(
-        offset: Offset(0, _anim.value),
-        child: Container(
-          width: 6,
-          height: 6,
-          decoration: const BoxDecoration(
-            color: AppColors.warmGrey50,
-            shape: BoxShape.circle,
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ── Input bar ─────────────────────────────────────────────────────────────
+// ── Input bar ──────────────────────────────────────────────────────────────
 
 class _InputBar extends StatelessWidget {
   const _InputBar({
@@ -833,6 +854,8 @@ class _InputBar extends StatelessWidget {
     required this.focusNode,
     required this.remaining,
     required this.loading,
+    required this.isDark,
+    required this.onChanged,
     required this.onSend,
   });
 
@@ -840,87 +863,115 @@ class _InputBar extends StatelessWidget {
   final FocusNode focusNode;
   final int remaining;
   final bool loading;
+  final bool isDark;
+  final VoidCallback onChanged;
   final VoidCallback onSend;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final canSend = remaining > 0 && !loading;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
 
+    if (remaining <= 0) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 16),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: dividerSoft)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Text(
+            'Daily question limit reached — resets at midnight.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 12,
+              height: 1.4,
+              color: text3,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final surface2 = isDark ? DColors.surface2 : LColors.surface2;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final canSend = !loading && controller.text.trim().isNotEmpty;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SafeArea(
         top: false,
         bottom: bottomInset == 0,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.pagePadding,
-            AppSpacing.sm,
-            AppSpacing.sm,
-            AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            border: Border(
-              top: BorderSide(
-                color: isDark ? AppColors.borderDark : AppColors.border,
-              ),
-            ),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  style: context.ts.bodyMedium,
-                  textInputAction: TextInputAction.send,
-                  maxLines: 3,
-                  minLines: 1,
-                  enabled: canSend,
-                  decoration: InputDecoration(
-                    hintText: remaining > 0
-                        ? 'Ask about this verse…'
-                        : 'Daily limit reached',
-                    hintStyle: context.ts.bodyMedium.copyWith(
-                      color: AppColors.textHint,
-                    ),
-                    // Field sits in a custom pill — strip the global
-                    // inputDecorationTheme (filled:true + bordered).
-                    filled: false,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.sm,
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  decoration: BoxDecoration(
+                    color: surface,
+                    borderRadius: BorderRadius.circular(26),
+                    border: Border.all(color: dividerSoft),
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      minLines: 1,
+                      maxLines: 4,
+                      textInputAction: TextInputAction.send,
+                      enabled: !loading,
+                      onChanged: (_) => onChanged(),
+                      onSubmitted: (_) => onSend(),
+                      style: TextStyle(
+                        fontFamily: Fonts.sans,
+                        fontFamilyFallback: AppFontFallback.latin,
+                        fontSize: 13.5,
+                        height: 1.4,
+                        color: text1,
+                      ),
+                      decoration: InputDecoration(
+                        isCollapsed: true,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: 'Ask about this verse…',
+                        hintStyle: TextStyle(
+                          fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
+                          fontSize: 13.5,
+                          color: text3,
+                        ),
+                      ),
                     ),
                   ),
-                  onSubmitted: (_) => onSend(),
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              IconButton(
-                onPressed: canSend ? onSend : null,
-                icon: loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.saffron,
-                        ),
-                      )
-                    : Icon(
-                        Icons.send_rounded,
-                        color: canSend
-                            ? AppColors.saffron
-                            : AppColors.textSecondary,
-                      ),
+              const SizedBox(width: 8),
+              _SendButton(
+                isDark: isDark,
+                enabled: canSend,
+                loading: loading,
+                onTap: canSend ? onSend : null,
+                surface2: surface2,
+                saffron: saffron,
+                text3: text3,
               ),
             ],
           ),
@@ -928,6 +979,90 @@ class _InputBar extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SendButton extends StatelessWidget {
+  const _SendButton({
+    required this.isDark,
+    required this.enabled,
+    required this.loading,
+    required this.onTap,
+    required this.surface2,
+    required this.saffron,
+    required this.text3,
+  });
+
+  final bool isDark;
+  final bool enabled;
+  final bool loading;
+  final VoidCallback? onTap;
+  final Color surface2;
+  final Color saffron;
+  final Color text3;
+
+  @override
+  Widget build(BuildContext context) {
+    final glyphColor =
+        enabled ? (isDark ? const Color(0xFF1A1208) : Colors.white) : text3;
+    return InkResponse(
+      onTap: onTap,
+      radius: 26,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: enabled ? saffron : surface2,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: loading
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: isDark ? const Color(0xFF1A1208) : saffron,
+                  ),
+                )
+              : SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CustomPaint(
+                    painter: _PaperPlanePainter(color: glyphColor),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Paper plane `M3 9l13-6-4 13-3-6-6-1z`, sw 1.6 — shared with general chat.
+class _PaperPlanePainter extends CustomPainter {
+  const _PaperPlanePainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final u = size.width / 18.0;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6 * u
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final path = Path()
+      ..moveTo(3 * u, 9 * u)
+      ..lineTo(16 * u, 3 * u)
+      ..lineTo(12 * u, 16 * u)
+      ..lineTo(9 * u, 10 * u)
+      ..lineTo(3 * u, 9 * u)
+      ..close();
+    canvas.drawPath(path, p);
+  }
+
+  @override
+  bool shouldRepaint(_PaperPlanePainter old) => old.color != color;
 }
 
 /// Appends [reply] to [prior] note text with a dated separator block.
