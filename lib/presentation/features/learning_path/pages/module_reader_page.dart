@@ -1,21 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:sanatan_guide/core/extensions/typography_extensions.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/review_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
-import 'package:sanatan_guide/presentation/theme/app_colors.dart';
 import 'package:sanatan_guide/presentation/theme/app_spacing.dart';
+import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
+import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
 class ModuleReaderPage extends ConsumerStatefulWidget {
   const ModuleReaderPage({super.key, required this.moduleId});
@@ -28,6 +30,9 @@ class ModuleReaderPage extends ConsumerStatefulWidget {
 
 class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
   int? _currentIndex;
+  // Tracks which way the last step moved so the slide transition runs in the
+  // right direction (forward = in-from-right; resume = no slide).
+  int _previousIndex = 0;
   late final String _moduleId = widget.moduleId;
   // Stored in didChangeDependencies so dispose() can invalidate safely
   // without touching ref (forbidden by Riverpod 3.x during unmount).
@@ -136,16 +141,23 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
       });
     }
 
-    setState(() => _currentIndex = _currentIndex! + 1);
+    setState(() {
+      _previousIndex = _currentIndex!;
+      _currentIndex = _currentIndex! + 1;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
     final state = ref.watch(moduleDetailProvider(widget.moduleId));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           const Positioned.fill(child: WarmBackdrop()),
@@ -157,8 +169,11 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
               (detail) {
                 final cards = _buildCardSequence(detail);
                 if (cards.isEmpty) {
-                  return const Center(
-                    child: Text('No cards for this module.'),
+                  return Center(
+                    child: Text(
+                      'No cards for this module.',
+                      style: AppText.rowSub(color: text2),
+                    ),
                   );
                 }
 
@@ -176,16 +191,23 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                     // Clamp in case extras (anchor/reflection/completion) were counted.
                     _currentIndex = read.clamp(0, cards.length - 1);
                   }
+                  _previousIndex = _currentIndex!;
                 }
 
                 final currentIdx = _currentIndex!;
                 if (currentIdx >= cards.length) {
-                  return const Center(child: Text('No cards for this module.'));
+                  return Center(
+                    child: Text(
+                      'No cards for this module.',
+                      style: AppText.rowSub(color: text2),
+                    ),
+                  );
                 }
 
                 final card = cards[currentIdx];
                 final isLast = currentIdx == cards.length - 1;
                 final progress = (currentIdx + 1) / cards.length;
+                final forward = currentIdx >= _previousIndex;
 
                 return GestureDetector(
                   onTap: () => _advance(detail, cards),
@@ -203,19 +225,20 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // ── Module title ──────────────────────────────────────────
+                              // ── Topbar: close · module name · step counter ──
                               Row(
                                 children: [
                                   IconButton(
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(
-                                      minWidth: 48,
-                                      minHeight: 48,
+                                      minWidth: 44,
+                                      minHeight: 44,
                                     ),
                                     tooltip: 'Close',
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.close_rounded,
-                                      color: AppColors.textSecondary,
+                                      size: 22,
+                                      color: text2,
                                     ),
                                     onPressed: () {
                                       if (context.canPop()) {
@@ -225,35 +248,47 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                                       }
                                     },
                                   ),
-                                  const SizedBox(width: AppSpacing.md),
+                                  const SizedBox(width: AppSpacing.sm),
                                   Expanded(
                                     child: Text(
                                       detail.module.title,
-                                      style: context.ts.captionHighlight,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontFamily: Fonts.serif,
+                                        fontFamilyFallback:
+                                            AppFontFallback.latin,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: saffron,
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: AppSpacing.sm),
                                   Text(
                                     '${_currentIndex! + 1} / ${cards.length}',
-                                    style: context.ts.caption,
+                                    style: TextStyle(
+                                      fontFamily: Fonts.sans,
+                                      fontFamilyFallback: AppFontFallback.latin,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.12 * 11,
+                                      color: text3,
+                                    ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: AppSpacing.sm),
-                              // ── Progress bar ──────────────────────────────────────────
+                              // ── Progress hairline ──
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(2),
                                 child: LinearProgressIndicator(
                                   value: progress,
-                                  backgroundColor: isDark
-                                      ? AppColors.borderDark
-                                      : AppColors.border,
+                                  backgroundColor: divider,
                                   valueColor:
-                                      const AlwaysStoppedAnimation<Color>(
-                                    AppColors.saffron,
-                                  ),
-                                  minHeight: 6,
+                                      AlwaysStoppedAnimation<Color>(saffron),
+                                  minHeight: 3,
                                 ),
                               ),
                             ],
@@ -261,10 +296,20 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                         ),
                         Expanded(
                           child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (child, animation) =>
-                                FadeTransition(
-                                    opacity: animation, child: child),
+                            duration: const Duration(milliseconds: 280),
+                            switchInCurve: Curves.easeOut,
+                            switchOutCurve: Curves.easeIn,
+                            transitionBuilder: (child, animation) {
+                              final slide = Tween<Offset>(
+                                begin: Offset(forward ? 0.06 : -0.06, 0),
+                                end: Offset.zero,
+                              ).animate(animation);
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                    position: slide, child: child),
+                              );
+                            },
                             child: KeyedSubtree(
                               key: ValueKey<int>(_currentIndex!),
                               child: _buildCard(context, card, detail),
@@ -277,8 +322,13 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                                 const EdgeInsets.only(bottom: AppSpacing.lg),
                             child: Text(
                               'Tap anywhere to continue',
-                              style: context.ts.caption.copyWith(
-                                color: AppColors.textHint,
+                              style: TextStyle(
+                                fontFamily: Fonts.sans,
+                                fontFamilyFallback: AppFontFallback.latin,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.16 * 11,
+                                color: text3,
                               ),
                             ),
                           ),
@@ -333,16 +383,38 @@ class _ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const Spacer(flex: 2),
-          Text(card.title, style: context.ts.cardLabel),
+          Text(
+            card.title,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+              height: 1.25,
+              letterSpacing: -0.01 * 24,
+              color: cream,
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
-          Text(card.body, style: context.ts.bodyLarge),
+          Text(
+            card.body,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 16,
+              height: 1.7,
+              color: text1,
+            ),
+          ),
           const Spacer(flex: 3),
         ],
       ),
@@ -358,51 +430,62 @@ class _AnchorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ColoredBox(
-      color: isDark ? Colors.transparent : AppColors.saffronFaint,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.pagePadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const Spacer(flex: 2),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.deepRedMuted,
-                borderRadius: BorderRadius.circular(AppSpacing.sm),
-              ),
-              child: Text(
-                'KEY VERSE',
-                style: context.ts.cardLabel.copyWith(
-                  color: AppColors.deepRed,
-                  letterSpacing: 1.0,
-                ),
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final iron = isDark ? DColors.ironRedBright : LColors.ironRedBright;
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(flex: 2),
+          // The one place outside Festivals where iron-red appears — a
+          // "featured verse" semantic, not destructive.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: iron.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: iron.withValues(alpha: 0.5)),
+            ),
+            child: Text(
+              'KEY VERSE',
+              style: TextStyle(
+                fontFamily: Fonts.sans,
+                fontFamilyFallback: AppFontFallback.latin,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2 * 10,
+                color: iron,
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(card.body, style: context.ts.bodyLarge),
-            if (card.verseId != null) ...[
-              const SizedBox(height: AppSpacing.xl),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.menu_book_outlined, size: 16),
-                label: Text('Read ${card.verseId} in the Gita'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.saffron,
-                  side: const BorderSide(color: AppColors.saffron),
-                ),
-                onPressed: () => context.push(
-                  '/browse/bhagavad_gita/verse/${card.verseId}',
-                ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            card.body,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 20,
+              height: 1.55,
+              color: text1,
+            ),
+          ),
+          if (card.verseId != null) ...[
+            const SizedBox(height: AppSpacing.xl),
+            _PillButton(
+              label: 'Read ${card.verseId} in the Gītā',
+              icon: Icons.menu_book_outlined,
+              color: saffron,
+              filled: false,
+              onTap: () => context.push(
+                '/browse/bhagavad_gita/verse/${card.verseId}',
               ),
-            ],
-            const Spacer(flex: 3),
+            ),
           ],
-        ),
+          const Spacer(flex: 3),
+        ],
       ),
     );
   }
@@ -416,34 +499,119 @@ class _ReflectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ColoredBox(
-      color: isDark ? Colors.transparent : AppColors.warmGrey10,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.pagePadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const Spacer(flex: 2),
-            const Icon(
-              Icons.self_improvement_outlined,
-              color: AppColors.warmGrey50,
-              size: 36,
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(flex: 2),
+          Icon(Icons.self_improvement_rounded, color: saffron, size: 32),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'REFLECT',
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.16 * 13,
+              color: saffron,
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Text('Reflect', style: context.ts.cardLabel),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              card.body,
-              style: context.ts.bodyLarge,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            card.body,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 22,
+              height: 1.45,
+              color: text1,
             ),
-            const SizedBox(height: AppSpacing.xl),
-            Text(
-              'Sit with this question. Tap to continue when ready.',
-              style: context.ts.caption.copyWith(color: AppColors.textHint),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Text(
+            'Sit with this question. Tap to continue when ready.',
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontStyle: FontStyle.italic,
+              fontSize: 13.5,
+              height: 1.5,
+              color: text3,
             ),
-            const Spacer(flex: 3),
-          ],
+          ),
+          const Spacer(flex: 3),
+        ],
+      ),
+    );
+  }
+}
+
+/// Heritage outline / filled pill button used across the module reader.
+class _PillButton extends StatelessWidget {
+  const _PillButton({
+    required this.label,
+    required this.color,
+    required this.onTap,
+    this.icon,
+    this.filled = false,
+    this.center = false,
+  });
+
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  final IconData? icon;
+  final bool filled;
+
+  /// Center the label across the full button width (for full-width primaries
+  /// like "Back to Learning Path"). Otherwise the row hugs its content.
+  final bool center;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fg = filled
+        ? (isDark ? const Color(0xFF1A1208) : Colors.white)
+        : color;
+    return Material(
+      color: filled ? color : Colors.transparent,
+      borderRadius: BorderRadius.circular(28),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(28),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            border: filled ? null : Border.all(color: color, width: 1.5),
+          ),
+          child: Row(
+            mainAxisSize: center ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment:
+                center ? MainAxisAlignment.center : MainAxisAlignment.start,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 16, color: fg),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.02 * 14,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -724,6 +892,10 @@ class _CompletionCard extends StatelessWidget {
     });
     final recs = _books[module.id] ?? [];
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final divider = isDark ? DColors.divider : LColors.divider;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.pagePadding),
@@ -731,46 +903,75 @@ class _CompletionCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: AppSpacing.xxl),
-          const Icon(
-            Icons.check_circle_outline_rounded,
-            color: AppColors.success,
-            size: 64,
-          ),
+          // Saffron seal bound in a palm-leaf frame — replaces the old green
+          // check, which was the only green in the app and broke the palette.
+          SizedBox(
+            width: 140,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BindingLine(isDark: isDark, sideGap: 8),
+                const SizedBox(height: 16),
+                Container(
+                  width: 56,
+                  height: 56,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: saffron.withValues(alpha: isDark ? 0.14 : 0.10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: saffron.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.check_rounded, color: saffron, size: 30),
+                ),
+                const SizedBox(height: 16),
+                BindingLine(isDark: isDark, sideGap: 8),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 400.ms)
+              .slideY(begin: 0.06, end: 0, duration: 400.ms),
           const SizedBox(height: AppSpacing.xl),
           Text(
             'Module Complete',
-            style: context.ts.displayLarge,
             textAlign: TextAlign.center,
-          ),
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 30,
+              fontWeight: FontWeight.w500,
+              height: 1.15,
+              letterSpacing: -0.01 * 30,
+              color: cream,
+            ),
+          ).animate(delay: 200.ms).fadeIn(duration: 380.ms),
           const SizedBox(height: AppSpacing.md),
           Text(
             module.title,
-            style: context.ts.bodyLarge,
             textAlign: TextAlign.center,
-          ),
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontStyle: FontStyle.italic,
+              fontSize: 17,
+              height: 1.4,
+              color: text2,
+            ),
+          ).animate(delay: 380.ms).fadeIn(duration: 380.ms),
           if (recs.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.xxl),
-            Divider(color: isDark ? AppColors.dividerDark : AppColors.divider),
+            Container(height: 1, color: divider),
             const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                const Icon(
-                  Icons.menu_book_outlined,
-                  color: AppColors.warmGrey50,
-                  size: 16,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  'Continue learning',
-                  style: context.ts.labelMedium,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'Recommended books for this module',
-              style: context.ts.caption.copyWith(
-                color: AppColors.textSecondary,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'RECOMMENDED FOR THIS MODULE',
+                style: AppText.sectionLabel(color: saffron),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -778,22 +979,33 @@ class _CompletionCard extends StatelessWidget {
           ],
           const SizedBox(height: AppSpacing.xxl),
           if (_scriptureLinks[module.id] case final link?) ...[
-            OutlinedButton.icon(
-              icon: const Icon(Icons.auto_stories_outlined, size: 18),
-              label: Text(link.label),
-              onPressed: () => context.go(link.route),
+            _PillButton(
+              label: link.label,
+              icon: Icons.auto_stories_outlined,
+              color: saffron,
+              filled: false,
+              onTap: () => context.go(link.route),
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
           ],
-          ElevatedButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/learn');
-              }
-            },
-            child: const Text('Back to Learning Path'),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: _PillButton(
+                label: 'Back to Learning Path',
+                color: saffron,
+                filled: true,
+                center: true,
+                onTap: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/learn');
+                  }
+                },
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
@@ -823,66 +1035,85 @@ class _BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final text1 = isDark ? DColors.text1 : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final text3 = isDark ? DColors.text3 : LColors.text3;
+    final divider = isDark ? DColors.divider : LColors.divider;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: InkWell(
-        onTap: () async {
-          final uri = Uri.parse(rec.url);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-            border: Border.all(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.borderDark
-                  : AppColors.border,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(4),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(4),
+          splashColor: Colors.transparent,
+          highlightColor: saffron.withValues(alpha: 0.04),
+          onTap: () async {
+            final uri = Uri.parse(rec.url);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: divider),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: AppSpacing.xxl,
-                height: AppSpacing.xxl,
-                decoration: BoxDecoration(
-                  color: AppColors.warmGrey10,
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: saffron.withValues(alpha: isDark ? 0.12 : 0.08),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.menu_book_outlined,
+                    color: saffron,
+                    size: 20,
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: const Icon(
-                  Icons.book_outlined,
-                  color: AppColors.warmGrey50,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(rec.title, style: context.ts.labelMedium),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      rec.author,
-                      style: context.ts.caption.copyWith(
-                        color: AppColors.textSecondary,
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        rec.title,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3,
+                          color: text1,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 3),
+                      Text(
+                        rec.author,
+                        style: TextStyle(
+                          fontFamily: Fonts.serif,
+                          fontFamilyFallback: AppFontFallback.latin,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 13,
+                          color: text2,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              const Icon(
-                Icons.open_in_new_rounded,
-                color: AppColors.warmGrey50,
-                size: 16,
-              ),
-            ],
+                const SizedBox(width: AppSpacing.sm),
+                Icon(Icons.open_in_new_rounded, color: text3, size: 16),
+              ],
+            ),
           ),
         ),
       ),

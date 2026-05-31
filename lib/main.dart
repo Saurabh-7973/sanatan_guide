@@ -186,6 +186,12 @@ class _SanatanGuideAppState extends ConsumerState<SanatanGuideApp>
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
+      // Instant theme switch. The default 200ms cross-fade janks on
+      // low-end devices, and the heritage widgets (WarmBackdrop, the
+      // DColors/LColors readers) hard-cut on brightness anyway — so the
+      // animated ThemeData colors desynced from the snap-switching custom
+      // ones, reading as a stutter. Zero duration snaps everything together.
+      themeAnimationDuration: Duration.zero,
       routerConfig: router,
       // App-wide: tapping anywhere outside a focused text field dismisses
       // the keyboard / drops focus.
