@@ -635,10 +635,11 @@ class _LeafCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            // Drop the glyph to sit on the cap-height line
-                            // of the first text line (fontSize 13 × height
-                            // 1.5 → cap roughly at y=6 inside the line box).
-                            padding: const EdgeInsets.only(top: 6),
+                            // screen-07 `.leaf-note-icon { margin-top: 2px }`
+                            // with the row at flex-start — the pencil rides
+                            // just above the first note line. top:6 dropped it
+                            // out of line with the text the user flagged.
+                            padding: const EdgeInsets.only(top: 2),
                             child: Opacity(
                               opacity: 0.6,
                               child: SizedBox(
@@ -692,14 +693,22 @@ class _LeafCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               entry.scriptureName.toUpperCase(),
-                              style: TextStyle(
+                              // Outfit lacks uppercase IAST glyphs (Ī, Ā, Ṇ …),
+                              // so "BHAGAVAD GĪTĀ" silently lost its macrons and
+                              // read as plain "BHAGAVAD GITA". Prepend the serif
+                              // (Lora) so the diacritics render — same fix as
+                              // the chapter-list MAṆḌALAS header.
+                              style: const TextStyle(
                                 fontFamily: Fonts.sans,
-                                fontFamilyFallback: AppFontFallback.latin,
+                                fontFamilyFallback: <String>[
+                                  Fonts.serif,
+                                  'NotoSansDevanagari',
+                                  'serif',
+                                ],
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 0.14 * 9.5,
-                                color: text3,
-                              ),
+                              ).copyWith(color: text3),
                             ),
                           ],
                         ),
@@ -906,8 +915,8 @@ class _EmptyBody extends StatelessWidget {
         ),
         const Spacer(),
         SizedBox(
-          width: 120,
-          height: 100,
+          width: 170,
+          height: 132,
           child: CustomPaint(
             painter: _ThreeLeafPainter(thread: divider, leaf: saffron),
           ),
@@ -985,66 +994,81 @@ class _EmptyBody extends StatelessWidget {
   }
 }
 
-/// Empty-state pothī icon: three palm-leaves stacked horizontally
-/// with a saffron binding thread passing through a centered hole, like
-/// an ancient palm-leaf manuscript before any verses are saved into it.
+/// Empty-state pothī icon: three slightly-skewed palm-leaf folios bound by
+/// a saffron cord, each with a hairline ruling and a diamond binding hole —
+/// matching screen-07 `.empty-illustration`. An ancient palm-leaf
+/// manuscript awaiting its first saved verse.
 class _ThreeLeafPainter extends CustomPainter {
   _ThreeLeafPainter({required this.thread, required this.leaf});
+
+  /// Leaf border colour (divider).
   final Color thread;
+
+  /// Accent colour (saffron) — ruling, binding hole, and cord.
   final Color leaf;
+
+  // Design space is the 180×140 illustration; we scale to the canvas.
+  static const double _dw = 180;
+  static const double _dh = 140;
+  static const double _leafW = 130;
+  static const double _leafH = 38;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final leafFill = Paint()
-      ..color = leaf.withValues(alpha: 0.18)
-      ..style = PaintingStyle.fill;
-    final leafStroke = Paint()
-      ..color = leaf.withValues(alpha: 0.55)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
-    final threadPaint = Paint()
+    canvas.save();
+    canvas.scale(size.width / _dw, size.height / _dh);
+
+    final border = Paint()
       ..color = thread
-      ..strokeWidth = 1.4
-      ..style = PaintingStyle.stroke;
-    final holeFill = Paint()..color = const Color(0x00000000);
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final rule = Paint()
+      ..color = leaf.withValues(alpha: 0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final accent = Paint()..color = leaf;
 
-    // Three horizontally-stacked leaves at fixed y positions.
-    const leafW = 86.0;
-    const leafH = 14.0;
-    const holeR = 2.4;
-    final ys = <double>[
-      size.height * 0.22,
-      size.height * 0.50,
-      size.height * 0.78,
+    // Vertical binding cord (drawn first, behind the folios).
+    canvas.drawRect(
+      const Rect.fromLTWH(63, 0, 2, _dh),
+      Paint()..color = leaf.withValues(alpha: 0.6),
+    );
+
+    // (top-left, rotation°) per .empty-leaf-1/2/3.
+    const leaves = <(double, double, double)>[
+      (14, 10, -4),
+      (26, 50, 2),
+      (18, 90, -2),
     ];
-
-    for (final y in ys) {
+    for (final (left, top, deg) in leaves) {
+      final cx = left + _leafW / 2;
+      final cy = top + _leafH / 2;
+      canvas.save();
+      canvas.translate(cx, cy);
+      canvas.rotate(deg * 3.1415926535 / 180);
       final rect = RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(cx, y),
-          width: leafW,
-          height: leafH,
-        ),
-        const Radius.circular(leafH / 2),
+        Rect.fromCenter(center: Offset.zero, width: _leafW, height: _leafH),
+        const Radius.circular(2),
       );
-      canvas.drawRRect(rect, leafFill);
-      canvas.drawRRect(rect, leafStroke);
-      canvas.drawCircle(Offset(cx, y), holeR, holeFill);
+      canvas.drawRRect(rect, border);
+      // Inner ruling: .empty-leaf::before — inset 8px, 14px down from top.
+      const ruleY = -_leafH / 2 + 14;
+      canvas.drawLine(
+        const Offset(-_leafW / 2 + 8, ruleY),
+        const Offset(_leafW / 2 - 8, ruleY),
+        rule,
+      );
+      // Binding hole: .empty-leaf::after — 4×4 diamond at the leaf centre.
+      canvas.save();
+      canvas.rotate(3.1415926535 / 4);
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset.zero, width: 4, height: 4),
+        accent,
+      );
+      canvas.restore();
+      canvas.restore();
     }
-
-    // Saffron binding thread weaving through each hole, slight slack
-    // between leaves so it reads as a tied cord.
-    final path = Path()
-      ..moveTo(cx, ys.first - holeR - 4)
-      ..lineTo(cx, ys.first - holeR)
-      ..moveTo(cx, ys.first + holeR)
-      ..lineTo(cx, ys[1] - holeR)
-      ..moveTo(cx, ys[1] + holeR)
-      ..lineTo(cx, ys.last - holeR)
-      ..moveTo(cx, ys.last + holeR)
-      ..lineTo(cx, ys.last + holeR + 4);
-    canvas.drawPath(path, threadPaint);
+    canvas.restore();
   }
 
   @override

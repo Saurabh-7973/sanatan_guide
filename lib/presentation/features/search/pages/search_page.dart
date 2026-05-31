@@ -563,69 +563,76 @@ class _SuggestRow extends StatelessWidget {
     final divider = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
 
-    final body = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(bottom: BorderSide(color: divider, width: 1)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: SizedBox(
-              width: 22,
-              height: 22,
-              child: Icon(icon, size: 18, color: text3),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: titleIsDeva ? Fonts.deva : Fonts.serif,
-                    fontFamilyFallback: titleIsDeva
-                        ? AppFontFallback.deva
-                        : AppFontFallback.latin,
-                    fontSize: titleIsDeva ? 15 : 14.5,
-                    height: 1.35,
-                    color: text1,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  meta,
-                  style: TextStyle(
-                    fontFamily: Fonts.sans,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.04 * 10.5,
-                    color: text3,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          if (showArrow)
+    // Horizontal pad lives OUTSIDE the bordered box so the divider runs
+    // only across the content area — same inset as the result rows. The
+    // recents divider used to bleed edge-to-edge while results stayed
+    // inset; the user flagged the mismatch.
+    final body = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : Border(bottom: BorderSide(color: divider, width: 1)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: MockupRowChevron(
-                color: text3.withValues(alpha: 0.6),
+              padding: const EdgeInsets.only(top: 2),
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: Icon(icon, size: 18, color: text3),
               ),
             ),
-        ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: titleIsDeva ? Fonts.deva : Fonts.serif,
+                      fontFamilyFallback: titleIsDeva
+                          ? AppFontFallback.deva
+                          : AppFontFallback.latin,
+                      fontSize: titleIsDeva ? 15 : 14.5,
+                      height: 1.35,
+                      color: text1,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    meta,
+                    style: TextStyle(
+                      fontFamily: Fonts.sans,
+                      fontFamilyFallback: AppFontFallback.latin,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.04 * 10.5,
+                      color: text3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (showArrow)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: MockupRowChevron(
+                  color: text3.withValues(alpha: 0.6),
+                ),
+              ),
+          ],
+        ),
       ),
     );
 
@@ -806,65 +813,67 @@ class _SearchingBody extends StatelessWidget {
             ),
           ),
         ],
-        if (coord == null) for (var g = 0; g < 2; g++) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 14, 24, 10),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: divider, width: 1)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _ShimmerBar(width: 140, height: 12, color: shimmer),
-                    _ShimmerBar(width: 60, height: 9, color: shimmer),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          for (var r = 0; r < 2; r++)
+        if (coord == null)
+          for (var g = 0; g < 2; g++) ...[
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.fromLTRB(24, 14, 24, 10),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: dividerSoft, width: 1),
-                  ),
+                  border: Border(bottom: BorderSide(color: divider, width: 1)),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 10),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _ShimmerBar(width: 44, height: 14, color: shimmer),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _ShimmerBar(
-                              widthFraction: 0.9,
-                              height: 14,
-                              color: shimmer,
-                            ),
-                            const SizedBox(height: 5),
-                            _ShimmerBar(
-                              widthFraction: 0.75,
-                              height: 11,
-                              color: shimmer,
-                            ),
-                          ],
-                        ),
-                      ),
+                      _ShimmerBar(width: 140, height: 12, color: shimmer),
+                      _ShimmerBar(width: 60, height: 9, color: shimmer),
                     ],
                   ),
                 ),
               ),
             ),
-        ],
+            for (var r = 0; r < 2; r++)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: dividerSoft, width: 1),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _ShimmerBar(width: 44, height: 14, color: shimmer),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _ShimmerBar(
+                                widthFraction: 0.9,
+                                height: 14,
+                                color: shimmer,
+                              ),
+                              const SizedBox(height: 5),
+                              _ShimmerBar(
+                                widthFraction: 0.75,
+                                height: 11,
+                                color: shimmer,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
       ],
     );
   }
@@ -1446,91 +1455,91 @@ class _ResultRow extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: dividerSoft, width: 1)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 64,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 1),
-                  child: Text(
-                    coordText,
-                    // Compound coords like ‖१·१४‖ or ‖१·१·७‖ (Ṛgveda) wrap
-                    // when the box is too tight — start/end ॥ slid onto a
-                    // second line. Force one line and let it fade if a very
-                    // wide 3-part coord still spills.
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    style: TextStyle(
-                      fontFamily: Fonts.deva,
-                      fontFamilyFallback: AppFontFallback.deva,
-                      fontSize: 12,
-                      height: 1.4,
-                      color: saffron,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: dividerSoft, width: 1)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 64,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Text(
+                      coordText,
+                      // Compound coords like ‖१·१४‖ or ‖१·१·७‖ (Ṛgveda) wrap
+                      // when the box is too tight — start/end ॥ slid onto a
+                      // second line. Force one line and let it fade if a very
+                      // wide 3-part coord still spills.
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                        fontFamily: Fonts.deva,
+                        fontFamilyFallback: AppFontFallback.deva,
+                        fontSize: 12,
+                        height: 1.4,
+                        color: saffron,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text.rich(
-                      _highlight(
-                        skLine,
-                        query,
-                        TextStyle(
-                          fontFamily: Fonts.deva,
-                          fontFamilyFallback: AppFontFallback.deva,
-                          fontSize: 14,
-                          height: 1.5,
-                          color: cream,
-                        ),
-                        saffron,
-                      ),
-                      // One-line previews per design — search results are
-                      // scannable lists, not full verses. Tap opens the verse
-                      // detail page where the user sees everything.
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (enLine.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text.rich(
                         _highlight(
-                          enLine,
+                          skLine,
                           query,
                           TextStyle(
-                            fontFamily: Fonts.serif,
-                            fontFamilyFallback: AppFontFallback.latin,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 12,
-                            height: 1.45,
-                            color: text2,
+                            fontFamily: Fonts.deva,
+                            fontFamilyFallback: AppFontFallback.deva,
+                            fontSize: 14,
+                            height: 1.5,
+                            color: cream,
                           ),
                           saffron,
-                          highlightDropsItalic: true,
                         ),
+                        // One-line previews per design — search results are
+                        // scannable lists, not full verses. Tap opens the verse
+                        // detail page where the user sees everything.
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (enLine.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text.rich(
+                          _highlight(
+                            enLine,
+                            query,
+                            TextStyle(
+                              fontFamily: Fonts.serif,
+                              fontFamilyFallback: AppFontFallback.latin,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                              height: 1.45,
+                              color: text2,
+                            ),
+                            saffron,
+                            highlightDropsItalic: true,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              MockupRowChevron(
-                color: text3.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
+                const SizedBox(width: 4),
+                MockupRowChevron(
+                  color: text3.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
           ),
         ),
       ),

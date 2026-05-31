@@ -433,14 +433,19 @@ class _DataCell extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
+          // "NAKṢATRA" etc. need the serif fallback so the uppercase
+          // dot/macron glyphs render — Outfit drops them.
+          style: const TextStyle(
             fontFamily: Fonts.sans,
-            fontFamilyFallback: AppFontFallback.latin,
+            fontFamilyFallback: <String>[
+              Fonts.serif,
+              'NotoSansDevanagari',
+              'serif',
+            ],
             fontSize: 8.5,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.9,
-            color: text3,
-          ),
+          ).copyWith(color: text3),
         ),
         const SizedBox(height: 4),
         Text(

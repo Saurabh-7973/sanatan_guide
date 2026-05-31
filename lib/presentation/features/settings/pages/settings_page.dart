@@ -8,6 +8,7 @@
 import 'dart:async';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 // `kDefaultFontSize` is also exported by material.dart (14.0); we need the
 // app's reading-font default (16.0) from font_size_provider.
@@ -19,11 +20,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
-import 'package:sanatan_guide/core/utils/verse_label.dart';
-import 'package:sanatan_guide/domain/entities/scripture.dart';
-import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
@@ -106,8 +103,6 @@ class SettingsPage extends ConsumerWidget {
                         isDark: isDark,
                       ),
                       const _NotificationTimeRow(),
-                      const _TestNotificationRow(),
-                      const _Schedule30sRow(),
                       const _BatteryOptimizationRow(),
                       const _FestivalAlertsRow(),
 
@@ -116,21 +111,12 @@ class SettingsPage extends ConsumerWidget {
                         title: l10n.settingsSectionData,
                         isDark: isDark,
                       ),
+                      // screen-09 puts the size in the subtitle (size +
+                      // offline reassurance), no trailing value, no icon.
                       _Row(
                         isDark: isDark,
-                        icon: Icons.folder_outlined,
                         title: 'Storage',
-                        subtitle: 'Scripture library bundled with the app',
-                        trailing: Text(
-                          '~65 MB',
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontFamilyFallback: AppFontFallback.latin,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: isDark ? DColors.text3 : LColors.text3,
-                          ),
-                        ),
+                        subtitle: '~65 MB · full library cached offline',
                       ),
                       // Export bookmarks deferred until v1.1 — the
                       // backing flow needs share_plus + a small JSON
@@ -152,14 +138,12 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       _Row(
                         isDark: isDark,
-                        icon: Icons.auto_stories_outlined,
                         title: 'Credits & attributions',
                         trailing: _Chevron(isDark: isDark),
                         onTap: () => context.push('/credits'),
                       ),
                       _Row(
                         isDark: isDark,
-                        icon: Icons.privacy_tip_outlined,
                         title: l10n.settingsPrivacyPolicy,
                         trailing: _ExternalIcon(isDark: isDark),
                         onTap: () => launchUrl(
@@ -169,7 +153,6 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       _Row(
                         isDark: isDark,
-                        icon: Icons.description_outlined,
                         title: l10n.settingsTermsOfService,
                         trailing: _ExternalIcon(isDark: isDark),
                         onTap: () => launchUrl(
@@ -179,7 +162,6 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       _Row(
                         isDark: isDark,
-                        icon: Icons.feedback_outlined,
                         title: 'Send feedback',
                         trailing: _Chevron(isDark: isDark),
                         onTap: () => context.push('/feedback'),
@@ -240,7 +222,6 @@ class _SectionHeader extends StatelessWidget {
 class _Row extends StatelessWidget {
   const _Row({
     required this.isDark,
-    this.icon,
     required this.title,
     this.subtitle,
     this.trailing,
@@ -249,9 +230,6 @@ class _Row extends StatelessWidget {
   });
 
   final bool isDark;
-  // Per screen-09 design, some rows (Reading font size, Theme) don't carry
-  // a leading icon — the section header alone is enough visual context.
-  final IconData? icon;
   final String title;
   final String? subtitle;
   final Widget? trailing;
@@ -260,7 +238,9 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    // screen-09 deliberately drops all per-row leading icons — the section
+    // header carries the context. Icons remain only on the theme segmented
+    // control and the external-link glyph (Privacy / Terms).
     final iron = isDark ? DColors.ironRedBright : LColors.ironRedBright;
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
@@ -271,10 +251,6 @@ class _Row extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         child: Row(
           children: [
-            if (icon != null) ...[
-              Icon(icon, size: 20, color: danger ? iron : saffron),
-              const SizedBox(width: 16),
-            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,24 +391,25 @@ class _BrandFooter extends StatelessWidget {
               final label = version == null
                   ? '...'
                   : 'V${version.version} · BUILD $displayBuild';
-              return GestureDetector(
-                // Hidden QA gesture: triple-tap the version label to fire
-                // a hard native crash via FirebaseCrashlytics.instance.crash()
-                // so we can verify the Crashlytics pipeline end-to-end on
-                // a real release build. Production users won't discover
-                // the gesture by accident.
-                onTap: () => _CrashTestCounter.bump(context),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: Fonts.sans,
-                    fontFamilyFallback: AppFontFallback.latin,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.18 * 10.5,
-                    color: text3,
-                  ),
+              final versionText = Text(
+                label,
+                style: TextStyle(
+                  fontFamily: Fonts.sans,
+                  fontFamilyFallback: AppFontFallback.latin,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.18 * 10.5,
+                  color: text3,
                 ),
+              );
+              // The triple-tap-to-crash QA gesture is debug-only — a
+              // production user must never be able to crash the app by
+              // tapping the version line. The Crashlytics symbolication
+              // pipeline was already verified on release builds.
+              if (!kDebugMode) return versionText;
+              return GestureDetector(
+                onTap: () => _CrashTestCounter.bump(context),
+                child: versionText,
               );
             },
           ),
@@ -485,68 +462,75 @@ class _ThemeRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
-    final icon = themeMode == ThemeMode.dark
-        ? Icons.dark_mode_rounded
-        : themeMode == ThemeMode.light
-            ? Icons.light_mode_rounded
-            : Icons.brightness_auto_rounded;
-    // Mockup `.seg-item.active` is neutral text-1 background with the bg
-    // colour as the icon fg — not iron-red. Override the Material-default
-    // primary colours so the active pill reads calm.
-    final activeBg = isDark ? DColors.text1 : LColors.text1;
-    final activeFg = isDark ? DColors.bg : LColors.bg;
-    final inactiveFg = isDark ? DColors.text2 : LColors.text2;
-    final divider = isDark ? DColors.divider : LColors.divider;
+    // screen-09 theme row: no leading icon, just the label + a compact
+    // 3-segment icon control (Auto · Light · Dark). Active segment fills
+    // saffron; that's the "something different" the previous tab-like
+    // SegmentedButton lost.
     return _Row(
       isDark: isDark,
-      icon: icon,
       title: 'Theme',
-      trailing: SegmentedButton<ThemeMode>(
-        // Three segments with short text labels matching design mockup
-        // "Light · Dark · System". Labels chosen over icons-only so the
-        // active segment reads from the heritage-tone label, not an
-        // ambiguous glyph.
-        segments: const [
-          ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-          ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
-          ButtonSegment(value: ThemeMode.system, label: Text('Auto')),
+      trailing: _ThemeSegmented(current: themeMode, isDark: isDark),
+    );
+  }
+}
+
+/// The `.seg` icon segmented control from screen-09: a rounded surface
+/// pill holding three 36×30 icon cells. The active cell fills saffron.
+class _ThemeSegmented extends ConsumerWidget {
+  const _ThemeSegmented({required this.current, required this.isDark});
+
+  final ThemeMode current;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final surface = isDark ? DColors.surface : LColors.surface;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: dividerSoft),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _seg(ref, ThemeMode.system, Icons.brightness_auto_rounded, 'Auto'),
+          const SizedBox(width: 2),
+          _seg(ref, ThemeMode.light, Icons.light_mode_rounded, 'Light'),
+          const SizedBox(width: 2),
+          _seg(ref, ThemeMode.dark, Icons.dark_mode_rounded, 'Dark'),
         ],
-        selected: {themeMode},
-        onSelectionChanged: (selection) {
-          final mode = selection.first;
+      ),
+    );
+  }
+
+  Widget _seg(WidgetRef ref, ThemeMode mode, IconData icon, String tip) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final inactiveFg = isDark ? DColors.text3 : LColors.text3;
+    final activeFg = isDark ? const Color(0xFF1A1208) : Colors.white;
+    final active = current == mode;
+    return Semantics(
+      button: true,
+      selected: active,
+      label: tip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
           ref.read(themeModeProvider.notifier).setThemeMode(mode);
           AnalyticsService.darkModeToggled(enabled: mode == ThemeMode.dark);
         },
-        showSelectedIcon: false,
-        style: ButtonStyle(
-          visualDensity: VisualDensity.compact,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: WidgetStateProperty.resolveWith(
-            (states) => states.contains(WidgetState.selected)
-                ? activeBg
-                : Colors.transparent,
+        child: Container(
+          width: 36,
+          height: 30,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: active ? saffron : Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
           ),
-          foregroundColor: WidgetStateProperty.resolveWith(
-            (states) =>
-                states.contains(WidgetState.selected) ? activeFg : inactiveFg,
-          ),
-          iconColor: WidgetStateProperty.resolveWith(
-            (states) =>
-                states.contains(WidgetState.selected) ? activeFg : inactiveFg,
-          ),
-          textStyle: WidgetStateProperty.all(
-            const TextStyle(
-              fontFamily: Fonts.sans,
-              fontFamilyFallback: AppFontFallback.latin,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-          padding: WidgetStateProperty.all(
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          ),
-          side: WidgetStateProperty.all(BorderSide(color: divider)),
+          child: Icon(icon, size: 16, color: active ? activeFg : inactiveFg),
         ),
       ),
     );
@@ -569,8 +553,8 @@ class _FontSizeRow extends ConsumerWidget {
       children: [
         _Row(
           isDark: isDark,
-          icon: Icons.format_size_rounded,
           title: 'Reading font size',
+          subtitle: 'Affects Sanskrit and translation text',
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
@@ -627,7 +611,6 @@ class _LanguageRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     return _Row(
       isDark: isDark,
-      icon: Icons.translate_rounded,
       title: l10n.settingsLanguage,
       subtitle: l10n.settingsLanguageEnglish,
     );
@@ -646,7 +629,6 @@ class _SanskritDisplayRow extends ConsumerWidget {
         ref.watch(transliterationEnabledProvider).asData?.value ?? false;
     return _Row(
       isDark: isDark,
-      icon: Icons.spellcheck_rounded,
       title: 'Sanskrit display',
       subtitle: iast ? 'Devanāgarī · IAST diacritics on' : 'Devanāgarī only',
       trailing: _Chevron(isDark: isDark),
@@ -666,7 +648,6 @@ class _ExperienceRow extends ConsumerWidget {
     final level = ref.watch(userExperienceLevelProvider);
     return _Row(
       isDark: isDark,
-      icon: Icons.school_outlined,
       title: 'Scripture experience',
       subtitle: level.displayTitle,
       trailing: _Chevron(isDark: isDark),
@@ -789,7 +770,6 @@ class _BatteryOptimizationRowState
     final granted = _status == PermissionStatus.granted;
     return _Row(
       isDark: isDark,
-      icon: Icons.battery_saver_outlined,
       title: 'Battery optimisation',
       subtitle: granted
           ? 'Reminder is exempt — fires reliably at the picked time'
@@ -829,55 +809,6 @@ class _BatteryOptimizationRowState
   }
 }
 
-// ── Notifications: 30-second scheduled test ───────────────────────────────
-
-class _Schedule30sRow extends ConsumerWidget {
-  const _Schedule30sRow();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return _Row(
-      isDark: isDark,
-      icon: Icons.schedule_outlined,
-      title: 'Schedule a test in 30 sec',
-      subtitle: 'Tests the *scheduled* fire path (lock screen, doze, etc)',
-      onTap: () async {
-        final verseAsync = await ref.read(verseOfDayProvider.future);
-        final t = await verseAsync.fold<Future<DateTime>>(
-          (_) => NotificationService.scheduleTestInSeconds(
-            verseId: 'BG.2.47',
-            title: 'Sanatan Guide · scheduled test',
-            body: 'Fired via zonedSchedule. If you see this, alarms work.',
-          ),
-          (verse) {
-            final en = verse.english?.trim() ?? '';
-            final body = en.isNotEmpty
-                ? (en.length > 100 ? '${en.substring(0, 97)}…' : en)
-                : verse.sanskrit.trim();
-            return NotificationService.scheduleTestInSeconds(
-              verseId: verse.id,
-              title: '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
-              body: body,
-            );
-          },
-        );
-        if (context.mounted) {
-          final hh = t.hour.toString().padLeft(2, '0');
-          final mm = t.minute.toString().padLeft(2, '0');
-          final ss = t.second.toString().padLeft(2, '0');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Scheduled for $hh:$mm:$ss — lock screen + wait'),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        }
-      },
-    );
-  }
-}
-
 // ── Notifications: festival alerts toggle ─────────────────────────────────
 //
 // Persists the user's preference. The scheduling job that posts day-of
@@ -894,12 +825,11 @@ class _FestivalAlertsRow extends ConsumerWidget {
     final enabled = ref.watch(festivalAlertsEnabledProvider);
     return _Row(
       isDark: isDark,
-      icon: Icons.celebration_outlined,
       title: 'Festival alerts',
       subtitle: 'Day before each major parva',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: Colors.white,
+        activeThumbColor: isDark ? const Color(0xFF1A1208) : Colors.white,
         activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(festivalAlertsEnabledProvider.notifier).setEnabled(v),
@@ -927,13 +857,12 @@ class _AnalyticsOptOutRow extends ConsumerWidget {
     final enabled = ref.watch(analyticsEnabledProvider);
     return _Row(
       isDark: isDark,
-      icon: Icons.analytics_outlined,
       title: 'Anonymous usage analytics',
       subtitle:
           'Helps improve the app. No personal data is collected. Crash reports are unaffected.',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: Colors.white,
+        activeThumbColor: isDark ? const Color(0xFF1A1208) : Colors.white,
         activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(analyticsEnabledProvider.notifier).setEnabled(v),
@@ -958,65 +887,16 @@ class _CrashlyticsOptOutRow extends ConsumerWidget {
     final enabled = ref.watch(crashlyticsEnabledProvider);
     return _Row(
       isDark: isDark,
-      icon: Icons.bug_report_outlined,
       title: 'Crash reports',
       subtitle:
           'Sends a stack trace when the app crashes so we can fix it. No personal data.',
       trailing: Switch(
         value: enabled,
-        activeThumbColor: Colors.white,
+        activeThumbColor: isDark ? const Color(0xFF1A1208) : Colors.white,
         activeTrackColor: saffron,
         onChanged: (v) =>
             ref.read(crashlyticsEnabledProvider.notifier).setEnabled(v),
       ),
-    );
-  }
-}
-
-// ── Notifications: test-fire button ───────────────────────────────────────
-
-class _TestNotificationRow extends ConsumerWidget {
-  const _TestNotificationRow();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return _Row(
-      isDark: isDark,
-      icon: Icons.send_outlined,
-      title: 'Send a test notification',
-      subtitle: 'Fires immediately — confirms delivery + tap deep-link',
-      onTap: () async {
-        final verseAsync = await ref.read(verseOfDayProvider.future);
-        verseAsync.fold(
-          (_) async {
-            await NotificationService.fireTestNotificationNow(
-              verseId: 'BG.2.47',
-              title: 'Sanatan Guide · test',
-              body: 'Test reminder — tap to open Verse Detail.',
-            );
-          },
-          (verse) async {
-            final en = verse.english?.trim() ?? '';
-            final body = en.isNotEmpty
-                ? (en.length > 100 ? '${en.substring(0, 97)}…' : en)
-                : verse.sanskrit.trim();
-            await NotificationService.fireTestNotificationNow(
-              verseId: verse.id,
-              title: '${verse.scripture.displayName} · ${getVerseLabel(verse)}',
-              body: body,
-            );
-          },
-        );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Test notification sent'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      },
     );
   }
 }
@@ -1035,7 +915,6 @@ class _NotificationTimeRow extends ConsumerWidget {
     final enabled = ref.watch(notificationEnabledProvider);
     return _Row(
       isDark: isDark,
-      icon: Icons.notifications_outlined,
       title: 'Daily verse reminder',
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1097,9 +976,9 @@ class _ClearHistoryRow extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return _Row(
       isDark: isDark,
-      icon: Icons.delete_outline_rounded,
       title: 'Clear reading history',
       subtitle: 'Resets streaks and read counts',
+      trailing: _Chevron(isDark: isDark),
       onTap: () => _showConfirmDialog(context, ref),
       danger: true,
     );
@@ -1504,9 +1383,9 @@ class _ResetRow extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return _Row(
       isDark: isDark,
-      icon: Icons.restart_alt_rounded,
       title: 'Reset all settings',
       subtitle: 'Restore theme, font, language, and reminders to defaults',
+      trailing: _Chevron(isDark: isDark),
       danger: true,
       onTap: () => _showResetDialog(context, ref),
     );

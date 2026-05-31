@@ -554,14 +554,20 @@ class _BannerCell extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
+          // Outfit has no uppercase IAST glyphs, so "VĀRA" / "NAKṢATRA"
+          // lost their diacritics and read "VARA" / "NAKSATRA". Prepend
+          // the serif so the macron/dot caps render.
+          style: const TextStyle(
             fontFamily: Fonts.sans,
-            fontFamilyFallback: AppFontFallback.latin,
+            fontFamilyFallback: <String>[
+              Fonts.serif,
+              'NotoSansDevanagari',
+              'serif',
+            ],
             fontSize: 8.5,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.5,
-            color: text3,
-          ),
+          ).copyWith(color: text3),
         ),
         const SizedBox(height: 3),
         Text(
@@ -1060,23 +1066,34 @@ class _MoonPhase extends StatelessWidget {
       child: Stack(
         children: [
           // Lit portion of the moon.
-          ClipOval(
-            child: Align(
-              alignment: waxing ? Alignment.centerRight : Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: fraction,
-                heightFactor: 1,
-                child: ColoredBox(color: lit),
+          Positioned.fill(
+            child: ClipOval(
+              child: Align(
+                alignment:
+                    waxing ? Alignment.centerRight : Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: fraction,
+                  heightFactor: 1,
+                  child: ColoredBox(color: lit),
+                ),
               ),
             ),
           ),
           // Always-visible outline ring so the moon glyph reads as a circle
           // even on Amāvāsyā (fraction = 0) when the fill collapses to
           // nothing. White in dark mode, near-black in light mode.
-          DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: lit, width: 1.25),
+          //
+          // MUST be Positioned.fill: a bare DecoratedBox is a non-positioned
+          // Stack child with no child of its own, so it collapses to 0×0
+          // under the Stack's loose constraints and never paints — which is
+          // why the ring was invisible (user-reported "nothing is visible
+          // when there is no circle").
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: lit, width: 1.25),
+              ),
             ),
           ),
         ],

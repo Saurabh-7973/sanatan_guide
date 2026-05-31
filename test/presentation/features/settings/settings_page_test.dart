@@ -68,7 +68,12 @@ void main() {
       (tester) async {
     await _pumpSettings(tester);
 
-    expect(find.byType(SegmentedButton<ThemeMode>), findsOneWidget);
+    // The theme control is now a custom 3-segment icon switch
+    // (Auto · Light · Dark), not a Material SegmentedButton.
+    expect(find.text('Theme'), findsOneWidget);
+    expect(find.byIcon(Icons.brightness_auto_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.light_mode_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.dark_mode_rounded), findsOneWidget);
     expect(find.text('Reading font size'), findsOneWidget);
     expect(find.text('Clear reading history'), findsOneWidget);
     expect(find.text('Reset all settings'), findsOneWidget);

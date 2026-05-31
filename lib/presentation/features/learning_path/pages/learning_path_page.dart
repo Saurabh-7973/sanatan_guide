@@ -456,11 +456,11 @@ class _SectionHeader extends StatelessWidget {
               else
                 Text(
                   status!,
-                  // In-progress / not-started read in muted text3 as before;
-                  // Complete pops in saffron to celebrate the win.
-                  style: AppText.sectionLabel(
-                    color: allDone ? saffron : text3,
-                  ),
+                  // screen-12 `.section-status` is saffron for every
+                  // non-locked state (NOT STARTED / IN PROGRESS / COMPLETE);
+                  // only `.locked` falls to text3. The status label is the
+                  // saffron accent of the section header.
+                  style: AppText.sectionLabel(color: saffron),
                 ),
             ],
           ),
@@ -938,7 +938,6 @@ class _ModuleRow extends StatelessWidget {
                 active: isActive,
                 locked: locked,
                 saffron: saffron,
-                text2: text2,
                 text3: text3,
               ),
             ),
@@ -955,7 +954,6 @@ class _ModuleStateIcon extends StatelessWidget {
     required this.active,
     required this.locked,
     required this.saffron,
-    required this.text2,
     required this.text3,
   });
 
@@ -963,7 +961,6 @@ class _ModuleStateIcon extends StatelessWidget {
   final bool active;
   final bool locked;
   final Color saffron;
-  final Color text2;
   final Color text3;
 
   @override
@@ -977,7 +974,9 @@ class _ModuleStateIcon extends StatelessWidget {
     if (done) {
       return Padding(
         padding: const EdgeInsets.only(top: 3),
-        child: Icon(Icons.check_circle_outline_rounded, size: 15, color: text2),
+        // screen-12 `.module-state` (the completed check) is saffron.
+        child:
+            Icon(Icons.check_circle_outline_rounded, size: 15, color: saffron),
       );
     }
     if (active) {

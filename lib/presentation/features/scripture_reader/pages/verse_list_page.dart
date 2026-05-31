@@ -424,6 +424,20 @@ class _ChapterHeader extends StatelessWidget {
     return _chapterMeta()?.enTitle;
   }
 
+  /// Singular form of the scripture's unit label, Title-cased — used to
+  /// build a chapter English line ("Canto 3", "Skanda 1") for DB-driven
+  /// scriptures that carry no curated chapter title.
+  static String _unitSingular(String plural) => switch (plural) {
+        'maṇḍalas' => 'Maṇḍala',
+        'kāṇḍas' => 'Kāṇḍa',
+        'cantos' => 'Canto',
+        'pādas' => 'Pāda',
+        'upadeśas' => 'Upadeśa',
+        'adhyāyas' => 'Adhyāya',
+        'parvas' => 'Parva',
+        _ => 'Chapter',
+      };
+
   @override
   Widget build(BuildContext context) {
     final cream = isDark ? DColors.cream : LColors.text1;
@@ -433,8 +447,12 @@ class _ChapterHeader extends StatelessWidget {
     final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
     final scripture = ScriptureX.fromCode(scriptureId);
     final percent = total > 0 ? ((read / total) * 100).floor() : 0;
-    final deva = _devaTitle();
-    final en = _englishTitle();
+    // Every scripture shows a Devanāgarī line + an English line, like the
+    // Gītā. Curated/BG chapters carry their own titles; DB-driven texts
+    // (Bhāgavata Purāṇa, Ṛgveda, …) fall back to the scripture's
+    // Devanāgarī name + the chapter's unit label ("Canto 3").
+    final deva = _devaTitle() ?? scripture.devaName;
+    final en = _englishTitle() ?? '${_unitSingular(scripture.unitLabel)} $chapterNum';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
@@ -447,7 +465,7 @@ class _ChapterHeader extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  deva ?? scripture.displayName,
+                  deva,
                   style: TextStyle(
                     fontFamily: Fonts.deva,
                     fontFamilyFallback: AppFontFallback.deva,
@@ -476,21 +494,19 @@ class _ChapterHeader extends StatelessWidget {
               ),
             ],
           ),
-          if (en != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              en,
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontStyle: FontStyle.italic,
-                fontSize: 13,
-                color: text2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 6),
+          Text(
+            en,
+            style: TextStyle(
+              fontFamily: Fonts.serif,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontStyle: FontStyle.italic,
+              fontSize: 13,
+              color: text2,
             ),
-          ],
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           if (read > 0) ...[
             const SizedBox(height: 12),
             ClipRRect(
