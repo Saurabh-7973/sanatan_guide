@@ -31,6 +31,7 @@ import 'package:sanatan_guide/presentation/features/settings/providers/font_size
     as font_prefs;
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/system_chrome.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -889,12 +890,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         onCopy: (text) {
           Clipboard.setData(ClipboardData(text: text));
           Navigator.of(sheetCtx).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Copied'),
-              duration: Duration(seconds: 2),
-            ),
-          );
+          showHeritageToast(context, 'Copied to clipboard');
         },
         onShare: (text) {
           AnalyticsService.verseShared(verse.id);

@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Verse Detail (Screen 02)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS (carried over) ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-surface-2: #EFE7D7;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-cream: #2A1E14;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+    --f-deva-ui: "Noto Sans Devanagari", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%),
+      #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p {
+    margin-top: 8px;
+    color: rgba(242, 229, 206, 0.5);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .frame-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* ==================== TOP BAR ==================== */
+  .topbar {
+    flex-shrink: 0;
+    padding: 6px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .topbar-actions { display: flex; gap: 4px; }
+
+  .topbar-context {
+    text-align: center;
+    flex: 1;
+  }
+  .topbar-context .title {
+    font-family: var(--f-serif);
+    font-size: 15px;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1;
+  }
+  .topbar-context .coord {
+    margin-top: 4px;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* ==================== VERSE FRAME (the leaf) ==================== */
+  .leaf {
+    margin: 8px 24px 0;
+    padding: 28px 4px 24px;
+    position: relative;
+  }
+
+  .leaf-binding {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 14px;
+    display: flex;
+    align-items: center;
+  }
+  .leaf-binding.top { top: 0; }
+  .leaf-binding.bottom { bottom: 0; }
+
+  .leaf-binding::before,
+  .leaf-binding::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+
+  .leaf-binding .hole {
+    width: 6px;
+    height: 6px;
+    margin: 0 12px;
+    transform: rotate(45deg);
+  }
+
+  /* coordinate above sanskrit */
+  .verse-coord {
+    text-align: center;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  .verse-coord .frac {
+    display: inline-block;
+    margin-left: 10px;
+    padding-left: 10px;
+    position: relative;
+    font-family: var(--f-serif);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  .verse-coord .frac::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 12px;
+    transform: translateY(-50%);
+  }
+
+  /* Sanskrit verse */
+  .sanskrit {
+    font-family: var(--f-deva);
+    font-size: 24px;
+    line-height: 1.95;
+    text-align: center;
+    letter-spacing: 0.005em;
+    padding: 0 6px;
+  }
+
+  .sanskrit .word {
+    cursor: pointer;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+  .sanskrit .word.active {
+    color: var(--d-saffron);
+  }
+  .sanskrit .word.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1.5px;
+    background: var(--d-saffron);
+  }
+
+  /* word callout */
+  .word-callout {
+    position: absolute;
+    background: var(--d-surface-2);
+    border: 1px solid var(--d-divider);
+    border-radius: 4px;
+    padding: 14px 18px;
+    z-index: 10;
+    width: 220px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  .word-callout::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 30px;
+    width: 8px;
+    height: 8px;
+    background: var(--d-surface-2);
+    border-left: 1px solid var(--d-divider);
+    border-top: 1px solid var(--d-divider);
+    transform: rotate(45deg);
+  }
+  .word-callout .word-deva {
+    font-family: var(--f-deva);
+    font-size: 18px;
+    color: var(--d-cream);
+    margin-bottom: 4px;
+  }
+  .word-callout .word-trans {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--d-saffron);
+    margin-bottom: 8px;
+  }
+  .word-callout .word-meaning {
+    font-family: var(--f-serif);
+    font-size: 13px;
+    color: var(--d-text-2);
+    line-height: 1.5;
+  }
+  .word-callout .word-pos {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--d-divider-soft);
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--d-text-3);
+  }
+
+  /* ==================== SECTIONS BELOW THE LEAF ==================== */
+  .section {
+    margin: 32px 24px 0;
+  }
+
+  .section-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .section-rule .line {
+    flex: 1;
+    height: 1px;
+  }
+  .section-rule .label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .transliteration {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.75;
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  .translation {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: left;
+    padding: 0 8px;
+  }
+
+  .translation-attr {
+    margin-top: 12px;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: right;
+    padding-right: 8px;
+  }
+
+  /* ==================== AI EXPLAIN BLOCK ==================== */
+  .explain-trigger {
+    margin: 24px;
+    padding: 16px 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border: 1px solid var(--d-divider);
+    background: linear-gradient(180deg, rgba(232, 130, 12, 0.04), transparent);
+  }
+  .explain-trigger .glyph {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--d-saffron-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-deva);
+    color: var(--d-saffron);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .explain-trigger .body {
+    flex: 1;
+  }
+  .explain-trigger .label {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--d-saffron);
+    margin-bottom: 2px;
+  }
+  .explain-trigger .text {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--d-text-1);
+  }
+  .explain-trigger .arrow {
+    color: var(--d-text-3);
+  }
+
+  /* expanded explanation */
+  .explain-card {
+    margin: 24px;
+    padding: 22px;
+    border-radius: 4px;
+    border: 1px solid var(--d-divider);
+    background: var(--d-surface);
+    position: relative;
+  }
+  .explain-card .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .explain-card .header .glyph {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--d-saffron-glow);
+    color: var(--d-saffron);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-deva);
+    font-size: 13px;
+  }
+  .explain-card .header .title {
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--d-saffron);
+  }
+  .explain-card .header .source {
+    margin-left: auto;
+    font-family: var(--f-sans);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--d-text-3);
+  }
+  .explain-card .prose {
+    font-family: var(--f-serif);
+    font-size: 14.5px;
+    line-height: 1.72;
+    color: var(--d-text-1);
+  }
+  .explain-card .prose p + p { margin-top: 12px; }
+  .explain-card .followups {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--d-divider-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .explain-card .followups .label {
+    font-family: var(--f-sans);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--d-text-3);
+    margin-bottom: 4px;
+  }
+  .explain-card .followups .chip {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1px solid var(--d-divider-soft);
+    border-radius: 4px;
+    color: var(--d-text-2);
+    cursor: pointer;
+  }
+
+  /* ==================== UTILITY BAR (bottom) ==================== */
+  .util-bar {
+    flex-shrink: 0;
+    margin: 8px 20px 16px;
+    padding: 6px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .util-btn {
+    flex: 1;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 24px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  .util-btn.nav {
+    flex: 0 0 44px;
+    height: 44px;
+  }
+
+  .util-btn svg { display: block; }
+
+  /* ==================== PROGRESS RAIL ==================== */
+  .progress-rail {
+    margin: 0 24px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .progress-rail .track {
+    flex: 1;
+    height: 1px;
+    position: relative;
+  }
+  .progress-rail .track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--d-divider-soft);
+  }
+  .progress-rail .track .fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--d-saffron);
+    width: 2.1%;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-btn { color: var(--d-text-1); }
+  .theme-dark .topbar-btn.bookmarked { color: var(--d-saffron); }
+  .theme-dark .topbar-context .title { color: var(--d-text-1); }
+  .theme-dark .topbar-context .coord { color: var(--d-text-3); }
+
+  .theme-dark .leaf-binding::before,
+  .theme-dark .leaf-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.45;
+  }
+  .theme-dark .leaf-binding .hole { background: var(--d-saffron); box-shadow: 0 0 6px rgba(232, 130, 12, 0.4); }
+  .theme-dark .verse-coord { color: var(--d-saffron); }
+  .theme-dark .verse-coord .frac { color: var(--d-text-3); }
+  .theme-dark .verse-coord .frac::before { background: var(--d-divider); }
+  .theme-dark .sanskrit { color: var(--d-cream); }
+
+  .theme-dark .progress-rail { color: var(--d-text-3); }
+
+  .theme-dark .section-rule .line { background: var(--d-divider); }
+  .theme-dark .section-rule .label { color: var(--d-saffron); }
+  .theme-dark .transliteration { color: var(--d-text-2); }
+  .theme-dark .translation { color: var(--d-text-1); }
+  .theme-dark .translation-attr { color: var(--d-text-3); }
+
+  .theme-dark .util-bar { background: var(--d-surface); }
+  .theme-dark .util-btn { color: var(--d-text-2); }
+  .theme-dark .util-btn:hover { color: var(--d-saffron); }
+  .theme-dark .util-btn.primary { background: var(--d-saffron-glow); color: var(--d-saffron); }
+  .theme-dark .util-btn.disabled { color: var(--d-text-3); opacity: 0.4; }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background:
+      radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%),
+      var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-btn { color: var(--l-text-1); }
+  .theme-light .topbar-btn.bookmarked { color: var(--l-saffron); }
+  .theme-light .topbar-context .title { color: var(--l-text-1); }
+  .theme-light .topbar-context .coord { color: var(--l-text-3); }
+
+  .theme-light .leaf-binding::before,
+  .theme-light .leaf-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .leaf-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .verse-coord { color: var(--l-saffron); }
+  .theme-light .verse-coord .frac { color: var(--l-text-3); }
+  .theme-light .verse-coord .frac::before { background: var(--l-divider); }
+  .theme-light .sanskrit { color: var(--l-text-1); }
+
+  .theme-light .progress-rail { color: var(--l-text-3); }
+  .theme-light .progress-rail .track::before { background: var(--l-divider-soft); }
+  .theme-light .progress-rail .track .fill { background: var(--l-saffron); }
+
+  .theme-light .section-rule .line { background: var(--l-divider); }
+  .theme-light .section-rule .label { color: var(--l-saffron); }
+  .theme-light .transliteration { color: var(--l-text-2); }
+  .theme-light .translation { color: var(--l-text-1); }
+  .theme-light .translation-attr { color: var(--l-text-3); }
+
+  .theme-light .explain-trigger {
+    background: linear-gradient(180deg, rgba(194, 101, 8, 0.04), transparent);
+    border-color: var(--l-divider);
+  }
+  .theme-light .explain-trigger .glyph { background: var(--l-saffron-glow); color: var(--l-saffron); }
+  .theme-light .explain-trigger .label { color: var(--l-saffron); }
+  .theme-light .explain-trigger .text { color: var(--l-text-1); }
+  .theme-light .explain-trigger .arrow { color: var(--l-text-3); }
+
+  .theme-light .util-bar { background: var(--l-surface); }
+  .theme-light .util-btn { color: var(--l-text-2); }
+  .theme-light .util-btn.primary { background: var(--l-saffron-glow); color: var(--l-saffron); }
+
+  /* ==================== STATES ==================== */
+  @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.85; } 100% { opacity: 0.5; } }
+  .skeleton { background: rgba(232, 130, 12, 0.08); border-radius: 2px; animation: shimmer 1.6s ease-in-out infinite; }
+
+  .error-banner {
+    margin: 32px 24px 0;
+    padding: 22px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px dashed var(--d-iron-red);
+    background: rgba(184, 90, 58, 0.06);
+  }
+  .error-banner .glyph {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(184, 90, 58, 0.12);
+    color: var(--d-iron-red);
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--f-deva); font-size: 18px;
+  }
+  .error-banner .title {
+    font-family: var(--f-serif); font-style: italic; font-size: 15px;
+    color: var(--d-text-1); margin-bottom: 6px;
+  }
+  .error-banner .body {
+    font-family: var(--f-sans); font-size: 12px; color: var(--d-text-2);
+    margin-bottom: 18px; line-height: 1.5;
+  }
+  .error-banner .retry {
+    font-family: var(--f-sans); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--d-saffron);
+    cursor: pointer;
+  }
+
+  /* ==================== AI loading (typing) ==================== */
+  @keyframes type-pulse {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .typing span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--d-saffron);
+    animation: type-pulse 1.4s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ==================== NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+  }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .sanskrit { animation: inkSettle 700ms 100ms ease-out backwards; }
+  .transliteration { animation: inkSettle 700ms 250ms ease-out backwards; }
+  .translation { animation: inkSettle 700ms 380ms ease-out backwards; }
+
+  /* swipe affordance hint (subtle, on edges) */
+  .swipe-hint-left, .swipe-hint-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 36px;
+    border-radius: 2px;
+    opacity: 0.4;
+  }
+  .swipe-hint-left { left: 4px; }
+  .swipe-hint-right { right: 4px; }
+  .theme-dark .swipe-hint-left, .theme-dark .swipe-hint-right { background: var(--d-divider); }
+  .theme-light .swipe-hint-left, .theme-light .swipe-hint-right { background: var(--l-divider); }
+
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 02 · Verse Detail</span></h1>
+  <p>The leaf, fully realized · word-tap meaning · AI commentary as natural next layer · six states</p>
+</div>
+
+<!-- ==================== ROW 1: PRIMARY ==================== -->
+<div class="row">
+
+  <!-- DARK · DEFAULT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · default</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn bookmarked">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="4" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.7 8l6.6-3M5.7 10l6.6 3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- progress rail -->
+        <div class="progress-rail">
+          <span>1 / 47</span>
+          <div class="track"><div class="fill"></div></div>
+          <span>2%</span>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- THE LEAF -->
+          <div class="leaf">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord">
+              <span>Chapter I · Verse 1</span>
+            </div>
+
+            <div class="sanskrit">
+              <span class="word">धृतराष्ट्र</span> <span class="word">उवाच</span> ।<br/>
+              <span class="word">धर्मक्षेत्रे</span> <span class="word">कुरुक्षेत्रे</span><br/>
+              <span class="word">समवेता</span> <span class="word">युयुत्सवः</span> ।<br/>
+              <span class="word">मामकाः</span> <span class="word">पाण्डवाश्चैव</span><br/>
+              <span class="word">किमकुर्वत</span> <span class="word">सञ्जय</span> ॥
+            </div>
+          </div>
+
+          <!-- TRANSLITERATION -->
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Transliteration</span>
+              <span class="line"></span>
+            </div>
+            <div class="transliteration">
+              dhṛtarāṣṭra uvāca .<br/>
+              dharmakṣetre kurukṣetre samavetā yuyutsavaḥ .<br/>
+              māmakāḥ pāṇḍavāścaiva kimakurvata sañjaya ||1-1||
+            </div>
+          </div>
+
+          <!-- TRANSLATION -->
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Translation</span>
+              <span class="line"></span>
+            </div>
+            <div class="translation">
+              Dhṛtarāṣṭra said: O Sañjaya, what did my sons and the sons of Pāṇḍu actually do when, desirous of battle, they had assembled together on the holy plain of Kurukṣetra?
+            </div>
+            <div class="translation-attr">— Swami Sivananda</div>
+          </div>
+
+          <!-- AI EXPLAIN TRIGGER -->
+          <div class="explain-trigger">
+            <div class="glyph">ॐ</div>
+            <div class="body">
+              <div class="label">Explain this verse</div>
+              <div class="text">Why does the Gītā begin here, with a blind king's question?</div>
+            </div>
+            <div class="arrow">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+        </div>
+
+        <!-- bottom utility bar -->
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Translation</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Listen</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · DEFAULT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · default</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn bookmarked">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="4" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.7 8l6.6-3M5.7 10l6.6 3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-rail">
+          <span>1 / 47</span>
+          <div class="track"><div class="fill"></div></div>
+          <span>2%</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="leaf">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord">
+              <span>Chapter I · Verse 1</span>
+            </div>
+
+            <div class="sanskrit">
+              <span class="word">धृतराष्ट्र</span> <span class="word">उवाच</span> ।<br/>
+              <span class="word">धर्मक्षेत्रे</span> <span class="word">कुरुक्षेत्रे</span><br/>
+              <span class="word">समवेता</span> <span class="word">युयुत्सवः</span> ।<br/>
+              <span class="word">मामकाः</span> <span class="word">पाण्डवाश्चैव</span><br/>
+              <span class="word">किमकुर्वत</span> <span class="word">सञ्जय</span> ॥
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Transliteration</span>
+              <span class="line"></span>
+            </div>
+            <div class="transliteration">
+              dhṛtarāṣṭra uvāca .<br/>
+              dharmakṣetre kurukṣetre samavetā yuyutsavaḥ .<br/>
+              māmakāḥ pāṇḍavāścaiva kimakurvata sañjaya ||1-1||
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Translation</span>
+              <span class="line"></span>
+            </div>
+            <div class="translation">
+              Dhṛtarāṣṭra said: O Sañjaya, what did my sons and the sons of Pāṇḍu actually do when, desirous of battle, they had assembled together on the holy plain of Kurukṣetra?
+            </div>
+            <div class="translation-attr">— Swami Sivananda</div>
+          </div>
+
+          <div class="explain-trigger">
+            <div class="glyph">ॐ</div>
+            <div class="body">
+              <div class="label">Explain this verse</div>
+              <div class="text">Why does the Gītā begin here, with a blind king's question?</div>
+            </div>
+            <div class="arrow">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+                <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Translation</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Listen</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 2: WORD TAP + AI EXPANDED ==================== -->
+<div class="row">
+
+  <!-- WORD TAPPED -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · word tapped</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="4" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.7 8l6.6-3M5.7 10l6.6 3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-rail">
+          <span>1 / 47</span>
+          <div class="track"><div class="fill"></div></div>
+          <span>2%</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="leaf">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord">
+              <span>Chapter I · Verse 1</span>
+            </div>
+
+            <div class="sanskrit">
+              <span class="word">धृतराष्ट्र</span> <span class="word">उवाच</span> ।<br/>
+              <span class="word active">धर्मक्षेत्रे</span> <span class="word">कुरुक्षेत्रे</span><br/>
+              <span class="word">समवेता</span> <span class="word">युयुत्सवः</span> ।<br/>
+              <span class="word">मामकाः</span> <span class="word">पाण्डवाश्चैव</span><br/>
+              <span class="word">किमकुर्वत</span> <span class="word">सञ्जय</span> ॥
+            </div>
+
+            <!-- callout -->
+            <div class="word-callout" style="left: 20px; top: 195px;">
+              <div class="word-deva">धर्मक्षेत्रे</div>
+              <div class="word-trans">dharma-kṣetre</div>
+              <div class="word-meaning">In the field of dharma — the place where right action is to be performed.</div>
+              <div class="word-pos">noun · locative · neuter</div>
+            </div>
+          </div>
+
+          <div class="section" style="opacity:0.45;">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Transliteration</span>
+              <span class="line"></span>
+            </div>
+            <div class="transliteration">
+              dhṛtarāṣṭra uvāca .<br/>
+              dharmakṣetre kurukṣetre samavetā yuyutsavaḥ ...
+            </div>
+          </div>
+
+          <div class="section" style="opacity:0.45;">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Translation</span>
+              <span class="line"></span>
+            </div>
+            <div class="translation">
+              Dhṛtarāṣṭra said: O Sañjaya, what did my sons...
+            </div>
+          </div>
+
+          <div style="height:80px;"></div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Translation</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Listen</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI EXPANDED -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · AI commentary</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn bookmarked">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="4" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.7 8l6.6-3M5.7 10l6.6 3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-rail">
+          <span>1 / 47</span>
+          <div class="track"><div class="fill"></div></div>
+          <span>2%</span>
+        </div>
+
+        <div class="screen-content">
+
+          <!-- compressed leaf -->
+          <div class="leaf" style="padding-top:20px; padding-bottom:18px;">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord">
+              <span>Chapter I · Verse 1</span>
+            </div>
+
+            <div class="sanskrit" style="font-size:18px; line-height:1.7;">
+              धृतराष्ट्र उवाच ।<br/>
+              धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः ।<br/>
+              मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय ॥
+            </div>
+          </div>
+
+          <!-- AI explain card -->
+          <div class="explain-card">
+            <div class="header">
+              <div class="glyph">ॐ</div>
+              <div class="title">Commentary</div>
+              <div class="source">AI · Gemini</div>
+            </div>
+            <div class="prose">
+              <p>The Gītā opens with a question, not a sermon. Dhṛtarāṣṭra is the blind king — and the blindness is more than physical. He cannot see the war his ambition has caused. He cannot see his sons.</p>
+              <p>The very first word, <em>dharmakṣetre</em>, "in the field of dharma," is the key. Kurukṣetra is not just a battlefield — it is the place where dharma is decided. Every choice you make is on this same field.</p>
+            </div>
+            <div class="followups">
+              <div class="label">Ask further</div>
+              <div class="chip">Why is Dhṛtarāṣṭra called blind?</div>
+              <div class="chip">What does "kṣetra" mean throughout the Gītā?</div>
+              <div class="chip">Who is Sañjaya?</div>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Translation</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Listen</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI THINKING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · AI thinking</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn bookmarked">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="4" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.7 8l6.6-3M5.7 10l6.6 3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-rail">
+          <span>1 / 47</span>
+          <div class="track"><div class="fill"></div></div>
+          <span>2%</span>
+        </div>
+
+        <div class="screen-content">
+          <div class="leaf" style="padding-top:20px; padding-bottom:18px;">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord">
+              <span>Chapter I · Verse 1</span>
+            </div>
+
+            <div class="sanskrit" style="font-size:18px; line-height:1.7;">
+              धृतराष्ट्र उवाच ।<br/>
+              धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः ।<br/>
+              मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय ॥
+            </div>
+          </div>
+
+          <div class="explain-card">
+            <div class="header">
+              <div class="glyph">ॐ</div>
+              <div class="title">Commentary</div>
+              <div class="source">AI · Gemini</div>
+            </div>
+            <div class="prose">
+              <p>The Gītā opens with a question, not a sermon. Dhṛtarāṣṭra is the blind king — and the blindness is more than physical.</p>
+              <p style="display:flex; align-items:center; gap:8px;">
+                <span style="opacity:0.5;">Reflecting on this verse</span>
+                <span class="typing"><span></span><span></span><span></span></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7c1-2 3-4 5-4s4 2 5 4c-1 2-3 4-5 4S3 9 2 7z" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Translation</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span>Listen</span>
+          </div>
+          <div class="util-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ROW 3: LOADING + ERROR ==================== -->
+<div class="row">
+
+  <!-- LOADING -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · loading</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">LOADING VERSE</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="leaf">
+            <div class="leaf-binding top"><div class="hole"></div></div>
+            <div class="leaf-binding bottom"><div class="hole"></div></div>
+
+            <div class="verse-coord" style="opacity:0.5;">
+              <div class="skeleton" style="width:140px; height:10px; margin:0 auto;"></div>
+            </div>
+
+            <div style="margin-top:30px; padding: 0 20px;">
+              <div class="skeleton" style="height:18px; width:80%; margin: 0 auto 18px;"></div>
+              <div class="skeleton" style="height:18px; width:90%; margin: 0 auto 18px;"></div>
+              <div class="skeleton" style="height:18px; width:75%; margin: 0 auto 18px;"></div>
+              <div class="skeleton" style="height:18px; width:85%; margin: 0 auto;"></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Transliteration</span>
+              <span class="line"></span>
+            </div>
+            <div style="padding: 0 20px;">
+              <div class="skeleton" style="height:10px; width:80%; margin: 0 auto 8px;"></div>
+              <div class="skeleton" style="height:10px; width:70%; margin: 0 auto;"></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-rule">
+              <span class="line"></span>
+              <span class="label">Translation</span>
+              <span class="line"></span>
+            </div>
+            <div style="padding: 0 8px;">
+              <div class="skeleton" style="height:12px; width:100%; margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:12px; width:95%; margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:12px; width:60%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn disabled"><span>Translation</span></div>
+          <div class="util-btn disabled"><span>Listen</span></div>
+          <div class="util-btn disabled"><span>Notes</span></div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · error</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="topbar">
+          <div class="topbar-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="topbar-context">
+            <div class="title">Bhagavad Gītā</div>
+            <div class="coord">अर्जुनविषादयोग</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="topbar-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M4 2h10v15l-5-3.5L4 17V2z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-content">
+          <div class="error-banner">
+            <div class="glyph">!</div>
+            <div class="title">This verse couldn't be loaded</div>
+            <div class="body">
+              The text might be missing from your offline library. You can retry, or return to the chapter.
+            </div>
+            <div class="retry">↻ &nbsp; Try again</div>
+          </div>
+
+          <div style="margin: 24px; text-align:center;">
+            <div style="font-family: var(--f-sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--d-text-3); margin-bottom: 14px;">
+              Or read instead
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="padding: 14px 18px; border:1px solid var(--d-divider-soft); border-radius: 4px; text-align:left; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <div style="font-family: var(--f-serif); font-size: 14px; color: var(--d-text-1); margin-bottom: 2px;">Bhagavad Gītā 1.2</div>
+                  <div style="font-family: var(--f-sans); font-size: 11px; color: var(--d-text-3);">Sañjaya uvāca</div>
+                </div>
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style="color:var(--d-text-3);">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div style="padding: 14px 18px; border:1px solid var(--d-divider-soft); border-radius: 4px; text-align:left; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <div style="font-family: var(--f-serif); font-size: 14px; color: var(--d-text-1); margin-bottom: 2px;">Return to chapter</div>
+                  <div style="font-family: var(--f-sans); font-size: 11px; color: var(--d-text-3);">Arjuna Viṣāda Yoga · 47 verses</div>
+                </div>
+                <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style="color:var(--d-text-3);">
+                  <path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="util-bar">
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="util-btn disabled"><span>Translation</span></div>
+          <div class="util-btn disabled"><span>Listen</span></div>
+          <div class="util-btn disabled"><span>Notes</span></div>
+          <div class="util-btn nav">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What changed and why</h2>
+  <ul>
+    <li><b>Removed the orange flower-yantra and the BG bubble.</b> Both were generic decoration. The verse coordinate ("Chapter I · Verse 1") now lives as inscriptional small caps inside the leaf — it carries the heritage signal.</li>
+    <li><b>Removed the "Translation on" pill, "BHAGAVAD GITA" vertical ribbon, "CH 1 V 1" stack, bottom verse label, and bottom edit pencil.</b> All chrome, no information.</li>
+    <li><b>The leaf is now the entire reading surface.</b> Top + bottom binding lines frame the Sanskrit. Margins match real palm-leaf folio proportions. Continuity with Home: same diamond, same rule, same saffron.</li>
+    <li><b>Tap-a-word reveals meaning in a callout.</b> Devanāgarī + IAST + English meaning + grammar (case/number). Word selection draws a thin saffron underline; rest of the screen dims to 45% so attention stays on the chosen word.</li>
+    <li><b>Translation moved to flowing left-aligned serif prose</b> (per Geeta Press / Chinmaya conventions). Centered translation reads like a quote-card; flowing prose reads like a book.</li>
+    <li><b>"Explain this verse" added as the natural next layer.</b> A specific contextual question — not a generic "Ask AI" button. When expanded, becomes a Commentary card with follow-up prompts.</li>
+    <li><b>Progress rail under the topbar.</b> "1 / 47 — 2%" makes location-in-chapter glanceable. Hairline thin, never decorative.</li>
+    <li><b>Bottom utility bar consolidates Translation switcher, Listen (audio), Notes, and prev/next.</b> Five things in one strip instead of five separate UI elements scattered across the screen.</li>
+  </ul>
+</div>
+
+</body>
+</html>

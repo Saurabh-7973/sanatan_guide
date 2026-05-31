@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — Module Reader (Screen 15)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ==================== TOKENS ==================== */
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+    --d-iron-red-bright: #D17048;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-saffron-glow: rgba(194, 101, 8, 0.08);
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+    --l-iron-red: #8B2818;
+    --l-iron-red-bright: #A53520;
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%), #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+    letter-spacing: -0.01em;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p { margin-top: 8px; color: rgba(242, 229, 206, 0.5); font-size: 14px; letter-spacing: 0.02em; }
+
+  .group-header { max-width: 1280px; margin: 0 auto 18px; padding-top: 16px; }
+  .group-header h2 {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 500;
+    color: #E8820C;
+  }
+  .group-header p { font-size: 13px; color: rgba(242, 229, 206, 0.55); margin-top: 4px; }
+
+  .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .frame-label {
+    font-family: var(--f-sans);
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #E8820C;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ==================== PHONE FRAME ==================== */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(232, 130, 12, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ==================== MODULE READER TOPBAR ==================== */
+  .module-topbar {
+    flex-shrink: 0;
+    padding: 6px 16px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: -8px;
+  }
+  .module-title {
+    flex: 1;
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .module-counter {
+    font-family: var(--f-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+
+  .progress-bar {
+    flex-shrink: 0;
+    height: 3px;
+    width: 100%;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    transition: width 280ms ease-out;
+  }
+
+  /* ==================== MODULE READER BODY ==================== */
+  .module-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 24px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .step-label {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  /* INTRO / CONCEPT step */
+  .step-title {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    margin-bottom: 22px;
+  }
+  .step-body-prose {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .step-body-prose p + p { margin-top: 14px; }
+  .step-body-prose em.term {
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* KEY VERSE step */
+  .key-verse-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border: 1px solid;
+    border-radius: 14px;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    align-self: flex-start;
+  }
+  .key-verse-text {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+  }
+  .key-verse-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 22px;
+    border: 1.5px solid;
+    border-radius: 28px;
+    font-family: var(--f-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  /* REFLECT step */
+  .reflect-glyph {
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .reflect-label {
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .reflect-question {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    margin-bottom: 22px;
+  }
+  .reflect-footer {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  /* Tap-anywhere hint */
+  .tap-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+    opacity: 0.5;
+  }
+
+  /* ==================== MODULE COMPLETE SCREEN ==================== */
+  .complete-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px;
+  }
+  .complete-hero {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Saffron checkmark inside palm-leaf binding-line frame */
+  .check-leaf {
+    width: 140px;
+    padding: 14px 0;
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .check-leaf-binding {
+    position: absolute;
+    left: 0; right: 0;
+    height: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .check-leaf-binding.top { top: 0; }
+  .check-leaf-binding.bottom { bottom: 0; }
+  .check-leaf-binding::before, .check-leaf-binding::after {
+    content: ""; flex: 1; height: 1px;
+  }
+  .check-leaf-binding .hole {
+    width: 5px; height: 5px;
+    margin: 0 10px;
+    transform: rotate(45deg);
+  }
+
+  .check-mark {
+    font-family: var(--f-sans);
+    font-size: 40px;
+    font-weight: 300;
+    text-align: center;
+    line-height: 1;
+    padding: 14px 0;
+  }
+
+  .complete-title {
+    font-family: var(--f-serif);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .complete-module-name {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.3;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .complete-divider {
+    height: 1px;
+    width: 100%;
+    margin-bottom: 22px;
+  }
+
+  .recommend-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .book-row {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid;
+  }
+  .book-row:last-child { border-bottom: none; }
+
+  .book-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .book-body { flex: 1; min-width: 0; }
+  .book-title {
+    font-family: var(--f-serif);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-bottom: 2px;
+  }
+  .book-author {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .book-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  /* Bottom CTA */
+  .complete-bottom {
+    flex-shrink: 0;
+    padding: 16px 24px 28px;
+  }
+  .primary-btn {
+    width: 100%;
+    height: 50px;
+    border-radius: 28px;
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+  }
+
+  /* ==================== DARK THEME ==================== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .topbar-close { color: var(--d-text-2); }
+  .theme-dark .module-title { color: var(--d-saffron); }
+  .theme-dark .module-counter { color: var(--d-text-3); }
+
+  .theme-dark .progress-bar { background: var(--d-surface-2); }
+  .theme-dark .progress-bar .fill {
+    background: var(--d-saffron);
+    box-shadow: 0 0 8px rgba(232, 130, 12, 0.4);
+  }
+
+  .theme-dark .step-label { color: var(--d-saffron); }
+  .theme-dark .step-title { color: var(--d-cream); }
+  .theme-dark .step-body-prose { color: var(--d-text-2); }
+  .theme-dark .step-body-prose em.term { color: var(--d-saffron); }
+
+  .theme-dark .key-verse-pill {
+    color: var(--d-iron-red-bright);
+    border-color: var(--d-iron-red);
+    background: rgba(184, 90, 58, 0.08);
+  }
+  .theme-dark .key-verse-text { color: var(--d-text-1); }
+  .theme-dark .key-verse-cta {
+    border-color: var(--d-saffron);
+    color: var(--d-saffron);
+  }
+
+  .theme-dark .reflect-glyph { color: var(--d-saffron-deep); }
+  .theme-dark .reflect-label { color: var(--d-saffron); }
+  .theme-dark .reflect-question { color: var(--d-text-1); }
+  .theme-dark .reflect-footer { color: var(--d-text-3); }
+
+  .theme-dark .tap-hint { color: var(--d-text-3); }
+
+  .theme-dark .check-leaf-binding::before, .theme-dark .check-leaf-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.5;
+  }
+  .theme-dark .check-leaf-binding .hole { background: var(--d-saffron); }
+  .theme-dark .check-mark {
+    color: var(--d-saffron);
+    text-shadow: 0 0 12px rgba(232, 130, 12, 0.5);
+  }
+
+  .theme-dark .complete-title { color: var(--d-cream); }
+  .theme-dark .complete-module-name { color: var(--d-text-2); }
+  .theme-dark .complete-divider { background: var(--d-divider); }
+  .theme-dark .recommend-label { color: var(--d-saffron); }
+  .theme-dark .book-row { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .book-icon {
+    background: var(--d-surface);
+    border-color: var(--d-divider);
+    color: var(--d-saffron);
+  }
+  .theme-dark .book-title { color: var(--d-text-1); }
+  .theme-dark .book-author { color: var(--d-text-2); }
+  .theme-dark .book-arrow { color: var(--d-text-3); }
+  .theme-dark .primary-btn { background: var(--d-saffron); color: #1a1208; }
+
+  /* ==================== LIGHT THEME ==================== */
+  .theme-light .screen {
+    background: radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%), var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .topbar-close { color: var(--l-text-2); }
+  .theme-light .module-title { color: var(--l-saffron); }
+  .theme-light .module-counter { color: var(--l-text-3); }
+
+  .theme-light .progress-bar { background: var(--l-surface); }
+  .theme-light .progress-bar .fill { background: var(--l-saffron); }
+
+  .theme-light .step-label { color: var(--l-saffron); }
+  .theme-light .step-title { color: var(--l-text-1); }
+  .theme-light .step-body-prose { color: var(--l-text-2); }
+  .theme-light .step-body-prose em.term { color: var(--l-saffron); }
+
+  .theme-light .key-verse-pill {
+    color: var(--l-iron-red-bright);
+    border-color: var(--l-iron-red);
+    background: rgba(139, 40, 24, 0.06);
+  }
+  .theme-light .key-verse-text { color: var(--l-text-1); }
+  .theme-light .key-verse-cta { border-color: var(--l-saffron); color: var(--l-saffron); }
+
+  .theme-light .reflect-glyph { color: var(--l-saffron-deep); }
+  .theme-light .reflect-label { color: var(--l-saffron); }
+  .theme-light .reflect-question { color: var(--l-text-1); }
+  .theme-light .reflect-footer { color: var(--l-text-3); }
+  .theme-light .tap-hint { color: var(--l-text-3); }
+
+  .theme-light .check-leaf-binding::before, .theme-light .check-leaf-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .check-leaf-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .check-mark { color: var(--l-saffron); }
+
+  .theme-light .complete-title { color: var(--l-text-1); }
+  .theme-light .complete-module-name { color: var(--l-text-2); }
+  .theme-light .complete-divider { background: var(--l-divider); }
+  .theme-light .recommend-label { color: var(--l-saffron); }
+  .theme-light .book-row { border-bottom-color: var(--l-divider-soft); }
+  .theme-light .book-icon {
+    background: var(--l-surface);
+    border-color: var(--l-divider);
+    color: var(--l-saffron);
+  }
+  .theme-light .book-title { color: var(--l-text-1); }
+  .theme-light .book-author { color: var(--l-text-2); }
+  .theme-light .book-arrow { color: var(--l-text-3); }
+  .theme-light .primary-btn { background: var(--l-saffron); color: #fff; }
+
+  /* ==================== ANIMATIONS ==================== */
+  @keyframes inkSettle {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .step-label, .step-title, .step-body-prose,
+  .key-verse-pill, .key-verse-text, .key-verse-cta,
+  .reflect-glyph, .reflect-label, .reflect-question, .reflect-footer {
+    animation: inkSettle 500ms ease-out backwards;
+  }
+  .step-label, .key-verse-pill, .reflect-glyph { animation-delay: 80ms; }
+  .step-title, .key-verse-text, .reflect-label { animation-delay: 200ms; }
+  .step-body-prose, .key-verse-cta, .reflect-question { animation-delay: 340ms; }
+  .reflect-footer { animation-delay: 480ms; }
+
+  .check-leaf, .complete-title, .complete-module-name,
+  .complete-divider, .recommend-label, .book-row, .primary-btn {
+    animation: inkSettle 500ms ease-out backwards;
+  }
+  .check-leaf { animation-delay: 100ms; }
+  .complete-title { animation-delay: 280ms; }
+  .complete-module-name { animation-delay: 420ms; }
+  .complete-divider { animation-delay: 580ms; }
+  .recommend-label { animation-delay: 660ms; }
+  .book-row:nth-child(2) { animation-delay: 720ms; }
+  .book-row:nth-child(3) { animation-delay: 780ms; }
+  .primary-btn { animation-delay: 920ms; }
+
+  /* ==================== DESIGN NOTES ==================== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes h3 {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: #E8820C;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 22px 0 10px;
+  }
+  .design-notes ul { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 32px; }
+  .design-notes li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px;
+    position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute;
+    left: 0; top: 1px;
+    font-size: 8px;
+    color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 15 · Module Reader + Complete</span></h1>
+  <p>The five step types inside a Practice module + the redesigned completion screen</p>
+</div>
+
+<!-- ==================== GROUP 1: STEP TYPES ==================== -->
+<div class="group-header">
+  <h2>1 · Module step types — what shows inside a Practice module</h2>
+  <p>Tap-anywhere-to-continue. Step transition: 280ms slide+fade. Body content vertically centered.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · INTRO -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Intro step</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">1 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 11%"></div></div>
+
+        <div class="module-body">
+          <div class="step-label">Introduction</div>
+          <div class="step-title">Before the verses, the framework.</div>
+          <div class="step-body-prose">
+            <p>Hinduism is not a religion in the Abrahamic sense — it has no founder, no single scripture, no creed to recite. What it has is a <em class="term">framework of inquiry</em> built over four millennia, where direct experience matters more than belief.</p>
+            <p>This module introduces five concepts that appear, in some form, in nearly every text you will read here. Knowing them changes how you read everything else.</p>
+          </div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · CONCEPT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Concept step</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">3 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 33%"></div></div>
+
+        <div class="module-body">
+          <div class="step-label">Concept 2 of 5 · आत्मन्</div>
+          <div class="step-title">Ātman — the self that observes.</div>
+          <div class="step-body-prose">
+            <p>The Upaniṣads draw a sharp line between the body, the mind, and <em class="term">the one who watches both</em>. That watcher — eternal, unchanging, the same in every being — is called Ātman.</p>
+            <p>Ātman is not a soul in the Christian sense. It is not a piece of you that goes to heaven. It is the irreducible awareness that is reading these words right now.</p>
+          </div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK · KEY VERSE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Key Verse step</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">7 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 78%"></div></div>
+
+        <div class="module-body">
+          <div class="key-verse-pill">Key Verse</div>
+          <div class="key-verse-text">
+            "The soul is never born nor dies at any time. It has not come into being, does not come into being, and will not come into being. It is unborn, eternal, ever-existing, and primeval."
+          </div>
+          <div class="key-verse-cta">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 3h4.5c1 0 1.5 0.5 1.5 1.5v9c0-1-0.5-1.5-1.5-1.5H2V3zM14 3h-4.5c-1 0-1.5 0.5-1.5 1.5v9c0-1 0.5-1.5 1.5-1.5H14V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+            <span>Read BG·2·20 in the Gītā</span>
+          </div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="row">
+
+  <!-- DARK · REFLECT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Reflect step</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">8 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 89%"></div></div>
+
+        <div class="module-body">
+          <div class="reflect-glyph">
+            <!-- Meditation/diya glyph: small flame above a base -->
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <!-- flame -->
+              <path d="M18 6c-1.5 3-3.5 5-3.5 8 0 2.2 1.6 4 3.5 4s3.5-1.8 3.5-4c0-3-2-5-3.5-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="currentColor" fill-opacity="0.15"/>
+              <!-- base / lamp -->
+              <path d="M11 22h14M9 26h18l-2-2H11l-2 2zM12 22c0-1 1-2 6-2s6 1 6 2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- light rays -->
+              <path d="M18 4v1.5M12 8l1 1M24 8l-1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="reflect-label">Reflect</div>
+          <div class="reflect-question">Of these five concepts, which one feels most true to your own direct experience right now — not as a belief, but as something you have actually noticed?</div>
+          <div class="reflect-footer">Sit with this question. Tap to continue when ready.</div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · INTRO -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · Intro step</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">1 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 11%"></div></div>
+
+        <div class="module-body">
+          <div class="step-label">Introduction</div>
+          <div class="step-title">Before the verses, the framework.</div>
+          <div class="step-body-prose">
+            <p>Hinduism is not a religion in the Abrahamic sense — it has no founder, no single scripture, no creed to recite. What it has is a <em class="term">framework of inquiry</em> built over four millennia, where direct experience matters more than belief.</p>
+            <p>This module introduces five concepts that appear, in some form, in nearly every text you will read here. Knowing them changes how you read everything else.</p>
+          </div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · KEY VERSE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · Key Verse step</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">7 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 78%"></div></div>
+
+        <div class="module-body">
+          <div class="key-verse-pill">Key Verse</div>
+          <div class="key-verse-text">
+            "The soul is never born nor dies at any time. It has not come into being, does not come into being, and will not come into being. It is unborn, eternal, ever-existing, and primeval."
+          </div>
+          <div class="key-verse-cta">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 3h4.5c1 0 1.5 0.5 1.5 1.5v9c0-1-0.5-1.5-1.5-1.5H2V3zM14 3h-4.5c-1 0-1.5 0.5-1.5 1.5v9c0-1 0.5-1.5 1.5-1.5H14V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+            <span>Read BG·2·20 in the Gītā</span>
+          </div>
+          <div class="tap-hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 2: MODULE COMPLETE ==================== -->
+<div class="group-header">
+  <h2>2 · Module Complete — replaces the green checkmark</h2>
+  <p>Saffron check inside palm-leaf binding-line frame. Book recommendations redesigned to match heritage vocabulary.</p>
+</div>
+
+<div class="row">
+
+  <!-- DARK · COMPLETE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · module complete</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">9 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+        <div class="complete-body">
+          <div class="complete-hero">
+            <div class="check-leaf">
+              <div class="check-leaf-binding top"><div class="hole"></div></div>
+              <div class="check-mark">✓</div>
+              <div class="check-leaf-binding bottom"><div class="hole"></div></div>
+            </div>
+            <div class="complete-title">Module Complete</div>
+            <div class="complete-module-name">The Five Core Concepts</div>
+          </div>
+
+          <div class="complete-divider"></div>
+
+          <div class="recommend-label">Recommended for this module</div>
+
+          <div class="book-row">
+            <div class="book-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4h6c1.5 0 2.5 0.8 2.5 2v11c0-1.2-1-2-2.5-2H3V4zM17 4h-6c-1.5 0-2.5 0.8-2.5 2v11c0-1.2 1-2 2.5-2h6V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="book-body">
+              <div class="book-title">The Essentials of Hinduism</div>
+              <div class="book-author">Swami Bhaskarananda</div>
+            </div>
+            <div class="book-arrow">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="book-row">
+            <div class="book-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4h6c1.5 0 2.5 0.8 2.5 2v11c0-1.2-1-2-2.5-2H3V4zM17 4h-6c-1.5 0-2.5 0.8-2.5 2v11c0-1.2 1-2 2.5-2h6V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="book-body">
+              <div class="book-title">An Introduction to Hindu Philosophy</div>
+              <div class="book-author">Subhash Kak</div>
+            </div>
+            <div class="book-arrow">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="complete-bottom">
+          <button class="primary-btn">Back to Learning Path</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHT · COMPLETE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · module complete</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>10:14</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="module-topbar">
+          <div class="topbar-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="module-title">The Five Core Concepts</div>
+          <div class="module-counter">9 / 9</div>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+        <div class="complete-body">
+          <div class="complete-hero">
+            <div class="check-leaf">
+              <div class="check-leaf-binding top"><div class="hole"></div></div>
+              <div class="check-mark">✓</div>
+              <div class="check-leaf-binding bottom"><div class="hole"></div></div>
+            </div>
+            <div class="complete-title">Module Complete</div>
+            <div class="complete-module-name">The Five Core Concepts</div>
+          </div>
+
+          <div class="complete-divider"></div>
+
+          <div class="recommend-label">Recommended for this module</div>
+
+          <div class="book-row">
+            <div class="book-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4h6c1.5 0 2.5 0.8 2.5 2v11c0-1.2-1-2-2.5-2H3V4zM17 4h-6c-1.5 0-2.5 0.8-2.5 2v11c0-1.2 1-2 2.5-2h6V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="book-body">
+              <div class="book-title">The Essentials of Hinduism</div>
+              <div class="book-author">Swami Bhaskarananda</div>
+            </div>
+            <div class="book-arrow">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="book-row">
+            <div class="book-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4h6c1.5 0 2.5 0.8 2.5 2v11c0-1.2-1-2-2.5-2H3V4zM17 4h-6c-1.5 0-2.5 0.8-2.5 2v11c0-1.2 1-2 2.5-2h6V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="book-body">
+              <div class="book-title">An Introduction to Hindu Philosophy</div>
+              <div class="book-author">Subhash Kak</div>
+            </div>
+            <div class="book-arrow">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M4 1h6v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M10 1L4 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="complete-bottom">
+          <button class="primary-btn">Back to Learning Path</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What this screen covers</h2>
+
+  <h3>Module reader — chrome (consistent across all step types)</h3>
+  <ul>
+    <li><b>Topbar:</b> ✕ close (left) + Module name in Lora italic saffron + counter "X / Y" in dText3 (right). Compact, doesn't compete with body.</li>
+    <li><b>Progress bar:</b> 3px full-bleed saffron under topbar, animates 280ms easeOut when advancing. Matches your existing app's pattern.</li>
+    <li><b>Body container:</b> Vertically centered in the available space. Padding 24px horizontal. Entire body is the tap target.</li>
+    <li><b>Tap hint:</b> "Tap anywhere to continue" in 11px lowercase tracked sans-serif, dText3, 28px from bottom. Subtle — doesn't shout.</li>
+    <li><b>Step transition:</b> Slide-in from right + fade (280ms). Previous step slides out left simultaneously. Same easing as a page route.</li>
+  </ul>
+
+  <h3>Five step types — each has its own typographic identity</h3>
+  <ul>
+    <li><b>INTRO / CONCEPT:</b> Small-caps label (saffron) + 28px serif title in cream + 16px serif body in dText2. Used for framing, definitions, narrative connective tissue. Label can be "INTRODUCTION", "CONCEPT 2 OF 5 · आत्मन्", "RECAP", etc.</li>
+    <li><b>KEY VERSE:</b> "KEY VERSE" pill in iron-red bright (8% tint, 1px border) — THE ONE PLACE OUTSIDE FESTIVALS where iron-red appears, because it's a "featured" semantic. 22px serif quote. Outlined saffron pill button "Read BG·2·20 in the Gītā" routes to verse detail.</li>
+    <li><b>REFLECT:</b> Meditation/diya glyph (saffron-deep) + small-caps "Reflect" label + 22px serif question + italic "Sit with this question" footer. The diya icon replaces the generic Material meditation glyph from your live app — fits the heritage palette.</li>
+    <li><b>COMPLETE:</b> Separate group below — see Module Complete.</li>
+  </ul>
+
+  <h3>Module Complete — why the green checkmark had to go</h3>
+  <ul>
+    <li><b>The problem:</b> Your live app uses a green check inside a green circle. Green appears nowhere else in the app — palette is saffron, iron-red, cream. A foreign color on the success screen breaks the visual contract.</li>
+    <li><b>The fix:</b> Saffron checkmark inside a small palm-leaf binding-line frame. The check itself is in saffron with a subtle text-shadow glow. The frame uses the BindingLine widget top and bottom (140px wide). Reads instantly as "success" because of the check, but speaks the language of the app.</li>
+    <li><b>"Module Complete" title:</b> Lora 32px w500 in cream. Below: module name in 18px italic serif. Centered. Standard hero rhythm.</li>
+    <li><b>Hairline divider</b> separates the celebration from the next-action surface (recommendations).</li>
+  </ul>
+
+  <h3>Continue learning — book recommendations redesigned</h3>
+  <ul>
+    <li><b>Kept this feature.</b> External book recommendations are a real differentiator and you already have data populated. Just had to fit the aesthetic.</li>
+    <li><b>"RECOMMENDED FOR THIS MODULE"</b> in small-caps saffron — uses the section label pattern from the rest of the app.</li>
+    <li><b>Book row:</b> 48px square icon (1px dDivider border, saffron book glyph inside, 4px radius) + Lora serif title (15px w500) + italic serif author + external-link arrow. 12px vertical padding, 1px dDividerSoft separator.</li>
+    <li><b>Tap a row:</b> Opens external URL (Amazon/Flipkart/publisher site) via url_launcher. The external-link arrow signals "leaves the app."</li>
+    <li><b>Primary CTA:</b> Full-width "Back to Learning Path" in standard saffron pill (50px height, 28px radius, uppercase tracked). Pops to /practice.</li>
+  </ul>
+
+  <h3>Motion choreography</h3>
+  <ul>
+    <li><b>Step content entry:</b> Ink-settle animation (fade up 6px) with 80-340-480ms stagger between label → title → body → footer. Echoes verse-detail entry.</li>
+    <li><b>Complete screen entry:</b> Slow sequenced reveal — check leaf (100ms) → title (280ms) → module name (420ms) → divider (580ms) → recommend label (660ms) → book rows (720, 780ms) → button (920ms). Total ~1 second. Feels earned, not rushed.</li>
+    <li><b>Progress bar:</b> Animates from previous-step width to current-step width over 280ms easeOut when step advances. Synced with step transition.</li>
+  </ul>
+
+  <h3>Data shape for Drift</h3>
+  <ul style="grid-template-columns: 1fr;">
+    <li style="font-family: var(--f-sans); font-size: 12px;">
+      <pre style="font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px; color: rgba(242,229,206,0.75); line-height: 1.6; padding: 14px; background: rgba(0,0,0,0.3); border-radius: 4px; border-left: 2px solid #E8820C; margin-top: 6px;">enum ModuleStepType { intro, concept, keyVerse, reflect, complete }
+
+class ModuleStep {
+  final String id;
+  final int stepIndex;           // 1-indexed
+  final int totalSteps;
+  final ModuleStepType type;
+  final String? label;           // small-caps section label (optional)
+  final String? title;           // hero title (intro/concept)
+  final String body;             // main body text
+  final String? verseRef;        // e.g. "BG/2/20" — keyVerse only
+  final String? verseLabel;      // e.g. "Read BG·2·20 in the Gītā" — keyVerse only
+}
+
+class BookRecommendation {
+  final String title;
+  final String author;
+  final String url;              // external link
+  final String? coverAssetPath;  // optional; null = default book glyph
+}</pre>
+    </li>
+  </ul>
+
+  <h3>Don'ts</h3>
+  <ul>
+    <li>❌ Don't add a "Continue" or "Next" button — tap-anywhere preserves the meditative flow of your live app.</li>
+    <li>❌ Don't show step content top-aligned — vertically center it in the body area for visual calm.</li>
+    <li>❌ Don't add green anywhere on Module Complete — saffron is the success color in this app.</li>
+    <li>❌ Don't add confetti, badges, or celebration animations on Complete — restraint matches the voice.</li>
+    <li>❌ Don't show iron-red on any step type other than KEY VERSE — it's reserved for festivals + destructive + featured-verse semantic only.</li>
+    <li>❌ Don't render the meditation icon as Material Icons default — use the diya/lamp glyph so it speaks the heritage vocabulary.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -31,6 +31,7 @@ import 'package:sanatan_guide/presentation/features/settings/providers/analytics
 import 'package:sanatan_guide/presentation/features/settings/providers/crashlytics_enabled_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/system_chrome.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -997,9 +998,7 @@ class _ClearHistoryRow extends ConsumerWidget {
     await StreakService.instance.clearAllHistory();
     ref.invalidate(currentStreakProvider);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reading history cleared')),
-      );
+      showHeritageToast(context, 'Reading history cleared');
     }
   }
 }
@@ -1414,9 +1413,7 @@ class _ResetRow extends ConsumerWidget {
         .read(userExperienceLevelProvider.notifier)
         .setLevel(UserExperienceLevel.regular);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settings reset')),
-      );
+      showHeritageToast(context, 'Settings reset');
     }
   }
 }

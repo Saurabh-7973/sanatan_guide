@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanatan Guide — System Chrome (Screen 16)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Noto+Sans+Devanagari:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --d-bg: #0F0F0F;
+    --d-surface: #1C1816;
+    --d-surface-2: #251F1B;
+    --d-saffron: #E8820C;
+    --d-saffron-deep: #B86908;
+    --d-saffron-glow: rgba(232, 130, 12, 0.12);
+    --d-cream: #F2E5CE;
+    --d-text-1: #F2E5CE;
+    --d-text-2: rgba(242, 229, 206, 0.62);
+    --d-text-3: rgba(242, 229, 206, 0.38);
+    --d-divider: rgba(232, 130, 12, 0.18);
+    --d-divider-soft: rgba(242, 229, 206, 0.08);
+    --d-iron-red: #B85A3A;
+    --d-iron-red-bright: #D17048;
+
+    --l-bg: #FDFAF6;
+    --l-surface: #F7F2EC;
+    --l-saffron: #C26508;
+    --l-saffron-deep: #8B4806;
+    --l-text-1: #2A1E14;
+    --l-text-2: rgba(42, 30, 20, 0.65);
+    --l-text-3: rgba(42, 30, 20, 0.40);
+    --l-divider: rgba(194, 101, 8, 0.25);
+    --l-divider-soft: rgba(42, 30, 20, 0.10);
+
+    --f-sans: "Outfit", system-ui, sans-serif;
+    --f-serif: "Lora", Georgia, serif;
+    --f-deva: "Tiro Devanagari Sanskrit", "Noto Sans Devanagari", serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0a0a0a;
+    color: #E8E0D2;
+    font-family: var(--f-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: radial-gradient(ellipse at top, rgba(232, 130, 12, 0.04), transparent 60%), #0a0a0a;
+    padding: 60px 32px 80px;
+  }
+
+  .gallery-header { max-width: 1280px; margin: 0 auto 48px; }
+  .gallery-header h1 {
+    font-family: var(--f-serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: #F2E5CE;
+  }
+  .gallery-header h1 span { color: #E8820C; font-style: italic; }
+  .gallery-header p { margin-top: 8px; color: rgba(242, 229, 206, 0.5); font-size: 14px; letter-spacing: 0.02em; }
+
+  .group-header { max-width: 1280px; margin: 0 auto 18px; padding-top: 16px; }
+  .group-header h2 {
+    font-family: var(--f-serif); font-style: italic;
+    font-size: 18px; font-weight: 500; color: #E8820C;
+  }
+  .group-header p { font-size: 13px; color: rgba(242, 229, 206, 0.55); margin-top: 4px; }
+
+  .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .frame-label {
+    font-family: var(--f-sans); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(242, 229, 206, 0.45);
+  }
+  .frame-label .dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: #E8820C;
+    margin-right: 8px; vertical-align: middle;
+  }
+
+  .phone {
+    width: 390px; height: 844px;
+    border-radius: 44px; overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(232, 130, 12, 0.06), 0 30px 80px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex; flex-direction: column;
+  }
+  .status-bar {
+    height: 44px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    font-family: var(--f-sans); font-size: 14px; font-weight: 600;
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+  .screen {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+  }
+
+  /* ============== background mock (dimmed) ============== */
+  .bg-mock {
+    flex: 1;
+    padding: 24px;
+    opacity: 0.32;
+    overflow: hidden;
+  }
+  .bg-mock-title {
+    font-family: var(--f-serif);
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+  .bg-mock-prose {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ============== TOAST / SNACKBAR ============== */
+  .toast-wrap {
+    position: absolute;
+    bottom: 60px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 20;
+  }
+  .toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 22px;
+    border: 1px solid;
+    max-width: 320px;
+    font-family: var(--f-serif);
+    font-size: 13.5px;
+  }
+  .toast-diamond {
+    width: 5px; height: 5px;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+  .toast-text { flex: 1; }
+  .toast-action {
+    flex-shrink: 0;
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding-left: 8px;
+    border-left: 1px solid;
+  }
+
+  /* ============== DIALOG ============== */
+  .scrim {
+    position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+  }
+  .dialog {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 312px;
+    border-radius: 12px;
+    border: 1px solid;
+    z-index: 11;
+    overflow: hidden;
+  }
+  .dialog-binding {
+    height: 12px;
+    padding-top: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .dialog-binding::before, .dialog-binding::after {
+    content: ""; flex: 1; height: 1px;
+  }
+  .dialog-binding .hole {
+    width: 5px; height: 5px;
+    margin: 0 10px;
+    transform: rotate(45deg);
+  }
+  .dialog-title {
+    font-family: var(--f-serif);
+    font-size: 19px;
+    font-weight: 500;
+    text-align: center;
+    padding: 18px 22px 0;
+    letter-spacing: -0.01em;
+  }
+  .dialog-body {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.55;
+    text-align: center;
+    padding: 12px 22px 22px;
+  }
+  .dialog-actions {
+    display: flex;
+    border-top: 1px solid;
+  }
+  .dialog-btn {
+    flex: 1;
+    height: 52px;
+    background: transparent;
+    border: none;
+    font-family: var(--f-sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .dialog-btn.destructive { font-weight: 600; }
+  .dialog-btn + .dialog-btn { border-left: 1px solid; }
+
+  /* ============== TIME PICKER SHEET ============== */
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    border-radius: 16px 16px 0 0;
+    z-index: 11;
+    padding: 8px 0 22px;
+    max-height: 80%;
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+  .sheet-header {
+    padding: 0 22px 14px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid;
+  }
+  .sheet-title {
+    flex: 1;
+    font-family: var(--f-serif);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sheet-close {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0.6;
+  }
+
+  .picker-body {
+    padding: 14px 22px 8px;
+  }
+  .picker-wheels {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 0 16px;
+    position: relative;
+  }
+  .wheel {
+    width: 80px;
+    height: 168px;
+    position: relative;
+    overflow: hidden;
+  }
+  .wheel-rows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .wheel-row {
+    height: 56px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-serif);
+    font-size: 26px;
+    line-height: 1;
+  }
+  .wheel-row.selected {
+    font-size: 32px;
+    font-weight: 500;
+  }
+  .wheel-separator {
+    font-family: var(--f-serif);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .wheel-underline {
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 56px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    pointer-events: none;
+  }
+
+  .ampm-toggle {
+    margin: 6px auto 14px;
+    display: inline-flex;
+    border-radius: 22px;
+    padding: 3px;
+    border: 1px solid;
+    gap: 0;
+  }
+  .ampm-toggle .seg {
+    padding: 7px 18px;
+    border-radius: 18px;
+    font-family: var(--f-sans);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+  }
+  .ampm-row {
+    text-align: center;
+  }
+
+  .sheet-actions {
+    padding: 12px 22px 0;
+    border-top: 1px solid;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  .sheet-btn {
+    height: 40px;
+    padding: 0 22px;
+    border-radius: 22px;
+    border: none;
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .sheet-btn.secondary { background: transparent; }
+
+  /* ============== SPLASH ============== */
+  .splash {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #0F0F0F;
+  }
+  .splash-om {
+    font-family: var(--f-deva);
+    font-size: 96px;
+    line-height: 1;
+    color: #E8820C;
+    text-shadow: 0 0 24px rgba(232, 130, 12, 0.4);
+    margin-bottom: 12px;
+  }
+  .splash-wordmark {
+    font-family: var(--f-deva);
+    font-size: 26px;
+    line-height: 1;
+    color: #B86908;
+    letter-spacing: 0.03em;
+  }
+  .splash-loader {
+    position: absolute;
+    bottom: 80px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+  .splash-loader .d {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #E8820C;
+    opacity: 0.4;
+  }
+
+  /* ============== WORD CALLOUT ============== */
+  .verse-mock {
+    padding: 24px;
+    text-align: center;
+  }
+  .verse-mock-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1.85;
+    color: var(--d-cream);
+    margin-top: 80px;
+    position: relative;
+  }
+  .verse-mock-deva .word-hit {
+    color: var(--d-saffron);
+    text-decoration: underline;
+    text-decoration-color: rgba(232, 130, 12, 0.4);
+    text-underline-offset: 6px;
+    position: relative;
+  }
+  .word-callout {
+    position: absolute;
+    top: 200px;
+    left: 75px;
+    width: 240px;
+    border-radius: 4px;
+    border: 1px solid;
+    padding: 14px 16px;
+    z-index: 5;
+  }
+  .word-callout-arrow {
+    position: absolute;
+    top: -6px;
+    left: 30%;
+    width: 10px; height: 10px;
+    transform: rotate(45deg);
+    border-left: 1px solid;
+    border-top: 1px solid;
+  }
+  .word-callout-deva {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .word-callout-iast {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .word-callout-meaning {
+    font-family: var(--f-serif);
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .word-callout-grammar {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* ============== VERSE EDGE STATE — LAST VERSE ============== */
+  .verse-last-banner {
+    text-align: center;
+    padding: 22px 24px 14px;
+  }
+  .verse-last-text {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .verse-last-mark {
+    width: 10px; height: 10px;
+    transform: rotate(45deg);
+    margin: 0 auto;
+    border: 1px solid;
+  }
+  .verse-bottom-bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 14px 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid;
+  }
+  .verse-nav-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .verse-nav-btn.disabled { opacity: 0.4; }
+
+  /* ============== HOME WITH AD BANNER ============== */
+  .home-content {
+    flex: 1;
+    padding: 12px 24px;
+    overflow: hidden;
+  }
+  .home-bigtitle {
+    font-family: var(--f-deva);
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--d-cream);
+  }
+  .home-sub {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--d-text-2);
+    margin-bottom: 20px;
+  }
+  .home-card {
+    margin: 20px 0;
+    padding: 18px;
+    border: 1px solid var(--d-divider);
+    border-radius: 4px;
+    background: var(--d-surface);
+  }
+  .home-card-label {
+    font-family: var(--f-sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--d-saffron);
+    margin-bottom: 10px;
+  }
+  .home-card-deva {
+    font-family: var(--f-deva);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--d-cream);
+    text-align: center;
+    margin: 14px 0;
+  }
+  .ad-slot {
+    flex-shrink: 0;
+    border-top: 1px solid var(--d-divider-soft);
+    padding: 6px 12px 8px;
+    position: relative;
+  }
+  .ad-slot-label {
+    position: absolute;
+    top: 6px; right: 12px;
+    font-family: var(--f-sans);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--d-text-3);
+  }
+  .ad-slot-banner {
+    margin-top: 14px;
+    height: 50px;
+    border-radius: 4px;
+    background: var(--d-surface);
+    border: 1px dashed var(--d-divider-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-sans);
+    font-size: 11px;
+    color: var(--d-text-3);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .bottom-nav {
+    flex-shrink: 0;
+    height: 64px;
+    border-top: 1px solid var(--d-divider-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 8px;
+  }
+  .bottom-tab {
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--f-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--d-text-3);
+  }
+  .bottom-tab.active { color: var(--d-saffron); }
+
+  /* ============== AI CHAT ERROR ============== */
+  .chat-mock {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+  .chat-user {
+    align-self: flex-end;
+    max-width: 78%;
+    padding: 10px 14px;
+    border-radius: 18px 18px 4px 18px;
+    background: var(--d-saffron-glow);
+    color: var(--d-cream);
+    font-family: var(--f-sans);
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .chat-err {
+    padding: 4px;
+  }
+  .chat-err-text {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--d-text-2);
+    margin-bottom: 8px;
+  }
+  .chat-err-retry {
+    font-family: var(--f-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--d-saffron);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chat-input-mock {
+    flex-shrink: 0;
+    margin: 8px 16px 16px;
+    padding: 0 18px;
+    height: 44px;
+    border-radius: 26px;
+    border: 1px solid var(--d-divider-soft);
+    background: var(--d-surface);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+  .chat-input-mock input {
+    flex: 1; background: transparent; border: none; outline: none;
+    font-family: var(--f-sans); font-size: 13.5px;
+    color: var(--d-text-3);
+  }
+  .offline-dot {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--d-iron-red-bright);
+    border: 2px solid var(--d-bg);
+  }
+  .chat-input-send {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--d-saffron-deep);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--d-cream);
+  }
+
+  /* ============== PULL TO REFRESH ============== */
+  .pull-mock {
+    flex: 1;
+    padding: 80px 24px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .pull-dots {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .pull-dots .d {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--d-saffron);
+  }
+  .pull-dots .d:nth-child(1) { opacity: 1; }
+  .pull-dots .d:nth-child(2) { opacity: 0.6; }
+  .pull-dots .d:nth-child(3) { opacity: 0.3; }
+  .pull-hint {
+    font-family: var(--f-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+    color: var(--d-text-3);
+    margin-bottom: 28px;
+  }
+  .pull-list-row {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--d-divider-soft);
+    text-align: left;
+    font-family: var(--f-serif);
+    font-size: 15px;
+    color: var(--d-text-2);
+  }
+
+  /* ============== DARK THEME ============== */
+  .theme-dark .screen { background: var(--d-bg); color: var(--d-text-1); }
+  .theme-dark .status-bar { color: var(--d-text-1); }
+  .theme-dark .bg-mock { color: var(--d-text-2); }
+  .theme-dark .bg-mock-title { color: var(--d-cream); }
+
+  .theme-dark .toast {
+    background: var(--d-surface-2);
+    border-color: var(--d-divider);
+    color: var(--d-text-1);
+  }
+  .theme-dark .toast-diamond { background: var(--d-saffron); }
+  .theme-dark .toast-action {
+    color: var(--d-saffron);
+    border-left-color: var(--d-divider-soft);
+  }
+
+  .theme-dark .dialog {
+    background: var(--d-surface-2);
+    border-color: var(--d-divider);
+  }
+  .theme-dark .dialog-binding::before, .theme-dark .dialog-binding::after {
+    background: linear-gradient(90deg, transparent, var(--d-saffron-deep), transparent);
+    opacity: 0.5;
+  }
+  .theme-dark .dialog-binding .hole { background: var(--d-saffron); }
+  .theme-dark .dialog-title { color: var(--d-cream); }
+  .theme-dark .dialog-body { color: var(--d-text-2); }
+  .theme-dark .dialog-actions { border-top-color: var(--d-divider-soft); }
+  .theme-dark .dialog-btn { color: var(--d-text-2); }
+  .theme-dark .dialog-btn.destructive { color: var(--d-iron-red-bright); }
+  .theme-dark .dialog-btn + .dialog-btn { border-left-color: var(--d-divider-soft); }
+
+  .theme-dark .sheet { background: var(--d-surface-2); }
+  .theme-dark .sheet-handle { background: var(--d-text-3); }
+  .theme-dark .sheet-header { border-bottom-color: var(--d-divider-soft); }
+  .theme-dark .sheet-title { color: var(--d-cream); }
+  .theme-dark .sheet-close { color: var(--d-text-2); }
+  .theme-dark .wheel-row { color: var(--d-text-3); }
+  .theme-dark .wheel-row.selected { color: var(--d-cream); }
+  .theme-dark .wheel-separator { color: var(--d-text-3); }
+  .theme-dark .wheel-underline {
+    border-top-color: var(--d-saffron);
+    border-bottom-color: var(--d-divider-soft);
+  }
+  .theme-dark .ampm-toggle { border-color: var(--d-divider); }
+  .theme-dark .ampm-toggle .seg { color: var(--d-text-2); }
+  .theme-dark .ampm-toggle .seg.active {
+    background: var(--d-saffron-glow);
+    color: var(--d-saffron);
+  }
+  .theme-dark .sheet-actions { border-top-color: var(--d-divider-soft); }
+  .theme-dark .sheet-btn { background: var(--d-saffron); color: #1a1208; }
+  .theme-dark .sheet-btn.secondary { color: var(--d-text-2); background: transparent; }
+
+  .theme-dark .word-callout {
+    background: var(--d-surface-2);
+    border-color: var(--d-divider);
+  }
+  .theme-dark .word-callout-arrow {
+    background: var(--d-surface-2);
+    border-left-color: var(--d-divider);
+    border-top-color: var(--d-divider);
+  }
+  .theme-dark .word-callout-deva { color: var(--d-saffron); }
+  .theme-dark .word-callout-iast { color: var(--d-text-2); }
+  .theme-dark .word-callout-meaning { color: var(--d-text-1); }
+  .theme-dark .word-callout-grammar { color: var(--d-text-3); }
+
+  .theme-dark .verse-last-text { color: var(--d-text-2); }
+  .theme-dark .verse-last-mark { border-color: var(--d-saffron); }
+  .theme-dark .verse-bottom-bar { border-top-color: var(--d-divider-soft); background: var(--d-bg); }
+  .theme-dark .verse-nav-btn { color: var(--d-text-1); }
+
+  /* ============== LIGHT THEME ============== */
+  .theme-light .screen {
+    background: radial-gradient(ellipse at top, rgba(194, 101, 8, 0.03), transparent 50%), var(--l-bg);
+    color: var(--l-text-1);
+  }
+  .theme-light .status-bar { color: var(--l-text-1); }
+  .theme-light .toast {
+    background: #fff;
+    border-color: var(--l-divider);
+    color: var(--l-text-1);
+  }
+  .theme-light .toast-diamond { background: var(--l-saffron); }
+  .theme-light .toast-action {
+    color: var(--l-saffron);
+    border-left-color: var(--l-divider-soft);
+  }
+
+  .theme-light .dialog {
+    background: #fff;
+    border-color: var(--l-divider);
+  }
+  .theme-light .dialog-binding::before, .theme-light .dialog-binding::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 72, 6, 0.4), transparent);
+  }
+  .theme-light .dialog-binding .hole { background: var(--l-saffron-deep); }
+  .theme-light .dialog-title { color: var(--l-text-1); }
+  .theme-light .dialog-body { color: var(--l-text-2); }
+  .theme-light .dialog-actions { border-top-color: var(--l-divider-soft); }
+  .theme-light .dialog-btn { color: var(--l-text-2); }
+  .theme-light .dialog-btn.destructive { color: #A53520; }
+  .theme-light .dialog-btn + .dialog-btn { border-left-color: var(--l-divider-soft); }
+
+  /* ============== ANIMATIONS ============== */
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .toast { animation: toastIn 240ms ease-out; }
+
+  @keyframes dialogIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  .dialog { animation: dialogIn 200ms ease-out; }
+
+  @keyframes sheetIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .sheet { animation: sheetIn 280ms cubic-bezier(0.32, 0.72, 0, 1); }
+
+  @keyframes calloutIn {
+    from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .word-callout { animation: calloutIn 180ms ease-out; }
+
+  @keyframes loaderPulse {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  .splash-loader .d {
+    animation: loaderPulse 1.4s ease-in-out infinite;
+  }
+  .splash-loader .d:nth-child(2) { animation-delay: 0.2s; }
+  .splash-loader .d:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ============== DESIGN NOTES ============== */
+  .design-notes {
+    max-width: 1280px;
+    margin: 32px auto 0;
+    padding: 28px;
+    border: 1px solid rgba(232, 130, 12, 0.15);
+    border-radius: 6px;
+    background: rgba(28, 24, 22, 0.6);
+  }
+  .design-notes h2 {
+    font-family: var(--f-serif);
+    font-size: 16px; font-weight: 500;
+    color: #F2E5CE;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .design-notes h3 {
+    font-family: var(--f-sans);
+    font-size: 11px; font-weight: 600;
+    color: #E8820C;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 22px 0 10px;
+  }
+  .design-notes ul { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 32px; }
+  .design-notes li {
+    font-size: 13px; line-height: 1.55;
+    color: rgba(242, 229, 206, 0.65);
+    padding-left: 16px; position: relative;
+  }
+  .design-notes li::before {
+    content: "◆";
+    position: absolute; left: 0; top: 1px;
+    font-size: 8px; color: #E8820C;
+  }
+  .design-notes li b { color: #F2E5CE; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Sanatan Guide — <span>Screen 16 · System Chrome</span></h1>
+  <p>Toasts · dialogs · time picker · splash · word callout · edge states · ad placement · error states</p>
+</div>
+
+<!-- ==================== GROUP 1: TOAST + DIALOG ==================== -->
+<div class="group-header">
+  <h2>1 · Toasts and confirmation dialogs</h2>
+  <p>System chrome that previously had no design. Uses heritage vocabulary, not Material defaults.</p>
+</div>
+
+<div class="row">
+
+  <!-- TOAST -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Bookmark toast</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:42</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="bg-mock">
+          <div class="bg-mock-title">[Verse Detail behind]</div>
+          <div class="bg-mock-prose">Your right is to action alone, never to its fruits. Let not the fruits of action be your motive...</div>
+        </div>
+
+        <div class="toast-wrap">
+          <div class="toast">
+            <div class="toast-diamond"></div>
+            <div class="toast-text">Verse saved to your collection</div>
+            <div class="toast-action">Undo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESTRUCTIVE DIALOG -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Reset confirm</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:43</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="bg-mock">
+          <div class="bg-mock-title">[Settings behind]</div>
+          <div class="bg-mock-prose">Reset all data · Clear bookmarks · Clear reading history...</div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dialog">
+          <div class="dialog-binding"><div class="hole"></div></div>
+          <div class="dialog-title">Reset all data?</div>
+          <div class="dialog-body">This will delete your bookmarks, reading history, notes, and reset your level. The texts themselves will remain.</div>
+          <div class="dialog-actions">
+            <button class="dialog-btn">Cancel</button>
+            <button class="dialog-btn destructive">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO DIALOG -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Light · Reset confirm</div>
+    <div class="phone theme-light">
+      <div class="status-bar">
+        <span>8:43</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="bg-mock" style="color: var(--l-text-2);">
+          <div class="bg-mock-title" style="color: var(--l-text-1);">[Settings behind]</div>
+          <div class="bg-mock-prose">Reset all data · Clear bookmarks · Clear reading history...</div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dialog">
+          <div class="dialog-binding"><div class="hole"></div></div>
+          <div class="dialog-title">Reset all data?</div>
+          <div class="dialog-body">This will delete your bookmarks, reading history, notes, and reset your level. The texts themselves will remain.</div>
+          <div class="dialog-actions">
+            <button class="dialog-btn">Cancel</button>
+            <button class="dialog-btn destructive">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 2: TIME PICKER + SPLASH ==================== -->
+<div class="group-header">
+  <h2>2 · Time picker sheet + Splash / launch screen</h2>
+  <p>Custom time picker for Settings + Onboarding. Splash for Android 12+ requirement.</p>
+</div>
+
+<div class="row">
+
+  <!-- TIME PICKER -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Time picker</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:44</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="bg-mock">
+          <div class="bg-mock-title">[Settings behind]</div>
+          <div class="bg-mock-prose">Daily reminder · 7:00 AM</div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet" style="min-height: 420px;">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">Reminder time</div>
+            <div class="sheet-close">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 4l8 8M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="picker-body">
+            <div class="picker-wheels">
+              <div class="wheel-underline"></div>
+              <div class="wheel">
+                <div class="wheel-rows" style="transform: translateY(-56px);">
+                  <div class="wheel-row">5</div>
+                  <div class="wheel-row">6</div>
+                  <div class="wheel-row selected">7</div>
+                  <div class="wheel-row">8</div>
+                  <div class="wheel-row">9</div>
+                </div>
+              </div>
+              <div class="wheel-separator">:</div>
+              <div class="wheel">
+                <div class="wheel-rows" style="transform: translateY(-56px);">
+                  <div class="wheel-row">50</div>
+                  <div class="wheel-row">55</div>
+                  <div class="wheel-row selected">00</div>
+                  <div class="wheel-row">05</div>
+                  <div class="wheel-row">10</div>
+                </div>
+              </div>
+            </div>
+            <div class="ampm-row">
+              <div class="ampm-toggle">
+                <div class="seg active">AM</div>
+                <div class="seg">PM</div>
+              </div>
+            </div>
+          </div>
+          <div class="sheet-actions">
+            <button class="sheet-btn secondary">Cancel</button>
+            <button class="sheet-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPLASH SCREEN -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Splash / launch</div>
+    <div class="phone theme-dark">
+      <div class="status-bar" style="color: rgba(232, 130, 12, 0.7);">
+        <span>8:40</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="splash">
+          <div class="splash-om">ॐ</div>
+          <div class="splash-wordmark">सनातन</div>
+        </div>
+        <div class="splash-loader">
+          <div class="d"></div>
+          <div class="d"></div>
+          <div class="d"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORD CALLOUT -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · word tap callout</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:45</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="verse-mock">
+          <div style="font-family: var(--f-sans); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--d-text-3); margin-bottom: 30px;">‖ BG · 2 · 47 ‖</div>
+          <div class="verse-mock-deva">
+            <span class="word-hit">कर्मण्येवाधिकारस्ते</span><br/>
+            मा फलेषु कदाचन ।
+          </div>
+
+          <div class="word-callout">
+            <div class="word-callout-arrow"></div>
+            <div class="word-callout-deva">कर्मणि</div>
+            <div class="word-callout-iast">karmaṇi</div>
+            <div class="word-callout-meaning">"In action" — locative case. Refers to the field of duty, the act itself.</div>
+            <div class="word-callout-grammar">Noun · Neuter · Loc.Sg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 3: VERSE EDGE + AD + ERRORS ==================== -->
+<div class="group-header">
+  <h2>3 · Verse Detail edge cases · Ad placement · Error states</h2>
+  <p>Last verse of scripture, Home with bottom banner ad, AI Chat error + offline indicator.</p>
+</div>
+
+<div class="row">
+
+  <!-- LAST VERSE EDGE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · last verse of scripture</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div style="padding: 6px 16px 14px; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: var(--d-text-2);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style="flex: 1; font-family: var(--f-serif); font-style: italic; font-size: 13px; color: var(--d-text-2);">
+            Bhagavad Gītā · Ch 18 · v 78
+          </div>
+        </div>
+
+        <div style="flex: 1; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-family: var(--f-sans); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--d-saffron); margin-bottom: 22px;">‖ १८ · ७८ ‖</div>
+          <div style="font-family: var(--f-deva); font-size: 18px; line-height: 1.85; color: var(--d-cream); text-align: center; margin-bottom: 24px;">
+            यत्र योगेश्वरः कृष्णो<br/>
+            यत्र पार्थो धनुर्धरः ।
+          </div>
+          <div style="font-family: var(--f-serif); font-style: italic; font-size: 14.5px; line-height: 1.6; color: var(--d-text-2); text-align: center;">
+            "Wherever there is Krishna, the Lord of Yoga, and wherever there is Arjuna, the wielder of the bow — there will be prosperity, victory, welfare, and morality."
+          </div>
+        </div>
+
+        <div class="verse-last-banner">
+          <div class="verse-last-text">You've finished the Bhagavad Gītā.</div>
+          <div class="verse-last-mark"></div>
+        </div>
+
+        <div class="verse-bottom-bar" style="position: static;">
+          <div class="verse-nav-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M11 4l-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style="font-family: var(--f-sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--d-text-3);">Bhagavad Gītā · End</div>
+          <div class="verse-nav-btn disabled">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M7 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME WITH AD -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · Home with bottom ad</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:46</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div style="padding: 6px 16px 14px 24px; display: flex; align-items: center; gap: 4px;">
+          <div style="flex: 1; font-family: var(--f-deva); font-size: 22px; color: var(--d-saffron);">सनातन</div>
+          <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--d-text-1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--d-text-1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 3h10v15l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--d-text-1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="4" cy="10" r="1.7" fill="currentColor"/><circle cx="10" cy="10" r="1.7" fill="currentColor"/><circle cx="16" cy="10" r="1.7" fill="currentColor"/></svg>
+          </div>
+        </div>
+
+        <div class="home-content">
+          <div class="home-bigtitle">शुभ प्रभात</div>
+          <div class="home-sub">Tuesday, 5 May 2026 · Vaiśākha śukla 8</div>
+
+          <div class="home-card">
+            <div class="home-card-label">Verse of the day · ‖ २·४७ ‖</div>
+            <div class="home-card-deva">कर्मण्येवाधिकारस्ते<br/>मा फलेषु कदाचन ।</div>
+            <div style="font-family: var(--f-serif); font-style: italic; font-size: 13.5px; line-height: 1.55; color: var(--d-text-2); text-align: center;">"Your right is to action alone, never to its fruits."</div>
+          </div>
+        </div>
+
+        <div class="ad-slot">
+          <div class="ad-slot-label">Ad</div>
+          <div class="ad-slot-banner">AdMob banner — 320×50</div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="bottom-tab active">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10l7-7 7 7v8h-5v-5h-4v5H3v-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Today
+          </div>
+          <div class="bottom-tab">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Practice
+          </div>
+          <div class="bottom-tab">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3h6c1 0 1.5 0.5 1.5 1.5v13c0-1-0.5-1.5-1.5-1.5H3V3zM17 3h-6c-1 0-1.5 0.5-1.5 1.5v13c0-1 0.5-1.5 1.5-1.5h6V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Texts
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHAT ERROR + OFFLINE -->
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · AI chat error + offline</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:47</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div style="padding: 6px 16px 14px; display: flex; align-items: center; gap: 8px;">
+          <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: var(--d-text-2);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="flex: 1; text-align: center;">
+            <div style="font-family: var(--f-deva); font-size: 18px; color: var(--d-saffron);">ॐ</div>
+            <div style="font-family: var(--f-sans); font-size: 9.5px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--d-text-3); margin-top: 3px;">Ask the Pandit</div>
+          </div>
+          <div style="width: 36px;"></div>
+        </div>
+
+        <div class="chat-mock">
+          <div class="chat-user">What does the Gītā say about anger?</div>
+
+          <div class="chat-err">
+            <div class="chat-err-text">The connection couldn't reach the texts. The verses are still here, but the Pandit needs internet to think.</div>
+            <span class="chat-err-retry">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M1.5 5.5a4 4 0 1 1 0.5 2L1 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+              <span>RETRY</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="chat-input-mock">
+          <input type="text" placeholder="Ask anything about the texts..." />
+          <div class="chat-input-send">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7l10-5-3 10-2.5-4.5L2 7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+            <div class="offline-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== GROUP 4: PULL TO REFRESH ==================== -->
+<div class="group-header">
+  <h2>4 · Pull-to-refresh indicator</h2>
+  <p>On Library, Chapter List, Verse List, Bookmarks. Uses the AI thinking dots vocabulary.</p>
+</div>
+
+<div class="row">
+
+  <div class="frame-wrap">
+    <div class="frame-label"><span class="dot"></span>Dark · pulled past threshold</div>
+    <div class="phone theme-dark">
+      <div class="status-bar">
+        <span>8:48</span>
+        <div class="right">
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+            <rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="15" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="screen">
+        <div style="padding: 6px 16px 14px 24px; display: flex; align-items: center; gap: 12px;">
+          <div style="font-family: var(--f-serif); font-size: 22px; font-weight: 500; color: var(--d-cream);">Bookmarks</div>
+          <div style="flex: 1;"></div>
+          <div style="font-family: var(--f-sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--d-text-3);">12 saved</div>
+        </div>
+
+        <div class="pull-mock">
+          <div class="pull-dots">
+            <div class="d"></div>
+            <div class="d"></div>
+            <div class="d"></div>
+          </div>
+          <div class="pull-hint">release to refresh</div>
+
+          <div style="margin-top: 12px;">
+            <div class="pull-list-row">कर्मण्येवाधिकारस्ते...</div>
+            <div class="pull-list-row">यदा यदा हि धर्मस्य...</div>
+            <div class="pull-list-row">सर्वधर्मान्परित्यज्य...</div>
+            <div class="pull-list-row">वासांसि जीर्णानि यथा...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== DESIGN NOTES ==================== -->
+<div class="design-notes">
+  <h2>What this screen covers</h2>
+
+  <h3>Toast / Snackbar (used for bookmarks, undo, generic info)</h3>
+  <ul>
+    <li><b>Position:</b> Bottom center, 60px from bottom of safe area (above bottom-nav on tab roots, near bottom on other screens).</li>
+    <li><b>Container:</b> Pill-shaped 22px radius. Background dSurface2, 1px dDivider border. Width = content + padding, max 320px.</li>
+    <li><b>Content:</b> Small saffron diamond ornament (5×5 rotated) + Lora serif 13.5px message + optional sans-serif uppercase action button on the right, separated by a thin vertical divider.</li>
+    <li><b>Motion:</b> Slide-up 240ms easeOut + fade. Auto-dismiss after 3.5s. Slide-down 240ms easeIn on exit. New toast cancels old one (no queue).</li>
+    <li><b>Use cases:</b> "Verse saved to your collection" (with Undo), "Note saved", "Bookmark removed", "Export failed — try again", "Daily reminder set for 7:00 AM".</li>
+    <li><b>Do NOT use for:</b> Anything destructive (use dialog), anything blocking (use dialog), errors that need user action (use dialog or inline).</li>
+  </ul>
+
+  <h3>Confirmation dialog (destructive actions)</h3>
+  <ul>
+    <li><b>Scrim:</b> 55% black, full-bleed, dismissible.</li>
+    <li><b>Card:</b> 312px wide, centered, dSurface2, 1px dDivider, 12px radius. <b>BindingLine motif at the top</b> — small (sideGap 10px) — ties the dialog to the heritage vocabulary.</li>
+    <li><b>Title:</b> Lora 19px w500 dCream, centered, 18px top padding.</li>
+    <li><b>Body:</b> Lora italic 14px line-height 1.55 dText2, centered.</li>
+    <li><b>Action row:</b> 1px top divider. Two equal-width buttons divided by a 1px vertical center divider. Left = Cancel (dText2 sans 13px w500). Right = destructive label in dIronRedBright sans 13px w600. Both 52px tall, no background.</li>
+    <li><b>Motion:</b> Fade + scale 0.96→1.0 over 200ms.</li>
+    <li><b>Use cases:</b> "Reset all data?", "Delete this bookmark?", "Clear AI chat history?", "Remove this note?"</li>
+    <li><b>Info variant:</b> Same dialog but single full-width "OK" button in saffron at bottom. Used for "Export complete", "Reminder set", etc.</li>
+  </ul>
+
+  <h3>Time picker bottom sheet</h3>
+  <ul>
+    <li><b>Why custom:</b> Material's default time picker doesn't speak the heritage vocabulary. The Lora serif numerals + saffron underline + AM/PM toggle in heritage style maintains visual continuity.</li>
+    <li><b>Sheet:</b> Bottom sheet, 16px top corner radius, dSurface2. Drag handle (36×4px) at top.</li>
+    <li><b>Header:</b> "Reminder time" Lora 17px + close ✕ icon.</li>
+    <li><b>Wheels:</b> Two scroll wheels side by side with `:` separator. Each wheel 80px wide × 168px tall (3 visible rows × 56px). Selected row = 32px w500 saffron, unselected rows = 26px regular dText3. <b>Saffron underline on the selected row</b> — actually a 56px-tall pair of horizontal hairlines top + bottom, with the saffron-glowing top edge.</li>
+    <li><b>Minute increments:</b> 5-minute steps (00, 05, 10, ...55). Reduces decision burden, matches "reminder" intent.</li>
+    <li><b>AM/PM toggle:</b> Rounded segmented control below wheels. Selected segment has dSaffronGlow background + saffron text.</li>
+    <li><b>Actions:</b> Cancel (secondary) + Save (saffron primary) right-aligned in action row.</li>
+    <li><b>Used in:</b> Settings "Daily reminder" row + Onboarding step 2 reminder picker. Same sheet, same widget.</li>
+  </ul>
+
+  <h3>Splash / launch screen</h3>
+  <ul>
+    <li><b>Background:</b> dBg (#0F0F0F) — dark always. The OS doesn't know the user's theme preference yet at splash time, and dark works for either.</li>
+    <li><b>Centered ॐ:</b> Tiro Devanagari 96px in saffron with a 24px blur text-shadow glow. The mark of the app.</li>
+    <li><b>Wordmark:</b> "सनातन" in Tiro Devanagari 26px in dSaffronDeep, 12px below the ॐ. Quiet, restrained — no English wordmark.</li>
+    <li><b>Loader dots:</b> Three saffron dots at the bottom (80px from bottom) using the AIThinkingDots phase math. Visible when boot is slow (DB warmup, etc.). On fast devices the splash is gone before they finish one cycle.</li>
+    <li><b>Implementation:</b> Use `flutter_native_splash` package for Android 12+ adaptive splash. Adaptive launcher icon reuses the same ॐ on a saffron-deep background with proper safe-zone padding.</li>
+  </ul>
+
+  <h3>Word callout (tap a Sanskrit word on Verse Detail)</h3>
+  <ul>
+    <li><b>Trigger:</b> Tap a word in the Sanskrit verse. Tapped word gets a subtle saffron underline (4-color: 40% saffron) so the user sees what they hit.</li>
+    <li><b>Callout container:</b> 240px wide, dSurface2 background, 1px dDivider border, 4px radius. Small 10×10 rotated arrow on the top edge pointing at the tapped word.</li>
+    <li><b>Content (top to bottom):</b>
+      <ul style="grid-template-columns: 1fr; gap: 4px; margin-top: 8px;">
+        <li style="padding-left: 0; font-size: 12.5px;">• Devanāgarī word in Tiro Sanskrit 22px saffron</li>
+        <li style="padding-left: 0; font-size: 12.5px;">• IAST transliteration in Lora italic 13px dText2</li>
+        <li style="padding-left: 0; font-size: 12.5px;">• Meaning in Lora 14px dText1 (1–2 lines, short)</li>
+        <li style="padding-left: 0; font-size: 12.5px;">• Grammar tag in small-caps sans 9.5px dText3 (e.g. "NOUN · NEUTER · LOC.SG")</li>
+      </ul>
+    </li>
+    <li><b>Position:</b> Anchored above the word with 4px gap. If insufficient space above, flip below. Arrow rotates accordingly.</li>
+    <li><b>Dismissal:</b> Tap outside or tap the same word again. No close button.</li>
+    <li><b>Motion:</b> 180ms fade + 0.96→1.0 scale from the anchor point.</li>
+    <li><b>Source:</b> Word meanings come from a dictionary table seeded with common Sanskrit terms. Words without dictionary entries don't show underline on tap (just no-op).</li>
+  </ul>
+
+  <h3>Verse Detail edge cases</h3>
+  <ul>
+    <li><b>First verse of a chapter:</b> Prev chevron at 40% opacity. Tap shows toast: "This is the first verse of the chapter."</li>
+    <li><b>Last verse of last chapter of a scripture:</b> Next chevron at 40% opacity. ABOVE the bottom bar, show "You've finished the [Scripture Name]" in italic serif dText2, centered, with a small saffron diamond (10×10 rotated, 1px stroke) below it. No celebration screen, no confetti — restraint matches the app's voice.</li>
+    <li><b>Center label in bottom bar:</b> "Bhagavad Gītā · End" in small-caps sans dText3 — replaces the usual "Ch X · v Y" pacing label.</li>
+  </ul>
+
+  <h3>AdMob placement — decision: HOME ONLY</h3>
+  <ul>
+    <li><b>Where:</b> Bottom of Home screen, above the bottom navigation bar. 50px tall.</li>
+    <li><b>Wrapper:</b> 1px top border (dDividerSoft) separating from content. Small "AD" label in 8.5px small-caps dText3 in the top-right of the ad slot — required by AdMob TOS and respects the user's intelligence.</li>
+    <li><b>NOT on:</b> Verse Detail, Verse List, Chapter List, AI Chat, Search, Bookmarks, Festivals, Settings, Practice, Module Reader, Onboarding. Reading flow is ad-free. This is a deliberate restraint that signals respect.</li>
+    <li><b>Failure mode:</b> If ad fails to load, collapse the banner area completely (don't leave empty space). The bottom-nav slides up to its normal position.</li>
+    <li><b>Test mode:</b> Use AdMob test IDs in dev. Real ad unit IDs come from Saurabh's AdMob console.</li>
+  </ul>
+
+  <h3>Error states — AI Chat + Search Pandit + Export</h3>
+  <ul>
+    <li><b>AI Chat error message:</b> Inline italic serif 14px dText2: "The connection couldn't reach the texts. The verses are still here, but the Pandit needs internet to think." Below it: small "RETRY" text button in saffron sans 12px tracked uppercase with a circular arrow icon. The message replaces what would have been the AI's response — same column position.</li>
+    <li><b>Search Pandit error:</b> Same pattern within the "Ask the Pandit" answer card on Search screen.</li>
+    <li><b>Offline indicator:</b> Small 10×10 iron-red-bright dot in the top-right corner of the chat input field send button when device is offline. Bordered with 2px of dBg so it sits cleanly on top of the saffron send button. Tap on the dot (or long-press the send button) shows tooltip: "AI Chat needs internet."</li>
+    <li><b>Export bookmarks failure:</b> Shows info dialog (single OK button) with title "Export failed" and body "Couldn't write the file. Check storage permissions and try again."</li>
+  </ul>
+
+  <h3>Pull-to-refresh</h3>
+  <ul>
+    <li><b>Where:</b> Library (refreshes recent additions), Chapter List (refreshes reading progress), Verse List (same), Bookmarks (refresh sort). Not on Home (everything is reactive already).</li>
+    <li><b>Indicator:</b> Three saffron dots in AIThinkingDots pulse pattern, centered, 60px above the list when pulled. Replaces Material's default spinner — same vocabulary as AI thinking, which reinforces "the app is doing literary work" as opposed to "loading spinner."</li>
+    <li><b>Hint text:</b> "release to refresh" in lowercase sans 11px tracked, dText3, below the dots. Appears when pull crosses the threshold.</li>
+    <li><b>Motion:</b> Dots fade in as pull begins. Hint text fades in at threshold. On release: dots pulse for the duration of the refresh, hint text says "refreshing" briefly, then collapses.</li>
+  </ul>
+
+  <h3>Don'ts (across the whole system chrome layer)</h3>
+  <ul>
+    <li>❌ Don't use Material's default toast/snackbar — design above. Material's slab-rectangular toast breaks the aesthetic.</li>
+    <li>❌ Don't use Material's default time picker — too circular, too generic. Custom wheel picker matches the app.</li>
+    <li>❌ Don't use Material's default alert dialog — no BindingLine motif means the dialog feels disconnected from the rest of the app.</li>
+    <li>❌ Don't put ads on any reading surface. Free + ads only for the Home landing. Period.</li>
+    <li>❌ Don't show "Loading..." spinners on reading surfaces. Skeleton states use the verse leaf shape with shimmer; non-reading surfaces use AIThinkingDots.</li>
+    <li>❌ Don't show confetti or celebration animations anywhere. Even for "Module Complete" or "You finished the Gītā" — restraint is the brand.</li>
+  </ul>
+</div>
+
+</body>
+</html>

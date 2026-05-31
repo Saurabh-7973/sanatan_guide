@@ -12,6 +12,7 @@ import 'package:sanatan_guide/core/services/streak_service.dart';
 import 'package:sanatan_guide/domain/entities/learning_module.dart';
 import 'package:sanatan_guide/presentation/features/learning_path/providers/learning_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/sacred_ornaments.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/shimmer_loading.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/error_state_widget.dart';
@@ -508,7 +509,8 @@ class _ReflectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Spacer(flex: 2),
-          Icon(Icons.self_improvement_rounded, color: saffron, size: 32),
+          // Brief Screen 15: diya/lamp glyph, NOT the Material meditation icon.
+          const DiyaIcon(size: 36, selected: true),
           const SizedBox(height: AppSpacing.lg),
           Text(
             'REFLECT',
