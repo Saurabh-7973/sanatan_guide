@@ -569,12 +569,7 @@ class _UtilBar extends StatelessWidget {
               activeColor: saffron,
               onTap: enabled ? onToggleTranslation : null,
             ),
-            _UtilAction(
-              glyphBuilder: (c) => ListenClockGlyph(color: c, size: 16),
-              label: 'Listen',
-              text: text2,
-              onTap: null, // audio not bundled yet
-            ),
+            // Listen removed for v1 (brief §5 #12 / §6 — audio not bundled).
             _UtilAction(
               glyphBuilder: (c) => NotesCaretGlyph(color: c, size: 16),
               label: 'Notes',
