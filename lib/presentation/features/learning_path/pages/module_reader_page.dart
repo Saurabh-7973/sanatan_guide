@@ -322,7 +322,7 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
                             padding:
                                 const EdgeInsets.only(bottom: AppSpacing.lg),
                             child: Text(
-                              'Tap anywhere to continue',
+                              'tap anywhere to continue',
                               style: TextStyle(
                                 fontFamily: Fonts.sans,
                                 fontFamilyFallback: AppFontFallback.latin,
@@ -398,13 +398,18 @@ class _ContentCard extends StatelessWidget {
             style: TextStyle(
               fontFamily: Fonts.serif,
               fontFamilyFallback: AppFontFallback.latin,
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.w500,
-              height: 1.25,
-              letterSpacing: -0.01 * 24,
+              height: 1.18,
+              letterSpacing: -0.02 * 28,
               color: cream,
             ),
-          ),
+          ).animate(delay: 200.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             card.body,
@@ -415,7 +420,12 @@ class _ContentCard extends StatelessWidget {
               height: 1.7,
               color: text1,
             ),
-          ),
+          ).animate(delay: 340.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const Spacer(flex: 3),
         ],
       ),
@@ -461,18 +471,29 @@ class _AnchorCard extends StatelessWidget {
                 color: iron,
               ),
             ),
-          ),
+          ).animate(delay: 80.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             card.body,
             style: TextStyle(
               fontFamily: Fonts.serif,
               fontFamilyFallback: AppFontFallback.latin,
-              fontSize: 20,
+              fontSize: 22,
               height: 1.55,
+              letterSpacing: -0.01 * 22,
               color: text1,
             ),
-          ),
+          ).animate(delay: 200.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           if (card.verseId != null) ...[
             const SizedBox(height: AppSpacing.xl),
             _PillButton(
@@ -483,7 +504,12 @@ class _AnchorCard extends StatelessWidget {
               onTap: () => context.push(
                 '/browse/bhagavad_gita/verse/${card.verseId}',
               ),
-            ),
+            ).animate(delay: 340.ms).fadeIn(duration: 500.ms).moveY(
+                  begin: 6,
+                  end: 0,
+                  duration: 500.ms,
+                  curve: Curves.easeOut,
+                ),
           ],
           const Spacer(flex: 3),
         ],
@@ -510,7 +536,10 @@ class _ReflectionCard extends StatelessWidget {
         children: [
           const Spacer(flex: 2),
           // Brief Screen 15: diya/lamp glyph, NOT the Material meditation icon.
-          const DiyaIcon(size: 36, selected: true),
+          const DiyaIcon(size: 36, selected: true)
+              .animate(delay: 80.ms)
+              .fadeIn(duration: 500.ms)
+              .moveY(begin: 6, end: 0, duration: 500.ms, curve: Curves.easeOut),
           const SizedBox(height: AppSpacing.lg),
           Text(
             'REFLECT',
@@ -522,7 +551,12 @@ class _ReflectionCard extends StatelessWidget {
               letterSpacing: 0.16 * 13,
               color: saffron,
             ),
-          ),
+          ).animate(delay: 200.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const SizedBox(height: AppSpacing.md),
           Text(
             card.body,
@@ -533,7 +567,12 @@ class _ReflectionCard extends StatelessWidget {
               height: 1.45,
               color: text1,
             ),
-          ),
+          ).animate(delay: 340.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const SizedBox(height: AppSpacing.xl),
           Text(
             'Sit with this question. Tap to continue when ready.',
@@ -545,7 +584,12 @@ class _ReflectionCard extends StatelessWidget {
               height: 1.5,
               color: text3,
             ),
-          ),
+          ).animate(delay: 480.ms).fadeIn(duration: 500.ms).moveY(
+                begin: 6,
+                end: 0,
+                duration: 500.ms,
+                curve: Curves.easeOut,
+              ),
           const Spacer(flex: 3),
         ],
       ),
@@ -602,13 +646,15 @@ class _PillButton extends StatelessWidget {
                 const SizedBox(width: 8),
               ],
               Text(
-                label,
+                // Full-width primary ("Back to Learning Path") is the spec's
+                // uppercase tracked pill; outlined inline CTAs stay sentence-case.
+                center ? label.toUpperCase() : label,
                 style: TextStyle(
                   fontFamily: Fonts.sans,
                   fontFamilyFallback: AppFontFallback.latin,
-                  fontSize: 14,
+                  fontSize: center ? 13 : 14,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: 0.02 * 14,
+                  letterSpacing: center ? 0.14 * 13 : 0.02 * 14,
                   color: fg,
                 ),
               ),
@@ -913,24 +959,23 @@ class _CompletionCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 BindingLine(isDark: isDark, sideGap: 8),
-                const SizedBox(height: 16),
-                Container(
-                  width: 56,
-                  height: 56,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: saffron.withValues(alpha: isDark ? 0.14 : 0.10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: saffron.withValues(alpha: 0.35),
-                        blurRadius: 8,
+                // Brief Screen 15: bare saffron check between the binding lines
+                // — NOT inside a circle. The green *circle* was the thing that
+                // broke the palette; the fix is a glyph, not a recolored disc.
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Icon(
+                    Icons.check_rounded,
+                    color: saffron,
+                    size: 44,
+                    shadows: [
+                      Shadow(
+                        color: saffron.withValues(alpha: 0.5),
+                        blurRadius: 12,
                       ),
                     ],
                   ),
-                  child: Icon(Icons.check_rounded, color: saffron, size: 30),
                 ),
-                const SizedBox(height: 16),
                 BindingLine(isDark: isDark, sideGap: 8),
               ],
             ),
@@ -945,10 +990,10 @@ class _CompletionCard extends StatelessWidget {
             style: TextStyle(
               fontFamily: Fonts.serif,
               fontFamilyFallback: AppFontFallback.latin,
-              fontSize: 30,
+              fontSize: 32,
               fontWeight: FontWeight.w500,
-              height: 1.15,
-              letterSpacing: -0.01 * 30,
+              height: 1.1,
+              letterSpacing: -0.02 * 32,
               color: cream,
             ),
           ).animate(delay: 200.ms).fadeIn(duration: 380.ms),
@@ -960,8 +1005,8 @@ class _CompletionCard extends StatelessWidget {
               fontFamily: Fonts.serif,
               fontFamilyFallback: AppFontFallback.latin,
               fontStyle: FontStyle.italic,
-              fontSize: 17,
-              height: 1.4,
+              fontSize: 18,
+              height: 1.3,
               color: text2,
             ),
           ).animate(delay: 380.ms).fadeIn(duration: 380.ms),
@@ -977,7 +1022,12 @@ class _CompletionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            ...recs.map((rec) => _BookCard(rec: rec)),
+            ...recs.asMap().entries.map(
+                  (e) => _BookCard(
+                    rec: e.value,
+                    isLast: e.key == recs.length - 1,
+                  ),
+                ),
           ],
           const SizedBox(height: AppSpacing.xxl),
           if (_scriptureLinks[module.id] case final link?) ...[
@@ -1031,9 +1081,12 @@ class _BookRec {
 }
 
 class _BookCard extends StatelessWidget {
-  const _BookCard({required this.rec});
+  const _BookCard({required this.rec, this.isLast = false});
 
   final _BookRec rec;
+
+  /// Last row drops the bottom hairline (spec: `.book-row:last-child`).
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
@@ -1044,45 +1097,44 @@ class _BookCard extends StatelessWidget {
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final divider = isDark ? DColors.divider : LColors.divider;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(4),
-          splashColor: Colors.transparent,
-          highlightColor: saffron.withValues(alpha: 0.04),
-          onTap: () async {
-            final uri = Uri.parse(rec.url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: divider),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: saffron.withValues(alpha: isDark ? 0.12 : 0.08),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.menu_book_outlined,
-                    color: saffron,
-                    size: 20,
-                  ),
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: saffron.withValues(alpha: 0.04),
+        onTap: () async {
+          final uri = Uri.parse(rec.url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: Container(
+          // Spec: borderless row, 12px vertical padding, 1px bottom hairline.
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: isLast
+                ? null
+                : Border(bottom: BorderSide(color: dividerSoft)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: divider),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.menu_book_outlined,
+                  color: saffron,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1118,7 +1170,6 @@ class _BookCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
