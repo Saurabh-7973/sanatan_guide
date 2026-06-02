@@ -35,10 +35,24 @@ decision, or a verified external resource). Last updated 2026-06-02.
 
 ### Decisions (code could change, but shouldn't be flipped silently)
 - **§6 `allowBackup`** — currently **`false`** (deliberate, with `dataExtractionRules`/`fullBackupContent=false`). Audit suggests `true`. Flipping it makes Android auto-backup the Drift DB **including users' bookmarks + personal notes**. That's a data-safety/UX call (good: notes survive reinstall; risk: schema-mismatch on restore). Decide, then I'll set it.
-- **§14 model name** — primary is `gemini-3.5-flash` (speculative, dated comment), fallback `gemini-2.5-flash`. Can't verify `3.5-flash` resolves without the live key. If it 404s, every uncached call eats a wasted round-trip before falling back. **Verify against the live API**; if it doesn't exist, make `gemini-2.5-flash` primary (one-line change).
+- **§14 model name** — RESOLVED to the audit's spec: default is now
+  `gemini-2.5-flash`. Still overridable via `--dart-define=GEMINI_MODEL` if you
+  want to opt into a newer tier later (the fallback catches a bad identifier).
 
 ### Crisis resource content (§4) — content, not code
 - The crisis interception **mechanism** ships now, but with a **generic fallback** message only ("please reach out to local emergency services or a crisis line"). **Do not** ship a hardcoded helpline number from me — a wrong/defunct/region-mismatched number is active harm. Supply a verified resource (org + number + region, e.g. India Tele-MANAS 14416 if you confirm it) and I'll wire it into `crisis_support.dart`.
+
+### §17 accessibility — partly code, partly device
+- **Done (code):** Semantics labels on the chat icon-only buttons (back / new
+  conversation). The AI label/Report/disclaimer all use real text, so they read
+  correctly under TalkBack.
+- **Code-fixable, DEFERRED to a focused a11y pass (not done this round):** an
+  app-wide audit for any remaining icon-only `InkResponse`/`IconButton` without
+  a `Tooltip`/`Semantics`, and wrapping Sanskrit text in `Semantics` with a
+  phonetic label. Bounded but spans many screens — called out honestly rather
+  than hidden under "manual".
+- **Device-only:** TalkBack pass, 200% font-scale, contrast ratios, touch-target
+  sizes.
 
 ### Recommended, but native deps / accounts / devices (do not auto-add)
 - **§9 Shorebird** — `shorebird login` / `init` / `release android`; needs account. Note: can't patch the SQLite DB or assets.
