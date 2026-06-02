@@ -1405,7 +1405,7 @@ const _kFamilies = <_Family>[
         englishName: 'Mahābhārata',
         verseCount: 72770,
         unitLabel: 'verses',
-        subdivision: '18 parvas',
+        subdivision: '17 parvas',
         aliases: ['maha', 'mahabharata'],
       ),
     ],
