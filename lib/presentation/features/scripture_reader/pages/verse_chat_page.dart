@@ -10,12 +10,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
+import 'package:sanatan_guide/core/utils/crisis_support.dart';
 import 'package:sanatan_guide/core/utils/verse_label.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/ai_message.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_states.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
@@ -60,7 +63,10 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
       'Acknowledge when you are uncertain. '
       'Never claim divine authority. '
       'Be respectful of all traditions within Sanatan Dharma. '
-      'Keep answers concise — under 200 words unless the user asks for more detail.';
+      'Keep answers concise — under 200 words unless the user asks for more detail. '
+      'If a user expresses thoughts of self-harm or suicide, do not give '
+      'methods or instructions; respond with compassion and gently encourage '
+      'them to contact local emergency services or a crisis helpline.';
 
   @override
   void initState() {
@@ -123,6 +129,24 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     final text = (overrideText ?? _controller.text).trim();
     if (text.isEmpty || _loading) return;
 
+    // Crisis interception — before quota + network. No Gemini call, no
+    // budget spent; we answer with a supportive system note instead.
+    if (isSelfHarmIntent(text)) {
+      setState(() {
+        _messages.add(ChatMessage(text: text, isUser: true));
+        _messages.add(const ChatMessage(
+          text: crisisSupportMessage,
+          isUser: false,
+          isSystem: true,
+        ));
+        _controller.clear();
+        _error = null;
+        _retryableText = null;
+      });
+      _scrollToBottom();
+      return;
+    }
+
     if (_remaining <= 0) {
       setState(() {
         _error =
@@ -142,6 +166,7 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
       return;
     }
 
+    AnalyticsService.aiChatMessage(verseId: verse.id);
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: true));
       _controller.clear();
@@ -172,7 +197,10 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     try {
       final reply = await GeminiService.ask(
         systemContext: _buildContext(verse),
-        history: _messages.sublist(0, _messages.length - 1),
+        history: _messages
+            .sublist(0, _messages.length - 1)
+            .where((m) => !m.isSystem)
+            .toList(),
         userMessage: text,
       );
       if (mounted) {
@@ -266,6 +294,8 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
                     ),
                   ),
                 ),
+                if (GeminiService.isEnabled)
+                  AiDisclaimer(isDark: isDark),
                 state
                         .whenData((either) => either.fold(
                               (_) => const SizedBox.shrink(),
@@ -403,6 +433,15 @@ class _ChatBody extends StatelessWidget {
                     final m = messages[index];
                     if (m.isUser) {
                       return _UserBubble(isDark: isDark, text: m.text);
+                    }
+                    if (m.isSystem) {
+                      // Crisis-support note — supportive prose, no AI
+                      // label/report and no copy/share/regenerate actions.
+                      return AiRichProse(
+                        isDark: isDark,
+                        text: m.text,
+                        horizontalPadding: 0,
+                      );
                     }
                     final isLastAi =
                         !loading && index == messages.length - 1;
@@ -716,9 +755,24 @@ class _AiActionRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final text3 = isDark ? DColors.text3 : LColors.text3;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        Icon(Icons.auto_awesome_outlined, size: 12, color: text3),
+        const SizedBox(width: 5),
+        Text(
+          'AI-generated',
+          style: TextStyle(
+            fontFamily: Fonts.sans,
+            fontFamilyFallback: AppFontFallback.latin,
+            fontSize: 11,
+            height: 1,
+            letterSpacing: 0.2,
+            color: text3,
+          ),
+        ),
+        const SizedBox(width: 10),
         _IconAction(
           icon: Icons.copy_outlined,
           tooltip: 'Copy',
@@ -751,6 +805,14 @@ class _AiActionRow extends ConsumerWidget {
             onTap: onRegenerate!,
           ),
         ],
+        const SizedBox(width: 4),
+        _IconAction(
+          icon: Icons.outlined_flag,
+          tooltip: 'Report',
+          color: saffron,
+          onTap: () =>
+              reportAiContent(context, text: text, surface: 'verse_chat'),
+        ),
       ],
     );
   }

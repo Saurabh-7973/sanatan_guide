@@ -29,6 +29,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/v
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/verse_detail_glyphs.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/font_size_provider.dart'
     as font_prefs;
+import 'package:sanatan_guide/presentation/shared/widgets/ai_message.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/system_chrome.dart';
@@ -1796,6 +1797,46 @@ class _ExplainCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
               ],
+            ],
+            if (!thinking && prose.trim().isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      kAiDisclaimer,
+                      style: AppText.meta(color: text3, size: 10)
+                          .copyWith(height: 1.4, letterSpacing: 0.1),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  InkWell(
+                    onTap: () => reportAiContent(
+                      context,
+                      text: prose,
+                      surface: 'explain',
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 3),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.outlined_flag, size: 12, color: saffron),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Report',
+                            style: AppText.meta(color: saffron, size: 10)
+                                .copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ],
         ),

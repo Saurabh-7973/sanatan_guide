@@ -7,7 +7,10 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
+import 'package:sanatan_guide/core/utils/crisis_support.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/ai_message.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/ai_rich_prose.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
@@ -35,7 +38,10 @@ const _kSystemPrompt =
     '**dharma**, so the app can highlight it. '
     'Acknowledge uncertainty honestly. Never claim divine authority. Respect '
     'every tradition within Sanatan Dharma. Keep answers concise — under 200 '
-    'words unless the user asks for more depth.';
+    'words unless the user asks for more depth. '
+    'If a user expresses thoughts of self-harm or suicide, do not give '
+    'methods or instructions; respond with compassion and gently encourage '
+    'them to contact local emergency services or a crisis helpline.';
 
 /// Max characters a user's Pandit prompt may carry. Covers any sensible
 /// question; a pasted full-article or hostile blob is refused before it
@@ -106,6 +112,25 @@ class _PanditChatPageState extends State<PanditChatPage> {
       return;
     }
 
+    // Crisis interception — runs before quota + network. A first-person
+    // self-harm message never reaches Gemini and never spends budget;
+    // we answer with a supportive system note instead.
+    if (isSelfHarmIntent(text)) {
+      setState(() {
+        _messages.add(ChatMessage(text: text, isUser: true));
+        _messages.add(const ChatMessage(
+          text: crisisSupportMessage,
+          isUser: false,
+          isSystem: true,
+        ));
+        _controller.clear();
+        _error = null;
+        _retryableText = null;
+      });
+      _scrollToBottom();
+      return;
+    }
+
     if (_remaining <= 0) {
       setState(() {
         _error = 'Daily question limit reached — resets at midnight local.';
@@ -123,6 +148,7 @@ class _PanditChatPageState extends State<PanditChatPage> {
       return;
     }
 
+    AnalyticsService.aiChatMessage();
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: true));
       _controller.clear();
@@ -153,7 +179,10 @@ class _PanditChatPageState extends State<PanditChatPage> {
     try {
       final reply = await GeminiService.ask(
         systemContext: _kSystemPrompt,
-        history: _messages.sublist(0, _messages.length - 1),
+        history: _messages
+            .sublist(0, _messages.length - 1)
+            .where((m) => !m.isSystem)
+            .toList(),
         userMessage: text,
       );
       if (!mounted) return;
@@ -242,6 +271,8 @@ class _PanditChatPageState extends State<PanditChatPage> {
                           scrollController: _scrollController,
                         ),
                 ),
+                if (GeminiService.isEnabled && !showEmpty)
+                  AiDisclaimer(isDark: isDark),
                 _InputArea(
                   isDark: isDark,
                   controller: _controller,
@@ -514,9 +545,18 @@ class _Conversation extends StatelessWidget {
                 );
               }
               final msg = messages[index];
-              return msg.isUser
-                  ? _UserBubble(isDark: isDark, text: msg.text)
-                  : AiRichProse(isDark: isDark, text: msg.text);
+              if (msg.isUser) {
+                return _UserBubble(isDark: isDark, text: msg.text);
+              }
+              if (msg.isSystem) {
+                // Crisis-support note — supportive prose, no AI label/report.
+                return AiRichProse(isDark: isDark, text: msg.text);
+              }
+              return AiMessage(
+                isDark: isDark,
+                text: msg.text,
+                surface: 'pandit',
+              );
             },
           ),
         ),

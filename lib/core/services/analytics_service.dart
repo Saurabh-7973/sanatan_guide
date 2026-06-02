@@ -105,6 +105,16 @@ abstract final class AnalyticsService {
         if (minute != null) 'minute': minute,
       });
 
+  /// A question sent to the AI chat. [verseId] is set for verse-anchored
+  /// chat, null for general "Ask the Pandit".
+  static Future<void> aiChatMessage({String? verseId}) =>
+      _log('ai_chat_message', {if (verseId != null) 'verse_id': verseId});
+
+  /// User flagged an AI response via the per-message report action.
+  /// [surface] identifies which chat raised it (pandit / verse_chat / explain).
+  static Future<void> aiContentReported({required String surface}) =>
+      _log('ai_content_reported', {'surface': surface});
+
   // ── Internal ────────────────────────────────────────────────────────────
 
   static Future<void> _log(
