@@ -133,7 +133,9 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
     // budget spent; we answer with a supportive system note instead.
     if (isSelfHarmIntent(text)) {
       setState(() {
-        _messages.add(ChatMessage(text: text, isUser: true));
+        // isSystem on the user turn too: it renders as a user bubble
+        // (isUser is checked first) but is excluded from Gemini history.
+        _messages.add(ChatMessage(text: text, isUser: true, isSystem: true));
         _messages.add(const ChatMessage(
           text: crisisSupportMessage,
           isUser: false,

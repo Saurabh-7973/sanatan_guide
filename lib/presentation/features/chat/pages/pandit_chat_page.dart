@@ -117,7 +117,9 @@ class _PanditChatPageState extends State<PanditChatPage> {
     // we answer with a supportive system note instead.
     if (isSelfHarmIntent(text)) {
       setState(() {
-        _messages.add(ChatMessage(text: text, isUser: true));
+        // isSystem on the user turn too: it renders as a user bubble
+        // (isUser is checked first) but is excluded from Gemini history.
+        _messages.add(ChatMessage(text: text, isUser: true, isSystem: true));
         _messages.add(const ChatMessage(
           text: crisisSupportMessage,
           isUser: false,
@@ -317,6 +319,7 @@ class _TopBar extends StatelessWidget {
         children: [
           _HitButton(
             onTap: () => Navigator.of(context).maybePop(),
+            semanticLabel: 'Back',
             child: const MockupBackChevron(),
           ),
           Expanded(
@@ -341,6 +344,7 @@ class _TopBar extends StatelessWidget {
           ),
           _HitButton(
             onTap: showClear ? onClear : null,
+            semanticLabel: showClear ? 'New conversation' : null,
             child: showClear
                 ? Icon(Icons.add_rounded, size: 20, color: text3)
                 : const SizedBox(width: 20, height: 20),
@@ -352,20 +356,25 @@ class _TopBar extends StatelessWidget {
 }
 
 class _HitButton extends StatelessWidget {
-  const _HitButton({required this.child, this.onTap});
+  const _HitButton({required this.child, this.onTap, this.semanticLabel});
 
   final Widget child;
   final VoidCallback? onTap;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: onTap,
-      radius: 22,
-      child: SizedBox(
-        width: 36,
-        height: 36,
-        child: Center(child: child),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: InkResponse(
+        onTap: onTap,
+        radius: 22,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Center(child: child),
+        ),
       ),
     );
   }
