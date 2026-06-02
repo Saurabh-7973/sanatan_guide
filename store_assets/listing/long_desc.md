@@ -9,12 +9,12 @@ with the source texts.
 
 WHAT'S INSIDE
 
-📜 35+ classical texts, each in full
+📜 32 classical texts
    Bhagavad Gītā · all four Vedas · 13 principal Upaniṣads · Yoga Sūtras ·
    Brahma Sūtras · Rāmāyaṇa · Mahābhārata · Bhāgavata Purāṇa · Manusmṛti ·
    Arthaśāstra · Tirukkuṟaḷ · and more.
 
-🕉 Sanskrit · IAST transliteration · English translation
+🕉 Sanskrit original · English translation
    See every verse in Devanāgarī, romanised with full diacritics, and
    translated by published public-domain translators (Sivananda,
    Prabhupada, Müller, Griffith, others — all attributed).

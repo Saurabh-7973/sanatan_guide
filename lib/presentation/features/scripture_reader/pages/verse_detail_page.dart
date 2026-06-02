@@ -280,6 +280,7 @@ class _ChromeFrame extends StatelessWidget {
     this.position,
     this.onShare,
     this.translationOn = false,
+    this.translationAvailable = true,
     this.onToggleTranslation,
     this.onOpenNotes,
     this.hasNote = false,
@@ -298,6 +299,7 @@ class _ChromeFrame extends StatelessWidget {
   final ({int index, int total})? position;
   final VoidCallback? onShare;
   final bool translationOn;
+  final bool translationAvailable;
   final VoidCallback? onToggleTranslation;
   final VoidCallback? onOpenNotes;
   final bool hasNote;
@@ -329,6 +331,7 @@ class _ChromeFrame extends StatelessWidget {
           onGoToVerse: onGoToVerse,
           enabled: actionsEnabled,
           translationOn: translationOn,
+          translationAvailable: translationAvailable,
           onToggleTranslation: onToggleTranslation,
           onOpenNotes: onOpenNotes,
           hasNote: hasNote,
@@ -510,6 +513,7 @@ class _UtilBar extends StatelessWidget {
     required this.onGoToVerse,
     required this.enabled,
     this.translationOn = false,
+    this.translationAvailable = true,
     this.onToggleTranslation,
     this.onOpenNotes,
     this.hasNote = false,
@@ -521,6 +525,7 @@ class _UtilBar extends StatelessWidget {
   final void Function(String) onGoToVerse;
   final bool enabled;
   final bool translationOn;
+  final bool translationAvailable;
   final VoidCallback? onToggleTranslation;
   final VoidCallback? onOpenNotes;
   final bool hasNote;
@@ -568,7 +573,13 @@ class _UtilBar extends StatelessWidget {
               active: translationOn,
               activeBg: saffronGlow,
               activeColor: saffron,
-              onTap: enabled ? onToggleTranslation : null,
+              // Grey out (auto, via null onTap) when this verse has no
+              // transliteration to show — true for all texts except the Gītā
+              // today, so the toggle reads as intentionally unavailable rather
+              // than broken.
+              onTap: (enabled && translationAvailable)
+                  ? onToggleTranslation
+                  : null,
             ),
             // Listen removed for v1 (brief §5 #12 / §6 — audio not bundled).
             _UtilAction(
@@ -1132,6 +1143,8 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         position: position,
         onShare: _share,
         translationOn: translitOn,
+        translationAvailable:
+            verse.transliteration?.trim().isNotEmpty ?? false,
         onToggleTranslation: () =>
             ref.read(transliterationEnabledProvider.notifier).toggle(),
         onOpenNotes: _openNotes,

@@ -45,7 +45,7 @@ after with `adb shell pm enable com.example.bigul_app`.
 | 1 | **Home (Verse of the Day)** | "A new verse every morning" | open app fresh → home |
 | 2 | **Verse detail (BG 2.47)** | "Sanskrit · IAST · English · together" | tap verse of day |
 | 3 | **Ask the Pandit chat (one Q + reply with citation chips)** | "Ask. Replies cite real verses." | open Pandit → ask "what is dharma" → wait |
-| 4 | **Library — scripture grid** | "35+ classical texts in full" | bottom-nav Library |
+| 4 | **Library — scripture grid** | "32 classical texts" | bottom-nav Library |
 | 5 | **Chapter list (RV Maṇḍala view) with Continue card** | "Pick up where you left off" | Library → Ṛgveda |
 | 6 | **Search results with citation matches** | "Search across every text at once" | bottom-nav Search → "dharma" |
 | 7 | **Bookmarks list with one personal note expanded** | "Your notes, side by side with the verse" | bottom-nav Bookmarks |

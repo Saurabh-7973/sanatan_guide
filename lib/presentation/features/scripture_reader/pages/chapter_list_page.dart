@@ -460,6 +460,10 @@ class _ChapterListHeader extends StatelessWidget {
               color: text2,
             ),
           ),
+          if (isSelectedVersesScripture(scripture.code)) ...[
+            const SizedBox(height: 8),
+            _SelectedVersesTag(isDark: isDark),
+          ],
           const SizedBox(height: 8),
           DefaultTextStyle(
             style: TextStyle(
@@ -1165,6 +1169,37 @@ class _ErrorBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ErrorStateWidget(
       onRetry: () => ref.invalidate(chapterOutlinesProvider(scriptureId)),
+    );
+  }
+}
+
+/// Small pill marking a scripture that ships a curated selection of verses
+/// rather than the full text (see [kSelectedVersesScriptures]).
+class _SelectedVersesTag extends StatelessWidget {
+  const _SelectedVersesTag({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final bg = isDark ? DColors.saffronGlow : LColors.saffronGlow;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        'SELECTED VERSES',
+        style: TextStyle(
+          fontFamily: Fonts.sans,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.18 * 10,
+          color: saffron,
+        ),
+      ),
     );
   }
 }

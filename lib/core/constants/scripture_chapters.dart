@@ -34,6 +34,36 @@ class ChapterMeta {
 List<ChapterMeta>? scriptureChaptersFor(String scriptureId) =>
     _chapters[scriptureId];
 
+/// Scriptures the bundle ships as a curated *selection* of verses rather than
+/// the complete text. Detected from the DB by verse-number gaps within each
+/// chapter (≥30% missing vs a contiguous sequence) — e.g. Manusmṛti ships 54
+/// of ~2,685, with cherry-picked ids. The UI tags these "Selected verses" so a
+/// reader isn't misled into thinking it's the full text. Full / near-full texts
+/// (Gītā, Mahābhārata, Rāmāyaṇa, Rigveda, the Vedas, complete Upaniṣads…) are
+/// deliberately excluded.
+const Set<String> kSelectedVersesScriptures = {
+  'manusmriti',
+  'brahma_sutras',
+  'hatha_yoga_pradipika',
+  'mahanirvana_tantra',
+  'markandeya_purana',
+  'devi_bhagavata_purana',
+  'vishnu_purana',
+  'aitareya_upanishad',
+  'kaushitaki_upanishad',
+  'maitrayani_upanishad',
+  'mundaka_upanishad',
+  'prashna_upanishad',
+  'shvetashvatara_upanishad',
+  'taittiriya_upanishad',
+  'katha_upanishad',
+};
+
+/// Whether [scriptureId] ships as a curated selection (see
+/// [kSelectedVersesScriptures]).
+bool isSelectedVersesScripture(String scriptureId) =>
+    kSelectedVersesScriptures.contains(scriptureId);
+
 const Map<String, List<ChapterMeta>> _chapters = {
   'bhagavata_purana': [
     ChapterMeta(
@@ -537,15 +567,15 @@ const Map<String, List<ChapterMeta>> _chapters = {
       enTitle: 'The First Maṇḍala',
       subtitle:
           'Various seers — Madhuchchandas, Medhātithi, Śunaḥśepa. Hymns to Agni, Indra, the Aśvins.',
-      chapterCount: 191,
-      verseCount: 2006,
+      chapterCount: 190,
+      verseCount: 1839,
     ),
     ChapterMeta(
       chapterNum: 2,
       devaTitle: 'द्वितीय मण्डल',
       enTitle: 'Family of Gṛtsamada',
       chapterCount: 43,
-      verseCount: 429,
+      verseCount: 386,
     ),
     ChapterMeta(
       chapterNum: 3,
@@ -553,49 +583,49 @@ const Map<String, List<ChapterMeta>> _chapters = {
       enTitle: 'Family of Viśvāmitra',
       subtitle: 'Includes the Gāyatrī Mantra — Tat savitur vareṇyam.',
       chapterCount: 62,
-      verseCount: 617,
+      verseCount: 550,
     ),
     ChapterMeta(
       chapterNum: 4,
       devaTitle: 'चतुर्थ मण्डल',
       enTitle: 'Family of Vāmadeva',
       chapterCount: 58,
-      verseCount: 589,
+      verseCount: 529,
     ),
     ChapterMeta(
       chapterNum: 5,
       devaTitle: 'पञ्चम मण्डल',
       enTitle: 'Family of Atri',
       chapterCount: 87,
-      verseCount: 727,
+      verseCount: 636,
     ),
     ChapterMeta(
       chapterNum: 6,
       devaTitle: 'षष्ठ मण्डल',
       enTitle: 'Family of Bharadvāja',
       chapterCount: 75,
-      verseCount: 765,
+      verseCount: 691,
     ),
     ChapterMeta(
       chapterNum: 7,
       devaTitle: 'सप्तम मण्डल',
       enTitle: 'Family of Vasiṣṭha',
       chapterCount: 104,
-      verseCount: 841,
+      verseCount: 740,
     ),
     ChapterMeta(
       chapterNum: 8,
       devaTitle: 'अष्टम मण्डल',
       enTitle: 'Family of Kāṇva',
       chapterCount: 103,
-      verseCount: 1716,
+      verseCount: 1602,
     ),
     ChapterMeta(
       chapterNum: 9,
       devaTitle: 'नवम मण्डल',
       enTitle: 'The Pavamāna Soma Hymns',
       chapterCount: 114,
-      verseCount: 1108,
+      verseCount: 983,
     ),
     ChapterMeta(
       chapterNum: 10,
@@ -604,7 +634,7 @@ const Map<String, List<ChapterMeta>> _chapters = {
       subtitle:
           'The Nāsadīya Sūkta on creation, the Puruṣa Sūkta, the Hiraṇyagarbha Sūkta.',
       chapterCount: 191,
-      verseCount: 1754,
+      verseCount: 1552,
     ),
   ],
   'atharvaveda': [
