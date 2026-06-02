@@ -425,11 +425,16 @@ class _ChapterListHeader extends StatelessWidget {
         totalChapters != null &&
         totalChapters! > 0 &&
         totalChapters != totalUnits;
+    // Curated-selection scriptures carry canonical chapter metadata (e.g.
+    // Manusmṛti's 2,684) while the bundle ships only a fraction, so a verse
+    // total here would contradict the "SELECTED VERSES" tag. Suppress it for
+    // those texts — the per-chapter rows do the same.
+    final selected = isSelectedVersesScripture(scripture.code);
     final parts = <(String, String)>[
       if (!dropUnitRow) ('$totalUnits', unit.toUpperCase()),
       if (totalChapters != null && totalChapters! > 0)
         (_fmt(totalChapters!), 'CHAPTERS'),
-      if (totalVerses > 0) (_fmt(totalVerses), 'VERSES'),
+      if (!selected && totalVerses > 0) (_fmt(totalVerses), 'VERSES'),
       if (readChapters > 0) ('$readChapters', 'READ'),
     ];
 
@@ -877,6 +882,8 @@ class _ChapterRow extends StatelessWidget {
                       saffron: saffron,
                       text2: text2,
                       text3: text3,
+                      showVerseCount:
+                          !isSelectedVersesScripture(scripture.code),
                     ),
                     if (_isStarted && entry.verseCount != null) ...[
                       const SizedBox(height: 6),
@@ -913,6 +920,7 @@ class _MetaText extends StatelessWidget {
     required this.saffron,
     required this.text2,
     required this.text3,
+    this.showVerseCount = true,
   });
 
   final ChapterMeta entry;
@@ -923,11 +931,15 @@ class _MetaText extends StatelessWidget {
   final Color saffron;
   final Color text2;
   final Color text3;
+  // False for curated-selection scriptures, whose per-chapter counts are
+  // canonical (not what the bundle ships) and would mislead.
+  final bool showVerseCount;
 
   @override
   Widget build(BuildContext context) {
     final spans = <InlineSpan>[];
-    final hasVerseCount = entry.verseCount != null && entry.verseCount! > 0;
+    final hasVerseCount =
+        showVerseCount && entry.verseCount != null && entry.verseCount! > 0;
     final hasSubtitle = entry.subtitle != null && entry.subtitle!.isNotEmpty;
     final base = TextStyle(
       fontFamily: Fonts.sans,

@@ -247,6 +247,7 @@ extension ScriptureX on Scripture {
         Scripture.brahmasutras => 'adhyāyas',
         Scripture.mahabharata => 'parvas',
         Scripture.ramayana => 'kāṇḍas',
+        Scripture.arthashastra => 'books',
         _ => 'chapters',
       };
 
@@ -268,6 +269,7 @@ extension ScriptureX on Scripture {
         Scripture.manusmriti || Scripture.brahmasutras => 'AD',
         Scripture.mahabharata => 'PV',
         Scripture.ramayana => 'KN',
+        Scripture.arthashastra => 'BK',
         _ => 'CH',
       };
 

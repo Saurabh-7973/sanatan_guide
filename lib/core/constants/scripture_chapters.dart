@@ -65,6 +65,88 @@ bool isSelectedVersesScripture(String scriptureId) =>
     kSelectedVersesScriptures.contains(scriptureId);
 
 const Map<String, List<ChapterMeta>> _chapters = {
+  // Arthaśāstra is structured as 15 books (adhikaraṇa). Without this rollup it
+  // fell back to DB outlines and listed 150 flat chapters all titled by their
+  // book ("Book I" eight times…). Counts are the bundled DB's per-book actuals
+  // (chapters / verses); book_num is populated in the DB so taps filter by
+  // book, mirroring the Rāmāyaṇa kāṇḍa rollup.
+  'arthashastra': [
+    ChapterMeta(
+        chapterNum: 1,
+        enTitle: 'Book I — Concerning Discipline',
+        chapterCount: 21,
+        verseCount: 500),
+    ChapterMeta(
+        chapterNum: 2,
+        enTitle: 'Book II — The Duties of Government Superintendents',
+        chapterCount: 36,
+        verseCount: 1269),
+    ChapterMeta(
+        chapterNum: 3,
+        enTitle: 'Book III — Concerning Law',
+        chapterCount: 20,
+        verseCount: 697),
+    ChapterMeta(
+        chapterNum: 4,
+        enTitle: 'Book IV — The Removal of Thorns',
+        chapterCount: 13,
+        verseCount: 418),
+    ChapterMeta(
+        chapterNum: 5,
+        enTitle: 'Book V — The Conduct of Courtiers',
+        chapterCount: 6,
+        verseCount: 252),
+    ChapterMeta(
+        chapterNum: 6,
+        enTitle: 'Book VI — The Source of Sovereign States',
+        chapterCount: 2,
+        verseCount: 58),
+    ChapterMeta(
+        chapterNum: 7,
+        enTitle: 'Book VII — The End of the Six-Fold Policy',
+        chapterCount: 18,
+        verseCount: 685),
+    ChapterMeta(
+        chapterNum: 8,
+        enTitle: 'Book VIII — Concerning Vices and Calamities',
+        chapterCount: 5,
+        verseCount: 235),
+    ChapterMeta(
+        chapterNum: 9,
+        enTitle: 'Book IX — The Work of an Invader',
+        chapterCount: 7,
+        verseCount: 340),
+    ChapterMeta(
+        chapterNum: 10,
+        enTitle: 'Book X — Relating to War',
+        chapterCount: 6,
+        verseCount: 220),
+    ChapterMeta(
+        chapterNum: 11,
+        enTitle: 'Book XI — The Conduct of Corporations',
+        chapterCount: 1,
+        verseCount: 56),
+    ChapterMeta(
+        chapterNum: 12,
+        enTitle: 'Book XII — Concerning a Powerful Enemy',
+        chapterCount: 5,
+        verseCount: 166),
+    ChapterMeta(
+        chapterNum: 13,
+        enTitle: 'Book XIII — Strategic Means to Capture a Fort',
+        chapterCount: 5,
+        verseCount: 216),
+    ChapterMeta(
+        chapterNum: 14,
+        enTitle: 'Book XIV — Secret Means',
+        chapterCount: 4,
+        verseCount: 186),
+    ChapterMeta(
+        chapterNum: 15,
+        enTitle: 'Book XV — The Plan of a Treatise',
+        chapterCount: 1,
+        verseCount: 73),
+  ],
   'bhagavata_purana': [
     ChapterMeta(
       chapterNum: 1,
