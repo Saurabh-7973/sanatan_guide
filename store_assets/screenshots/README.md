@@ -25,8 +25,11 @@ debug build. Demo-mode status bar (clock 9:00, full battery, no notif icons).
   1080×2400 is 2.22:1 and would bounce. Padded set is exactly 2:1. **Upload the
   `play_ready/` set.**
 
-Minor: a faint notification glyph sometimes survives demo-mode next to the
-clock — crop the top 60px if it bothers you.
+Clean status bar: another app on the emulator (`com.example.bigul_app`) runs
+a foreground service whose ONGOING|NO_CLEAR notification icon demo-mode can't
+hide. Before capturing (incl. shot 3 later), disable it:
+`adb shell pm disable-user --user 0 com.example.bigul_app`, then re-enable
+after with `adb shell pm enable com.example.bigul_app`.
 
 ## Target spec
 
