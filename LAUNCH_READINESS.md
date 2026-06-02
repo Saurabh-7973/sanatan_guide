@@ -1,5 +1,24 @@
 # Sanatan Guide — Launch Readiness Audit
 
+> **Rev 5 status (2026-06-02):** Three items listed below as open/optional are now
+> closed in code:
+> - **C1 (tappable AI citation cards)** — DONE. `ai_rich_prose.dart` renders
+>   `_CitationChip` with `onTap → context.push('/browse/<code>/verse/<id>')`,
+>   wired in Verse Detail + Pandit chat + Verse chat. (Was the last "deferred" code item.)
+> - **A3 (festivals beyond 2026)** — DONE. `festival_dates_future.dart` bundles
+>   2027–2030 as a year-aware in-app fallback; `festival_provider` applies
+>   `futureFestivalDates[year]` then Remote Config overrides on top.
+> - **Screen-16 confirm dialog** — DONE (commit `674cd72`). Heritage centered card
+>   (`showHeritageConfirmDialog`) replaces the off-spec bottom-sheet confirm at the
+>   destructive sites; +6 widget tests, suite green (304).
+> - **targetSdk** — resolved value is **36** (Flutter 3.35.4 `flutter.targetSdkVersion`),
+>   clears Play's ≥35 requirement. Section E item satisfied.
+>
+> Remaining work is **all manual / store-prep** (Section E + "need a manual pass"):
+> signed release on a real device, Data Safety form, content-rating questionnaire,
+> Play listing copy + graphics, and verifying the Privacy/Terms gist content.
+> No code blockers remain.
+
 **Date:** 2026-05-23 (rev 4 — B1/B2/B3/B5/B6/B7/B8/B9/B4/D1/D2 fixed) · **Audited by:** Claude (emulator-5554, debug build, Gemini key active)
 **Method:** Code review + on-device pass (happy + negative flows, both themes, AI features)
 
