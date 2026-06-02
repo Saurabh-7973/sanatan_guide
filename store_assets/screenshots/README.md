@@ -2,6 +2,32 @@
 
 Capture 8 screens. Play Console accepts 2-8; 8 covers everything.
 
+## Captured status (2026-06-02)
+
+7 of 8 captured on emulator-5554 (Medium_Phone, 1080×2400), current `main`
+debug build. Demo-mode status bar (clock 9:00, full battery, no notif icons).
+
+| # | File | Status |
+|---|------|--------|
+| 1 Home | `01_home.png` | ✅ |
+| 2 Verse detail (BG 12.17) | `02_verse_detail.png` | ✅ (Listen action gone, current build) |
+| 3 Pandit chat + citation chips | — | ⏳ **needs Gemini-keyed build** — chat returns no AI reply without `--dart-define=GEMINI_API_KEY`. Capture from the keyed `release.sh` build. |
+| 4 Library grid | `04_library.png` | ✅ |
+| 5 Chapter list (Ṛgveda maṇḍalas) | `05_chapter_list.png` | ✅ |
+| 6 Search "dharma" | `06_search.png` | ✅ |
+| 7 Bookmarks + note | `07_bookmarks.png` | ✅ (seeded BG 12.17 bookmark + note) |
+| 8 Festivals / pañcāṅga | `08_festivals.png` | ✅ |
+
+**Two output sets:**
+- Root `0N_*.png` — raw 1080×2400 device captures.
+- `play_ready/0N_*.png` — **padded to 1200×2400** (cream `#F5EDE0` side bars).
+  Play rejects screenshots where the long side is > 2× the short side; raw
+  1080×2400 is 2.22:1 and would bounce. Padded set is exactly 2:1. **Upload the
+  `play_ready/` set.**
+
+Minor: a faint notification glyph sometimes survives demo-mode next to the
+clock — crop the top 60px if it bothers you.
+
 ## Target spec
 
 - Resolution: **1080 × 1920** (portrait) or **1440 × 2960** (better).
