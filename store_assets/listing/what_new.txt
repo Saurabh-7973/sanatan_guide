@@ -2,7 +2,7 @@ First release — Sanatan Guide v1.0.0.
 
 35+ scriptures with Sanskrit + IAST + English. Daily verse reminder.
 Ask the Pandit (AI commentary that cites real verses). Bookmarks and
-personal notes. Festival calendar for 2026 with day-of alerts.
+personal notes. Festival calendar (2026–2030) with day-of alerts.
 Offline-first. No accounts, no ads.
 
 Welcome.

@@ -36,7 +36,7 @@ either the Play Console listing or the in-store presentation.
 ## Targets
 
 - Android 7.0+ (API 24 = `flutter.minSdkVersion`).
-- Target SDK = `flutter.targetSdkVersion` (currently 34).
+- Target SDK = `flutter.targetSdkVersion` (currently 36, Flutter 3.35.4 — clears Play ≥35).
 - Languages: English (primary). Devanāgarī text inside, but UI is English.
 
 ## What we do NOT submit in v1

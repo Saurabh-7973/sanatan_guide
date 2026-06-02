@@ -33,8 +33,8 @@ WHAT'S INSIDE
    AI explanations to your notes. Search across all texts at once.
 
 🎉 Festival calendar with day-of alerts
-   Drik Panchang dates for 2026. Optional notification on the morning
-   of each major parva. Quiet by default.
+   Pañcāṅga dates for 2026 through 2030. Optional notification on the
+   morning of each major parva. Quiet by default.
 
 🛕 Learning paths
    Short curated modules on dharma, karma yoga, moksha — designed for
@@ -80,8 +80,8 @@ can be turned off in one tap (Settings → Privacy). The Pandit feature
 sends your question + the verse text to Google Gemini for a reply —
 nothing else.
 
-Full policy: [Privacy Gist URL]
-Terms: [Terms Gist URL]
+Full policy: https://gist.github.com/Saurabh-7973/96cf400ffbbbece5ece2d5d4c3f0a16c
+Terms: https://gist.github.com/Saurabh-7973/04966e0f9717bba119ddf13e951d3df5
 
 ──────────
 
