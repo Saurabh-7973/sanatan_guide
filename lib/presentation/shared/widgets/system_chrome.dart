@@ -9,6 +9,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 
@@ -197,6 +198,195 @@ class _HeritageToastState extends State<_HeritageToast>
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Centered heritage confirmation dialog (brief Screen 16). A 312px card with
+/// the [BindingLine] motif at the top, a serif title + italic body, and two
+/// equal-width flat text buttons split by a hairline. The destructive label
+/// renders in iron-red; non-destructive in saffron. Fades + scales in 200ms
+/// over a 55% scrim. Returns `true` on confirm, `false`/`null` on dismiss.
+Future<bool?> showHeritageConfirmDialog(
+  BuildContext context, {
+  required String title,
+  required String body,
+  required String confirmLabel,
+  String cancelLabel = 'Cancel',
+  bool isDangerous = false,
+}) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return showGeneralDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black.withValues(alpha: 0.55),
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (_, __, ___) => _HeritageDialog(
+      title: title,
+      body: body,
+      confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
+      isDangerous: isDangerous,
+      isDark: isDark,
+    ),
+    transitionBuilder: (_, anim, __, child) {
+      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOut);
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+class _HeritageDialog extends StatelessWidget {
+  const _HeritageDialog({
+    required this.title,
+    required this.body,
+    required this.confirmLabel,
+    required this.cancelLabel,
+    required this.isDangerous,
+    required this.isDark,
+  });
+
+  final String title;
+  final String body;
+  final String confirmLabel;
+  final String cancelLabel;
+  final bool isDangerous;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface2 = isDark ? DColors.surface2 : LColors.surface2;
+    final divider = isDark ? DColors.divider : LColors.divider;
+    final dividerSoft = isDark ? DColors.dividerSoft : LColors.dividerSoft;
+    final saffron = isDark ? DColors.saffron : LColors.saffron;
+    final iron = isDark ? DColors.ironRedBright : LColors.ironRedBright;
+    final cream = isDark ? DColors.cream : LColors.text1;
+    final text2 = isDark ? DColors.text2 : LColors.text2;
+    final accent = isDangerous ? iron : saffron;
+
+    return Center(
+      child: Material(
+        color: surface2,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: divider),
+        ),
+        child: SizedBox(
+          width: 312,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+                child: BindingLine(isDark: isDark, sideGap: 10),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.01 * 19,
+                    color: cream,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+                child: Text(
+                  body,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: Fonts.serif,
+                    fontFamilyFallback: AppFontFallback.latin,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 14,
+                    height: 1.55,
+                    color: text2,
+                  ),
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: dividerSoft)),
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _DialogButton(
+                          label: cancelLabel,
+                          color: text2,
+                          weight: FontWeight.w500,
+                          onTap: () => Navigator.of(context).pop(false),
+                        ),
+                      ),
+                      Container(width: 1, color: dividerSoft),
+                      Expanded(
+                        child: _DialogButton(
+                          label: confirmLabel,
+                          color: accent,
+                          weight: FontWeight.w600,
+                          onTap: () => Navigator.of(context).pop(true),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DialogButton extends StatelessWidget {
+  const _DialogButton({
+    required this.label,
+    required this.color,
+    required this.weight,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color color;
+  final FontWeight weight;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: 52,
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 13,
+              fontWeight: weight,
+              letterSpacing: 0.04 * 13,
+              color: color,
             ),
           ),
         ),

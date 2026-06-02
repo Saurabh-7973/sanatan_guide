@@ -986,12 +986,12 @@ class _ClearHistoryRow extends ConsumerWidget {
   }
 
   Future<void> _showConfirmDialog(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showHeritageConfirmSheet(
-      context: context,
+    final confirmed = await showHeritageConfirmDialog(
+      context,
       title: 'Clear reading history?',
       body: 'This will reset your streak, read counts, and reading history. '
           'Bookmarks and notes will be kept.',
-      confirmLabel: 'CLEAR',
+      confirmLabel: 'Clear',
       isDangerous: true,
     );
     if (confirmed != true || !context.mounted) return;
@@ -1235,143 +1235,6 @@ class _Wheel extends StatelessWidget {
   }
 }
 
-/// Heritage-toned confirmation bottom sheet — replaces Material's flat
-/// AlertDialog at the destructive-action call sites (clear history, reset
-/// settings). Saffron-glow disc + Lora serif title + italic body + paired
-/// pill buttons; matches the look used in onboarding and elsewhere.
-Future<bool?> showHeritageConfirmSheet({
-  required BuildContext context,
-  required String title,
-  required String body,
-  required String confirmLabel,
-  bool isDangerous = false,
-}) async {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-  final saffron = isDark ? DColors.saffron : LColors.saffron;
-  final iron = isDark ? DColors.ironRedBright : LColors.ironRedBright;
-  final surface = isDark ? DColors.surface : LColors.surface;
-  final text1 = isDark ? DColors.text1 : LColors.text1;
-  final text2 = isDark ? DColors.text2 : LColors.text2;
-  final accent = isDangerous ? iron : saffron;
-  return showModalBottomSheet<bool>(
-    context: context,
-    backgroundColor: surface,
-    showDragHandle: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (ctx) => SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: isDark ? 0.12 : 0.10),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isDangerous
-                    ? Icons.warning_amber_rounded
-                    : Icons.help_outline_rounded,
-                color: accent,
-                size: 22,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-                color: text1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              body,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: Fonts.serif,
-                fontFamilyFallback: AppFontFallback.latin,
-                fontStyle: FontStyle.italic,
-                fontSize: 13,
-                height: 1.5,
-                color: text2,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(ctx).pop(false),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: text2.withValues(alpha: 0.4),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(
-                      'CANCEL',
-                      style: TextStyle(
-                        fontFamily: Fonts.sans,
-                        fontFamilyFallback: AppFontFallback.latin,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.12 * 12,
-                        color: text2,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Material(
-                    color: accent,
-                    borderRadius: BorderRadius.circular(24),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(24),
-                      onTap: () => Navigator.of(ctx).pop(true),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          confirmLabel,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: Fonts.sans,
-                            fontFamilyFallback: AppFontFallback.latin,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.12 * 12,
-                            color:
-                                isDark ? const Color(0xFF1A1208) : Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
 // ── Reset: restore defaults ────────────────────────────────────────────────
 
 class _ResetRow extends ConsumerWidget {
@@ -1391,13 +1254,13 @@ class _ResetRow extends ConsumerWidget {
   }
 
   Future<void> _showResetDialog(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showHeritageConfirmSheet(
-      context: context,
+    final confirmed = await showHeritageConfirmDialog(
+      context,
       title: 'Reset all settings?',
       body: 'Theme, reading font size, language, daily reminder time, and '
           'scripture experience will return to their defaults. Your '
           'bookmarks, notes, and reading history are not affected.',
-      confirmLabel: 'RESET',
+      confirmLabel: 'Reset',
       isDangerous: true,
     );
     if (confirmed != true || !context.mounted) return;

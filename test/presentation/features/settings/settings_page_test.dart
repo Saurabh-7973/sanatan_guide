@@ -112,12 +112,12 @@ void main() {
 
     await tester.tap(find.text('Reset all settings'));
     await tester.pumpAndSettle();
-    // Confirm dialog migrated from AlertDialog/TextButton to a heritage
-    // bottom sheet whose confirm CTA is an uppercase pill ("RESET").
-    // The "Reset" section header also renders "RESET" — disambiguate by
-    // tapping the descendant of the Material pill.
+    // Confirm dialog is the heritage centered card (screen-16): two split
+    // text buttons, confirm CTA labelled "Reset" (title case). The "RESET"
+    // section header is uppercase, so case alone disambiguates, but keep the
+    // InkWell-descendant filter for clarity.
     await tester.tap(find.descendant(
-        of: find.byType(InkWell), matching: find.text('RESET')));
+        of: find.byType(InkWell), matching: find.text('Reset')));
     await tester.pumpAndSettle();
 
     expect(container.read(themeModeProvider), ThemeMode.system);
