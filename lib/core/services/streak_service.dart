@@ -88,6 +88,7 @@ final class StreakService {
         unawaited(ReviewService.maybeRequestReview(ReviewTrigger.streak7Day));
       }
 
+      AnalyticsService.setStreakDays(newStreak);
       const milestones = {3, 7, 14, 30, 100};
       if (milestones.contains(newStreak)) {
         AnalyticsService.streakAchieved(newStreak);

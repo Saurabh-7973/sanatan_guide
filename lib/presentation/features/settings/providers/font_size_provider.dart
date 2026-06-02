@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sanatan_guide/core/constants/preferences_keys.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 
 part 'font_size_provider.g.dart';
 
@@ -27,6 +28,7 @@ class FontSizeNotifier extends _$FontSizeNotifier {
   Future<void> setFontSize(double size) async {
     final clamped = size.clamp(kMinFontSize, kMaxFontSize);
     state = clamped;
+    AnalyticsService.setFontSize(clamped);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(PrefsKeys.appFontSize, clamped);
   }

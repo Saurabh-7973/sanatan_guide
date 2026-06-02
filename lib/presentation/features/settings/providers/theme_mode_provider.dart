@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sanatan_guide/core/constants/preferences_keys.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 
 part 'theme_mode_provider.g.dart';
 
@@ -24,6 +25,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
 
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
+    AnalyticsService.setPreferredTheme(mode.name);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(PrefsKeys.appThemeMode, mode.name);
   }

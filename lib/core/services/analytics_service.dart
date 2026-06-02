@@ -115,6 +115,25 @@ abstract final class AnalyticsService {
   static Future<void> aiContentReported({required String surface}) =>
       _log('ai_content_reported', {'surface': surface});
 
+  /// Sets a user property (retention/segmentation dimension). Null values
+  /// are sent as null to clear. Failures are swallowed like events.
+  static Future<void> setUserProperty(String name, String? value) async {
+    try {
+      await _analytics.setUserProperty(name: name, value: value);
+    } catch (e) {
+      AppLogger.instance.w('Analytics user property "$name" failed: $e');
+    }
+  }
+
+  static Future<void> setStreakDays(int days) =>
+      setUserProperty('streak_days', '$days');
+
+  static Future<void> setPreferredTheme(String theme) =>
+      setUserProperty('preferred_theme', theme);
+
+  static Future<void> setFontSize(double size) =>
+      setUserProperty('font_size', size.round().toString());
+
   // ── Internal ────────────────────────────────────────────────────────────
 
   static Future<void> _log(
