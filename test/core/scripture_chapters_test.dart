@@ -1,28 +1,46 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sanatan_guide/core/constants/scripture_chapters.dart';
 
-/// Guards against the curated chapter metadata drifting away from what the
-/// bundled DB actually ships. The Rigveda rollup once read 10,552 (canonical)
-/// while the DB holds 9,508 — producing a header that lied about the content.
-/// These counts are pinned to the bundled DB (verified via
-/// `SELECT chapter_num, COUNT(DISTINCT chapter_label), COUNT(*)`); if the DB is
-/// ever expanded, update both the metadata and these expectations together.
+/// Guards every curated *rollup* scripture (book/canto/maṇḍala level) against
+/// drifting away from what the bundled DB actually ships. The metadata once
+/// carried canonical counts the bundle doesn't contain — e.g. Rigveda 10,552
+/// (DB 9,508) and Mahābhārata 83,049 / 18 parvas (DB 72,770 / 17) — producing
+/// headers that lied about the content.
+///
+/// Expected values are the bundled DB's actuals, verified with:
+///   SELECT COUNT(*) , COUNT(DISTINCT book_num) ...  (and per-maṇḍala for RV).
+/// If the DB is ever expanded, update the metadata AND these numbers together.
 void main() {
-  group('Rigveda chapter metadata matches bundled DB', () {
-    final rigveda = scriptureChaptersFor('rigveda')!;
+  // scriptureId -> (total verses, number of top-level rollup entries).
+  const expected = <String, (int, int)>{
+    'rigveda': (9508, 10),
+    'mahabharata': (72770, 17),
+    'ramayana': (18761, 7),
+    'bhagavata_purana': (14031, 12),
+    'arthashastra': (5371, 15),
+  };
 
-    test('sums to 9,508 verses across 10 maṇḍalas', () {
-      final verses =
-          rigveda.fold<int>(0, (sum, m) => sum + (m.verseCount ?? 0));
-      expect(rigveda.length, 10);
-      expect(verses, 9508);
-    });
+  expected.forEach((id, exp) {
+    final (expVerses, expEntries) = exp;
+    group('$id rollup matches bundled DB', () {
+      final entries = scriptureChaptersFor(id)!;
 
-    test('sums to 1,027 hymns (suktas)', () {
-      final suktas =
-          rigveda.fold<int>(0, (sum, m) => sum + (m.chapterCount ?? 0));
-      expect(suktas, 1027);
+      test('has $expEntries entries', () {
+        expect(entries.length, expEntries);
+      });
+
+      test('verseCount sums to $expVerses', () {
+        final sum =
+            entries.fold<int>(0, (acc, m) => acc + (m.verseCount ?? 0));
+        expect(sum, expVerses);
+      });
     });
+  });
+
+  test('Rigveda sums to 1,027 hymns (suktas)', () {
+    final suktas = scriptureChaptersFor('rigveda')!
+        .fold<int>(0, (acc, m) => acc + (m.chapterCount ?? 0));
+    expect(suktas, 1027);
   });
 
   test('selected-verses set is populated and lower-case ids', () {
