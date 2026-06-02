@@ -26,6 +26,7 @@ decision, or a verified external resource). Last updated 2026-06-02.
 | 4/14 | **Report/flag button on every AI message** → Crashlytics + analytics + AppLogger + confirm toast | ✅ FIXED |
 | 4 | **Crisis interception scaffold** (narrow first-person self-harm only; no Gemini call, no quota burn) + system-prompt hardening | ✅ FIXED (mechanism; resource content is MANUAL — see below) |
 | 8 | `ai_chat_message` analytics event | ✅ FIXED — wired in both chat dispatches |
+| 8 | User properties `streak_days` / `preferred_theme` / `font_size` | ✅ FIXED — `setUserProperty` wired at streak/theme/font change points |
 | 15 | `flutter analyze lib --fatal-infos` = 0 issues; no `print()`; no hardcoded keys | ✅ verified |
 
 ---
@@ -42,7 +43,6 @@ decision, or a verified external resource). Last updated 2026-06-02.
 ### Recommended, but native deps / accounts / devices (do not auto-add)
 - **§9 Shorebird** — `shorebird login` / `init` / `release android`; needs account. Note: can't patch the SQLite DB or assets.
 - **§10 `in_app_update`** — adds a native plugin; needs Play context + on-device test of the update flow. Not added blind.
-- **§8 user properties** (`streak_days`, `preferred_theme`, `font_size`) — not yet set; small follow-up, wire `setUserProperty` at the theme/font/streak change points.
 
 ### Play Console / account / device (cannot be done from code)
 - **§3 Closed testing** — 12+ testers opted-in 14 continuous days (account post-2023-11-13).
