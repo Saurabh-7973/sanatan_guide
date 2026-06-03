@@ -21,6 +21,7 @@ import 'package:sanatan_guide/core/panchanga/panchanga.dart';
 import 'package:sanatan_guide/core/panchanga/panchanga_names.dart';
 import 'package:sanatan_guide/core/utils/panchang_utils.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
 import 'package:sanatan_guide/presentation/features/festivals/pages/festival_detail_page.dart';
 import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
@@ -207,6 +208,9 @@ class _AlmanacViewState extends State<_AlmanacView> {
   }
 
   void _openFestival(Festival festival) {
+    // Pushed via root Navigator (not go_router), so the analytics observer
+    // doesn't see it — content_opened is the only festival-detail signal.
+    AnalyticsService.contentOpened(type: 'festival', id: festival.id);
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => FestivalDetailPage(festival: festival),
@@ -232,7 +236,11 @@ class _AlmanacViewState extends State<_AlmanacView> {
         _FilterStrip(
           selected: _filter,
           isDark: isDark,
-          onSelect: (c) => setState(() => _filter = c),
+          onSelect: (c) {
+            AnalyticsService.featureUsed('festival_filter',
+                extra: {'category': c?.name ?? 'all'});
+            setState(() => _filter = c);
+          },
         ),
         const SizedBox(height: 4),
         Expanded(

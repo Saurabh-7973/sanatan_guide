@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
@@ -34,9 +35,13 @@ class VerseHeroCard extends ConsumerWidget {
           isDark: isDark,
           verse: verse,
           isFirstDay: isFirstDay,
-          onTap: () => context.push(
-            '/browse/${verse.scripture.code}/verse/${verse.id}',
-          ),
+          onTap: () {
+            AnalyticsService.featureUsed('home_verse_of_day',
+                extra: {'verse_id': verse.id});
+            context.push(
+              '/browse/${verse.scripture.code}/verse/${verse.id}',
+            );
+          },
         ),
       ),
       loading: () => _LoadingCard(isDark: isDark),

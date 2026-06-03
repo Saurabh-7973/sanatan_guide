@@ -132,9 +132,18 @@ final class NotificationService {
     AppLogger.instance.i('NotificationService initialized');
   }
 
+  /// Guards against two permission flows (onboarding + the Settings reminder
+  /// toggle) firing concurrently — permission_handler throws "A request for
+  /// permissions is already running" if a second request starts mid-flight,
+  /// which surfaced in Crashlytics. While one request is in flight, later
+  /// callers no-op instead of racing.
+  static bool _permissionRequestInFlight = false;
+
   /// Request notification permission on Android 13+ (API 33+).
   /// Call after app is fully loaded, not on first launch screen.
   static Future<bool> requestPermission() async {
+    if (_permissionRequestInFlight) return false;
+    _permissionRequestInFlight = true;
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -183,6 +192,8 @@ final class NotificationService {
         st,
       );
       return false;
+    } finally {
+      _permissionRequestInFlight = false;
     }
   }
 
