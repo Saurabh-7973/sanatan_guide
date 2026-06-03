@@ -58,8 +58,8 @@ Future<Either<Failure, List<Verse>>> searchResults(Ref ref) async {
 
   result.fold((_) {}, (verses) {
     AnalyticsService.searchPerformed(
-      query: query.trim(),
-      filter: filter.label,
+      queryLength: query.trim().length,
+      mode: filter.label,
       resultCount: verses.length,
     );
   });

@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sanatan_guide/core/constants/content_credits.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -386,6 +387,7 @@ class _CreditRow extends StatelessWidget {
 }
 
 Future<void> _openUrl(BuildContext context, Uri url) async {
+  AnalyticsService.externalLink(host: url.host, source: 'credits');
   final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
   if (!ok && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(

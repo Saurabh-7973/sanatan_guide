@@ -26,6 +26,7 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
     AnalyticsService.setPreferredTheme(mode.name);
+    AnalyticsService.settingChanged(setting: 'theme', value: mode.name);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(PrefsKeys.appThemeMode, mode.name);
   }

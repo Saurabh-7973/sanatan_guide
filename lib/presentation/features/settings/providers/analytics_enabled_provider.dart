@@ -31,6 +31,13 @@ class AnalyticsEnabled extends _$AnalyticsEnabled {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(PrefsKeys.privacyAnalyticsEnabled, enabled);
+    // Log the opt-in BEFORE the SDK flag is read for sending; on opt-out the
+    // event is dropped by the disabled SDK, which is the privacy-correct
+    // outcome (we never record that someone turned tracking off).
+    AnalyticsService.settingChanged(
+      setting: 'analytics',
+      value: enabled ? 'on' : 'off',
+    );
     await AnalyticsService.setCollectionEnabled(enabled);
   }
 }

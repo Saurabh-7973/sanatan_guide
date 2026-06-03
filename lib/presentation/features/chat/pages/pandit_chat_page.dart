@@ -150,7 +150,7 @@ class _PanditChatPageState extends State<PanditChatPage> {
       return;
     }
 
-    AnalyticsService.aiChatMessage();
+    AnalyticsService.aiUsed(feature: 'chat', surface: 'pandit');
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: true));
       _controller.clear();

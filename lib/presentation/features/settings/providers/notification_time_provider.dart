@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sanatan_guide/core/constants/preferences_keys.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/festival_notification_scheduler.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
@@ -33,6 +34,10 @@ class NotificationTimeNotifier extends _$NotificationTimeNotifier {
 
   Future<void> setTime(TimeOfDay time) async {
     state = time;
+    AnalyticsService.settingChanged(
+      setting: 'reminder_time',
+      value: '${time.hour}:${time.minute.toString().padLeft(2, '0')}',
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(PrefsKeys.notifVerseHour, time.hour);
     await prefs.setInt(PrefsKeys.notifVerseMinute, time.minute);
@@ -62,6 +67,10 @@ class NotificationEnabled extends _$NotificationEnabled {
 
   Future<void> setEnabled(bool enabled) async {
     state = enabled;
+    AnalyticsService.settingChanged(
+      setting: 'daily_reminder',
+      value: enabled ? 'on' : 'off',
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(PrefsKeys.notifVerseEnabled, enabled);
     // Opting in for the first time → ask the OS for notification + exact
@@ -97,6 +106,10 @@ class FestivalAlertsEnabled extends _$FestivalAlertsEnabled {
 
   Future<void> setEnabled(bool enabled) async {
     state = enabled;
+    AnalyticsService.settingChanged(
+      setting: 'festival_alerts',
+      value: enabled ? 'on' : 'off',
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(PrefsKeys.notifFestivalAlertsEnabled, enabled);
     // Trigger the scheduler immediately so the user doesn't have to

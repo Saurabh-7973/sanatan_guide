@@ -168,7 +168,11 @@ class _VerseChatPageState extends ConsumerState<VerseChatPage> {
       return;
     }
 
-    AnalyticsService.aiChatMessage(verseId: verse.id);
+    AnalyticsService.aiUsed(
+      feature: 'chat',
+      surface: 'verse_chat',
+      verseId: verse.id,
+    );
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: true));
       _controller.clear();

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/router/app_routes.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/crashlytics_observer.dart';
 import 'package:sanatan_guide/core/services/notification_service.dart';
 import 'package:sanatan_guide/core/services/onboarding_service.dart';
@@ -39,11 +40,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: kDebugMode,
-    observers: [CrashlyticsObserver()],
+    observers: [CrashlyticsObserver(), AnalyticsService.observer],
     redirect: (context, state) {
       final deepLink = NotificationService.pendingDeepLink;
       if (deepLink != null && deepLink.isNotEmpty) {
         NotificationService.pendingDeepLink = null;
+        AnalyticsService.notificationOpened();
         return deepLink;
       }
       return null;
@@ -51,10 +53,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: AppRoutes.splash,
+        name: 'splash',
         builder: (_, __) => const _SplashPage(),
       ),
       GoRoute(
         path: '/learn/:moduleId',
+        name: 'module_reader',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (ctx, state) {
           final moduleId = state.pathParameters['moduleId']!;
@@ -67,6 +71,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/browse/:scriptureId/verse/:verseId',
+        name: 'verse_detail',
         pageBuilder: (ctx, state) {
           final verseId = state.pathParameters['verseId']!;
           return _fadeSlideUpTransition(
@@ -78,6 +83,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/browse/:scriptureId/verse/:verseId/chat',
+        name: 'verse_chat',
         pageBuilder: (ctx, state) {
           final verseId = state.pathParameters['verseId']!;
           final extra = state.extra;
@@ -93,6 +99,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/browse/:scriptureId/chapter/:chapterNum',
+        name: 'verse_list',
         pageBuilder: (ctx, state) {
           final scriptureId = state.pathParameters['scriptureId']!;
           final chapterNum = int.parse(state.pathParameters['chapterNum']!);
@@ -111,6 +118,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/browse/:scriptureId',
+        name: 'chapter_list',
         pageBuilder: (ctx, state) {
           final scriptureId = state.pathParameters['scriptureId']!;
           return _slideTransition(
@@ -121,11 +129,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding',
+        name: 'onboarding',
         builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.search,
+        name: 'search',
         pageBuilder: (_, state) => _fadeSlideUpTransition(
           state,
           const SearchPage(),
@@ -136,36 +146,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.bookmarks,
+        name: 'bookmarks',
         pageBuilder: (_, state) =>
             _fadeSlideUpTransition(state, const BookmarksPage()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.festivals,
+        name: 'festivals',
         pageBuilder: (_, state) =>
             _fadeSlideUpTransition(state, const FestivalCalendarPage()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.settings,
+        name: 'settings',
         pageBuilder: (_, state) =>
             _fadeSlideUpTransition(state, const SettingsPage()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: '/credits',
+        name: 'credits',
         pageBuilder: (_, state) =>
             _fadeSlideUpTransition(state, const CreditsPage()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.feedback,
+        name: 'feedback',
         pageBuilder: (_, state) =>
             _fadeSlideUpTransition(state, const FeedbackPage()),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.chatGeneral,
+        name: 'pandit_chat',
         pageBuilder: (_, state) => _fadeSlideUpTransition(
           state,
           const PanditChatPage(),
@@ -177,14 +193,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
+            name: 'home',
             builder: (_, __) => const HomePage(),
           ),
           GoRoute(
             path: '/learn',
+            name: 'learning_path',
             builder: (_, __) => const LearningPathPage(),
           ),
           GoRoute(
             path: AppRoutes.browse,
+            name: 'library',
             builder: (_, __) => const ScriptureLibraryPage(),
           ),
         ],
@@ -252,6 +271,7 @@ CustomTransitionPage<void> _slideTransition(
 ) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
+    name: state.name,
     child: child,
     transitionDuration: _kTransitionDuration,
     reverseTransitionDuration: const Duration(milliseconds: 250),
@@ -277,6 +297,7 @@ CustomTransitionPage<void> _fadeSlideUpTransition(
 ) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
+    name: state.name,
     child: child,
     transitionDuration: _kTransitionDuration,
     reverseTransitionDuration: const Duration(milliseconds: 250),

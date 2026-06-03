@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/utils/coordinate_parser.dart';
 import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -172,9 +173,15 @@ List<InlineSpan> _buildSpans({
             label: t.text,
             saffron: saffron,
             glow: saffronGlow,
-            onTap: () => context.push(
-              '/browse/${t.coord!.scripture.code}/verse/${t.coord!.verseId}',
-            ),
+            onTap: () {
+              AnalyticsService.aiUsed(
+                feature: 'citation_tap',
+                verseId: t.coord!.verseId,
+              );
+              context.push(
+                '/browse/${t.coord!.scripture.code}/verse/${t.coord!.verseId}',
+              );
+            },
           ),
         ));
     }

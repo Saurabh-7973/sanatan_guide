@@ -29,6 +29,10 @@ class FontSizeNotifier extends _$FontSizeNotifier {
     final clamped = size.clamp(kMinFontSize, kMaxFontSize);
     state = clamped;
     AnalyticsService.setFontSize(clamped);
+    AnalyticsService.settingChanged(
+      setting: 'font_size',
+      value: clamped.round().toString(),
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(PrefsKeys.appFontSize, clamped);
   }

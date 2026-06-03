@@ -147,19 +147,31 @@ class SettingsPage extends ConsumerWidget {
                         isDark: isDark,
                         title: l10n.settingsPrivacyPolicy,
                         trailing: _ExternalIcon(isDark: isDark),
-                        onTap: () => launchUrl(
-                          Uri.parse(_kPrivacyUrl),
-                          mode: LaunchMode.externalApplication,
-                        ),
+                        onTap: () {
+                          AnalyticsService.externalLink(
+                            host: Uri.parse(_kPrivacyUrl).host,
+                            source: 'privacy',
+                          );
+                          launchUrl(
+                            Uri.parse(_kPrivacyUrl),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
                       ),
                       _Row(
                         isDark: isDark,
                         title: l10n.settingsTermsOfService,
                         trailing: _ExternalIcon(isDark: isDark),
-                        onTap: () => launchUrl(
-                          Uri.parse(_kTermsUrl),
-                          mode: LaunchMode.externalApplication,
-                        ),
+                        onTap: () {
+                          AnalyticsService.externalLink(
+                            host: Uri.parse(_kTermsUrl).host,
+                            source: 'terms',
+                          );
+                          launchUrl(
+                            Uri.parse(_kTermsUrl),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
                       ),
                       _Row(
                         isDark: isDark,
@@ -520,8 +532,8 @@ class _ThemeSegmented extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () {
+          // Analytics logged centrally in themeModeProvider.setThemeMode.
           ref.read(themeModeProvider.notifier).setThemeMode(mode);
-          AnalyticsService.darkModeToggled(enabled: mode == ThemeMode.dark);
         },
         child: Container(
           width: 36,

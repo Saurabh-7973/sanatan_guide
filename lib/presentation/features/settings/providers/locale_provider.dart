@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sanatan_guide/core/constants/preferences_keys.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 
 part 'locale_provider.g.dart';
 
@@ -24,6 +25,10 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   Future<void> setLocale(Locale? locale) async {
     state = locale;
+    AnalyticsService.settingChanged(
+      setting: 'language',
+      value: locale?.languageCode ?? 'system',
+    );
     final prefs = await SharedPreferences.getInstance();
     if (locale == null) {
       await prefs.remove(PrefsKeys.appLocale);

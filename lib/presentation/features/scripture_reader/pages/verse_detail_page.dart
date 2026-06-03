@@ -892,6 +892,13 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
 
   void _selectWord(WordMeaning? wm) {
     if (_selectedWord == wm) return;
+    if (wm != null) {
+      AnalyticsService.aiUsed(
+        feature: 'gloss',
+        surface: 'verse_detail',
+        verseId: verse.id,
+      );
+    }
     setState(() => _selectedWord = wm);
   }
 
@@ -911,7 +918,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
           showHeritageToast(context, 'Copied to clipboard');
         },
         onShare: (text) {
-          AnalyticsService.verseShared(verse.id);
+          AnalyticsService.verseShared(verseId: verse.id);
           Navigator.of(sheetCtx).pop();
           Share.share(text);
         },
@@ -923,6 +930,11 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
 
   Future<void> _startExplain() async {
     if (_explaining) return;
+    AnalyticsService.aiUsed(
+      feature: 'explain',
+      surface: 'verse_detail',
+      verseId: verse.id,
+    );
     setState(() {
       _explaining = true;
       _explainError = null;
@@ -1145,8 +1157,10 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         translationOn: translitOn,
         translationAvailable:
             verse.transliteration?.trim().isNotEmpty ?? false,
-        onToggleTranslation: () =>
-            ref.read(transliterationEnabledProvider.notifier).toggle(),
+        onToggleTranslation: () {
+          AnalyticsService.featureUsed('transliteration_toggle');
+          ref.read(transliterationEnabledProvider.notifier).toggle();
+        },
         onOpenNotes: _openNotes,
         hasNote: hasNote,
         child: Stack(
@@ -2535,7 +2549,10 @@ class _BookmarkAction extends ConsumerWidget {
           } catch (_) {}
           final BookmarksDao dao = await ref.read(bookmarksDaoProvider.future);
           await dao.toggleBookmark(verseId);
-          if (!isBookmarked) AnalyticsService.verseBookmarked(verseId);
+          AnalyticsService.verseBookmarked(
+            verseId: verseId,
+            added: !isBookmarked,
+          );
         },
         child: ExcludeSemantics(
           child: RibbonBookmarkGlyph(

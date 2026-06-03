@@ -40,6 +40,12 @@ class _ModuleReaderPageState extends ConsumerState<ModuleReaderPage> {
   ProviderContainer? _container;
 
   @override
+  void initState() {
+    super.initState();
+    AnalyticsService.moduleStarted(widget.moduleId);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _container = ProviderScope.containerOf(context, listen: false);
@@ -1105,6 +1111,7 @@ class _BookCard extends StatelessWidget {
         highlightColor: saffron.withValues(alpha: 0.04),
         onTap: () async {
           final uri = Uri.parse(rec.url);
+          AnalyticsService.externalLink(host: uri.host, source: 'module');
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           }

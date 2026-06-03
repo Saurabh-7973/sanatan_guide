@@ -4,6 +4,7 @@ import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_top_bar.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -203,6 +204,7 @@ class _ScriptureLibraryPageState extends ConsumerState<ScriptureLibraryPage> {
 }
 
 void _openScripture(BuildContext context, String id) {
+  AnalyticsService.contentOpened(type: 'scripture', id: id);
   if (_kSingleChapterBrowse.contains(id)) {
     context.push('/browse/$id/chapter/1');
   } else {

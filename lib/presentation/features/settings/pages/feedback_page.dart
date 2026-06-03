@@ -8,6 +8,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/mockup_icons.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
@@ -109,6 +110,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       query: 'subject=${Uri.encodeComponent('[Sanatan Guide · '
           '${kind.mailTag}]')}&body=${Uri.encodeComponent(buffer.toString())}',
     );
+    AnalyticsService.feedbackSubmitted(category: kind.name);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (mounted) {

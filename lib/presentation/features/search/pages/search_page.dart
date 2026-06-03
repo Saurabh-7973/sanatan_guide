@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanatan_guide/core/router/app_routes.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/services/gemini_service.dart';
 import 'package:sanatan_guide/core/utils/coordinate_parser.dart';
 import 'package:sanatan_guide/core/utils/devanagari.dart';
@@ -119,7 +120,11 @@ class _SearchPageState extends ConsumerState<SearchPage>
                       _setQuery(q);
                       _commitRecent(q);
                     },
-                    onPandit: () => context.push(AppRoutes.chatGeneral),
+                    onPandit: () {
+                      AnalyticsService.featureUsed('pandit_cta',
+                          extra: {'source': 'search'});
+                      context.push(AppRoutes.chatGeneral);
+                    },
                   ),
                 ),
               ],
@@ -1197,6 +1202,9 @@ class _CoordResolvedCard extends ConsumerWidget {
         splashColor: Colors.transparent,
         highlightColor: saffron.withValues(alpha: 0.04),
         onTap: () {
+          AnalyticsService.searchResultTapped(
+            scripture: coord.scripture.code,
+          );
           _recordRecentOnTap(ref, query);
           context.push(
             browseVersePath(
@@ -1440,6 +1448,9 @@ class _ResultRow extends ConsumerWidget {
         splashColor: Colors.transparent,
         highlightColor: saffron.withValues(alpha: 0.04),
         onTap: () {
+          AnalyticsService.searchResultTapped(
+            scripture: verse.scripture.code,
+          );
           _recordRecentOnTap(ref, query);
           context.push(
             browseVersePath(

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sanatan_guide/core/constants/preferences_keys.dart';
+import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/core/utils/app_logger.dart';
 
 part 'crashlytics_enabled_provider.g.dart';
@@ -34,6 +35,10 @@ class CrashlyticsEnabled extends _$CrashlyticsEnabled {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(PrefsKeys.privacyCrashlyticsEnabled, enabled);
+    AnalyticsService.settingChanged(
+      setting: 'crashlytics',
+      value: enabled ? 'on' : 'off',
+    );
     await _apply(enabled);
   }
 
