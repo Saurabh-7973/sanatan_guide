@@ -44,7 +44,7 @@ final class LocaleNotifierProvider
   }
 }
 
-String _$localeNotifierHash() => r'c3f96af4c84d339d5abea3693866982adc03b09e';
+String _$localeNotifierHash() => r'eaf118cfeecd941c7ba9891cae2bd0b9b5e4122d';
 
 /// Null → follow device locale. Non-null → force this locale.
 

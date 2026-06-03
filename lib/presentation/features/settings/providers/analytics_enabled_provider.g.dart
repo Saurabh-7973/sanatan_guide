@@ -8,19 +8,22 @@ part of 'analytics_enabled_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
+/// User-facing opt-out for Firebase Analytics. Default ON in release, OFF in
+/// debug (so dev/test runs don't pollute production GA4 data). Writing to the
 /// notifier persists to SharedPreferences and immediately flips the SDK-level
 /// collection flag so no further events are buffered or sent.
 
 @ProviderFor(AnalyticsEnabled)
 final analyticsEnabledProvider = AnalyticsEnabledProvider._();
 
-/// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
+/// User-facing opt-out for Firebase Analytics. Default ON in release, OFF in
+/// debug (so dev/test runs don't pollute production GA4 data). Writing to the
 /// notifier persists to SharedPreferences and immediately flips the SDK-level
 /// collection flag so no further events are buffered or sent.
 final class AnalyticsEnabledProvider
     extends $NotifierProvider<AnalyticsEnabled, bool> {
-  /// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
+  /// User-facing opt-out for Firebase Analytics. Default ON in release, OFF in
+  /// debug (so dev/test runs don't pollute production GA4 data). Writing to the
   /// notifier persists to SharedPreferences and immediately flips the SDK-level
   /// collection flag so no further events are buffered or sent.
   AnalyticsEnabledProvider._()
@@ -50,9 +53,10 @@ final class AnalyticsEnabledProvider
   }
 }
 
-String _$analyticsEnabledHash() => r'd7279ad510c8f26a9dbf644f5ddf43a94d63e482';
+String _$analyticsEnabledHash() => r'85fcdb0fd0e8da7765264f8de428560589344308';
 
-/// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
+/// User-facing opt-out for Firebase Analytics. Default ON in release, OFF in
+/// debug (so dev/test runs don't pollute production GA4 data). Writing to the
 /// notifier persists to SharedPreferences and immediately flips the SDK-level
 /// collection flag so no further events are buffered or sent.
 
