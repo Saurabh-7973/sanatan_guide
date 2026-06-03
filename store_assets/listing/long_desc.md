@@ -15,9 +15,10 @@ WHAT'S INSIDE
    Arthaśāstra · Tirukkuṟaḷ · and more.
 
 🕉 Sanskrit original · English translation
-   See every verse in Devanāgarī, romanised with full diacritics, and
-   translated by published public-domain translators (Sivananda,
-   Prabhupada, Müller, Griffith, others — all attributed).
+   See every verse in Devanāgarī with an English translation by published
+   public-domain translators (Sivananda, Prabhupada, Müller, Griffith,
+   others — all attributed). Romanised IAST transliteration is available
+   for the Bhagavad Gītā.
 
 🪔 Daily verse, every morning
    A new verse waits each day. Schedule a reminder, build a streak, mark
@@ -68,7 +69,8 @@ WHO IT'S FOR
 — Devotees who want a clean daily reading app without the noise.
 — Students of Indology, philosophy, or comparative religion who want
   search + bookmarks across canonical texts.
-— Sanskrit learners who want IAST + Devanāgarī side by side.
+— Sanskrit learners who want Devanāgarī with translation (and IAST
+  transliteration for the Bhagavad Gītā).
 
 ──────────
 
