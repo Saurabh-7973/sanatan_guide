@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,7 +8,8 @@ import 'package:sanatan_guide/core/services/analytics_service.dart';
 part 'analytics_enabled_provider.g.dart';
 
 
-/// User-facing opt-out for Firebase Analytics. Default ON. Writing to the
+/// User-facing opt-out for Firebase Analytics. Default ON in release, OFF in
+/// debug (so dev/test runs don't pollute production GA4 data). Writing to the
 /// notifier persists to SharedPreferences and immediately flips the SDK-level
 /// collection flag so no further events are buffered or sent.
 @Riverpod(keepAlive: true)
@@ -15,7 +17,7 @@ class AnalyticsEnabled extends _$AnalyticsEnabled {
   @override
   bool build() {
     _load();
-    return true;
+    return !kDebugMode;
   }
 
   Future<void> _load() async {

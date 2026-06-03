@@ -61,9 +61,12 @@ Future<void> _bootstrap() async {
       prefs.getBool(PrefsKeys.privacyCrashlyticsEnabled) ?? !kDebugMode;
   await FirebaseCrashlytics.instance
       .setCrashlyticsCollectionEnabled(crashlyticsEnabled);
-  // Analytics: default on for everyone, off only if the user opted out.
+  // Analytics: on in release for everyone (off only if the user opted out),
+  // but OFF in debug so dev/test runs don't pollute the production GA4 data.
+  // To test analytics from a debug build, flip the Settings switch (persists a
+  // pref) or use a release/internal-testing build.
   final analyticsEnabled =
-      prefs.getBool(PrefsKeys.privacyAnalyticsEnabled) ?? true;
+      prefs.getBool(PrefsKeys.privacyAnalyticsEnabled) ?? !kDebugMode;
   await AnalyticsService.setCollectionEnabled(analyticsEnabled);
 
   if (!kDebugMode) {
