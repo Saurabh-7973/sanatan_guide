@@ -114,7 +114,10 @@ abstract final class FestivalNotificationScheduler {
             ),
           ),
           payload: f.readingVerseId,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          // inexact: festival alerts don't need exact timing, and exact
+          // alarms throw `exact_alarms_not_permitted` without a runtime grant
+          // (USE_EXACT_ALARM dropped for Play policy). See NotificationService.
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
         );

@@ -150,17 +150,10 @@ final class NotificationService {
       if (android == null) return true;
       final granted = await android.requestNotificationsPermission();
       AppLogger.instance.i('Notification permission granted: $granted');
-      // Also request the exact-alarm permission on Android 12+ so
-      // exactAllowWhileIdle schedules actually fire on time instead of
-      // being demoted to inexact. USE_EXACT_ALARM in the manifest covers
-      // most cases without a runtime prompt, but the call is a no-op
-      // when not needed.
-      try {
-        final exactGranted = await android.requestExactAlarmsPermission();
-        AppLogger.instance.i('Exact alarm permission granted: $exactGranted');
-      } catch (e, st) {
-        AppLogger.instance.w('Exact alarm permission request failed', e, st);
-      }
+      // No exact-alarm permission request: we schedule with
+      // inexactAllowWhileIdle, which needs no SCHEDULE_EXACT_ALARM grant.
+      // Requesting it here would pointlessly bounce the user to a system
+      // settings screen for a capability the app no longer uses.
       // CMF/Nothing OS + Samsung One UI + Xiaomi MIUI aggressively suppress
       // alarms unless the app is explicitly exempt from battery
       // optimisation. The exact-alarm permission is necessary but not
@@ -249,26 +242,34 @@ final class NotificationService {
 
     final notifDetails = NotificationDetails(android: androidDetails);
 
-    // exactAllowWhileIdle = fire at the picked minute even in doze.
-    // Requires SCHEDULE_EXACT_ALARM + USE_EXACT_ALARM in manifest (both
-    // already declared). inexactAllowWhileIdle was deferring delivery for
-    // hours on a real Samsung device — invisible to users who set a
-    // morning verse reminder and never saw it land at the picked time.
-    await _plugin.zonedSchedule(
-      _kVerseOfDayNotifId,
-      title,
-      body,
-      scheduledDate,
-      notifDetails,
-      payload: verseId,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
-
-    AppLogger.instance.i(
-      'Daily notification scheduled for $targetLocal (local) — $verseId',
-    );
+    // inexactAllowWhileIdle: the daily verse reminder does NOT need exact
+    // timing. Exact alarms require SCHEDULE_EXACT_ALARM, which is not granted
+    // by default on Android 13+ (and USE_EXACT_ALARM was dropped for Play
+    // policy). Calling exact without the grant threw
+    // `exact_alarms_not_permitted` on launch and crashed the app for >50% of
+    // users. Inexact never throws; battery-optimisation exemption (requested
+    // separately) keeps delivery reasonably close to the picked time.
+    //
+    // Wrapped in try/catch as a boot-zone safety net — a scheduling failure
+    // must never crash the app at startup.
+    try {
+      await _plugin.zonedSchedule(
+        _kVerseOfDayNotifId,
+        title,
+        body,
+        scheduledDate,
+        notifDetails,
+        payload: verseId,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      AppLogger.instance.i(
+        'Daily notification scheduled for $targetLocal (local) — $verseId',
+      );
+    } catch (e, st) {
+      AppLogger.instance.w('Daily notification schedule failed', e, st);
+    }
   }
 
   /// Cancel the daily verse notification.
@@ -315,7 +316,7 @@ final class NotificationService {
       scheduledDate,
       NotificationDetails(android: androidDetails),
       payload: verseId,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );

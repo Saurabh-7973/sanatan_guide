@@ -5,14 +5,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!-- SCHEDULE_EXACT_ALARM only: lets us request exact alarms for the daily
-         verse reminder. NOT category-restricted by Play (auto-granted on
-         Android ≤13; Android 14+ routes the user to Settings via
-         requestExactAlarmsPermission(), falls back to inexact if denied).
-         USE_EXACT_ALARM was removed — Play restricts it to alarm-clock /
-         calendar apps only, which a scripture reader is not. The plugin's
-         own manifest may still merge USE_EXACT_ALARM in, so strip it. -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- No exact-alarm permissions. The app schedules notifications with
+         inexactAllowWhileIdle, which needs neither SCHEDULE_EXACT_ALARM nor
+         USE_EXACT_ALARM. Both are stripped: USE_EXACT_ALARM is Play-restricted
+         to alarm-clock/calendar apps, and SCHEDULE_EXACT_ALARM (declared
+         earlier) caused `exact_alarms_not_permitted` crashes on Android 13+
+         where it isn't granted by default. The flutter_local_notifications
+         plugin merges both into its own manifest, so remove them explicitly. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"
         tools:node="remove"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
