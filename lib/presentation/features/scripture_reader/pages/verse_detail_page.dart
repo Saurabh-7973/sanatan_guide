@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,6 +28,7 @@ import 'package:sanatan_guide/domain/entities/scripture.dart';
 import 'package:sanatan_guide/domain/entities/verse.dart';
 import 'package:sanatan_guide/presentation/features/bookmarks/providers/bookmarks_provider.dart';
 import 'package:sanatan_guide/presentation/features/home/providers/verse_of_day_provider.dart';
+import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_browser_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/chapter_progress_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/providers/verse_detail_provider.dart';
 import 'package:sanatan_guide/presentation/features/scripture_reader/widgets/verse_detail_glyphs.dart';
@@ -807,6 +812,9 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
               chapterReadCountProvider(
                   v.scripture.code, v.chapterNum, v.bookNum),
             )
+            ..invalidate(
+              chapterVersesProvider(v.scripture.code, v.chapterNum, v.bookNum),
+            )
             ..invalidate(scriptureReadCountsProvider)
             ..invalidate(scriptureChapterReadCountsProvider(v.scripture.code));
         }
@@ -920,7 +928,6 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         onShare: (text) {
           AnalyticsService.verseShared(verseId: verse.id);
           Navigator.of(sheetCtx).pop();
-          Share.share(text);
         },
       ),
     );
@@ -1155,8 +1162,7 @@ class _VerseBodyState extends ConsumerState<_VerseBody> {
         position: position,
         onShare: _share,
         translationOn: translitOn,
-        translationAvailable:
-            verse.transliteration?.trim().isNotEmpty ?? false,
+        translationAvailable: verse.transliteration?.trim().isNotEmpty ?? false,
         onToggleTranslation: () {
           AnalyticsService.featureUsed('transliteration_toggle');
           ref.read(transliterationEnabledProvider.notifier).toggle();
@@ -2632,13 +2638,50 @@ class _ShareSheet extends StatefulWidget {
 class _ShareSheetState extends State<_ShareSheet> {
   _ShareFormat _format = _ShareFormat.withTranslation;
 
+  /// Wraps the preview card so it can be rasterised for image sharing.
+  final GlobalKey _shareCardKey = GlobalKey();
+
+  /// Shares the on-screen preview card as a PNG, falling back to plain
+  /// text if the capture fails for any reason.
+  Future<void> _onShareTap() async {
+    final text = _buildShareText();
+    final imagePath = await _captureCard();
+    widget.onShare(text);
+    if (imagePath != null) {
+      await Share.shareXFiles(
+        [XFile(imagePath, mimeType: 'image/png')],
+        text: text,
+      );
+    } else {
+      await Share.share(text);
+    }
+  }
+
+  Future<String?> _captureCard() async {
+    try {
+      final boundary = _shareCardKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final image = await boundary.toImage(pixelRatio: 3);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return null;
+      final bytes = byteData.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/sanatan_verse_${widget.verse.id}.png');
+      await file.writeAsBytes(bytes);
+      return file.path;
+    } catch (e, st) {
+      AppLogger.instance.e('Share card capture failed', e, st);
+      return null;
+    }
+  }
+
   String _buildShareText() {
     final v = widget.verse;
     final coord = '${v.scripture.displayNameSafe} '
         '${v.chapterNum}.${v.verseNum}';
     final sanskrit = v.sanskrit.trim();
     final english = v.english?.trim() ?? '';
-    const link = 'https://sanatanguide.app';
     final buf = StringBuffer();
     switch (_format) {
       case _ShareFormat.sanskritOnly:
@@ -2668,7 +2711,7 @@ class _ShareSheetState extends State<_ShareSheet> {
         }
         buf
           ..writeln()
-          ..writeln('— Sanatan Guide · $link');
+          ..writeln('— Sanatan Guide');
     }
     return buf.toString().trimRight();
   }
@@ -2819,95 +2862,96 @@ class _ShareSheetState extends State<_ShareSheet> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    // Preview card.
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20, 26, 20, 18),
-                      decoration: BoxDecoration(
-                        color: surface,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: divider),
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            top: -16,
-                            child: _SharePreviewBinding(
-                              divider: divider,
-                              saffron: saffron,
+                    // Preview card — also rasterised for image sharing.
+                    RepaintBoundary(
+                      key: _shareCardKey,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(20, 26, 20, 18),
+                        decoration: BoxDecoration(
+                          color: surface,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: divider),
+                        ),
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              top: -16,
+                              child: _SharePreviewBinding(
+                                divider: divider,
+                                saffron: saffron,
+                              ),
                             ),
-                          ),
-                          // SizedBox forces the column to fill the card
-                          // width — without it the Column takes the intrinsic
-                          // width of its widest child (so the Sanskrit-only
-                          // format reads left-aligned when the single-line
-                          // Sanskrit is narrower than the card).
-                          SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '‖ ${v.scripture.displayNameSafe} · '
-                                  '$fullCoordDeva ‖',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: Fonts.deva,
-                                    fontFamilyFallback: AppFontFallback.deva,
-                                    fontSize: 12,
-                                    color: saffron,
+                            // SizedBox forces the column to fill the card
+                            // width — without it the Column takes the intrinsic
+                            // width of its widest child (so the Sanskrit-only
+                            // format reads left-aligned when the single-line
+                            // Sanskrit is narrower than the card).
+                            SizedBox(
+                              width: double.infinity,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '‖ ${v.scripture.displayNameSafe} · '
+                                    '$fullCoordDeva ‖',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: Fonts.deva,
+                                      fontFamilyFallback: AppFontFallback.deva,
+                                      fontSize: 12,
+                                      color: saffron,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  v.sanskrit.trim(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: Fonts.deva,
-                                    fontFamilyFallback: AppFontFallback.deva,
-                                    fontSize: 16,
-                                    height: 1.6,
-                                    color: cream,
-                                  ),
-                                ),
-                                if (_format != _ShareFormat.sanskritOnly &&
-                                    (v.english?.trim().isNotEmpty ??
-                                        false)) ...[
                                   const SizedBox(height: 12),
                                   Text(
-                                    '"${v.english!.trim()}"',
+                                    v.sanskrit.trim(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: Fonts.deva,
+                                      fontFamilyFallback: AppFontFallback.deva,
+                                      fontSize: 16,
+                                      height: 1.6,
+                                      color: cream,
+                                    ),
+                                  ),
+                                  if (_format != _ShareFormat.sanskritOnly &&
+                                      (v.english?.trim().isNotEmpty ??
+                                          false)) ...[
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '"${v.english!.trim()}"',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: Fonts.serif,
+                                        fontFamilyFallback:
+                                            AppFontFallback.latin,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 12.5,
+                                        height: 1.5,
+                                        color: text2,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Sanatan Guide',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: Fonts.serif,
                                       fontFamilyFallback: AppFontFallback.latin,
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 12.5,
-                                      height: 1.5,
-                                      color: text2,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.08 * 11,
+                                      color: saffron,
                                     ),
                                   ),
                                 ],
-                                if (_format == _ShareFormat.fullCitation) ...[
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'sanatanguide.app/'
-                                    '${v.scripture.shortCode}/'
-                                    '${v.chapterNum}/${v.verseNum}',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: Fonts.sans,
-                                      fontFamilyFallback: AppFontFallback.latin,
-                                      fontSize: 10,
-                                      letterSpacing: 0.06 * 10,
-                                      color: text3,
-                                    ),
-                                  ),
-                                ],
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -2932,7 +2976,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                       bg: saffron,
                       fg: onSaffron,
                       enabled: true,
-                      onTap: () => widget.onShare(_buildShareText()),
+                      onTap: _onShareTap,
                     ),
                   ],
                 ),
