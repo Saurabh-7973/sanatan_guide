@@ -1553,25 +1553,11 @@ const _kFamilies = <_Family>[
       ),
     ],
   ),
-  _Family(
-    kind: _FamilyKind.tamil,
-    devaName: 'தமிழ் சாஸ்திரம்',
-    englishLabel: 'Tamil sacred corpus',
-    metaLabel: '1 TEXT',
-    shortLabel: 'TAMIL',
-    description: 'The southern stream — ethics in couplets, devotion in song.',
-    scriptures: [
-      _Scripture(
-        id: 'tirukkural',
-        devaName: 'திருக்குறள்',
-        englishName: 'Tirukkuṟaḷ',
-        verseCount: 1326,
-        unitLabel: 'couplets',
-        subdivision: 'Tiruvaḷḷuvar',
-        aliases: ['kural', 'tirukkural'],
-      ),
-    ],
-  ),
+  // Tamil family (Tirukkuṟaḷ) disabled for v1: the bundled couplets ship with
+  // only the second line of each kural (1,325 of 1,326 rows are ≤4 words, no
+  // first line) and no translation — unfit to display. Re-enable once the
+  // full couplets + translation are seeded. Data stays in the DB, just not
+  // surfaced. See CONTENT_INVENTORY.md.
 ];
 
 // ============================================================
