@@ -40,8 +40,11 @@ class ContinueStrip extends ConsumerWidget {
     return _StripShell(
       isDark: isDark,
       glyph: _StripGlyph.resume,
-      label:
-          streak > 0 ? 'CONTINUE  ·  $streak DAY STREAK' : 'CONTINUE READING',
+      // Spell out that the streak is reading-based — a beta tester couldn't
+      // tell whether it counted app opens or a daily reading task.
+      label: streak > 0
+          ? 'CONTINUE  ·  $streak-DAY READING STREAK'
+          : 'CONTINUE READING',
       title: '${scripture.displayName} · $verseLabel',
       progressBeads: beadsFilled,
       onTap: () => context.push(
