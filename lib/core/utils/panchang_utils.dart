@@ -321,6 +321,40 @@ abstract final class PanchangUtils {
     'Ravivara': 'रविवार',
   };
 
+  static const Map<String, String> _tithiIast = {
+    'Pratipada': 'Pratipadā',
+    'Dwitiya': 'Dvitīyā',
+    'Tritiya': 'Tṛtīyā',
+    'Chaturthi': 'Caturthī',
+    'Panchami': 'Pañcamī',
+    'Shashthi': 'Ṣaṣṭhī',
+    'Saptami': 'Saptamī',
+    'Ashtami': 'Aṣṭamī',
+    'Navami': 'Navamī',
+    'Dashami': 'Daśamī',
+    'Ekadashi': 'Ekādaśī',
+    'Dwadashi': 'Dvādaśī',
+    'Trayodashi': 'Trayodaśī',
+    'Chaturdashi': 'Caturdaśī',
+    'Purnima': 'Pūrṇimā',
+    'Amavasya': 'Amāvāsyā',
+  };
+
+  static const Map<String, String> _pakshaIast = {
+    'Shukla Paksha': 'Śukla',
+    'Krishna Paksha': 'Kṛṣṇa',
+  };
+
+  static const Map<String, String> _varaIast = {
+    'Somavara': 'Somavāra',
+    'Mangalavara': 'Maṅgalavāra',
+    'Budhavara': 'Budhavāra',
+    'Guruvara': 'Guruvāra',
+    'Shukravara': 'Śukravāra',
+    'Shanivara': 'Śanivāra',
+    'Ravivara': 'Ravivāra',
+  };
+
   static String monthDeva(String monthName) =>
       _hinduMonthDeva[monthName] ?? monthName;
 
@@ -331,9 +365,19 @@ abstract final class PanchangUtils {
   static String tithiDeva(String tithiName) =>
       _tithiDeva[tithiName] ?? tithiName;
 
+  /// IAST transliteration of a tithi name (e.g. `Caturdaśī`).
+  static String tithiIast(String tithiName) =>
+      _tithiIast[tithiName] ?? tithiName;
+
   static String pakshaDeva(String paksha) => _pakshaDeva[paksha] ?? paksha;
 
+  /// IAST transliteration of a paksha name (e.g. `Kṛṣṇa`).
+  static String pakshaIast(String paksha) => _pakshaIast[paksha] ?? paksha;
+
   static String varaDeva(String varaName) => _varaDeva[varaName] ?? varaName;
+
+  /// IAST transliteration of a vāra (weekday) name (e.g. `Śanivāra`).
+  static String varaIast(String varaName) => _varaIast[varaName] ?? varaName;
 
   static const List<String> _shuklaTithiNames = [
     'Pratipada',

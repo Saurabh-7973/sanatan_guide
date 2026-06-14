@@ -23,8 +23,10 @@ import 'package:sanatan_guide/core/utils/panchang_utils.dart';
 import 'package:sanatan_guide/data/festivals/festival_data_2026.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:sanatan_guide/domain/entities/festival.dart';
+import 'package:sanatan_guide/domain/entities/script_style.dart';
 import 'package:sanatan_guide/presentation/features/festivals/pages/festival_detail_page.dart';
 import 'package:sanatan_guide/presentation/features/festivals/providers/festival_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/script_style_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
@@ -81,6 +83,7 @@ class FestivalCalendarPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final festivalsAsync = ref.watch(festivalsProvider);
+    final script = ref.watch(scriptStyleProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -91,8 +94,10 @@ class FestivalCalendarPage extends ConsumerWidget {
           SafeArea(
             child: festivalsAsync.when(
               loading: () => const _AlmanacShimmer(),
-              error: (_, __) => _AlmanacView(festivals: festivals2026),
-              data: (festivals) => _AlmanacView(festivals: festivals),
+              error: (_, __) =>
+                  _AlmanacView(festivals: festivals2026, script: script),
+              data: (festivals) =>
+                  _AlmanacView(festivals: festivals, script: script),
             ),
           ),
         ],
@@ -124,9 +129,10 @@ class _LunarSegment {
 // ── Almanac view ────────────────────────────────────────────────────────────
 
 class _AlmanacView extends StatefulWidget {
-  const _AlmanacView({required this.festivals});
+  const _AlmanacView({required this.festivals, required this.script});
 
   final List<Festival> festivals;
+  final ScriptStyle script;
 
   @override
   State<_AlmanacView> createState() => _AlmanacViewState();
@@ -232,6 +238,7 @@ class _AlmanacViewState extends State<_AlmanacView> {
           panchanga: _todayPanchanga,
           date: _today,
           isDark: isDark,
+          script: widget.script,
         ),
         _FilterStrip(
           selected: _filter,
@@ -268,7 +275,11 @@ class _AlmanacViewState extends State<_AlmanacView> {
       slivers.add(
         SliverPersistentHeader(
           pinned: true,
-          delegate: _MonthHeaderDelegate(segment: seg, isDark: isDark),
+          delegate: _MonthHeaderDelegate(
+            segment: seg,
+            isDark: isDark,
+            script: widget.script,
+          ),
         ),
       );
       slivers.add(
@@ -281,6 +292,7 @@ class _AlmanacViewState extends State<_AlmanacView> {
                 festivals: _festivalsOn(cell.date),
                 isToday: cell.date == _today,
                 isDark: isDark,
+                script: widget.script,
                 onTapFestival: _openFestival,
               );
             },
@@ -406,11 +418,13 @@ class _PanchangaBanner extends StatelessWidget {
     required this.panchanga,
     required this.date,
     required this.isDark,
+    required this.script,
   });
 
   final Panchanga panchanga;
   final DateTime date;
   final bool isDark;
+  final ScriptStyle script;
 
   @override
   Widget build(BuildContext context) {
@@ -466,7 +480,9 @@ class _PanchangaBanner extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  panchanga.tithiLabelDeva,
+                  script.showsDevanagari
+                      ? panchanga.tithiLabelDeva
+                      : panchanga.tithiLabelIast,
                   style: TextStyle(
                     fontFamily: Fonts.deva,
                     fontFamilyFallback: AppFontFallback.deva,
@@ -501,33 +517,41 @@ class _PanchangaBanner extends StatelessWidget {
                 Expanded(
                   child: _BannerCell(
                     label: 'Vāra',
-                    value: panchanga.vara.deva,
+                    deva: panchanga.vara.deva,
+                    iast: panchanga.vara.iast,
                     en: _weekdaysFull[date.weekday - 1],
                     isDark: isDark,
+                    script: script,
                   ),
                 ),
                 Expanded(
                   child: _BannerCell(
                     label: 'Nakṣatra',
-                    value: panchanga.nakshatra.deva,
+                    deva: panchanga.nakshatra.deva,
+                    iast: panchanga.nakshatra.iast,
                     en: panchanga.nakshatra.iast,
                     isDark: isDark,
+                    script: script,
                   ),
                 ),
                 Expanded(
                   child: _BannerCell(
                     label: 'Yoga',
-                    value: panchanga.yoga.deva,
+                    deva: panchanga.yoga.deva,
+                    iast: panchanga.yoga.iast,
                     en: panchanga.yoga.iast,
                     isDark: isDark,
+                    script: script,
                   ),
                 ),
                 Expanded(
                   child: _BannerCell(
                     label: 'Karana',
-                    value: panchanga.karana.deva,
+                    deva: panchanga.karana.deva,
+                    iast: panchanga.karana.iast,
                     en: panchanga.karana.iast,
                     isDark: isDark,
+                    script: script,
                   ),
                 ),
               ],
@@ -542,20 +566,31 @@ class _PanchangaBanner extends StatelessWidget {
 class _BannerCell extends StatelessWidget {
   const _BannerCell({
     required this.label,
-    required this.value,
+    required this.deva,
+    required this.iast,
     required this.en,
     required this.isDark,
+    required this.script,
   });
 
   final String label;
-  final String value;
+  final String deva;
+  final String iast;
+
+  /// Secondary romanised gloss shown under the primary form in "Both" mode
+  /// (the English weekday for Vāra, the IAST reading elsewhere).
   final String en;
   final bool isDark;
+  final ScriptStyle script;
 
   @override
   Widget build(BuildContext context) {
     final text3 = isDark ? DColors.text3 : LColors.text3;
     final cream = isDark ? DColors.cream : LColors.text1;
+
+    // Primary form follows the chosen script; the secondary gloss only shows
+    // when both scripts are requested.
+    final primary = script.showsDevanagari ? deva : iast;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,7 +614,7 @@ class _BannerCell extends StatelessWidget {
         ),
         const SizedBox(height: 3),
         Text(
-          value,
+          primary,
           style: TextStyle(
             fontFamily: Fonts.deva,
             fontFamilyFallback: AppFontFallback.deva,
@@ -588,19 +623,21 @@ class _BannerCell extends StatelessWidget {
             color: cream,
           ),
         ),
-        const SizedBox(height: 1),
-        Text(
-          en,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontFamily: Fonts.deva,
-            fontFamilyFallback: AppFontFallback.deva,
-            fontSize: 9,
-            fontWeight: FontWeight.w500,
-            color: text3,
+        if (script.showsDevanagari && script.showsLatin) ...[
+          const SizedBox(height: 1),
+          Text(
+            en,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: Fonts.deva,
+              fontFamilyFallback: AppFontFallback.deva,
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: text3,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -698,10 +735,15 @@ class _FilterPill extends StatelessWidget {
 // ── Sticky lunar-month header ───────────────────────────────────────────────
 
 class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _MonthHeaderDelegate({required this.segment, required this.isDark});
+  _MonthHeaderDelegate({
+    required this.segment,
+    required this.isDark,
+    required this.script,
+  });
 
   final _LunarSegment segment;
   final bool isDark;
+  final ScriptStyle script;
 
   @override
   double get minExtent => 46;
@@ -729,7 +771,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
         textBaseline: TextBaseline.alphabetic,
         children: [
           Text(
-            segment.monthDeva,
+            script.showsDevanagari ? segment.monthDeva : segment.monthIast,
             style: TextStyle(
               fontFamily: Fonts.deva,
               fontFamilyFallback: AppFontFallback.deva,
@@ -738,16 +780,18 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
               color: saffron,
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            segment.monthIast,
-            style: TextStyle(
-              fontFamily: Fonts.deva,
-              fontFamilyFallback: AppFontFallback.deva,
-              fontSize: 12.5,
-              color: text2,
+          if (script.showsDevanagari && script.showsLatin) ...[
+            const SizedBox(width: 8),
+            Text(
+              segment.monthIast,
+              style: TextStyle(
+                fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
+                fontSize: 12.5,
+                color: text2,
+              ),
             ),
-          ),
+          ],
           const Spacer(),
           Text(
             'VS ${segment.vsYear}',
@@ -769,7 +813,8 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_MonthHeaderDelegate old) =>
       old.segment.monthDeva != segment.monthDeva ||
       old.segment.vsYear != segment.vsYear ||
-      old.isDark != isDark;
+      old.isDark != isDark ||
+      old.script != script;
 }
 
 // ── Day row ─────────────────────────────────────────────────────────────────
@@ -780,6 +825,7 @@ class _DayRow extends StatelessWidget {
     required this.festivals,
     required this.isToday,
     required this.isDark,
+    required this.script,
     required this.onTapFestival,
   });
 
@@ -787,6 +833,7 @@ class _DayRow extends StatelessWidget {
   final List<Festival> festivals;
   final bool isToday;
   final bool isDark;
+  final ScriptStyle script;
   final ValueChanged<Festival> onTapFestival;
 
   @override
@@ -822,6 +869,7 @@ class _DayRow extends StatelessWidget {
               panchanga: p,
               festivals: festivals,
               isDark: isDark,
+              script: script,
             ),
           ),
         ],
@@ -904,17 +952,30 @@ class _DayBody extends StatelessWidget {
     required this.panchanga,
     required this.festivals,
     required this.isDark,
+    required this.script,
   });
 
   final Panchanga panchanga;
   final List<Festival> festivals;
   final bool isDark;
+  final ScriptStyle script;
 
   @override
   Widget build(BuildContext context) {
     final text1 = isDark ? DColors.text1 : LColors.text1;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final text3 = isDark ? DColors.text3 : LColors.text3;
+
+    // Paksha is always shown as a small uppercase prefix; the tithi follows
+    // in the chosen script. The nakṣatra line shows the primary script, with
+    // the IAST gloss appended only in "Both" mode.
+    final pakshaText =
+        '${(script.showsDevanagari ? panchanga.paksha.deva : panchanga.paksha.iast.toUpperCase())}  ';
+    final tithiText =
+        script.showsDevanagari ? panchanga.tithi.deva : panchanga.tithi.iast;
+    final nakshatraPrimary = script.showsDevanagari
+        ? panchanga.nakshatra.deva
+        : panchanga.nakshatra.iast;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -923,7 +984,7 @@ class _DayBody extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: '${panchanga.paksha.iast.toUpperCase()}  ',
+                text: pakshaText,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
                   fontFamilyFallback: AppFontFallback.deva,
@@ -934,7 +995,7 @@ class _DayBody extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: panchanga.tithi.deva,
+                text: tithiText,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
                   fontFamilyFallback: AppFontFallback.deva,
@@ -950,7 +1011,9 @@ class _DayBody extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: '${panchanga.nakshatra.deva}  ',
+                text: script.showsDevanagari && script.showsLatin
+                    ? '$nakshatraPrimary  '
+                    : nakshatraPrimary,
                 style: TextStyle(
                   fontFamily: Fonts.deva,
                   fontFamilyFallback: AppFontFallback.deva,
@@ -958,16 +1021,17 @@ class _DayBody extends StatelessWidget {
                   color: text2,
                 ),
               ),
-              TextSpan(
-                text: panchanga.nakshatra.iast,
-                style: TextStyle(
-                  fontFamily: Fonts.deva,
-                  fontFamilyFallback: AppFontFallback.deva,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: text3,
+              if (script.showsDevanagari && script.showsLatin)
+                TextSpan(
+                  text: panchanga.nakshatra.iast,
+                  style: TextStyle(
+                    fontFamily: Fonts.deva,
+                    fontFamilyFallback: AppFontFallback.deva,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: text3,
+                  ),
                 ),
-              ),
             ],
           ),
         ),

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:sanatan_guide/domain/entities/script_style.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/script_style_provider.dart';
 import 'package:sanatan_guide/presentation/theme/design_typography.dart';
 import 'package:sanatan_guide/core/utils/panchang_utils.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/heritage_widgets.dart';
 import 'package:sanatan_guide/presentation/theme/design_tokens.dart';
 
-/// Top-of-screen block: time-aware greeting + Devanāgarī panchang line +
-/// Vikram Samvat year + 88 px IncisedRule.
-class PanchangBlock extends StatelessWidget {
+/// Top-of-screen block: time-aware greeting + panchang line (scripted per the
+/// user's [ScriptStyle]) + Vikram Samvat year + Gregorian date + 88 px rule.
+class PanchangBlock extends ConsumerWidget {
   const PanchangBlock({
     super.key,
     this.greetingName,
@@ -19,11 +23,13 @@ class PanchangBlock extends StatelessWidget {
   final DateTime? now;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final saffron = isDark ? DColors.saffron : LColors.saffron;
     final text2 = isDark ? DColors.text2 : LColors.text2;
     final cream = isDark ? DColors.cream : LColors.text1;
+
+    final script = ref.watch(scriptStyleProvider);
 
     final today = now ?? DateTime.now();
     final greeting = isFirstDay ? 'Welcome' : greetingForTimeOfDay(today);
@@ -39,9 +45,17 @@ class PanchangBlock extends StatelessWidget {
     final pakshaDeva = PanchangUtils.pakshaDeva(tithi.paksha);
     final varaDeva = PanchangUtils.varaDeva(vara.varaName);
 
+    final latinLine = '${PanchangUtils.monthIast(hindu.monthName)}  ·  '
+        '${PanchangUtils.pakshaIast(tithi.paksha)} '
+        '${PanchangUtils.tithiIast(tithi.tithiName)}  ·  '
+        '${PanchangUtils.varaIast(vara.varaName)}';
+
     final vsLine = isFirstDay
         ? 'DAY ONE  ·  VS ${hindu.vikramSamvatYear}'
         : 'VIKRAM SAMVAT ${hindu.vikramSamvatYear}';
+    // Gregorian date alongside the Vikram Samvat year so users can match the
+    // two calendars at a glance (requested by beta testers).
+    final gregorianLine = DateFormat('d MMMM yyyy').format(today);
 
     return Padding(
       padding: const EdgeInsets.only(top: Spacing.md),
@@ -60,14 +74,31 @@ class PanchangBlock extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          _PanchangLine(
-            month: monthDeva,
-            paksha: pakshaDeva,
-            tithi: tithiDeva,
-            vara: varaDeva,
-            cream: cream,
-            saffron: saffron,
-          ),
+          if (script.showsDevanagari)
+            _PanchangLine(
+              month: monthDeva,
+              paksha: pakshaDeva,
+              tithi: tithiDeva,
+              vara: varaDeva,
+              cream: cream,
+              saffron: saffron,
+            ),
+          if (script.showsLatin) ...[
+            if (script.showsDevanagari) const SizedBox(height: 4),
+            Text(
+              latinLine,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                // IAST diacritics need the Devanāgarī face (Lora/Outfit tofu).
+                fontFamily: Fonts.deva,
+                fontFamilyFallback: AppFontFallback.deva,
+                fontSize: script.showsDevanagari ? 11.5 : 14,
+                letterSpacing: 0.3,
+                height: 1.0,
+                color: script.showsDevanagari ? text2 : cream,
+              ),
+            ),
+          ],
           const SizedBox(height: 5),
           Text(
             vsLine,
@@ -78,6 +109,18 @@ class PanchangBlock extends StatelessWidget {
               fontWeight: FontWeight.w500,
               letterSpacing: 1.76,
               color: saffron,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 3),
+          Text(
+            gregorianLine,
+            style: TextStyle(
+              fontFamily: Fonts.sans,
+              fontFamilyFallback: AppFontFallback.latin,
+              fontSize: 11,
+              letterSpacing: 0.4,
+              color: text2,
             ),
             textAlign: TextAlign.center,
           ),

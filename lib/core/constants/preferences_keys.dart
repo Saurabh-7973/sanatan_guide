@@ -49,6 +49,7 @@ abstract final class PrefsKeys {
   static const appFontSize = 'app_font_size';
   static const appThemeMode = 'app_theme_mode';
   static const transliterationEnabled = 'transliteration_enabled';
+  static const scriptStyle = 'script_style';
 
   // ── Privacy opt-outs ────────────────────────────────────────────────────
   static const privacyAnalyticsEnabled = 'privacy_analytics_enabled';

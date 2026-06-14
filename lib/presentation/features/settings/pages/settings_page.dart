@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:sanatan_guide/core/services/analytics_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sanatan_guide/core/services/streak_service.dart';
+import 'package:sanatan_guide/domain/entities/script_style.dart';
 import 'package:sanatan_guide/domain/entities/user_experience_level.dart';
 import 'package:sanatan_guide/l10n/generated/app_localizations.dart';
 import 'package:sanatan_guide/presentation/features/onboarding/providers/user_experience_level_provider.dart';
@@ -30,6 +31,7 @@ import 'package:sanatan_guide/presentation/features/scripture_reader/providers/v
 import 'package:sanatan_guide/presentation/features/settings/providers/analytics_enabled_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/crashlytics_enabled_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/notification_time_provider.dart';
+import 'package:sanatan_guide/presentation/features/settings/providers/script_style_provider.dart';
 import 'package:sanatan_guide/presentation/features/settings/providers/theme_mode_provider.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/system_chrome.dart';
 import 'package:sanatan_guide/presentation/shared/widgets/warm_backdrop.dart';
@@ -96,6 +98,7 @@ class SettingsPage extends ConsumerWidget {
                       const _FontSizeRow(),
                       const _LanguageRow(),
                       const _SanskritDisplayRow(),
+                      const _AlmanacScriptRow(),
                       const _ExperienceRow(),
 
                       // ── Notifications ───────────────────────────────────────
@@ -646,6 +649,87 @@ class _SanskritDisplayRow extends ConsumerWidget {
       subtitle: iast ? 'Devanāgarī · IAST diacritics on' : 'Devanāgarī only',
       trailing: _Chevron(isDark: isDark),
       onTap: () => ref.read(transliterationEnabledProvider.notifier).toggle(),
+    );
+  }
+}
+
+// ── Reading: almanac / calendar script ─────────────────────────────────────
+//
+// Controls how the home panchang line scripts its Sanskrit names —
+// Devanāgarī, Latin (IAST), or both. Requested by beta testers who wanted a
+// Latin reading of the almanac. Defaults to Both.
+
+class _AlmanacScriptRow extends ConsumerWidget {
+  const _AlmanacScriptRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final style = ref.watch(scriptStyleProvider);
+    return _Row(
+      isDark: isDark,
+      title: 'Almanac script',
+      subtitle: style.displayTitle,
+      trailing: _Chevron(isDark: isDark),
+      onTap: () => _showScriptSheet(context, ref),
+    );
+  }
+
+  Future<void> _showScriptSheet(BuildContext context, WidgetRef ref) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => Consumer(
+        builder: (context, refSheet, _) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final text1 = isDark ? DColors.text1 : LColors.text1;
+          final text3 = isDark ? DColors.text3 : LColors.text3;
+          final saffron = isDark ? DColors.saffron : LColors.saffron;
+          final current = refSheet.watch(scriptStyleProvider);
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                    child: Text(
+                      'ALMANAC SCRIPT',
+                      style: AppText.sectionLabel(color: text3),
+                    ),
+                  ),
+                  for (final ScriptStyle s in ScriptStyle.values)
+                    ListTile(
+                      selected: current == s,
+                      title: Text(
+                        s.displayTitle,
+                        style: TextStyle(
+                          fontFamily: Fonts.sans,
+                          fontFamilyFallback: AppFontFallback.latin,
+                          fontSize: 14,
+                          color: text1,
+                        ),
+                      ),
+                      trailing: current == s
+                          ? Icon(Icons.check_circle, color: saffron)
+                          : null,
+                      onTap: () async {
+                        await refSheet
+                            .read(scriptStyleProvider.notifier)
+                            .setStyle(s);
+                        if (sheetContext.mounted) {
+                          Navigator.of(sheetContext).pop();
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -1287,6 +1371,7 @@ class _ResetRow extends ConsumerWidget {
     await ref
         .read(userExperienceLevelProvider.notifier)
         .setLevel(UserExperienceLevel.regular);
+    await ref.read(scriptStyleProvider.notifier).setStyle(ScriptStyle.both);
     if (context.mounted) {
       showHeritageToast(context, 'Settings reset');
     }
