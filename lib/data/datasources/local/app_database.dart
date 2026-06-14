@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -38,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -90,8 +91,60 @@ class AppDatabase extends _$AppDatabase {
               'ON verse_explanations (verse_id)',
             );
           }
+          if (from <= 10) {
+            // The bundled Tirukkuṟaḷ Tamil text was double-encoded during
+            // seeding (UTF-8 bytes read as Latin-1, then re-encoded), so the
+            // reader showed mojibake ("à®ªà®à®µà®©…"). Repair it in place. The
+            // AFTER UPDATE trigger on `verses` keeps the FTS index in sync.
+            await _repairTirukkuralEncoding(m.database);
+          }
         },
       );
+
+  /// Reverses the double-encoding of the bundled Tirukkuṟaḷ Tamil column and
+  /// restores the `அ` (U+0B85) letters whose 0x85 byte was normalised to a
+  /// newline during seeding. Only touches rows still showing the mojibake
+  /// marker, so it is safe + idempotent for already-clean data.
+  static Future<void> _repairTirukkuralEncoding(GeneratedDatabase db) async {
+    final rows = await db
+        .customSelect(
+          "SELECT id, sanskrit FROM verses "
+          "WHERE scripture = 'tirukkural' AND sanskrit LIKE '%à®%'",
+        )
+        .get();
+    var fixed = 0;
+    for (final row in rows) {
+      final id = row.read<String>('id');
+      final raw = row.read<String>('sanskrit');
+      final repaired = _repairMojibake(raw);
+      if (repaired == null || repaired == raw || !_hasTamil(repaired)) continue;
+      await db.customStatement(
+        'UPDATE verses SET sanskrit = ? WHERE id = ?',
+        [repaired, id],
+      );
+      fixed++;
+    }
+    AppLogger.instance.i('Tirukkuṟaḷ encoding repair: fixed $fixed rows');
+  }
+
+  /// Latin-1 → UTF-8 round-trip that recovers double-encoded text. Returns
+  /// null when the string can't be safely reinterpreted (e.g. it is already
+  /// clean Tamil, whose code points exceed Latin-1's range).
+  static String? _repairMojibake(String s) {
+    // `அ` (E0 AE 85) became E0 AE 0A — its 0x85 byte was turned into a
+    // newline. Restore it before the round-trip.
+    final restored = s.replaceAll('à®\n', 'à®');
+    try {
+      return utf8.decode(latin1.encode(restored));
+    } on FormatException {
+      return null;
+    } on ArgumentError {
+      return null;
+    }
+  }
+
+  static bool _hasTamil(String s) =>
+      s.runes.any((r) => r >= 0x0B80 && r <= 0x0BFF);
 
   Future<void> _createIndexes(Migrator m) async {
     await m.database.customStatement(
