@@ -17,13 +17,14 @@ honest conversation with the source texts.
 ![Dart](https://img.shields.io/badge/Dart-3.3+-0175C2?logo=dart&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Riverpod-7C4DFF)
-![CI](https://github.com/Saurabh-7973/sanatan_guide/actions/workflows/flutter.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-Source%20Available-E8820C)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 
 <br/>
 
 **32 classical texts · 133,613 verses · No account · No ads · Reads in airplane mode**
+
+**[Get it on Google Play](https://play.google.com/store/apps/details?id=com.Saurabh7973.sanatan_guide)**
 
 </div>
 
