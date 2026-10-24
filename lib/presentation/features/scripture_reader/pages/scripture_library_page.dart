@@ -1557,7 +1557,7 @@ const _kFamilies = <_Family>[
   // only the second line of each kural (1,325 of 1,326 rows are ≤4 words, no
   // first line) and no translation — unfit to display. Re-enable once the
   // full couplets + translation are seeded. Data stays in the DB, just not
-  // surfaced. See CONTENT_INVENTORY.md.
+  // surfaced. See docs/notes/CONTENT_INVENTORY.md.
 ];
 
 // ============================================================

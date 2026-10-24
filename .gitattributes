@@ -1,0 +1,9 @@
+# Keep GitHub's language bar about the app, not about scraped source
+# texts, design mockups or agent notes.
+tool/sources/** linguist-vendored
+.claude/** linguist-documentation
+.superpowers/** linguist-documentation
+claude-seo/** linguist-documentation
+"New Design/**" linguist-documentation
+docs/** linguist-documentation
+android/build/** linguist-generated
